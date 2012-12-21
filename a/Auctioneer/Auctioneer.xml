@@ -1,0 +1,311 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+<!--
+	Version: 3.6.1 (Platypus)
+	Revision: $Id: Auctioneer.xml 766 2006-03-22 22:35:05Z mentalpower $
+
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+	<Script file="AucObjects.lua"/>
+
+	<Script file="Babylonian.lua"/>
+	<Script file="AucStrings.lua"/>
+	<Script file="AucLocale.lua"/>
+
+	<Script file="BalancedList.lua"/>
+	<Script file="AucEvent.lua"/>
+	<Script file="AHScanning.lua"/>
+	<Script file="AucAPI.lua"/>
+	<Script file="AucCommand.lua"/>
+	<Script file="AucConvert.lua"/>
+	<Script file="AucCore.lua"/>
+	<Script file="AucFilter.lua"/>
+	<Script file="AucScanner.lua"/>
+	<Script file="AucStatistic.lua"/>
+	<Script file="AucTooltip.lua"/>
+	<Script file="AucUtil.lua"/>
+	<Script file="AucStorage.lua"/>
+	<Script file="AucAskPrice.lua"/>
+	<Script file="Auctioneer.lua"/>
+
+	<Script file="AuctioneerUI.lua"/>
+	<Script file="AucBidManager.lua"/>
+	<Script file="AucPostManager.lua"/>
+	<Frame name="AuctioneerFrame" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnLoad>
+				Auctioneer.OnLoad();
+				AuctioneerUI_OnLoad();
+				this:RegisterEvent("ADDON_LOADED")
+			</OnLoad>
+			<OnEvent>
+				if (event == "ADDON_LOADED" and string.lower(arg1) == "auctioneer") then
+					Auctioneer.Core.AddonLoaded()
+					this:UnregisterEvent("ADDON_LOADED")
+				end
+			</OnEvent>
+		</Scripts>
+		<Frames>
+			<Button name="BrowseScanButton" inherits="UIPanelButtonTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						Auctioneer.Scanning.RequestAuctionScan();
+					</OnClick>
+					<OnUpdate>
+						if (Auctioneer.Scanning.CanScan()) then
+							this:Enable();
+						else
+							this:Disable();
+						end
+					</OnUpdate>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<!--
+	   BidManagerFrame is broken out separately in order to control OnUpdate
+	   events. The frame is show when it wants to receive them and hidden when
+	   it doesn't.
+	 -->
+	<Frame name="AucBidManagerFrame" hidden="true">
+		<Scripts>
+			<OnLoad>
+				AucBidManagerFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				AucBidManagerFrame_OnEvent(event);
+			</OnEvent>
+			<OnUpdate>
+				AucBidManagerFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="AucPostManagerFrame" hidden="true">
+		<Scripts>
+			<OnLoad>
+				AucPostManagerFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				AucPostManagerFrame_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="AuctionInfo" hidden="true">
+		<Size>
+			<AbsDimension x="160" y="80"/>
+		</Size>
+		<Layers>
+			<Layer level="INFO">
+				<FontString name="$parentText1" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText2" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText1" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText3" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText2" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText4" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText3" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText5" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText4" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentWarnText" inherits="GameFontNormal" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-76"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentMoney1" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney2" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText2" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney3" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText3" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney4" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText4" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney5" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText5" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="AuctPriceRemember" hidden="true">
+		<Size>
+			<AbsDimension x="160" y="80"/>
+		</Size>
+		<Layers>
+			<Layer level="INFO">
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<CheckButton name="AuctPriceRememberCheck" hidden="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="AuctPriceRemember" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		<Scripts>
+			<OnClick>
+				Auctioneer.Scanner.RememberPrice()
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="AuctFilterTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		<Scripts>
+			<OnClick>
+				if (this.filterVal) then
+					if (this:GetChecked()) then
+						Auctioneer.Command.SetFilter(this.filterVal, "on");
+					else
+						Auctioneer.Command.SetFilter(this.filterVal, "off");
+					end
+				end
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="AuctionFilterButton1Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton2Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton3Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton4Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton5Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton6Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton7Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton8Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton9Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton10Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton11Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton12Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton13Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton14Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton15Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+</Ui>
+

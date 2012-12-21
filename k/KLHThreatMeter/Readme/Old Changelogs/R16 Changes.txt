@@ -1,0 +1,207 @@
+
+--> Upgrading: You'll need to restart wow.exe to get this working. Additionally, most of the files have changed, so it's recommended you delete the contents of the KLHThreatMeter directory first.
+
+--> Patch 1.11 compliant. Also added the new mage and shaman talents, see below.
+
+--> Compatability: R16 will work fine alongside older versions. It's still recommended that you upgrade, as many new talents and abilities were added. There are a few minor breaking changes to the UI, mentioned later.
+
+--> New GUI. Thanks to Lukon@Perenolde for coding this. A massive amount of work went into this, and the result looks awesome. A few features are:
+	New colour schemes, fonts, textures. It's pretty!
+	A MasterTarget Button (hunter's mark texture). Click with a mob targetted to set, click with no mob targetted to clear.
+	An options frame, replacing most of the command line. e.g. slider for scale, and one for number of rows displayed
+	Option to make the frame fixed width and height
+	raid frame and personal frame have been combined, and there's a button to toggle them
+	Click on a column in the personal view to sort by that column.
+	chose the buttons that are displayed when the frame is minimised
+	per-character settings
+	lots of tooltips
+	heaps more things i can't think of!
+
+The new GUI might be a bit confusing at first, but the tooltips are very descriptive and should help you figure out how things work.
+
+Note that by default, the window has a fixed height (room for 10 people). If you prefer the old style, where it will shrink when there are only a few entries, click the options button, then in the raid tab check the "resize frame" box.
+
+--> oRA support. The mod will use your oRA channel, if it exists.
+
+--> Added new abilities and talents:
+
+	Shamans:
+		Healing Grace - up to -15% threat. Healing only. Multiplicative.
+		Rockbiter Weapon - added threat on melee hits.
+		Earth Shock - 2 threat / damage
+
+	Mages:
+		Arcane Subtlety (updated in 1.11) - 20% per point. Additive.
+		Frost Channeling - 10% per point. Additive.
+		Burning Soul - 15% per point. Additive.
+
+	Priests:
+		Holy Nova - no threat
+		Mind Blast - 2 threat / damage
+		Silent Resolve - now treated as an additive modifier.
+		Fade - temporary reduction in threat, not affected by modifiers.
+		
+	Warlocks:
+		Siphon Life - no threat from healing.
+		Drain Life - no threat from healing
+		Searing Pain - 2 threat / damage
+
+	Druids:
+		Improved Tranquility - up to 80% reduction. Multiplicative.
+
+	Paladins: 
+		Holy Shield - 1.2 multiplier on this ability. Multiplicative.
+
+	Hunters:
+		Distracting Shot - all ranks added.
+
+
+--> Localisation
+	--> Each locale now has its own localisation file, to make it easier to manage and in particular update. e.g. the French localisation file is stored in \KLHThreatMeter\Code\Localisation\KTM_frFR.lua
+
+	--> Added a command "/ktm test local" which will print out a list of localisation strings that are missing for your locale.
+
+	--> Still need localisations for the many new GUI strings for French (frFR) and Chinese (zhCN)! Thanks Leidbringer and CuteMiyu for the German and Taiwanese versions!
+
+--> Major code changes under the hood. Interested readers should check out "Implementation Notes.txt" for more details. For example, removed string.gfind from the mod, which was creating heaps of heap memory.
+	
+--> Fixed Lua Error in KLHTM_Combat.lua:15 that occasionally occurred on ReloadUI()
+
+--> New Console Commands:
+	
+	--> Console commands are now easier to abbreviate. When the mod prints out a list of commands, the letters needed to abbreviate a command are printed in blue.
+
+	--> The mod can be disabled at runtime with the command "/ktm disable" or "/ktm d". It won't react to events or run OnUpdate, so it will pretty much stop doing anything. Use the command "/ktm enable" or "/ktm e" to restart it.
+
+	--> As a bit of a joke, you can now advertise KLHTM to other members of the raid! Run the command "/ktm version advertise", or "/ktm v a", and occasionally (at most every 5 minutes), the mod will look for people who don't have the mod installed and have pulled aggro (non-warriors who are being targetted by a mob), and whisper them to go and download it! 
+
+	--> Check the memory usage of separate modules of the mod. Type "/ktm test memory" or "/ktm t m" to see a rundown of memory usage.
+
+
+--> Players not in a party or group will no longer send idle updates, which should stop "KLHTM threat 0" spam.
+
+--> Documentation Changes:
+	--> Added "Implementation Notes.txt" for interested addon authors
+	--> Clarified the Warrior readme
+
+
+--> Minor Incompatibilities / Things That Work Differently.
+
+1) There's no "/ktm mastertarget" command now. Instead just click the button on the GUI, which looks like a hunter's mark. If you want to add this command to a macro, the script command to create a master target is
+
+	/script klhtm.net.sendmastertarget()
+
+2) Similarly, there is no longer a "/ktm raid clear" to clear the raid's threat. There is now a GUI button, which does not appear by default (click the options button, then go to the general tab, and there is a section for which buttons are shown), which does this. Alternatively, the macro command is
+
+	/script klhtm.net.clearraidthreat()
+
+Remember that the above two commands still require you to be a raid assistant or the party leader.
+
+3) Onyxia phase 3 threat wipe. This no longer happens. If people are still using the old version, their threat will clear and yours wont, so the meter won't work very well. But with the threat wipe it wasn't working in phase 3 anyway, so you can't complain. And it might just work in phase 3 now, too.
+
+--------------------------------------------------------------------------------------------------------
+
+Changes from Test 5 to Test 6
+
+--> 1.11 compliant. Well, i really just edited the TOC file to say so, but don't tell WoW :D
+
+--> Mage Talents: Arcane Subtlety, Frost Channeling, and that Fire one.
+
+--> Shaman Talent: Healing Grace.
+
+--> Fixed that disasterous implementation of fade.
+
+--> Threat wipes won't get added to your personal data's threat total, so the nonnegative percentages add up to 100.
+
+--> Mind Blast Added. 2x threat per damage. This isn't firmly tested, speak up if it doesn't work out.
+
+--> Added Taiwanese localisation for the GUI. Thanks CuteMiyu.
+
+--------------------------------------------------------------------------------------------------------
+
+Changes from Test 4 to Test 5
+
+--> Fixed a memory "leak" in the GUI code, that would create excess memory in a raid when the raid table was visible.
+
+--> Trimming " ...hic!" suffixes. Do they localise?
+
+--> Fixed an error with /afk detection which could cause players to stop updating their threat.
+
+--> The values for "total" in "/ktm test netlog" was not being calculated correctly.
+
+--> Added Leidbringer's latest German Localisation
+
+--------------------------------------------------------------------------------------------------------
+
+Changes from Test 3 to Test 4
+
+--> Added memory diagnostics! "/ktm test memory" will tell you how much memory each of the modules are paging, with average, burst, total, recent values, in kB/sec.
+
+--> "/ktm test time" is now working again
+
+--> My:40 typo causing feign death resists to be ignored. Thanks Keter.
+
+--> Combat:348 the source of non-periodic power gains was not being reported. Thanks Graguk.
+
+--> Added more colour to the command line printouts to make it clearer how to abbreviate commands. The minimum abbreviation of each command is written in blue letters.
+
+--> Added distracting shot (all ranks). Affected by global threat. (Not strongly tested)
+
+--> Added Fade (all ranks). Not affected by any threat modifiers. (Not strongly tested)
+
+--------------------------------------------------------------------------------------------------------
+
+Changes from Test 2 to Test 3
+
+--> fixed a typo in the maul code. Thanks Dimarius!
+
+--> some GUI code was changed for compatability w/ test server... but not tested yet. 
+
+--> The "/script klhtest()" functionality will now work again.
+
+--> Shaman Tanking!
+	--> Added earth shock - 2x threat per damage.
+
+	--> Added Rockbiter (all ranks). A separate column will come up in your personal table for it. However, the value shown does not include the increased attack power that Rockbiter gives you, only the threat from actual procs. When evaluating Rockbiter Weapon, remember to take this into account. The threat added per attack will show up in "/ktm test threat". 
+
+Thanks Praetorian for the inspiration!
+
+--> Added these localisations:
+
+	["combatlog"]["weaponbuff"] = "You cast (.+) on your (.+)%.",  -- ITEMENCHANTMENTADDSELFSELF
+	["spell"]["rockbiter"] = "Rockbiter",  
+	["print"]["data"]["rockbiter"] = "Your rank %d Rockbiter adds %d threat to successful melee attacks.",
+
+--> Turned off "Received this invalid message ..." trace, too much spamming when people are drunk.
+
+--> Added German Localisation for the new GUI. Thanks Leidbringer!
+
+--> Added a command "/ktm test local", or "ktm t l" that will print out all the missing / unknown strings for your localisation!
+
+--------------------------------------------------------------------------------------------------------
+
+Changes from Test 1 to Test 2
+
+--> Advertising feature Buffs:
+	will no longer whisper to yourself.
+	Also, will check the raid group in a random order, to quit bugging the same person all the time. 	Also, fixed a printout typo.
+	Also, will only advertise to people who don't have the meter
+
+--> Fixed a typo at My: 304 which caused an error after a feign death.
+
+--> Clarified some tooltips.
+
+--> Onyxia threat wipe in phase 3 is disabled for this testing phase. need more anecdotal evidence! :D
+
+--> Other stuff that would be too small to mention.
+
+Thanks Qrt, Leidbringer, et al.
+
+Todo:
+localise some stuff in net. More comments too.
+
+--------------------------------------------------------------------------------------------------------
+
+
+
+

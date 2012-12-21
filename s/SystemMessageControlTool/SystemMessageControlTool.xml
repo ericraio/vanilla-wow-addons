@@ -1,0 +1,948 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+  <Script file="SystemMessageControlTool.lua"/>
+  <Script file="SystemMessageControlTool_events.lua"/>
+
+  <Button name="smctColorSwatchTemplate" hidden="false" virtual="true">
+    <Size>
+      <AbsDimension x="14" y="14"/>
+    </Size>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture name="$parentSwatchBg">
+          <Size>
+            <AbsDimension x="12" y="12"/>
+          </Size>
+          <Anchors>
+            <Anchor point="CENTER">
+              <Offset>
+                <AbsDimension x="0" y="0"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+          <Color r="1.0" g="1.0" b="1.0"/>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnClick>
+        smctOpenColorPicker(this:GetParent().group, this:GetParent():GetID());
+      </OnClick>
+      <OnEnter>
+        getglobal(this:GetName().."SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+      </OnEnter>
+      <OnLeave>
+        getglobal(this:GetName().."SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+      </OnLeave>
+    </Scripts>
+    <NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+  </Button>
+
+  <Button name="smctTextButtonTemplate" toplevel="true" virtual="true">
+    <Size>
+      <AbsDimension x="120" y="14"/>
+    </Size>
+    <NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+      <Size>
+        <AbsDimension x="120" y="14"/>
+      </Size>
+    </NormalText>
+    <DisabledText inherits="GameFontDisableSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+      <Size>
+        <AbsDimension x="120" y="14"/>
+      </Size>
+    </DisabledText>
+    <HighlightText inherits="GameFontHighlightSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+      <Size>
+        <AbsDimension x="120" y="14"/>
+      </Size>
+    </HighlightText>
+  </Button>
+
+  <Button name="smctTextButtonGreyedTemplate" inherits="smctTextButtonTemplate" toplevel="true" virtual="true">
+    <NormalText name="$parentText" inherits="GameFontDisableSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+      <Size>
+        <AbsDimension x="120" y="14"/>
+      </Size>
+    </NormalText>
+  </Button>
+
+  <Frame name="smctTextCheckButtonTemplate" toplevel="true" virtual="true">
+    <Size>
+      <AbsDimension x="140" y="14"/>
+    </Size>
+    <Frames>
+      <Button name="$parentButton">
+        <Size>
+          <AbsDimension x="125" y="14"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="15" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+          <Size>
+            <AbsDimension x="125" y="14"/>
+          </Size>
+        </NormalText>
+        <DisabledText inherits="GameFontDisableSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+          <Size>
+            <AbsDimension x="125" y="14"/>
+          </Size>
+        </DisabledText>
+        <HighlightText inherits="GameFontHighlightSmall" justifyH="left" nonspacewrap="true" maxLines="1">
+          <Size>
+            <AbsDimension x="125" y="14"/>
+          </Size>
+        </HighlightText>
+      </Button>
+    </Frames>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture name="$parentCheck" file="Interface\Buttons\UI-CheckBox-Check">
+          <Size>
+            <AbsDimension x="14" y="14"/>
+          </Size>
+          <Anchors>
+            <Anchor point="LEFT">
+              <Offset>
+                <AbsDimension x="0" y="-2"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+  </Frame>
+
+  <Frame name="smctGroupTemplate" enableMouse="true" virtual="true" hidden="true">
+    <Size>
+      <AbsDimension x="125" y="16"/>
+    </Size>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="$parentLabel" inherits="GameFontHighlightSmall" justifyH="left">
+          <Size>
+            <AbsDimension x="125" y="16"/>
+          </Size>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="$parentColorSwatch" inherits="smctColorSwatchTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="15" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Button>
+      <Button name="$parentSetWindow" inherits="smctTextButtonTemplate">
+        <Anchors>
+          <Anchor point="LEFT" relativeTo="$parentColorSwatch" relativePoint="RIGHT">
+            <Offset>
+              <AbsDimension x="15" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            smctSetGroupWindow(this); --this:GetParent().group, this:GetParent():GetID());
+          </OnClick>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        this.text = nil;
+        this.tooltip = nil;
+        this.group = nil;
+        this.window = nil;
+      </OnLoad>
+      <OnShow>
+        if (this.text) then
+          getglobal(this:GetName().."Label"):SetText(this.text);
+          getglobal(this:GetName().."Label"):Show();
+        else
+          getglobal(this:GetName().."Label"):Hide();
+        end
+      </OnShow>
+      <OnEnter>
+        if (this.tooltip) then
+          GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+          GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+        end
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+    </Scripts>
+  </Frame> 
+
+  <Frame name="smctProfileTemplate" virtual="true" toplevel="true" hidden="true">
+    <Size>
+      <AbsDimension x="140" y="14"/>
+    </Size>
+    <Frames>
+      <Button name="$parentServer" inherits="smctTextButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Button>
+
+      <Button name="$parentName1" inherits="smctTextButtonTemplate" id="1" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentServer" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="10" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Button>
+      <Button name="$parentName2" inherits="smctTextButtonTemplate" id="2" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName1" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName3" inherits="smctTextButtonTemplate" id="3" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName2" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName4" inherits="smctTextButtonTemplate" id="4" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName3" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName5" inherits="smctTextButtonTemplate" id="5" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName4" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName6" inherits="smctTextButtonTemplate" id="6" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName5" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName7" inherits="smctTextButtonTemplate" id="7" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName6" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName8" inherits="smctTextButtonTemplate" id="8" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName7" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName9" inherits="smctTextButtonTemplate" id="9" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName8" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentName10" inherits="smctTextButtonTemplate" id="10" hidden="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentName9" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+    </Frames>
+  </Frame>
+
+
+  <Frame name="SystemMessageControlToolFrame" toplevel="true" frameStrata="DIALOG" movable="false" enableMouse="true" hidden="true" parent="UIParent">
+    <Size>
+      <AbsDimension x="470" y="480"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER">
+        <Offset>
+          <AbsDimension x="0" y="20"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+          <Size>
+            <AbsDimension x="460" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="12"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+        <FontString name="$parentHeaderText" inherits="GameFontNormal">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="$parentHeader">
+              <Offset>
+                <AbsDimension x="0" y="-14"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentVersion" inherits="GameFontDisableSmall" justifyH="right">
+          <Anchors>
+            <Anchor point="TOPRIGHT">
+              <Offset>
+                <AbsDimension x="-14" y="-16"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <FontString name="$parentHelp" inherits="GameFontHighlightSmall" justifyH="left" justifyV="top">
+          <Size>
+            <AbsDimension x="135" y="400"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPRIGHT">
+              <Offset>
+                <AbsDimension x="-14" y="-34"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
+    <Frames>
+      <Frame name="$parentGroup1" inherits="smctGroupTemplate" id="1">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="20" y="-30"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup2" inherits="smctGroupTemplate" id="2">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup1" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup3" inherits="smctGroupTemplate" id="3">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup2" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup4" inherits="smctGroupTemplate" id="4">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup3" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup5" inherits="smctGroupTemplate" id="5">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup4" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup6" inherits="smctGroupTemplate" id="6">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup5" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup7" inherits="smctGroupTemplate" id="7">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup6" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup8" inherits="smctGroupTemplate" id="8">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup7" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup9" inherits="smctGroupTemplate" id="9">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup8" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup10" inherits="smctGroupTemplate" id="10">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup9" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup11" inherits="smctGroupTemplate" id="11">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup10" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup12" inherits="smctGroupTemplate" id="12">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup11" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup13" inherits="smctGroupTemplate" id="13">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup12" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup14" inherits="smctGroupTemplate" id="14">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup13" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup15" inherits="smctGroupTemplate" id="15">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup14" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup16" inherits="smctGroupTemplate" id="16">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup15" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup17" inherits="smctGroupTemplate" id="17">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup16" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup18" inherits="smctGroupTemplate" id="18">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup17" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup19" inherits="smctGroupTemplate" id="19">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup18" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup20" inherits="smctGroupTemplate" id="20">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup19" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup21" inherits="smctGroupTemplate" id="21">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup20" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup22" inherits="smctGroupTemplate" id="22">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup21" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup23" inherits="smctGroupTemplate" id="23">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup22" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup24" inherits="smctGroupTemplate" id="24">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup23" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup25" inherits="smctGroupTemplate" id="25">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup24" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup26" inherits="smctGroupTemplate" id="26">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup25" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup27" inherits="smctGroupTemplate" id="27">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup26" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup28" inherits="smctGroupTemplate" id="28">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup27" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup29" inherits="smctGroupTemplate" id="29">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup28" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup30" inherits="smctGroupTemplate" id="30">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup29" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup31" inherits="smctGroupTemplate" id="31">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup30" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup32" inherits="smctGroupTemplate" id="32">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup31" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup33" inherits="smctGroupTemplate" id="33">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup32" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup34" inherits="smctGroupTemplate" id="34">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup33" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup35" inherits="smctGroupTemplate" id="35">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup34" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup36" inherits="smctGroupTemplate" id="36">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup35" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup37" inherits="smctGroupTemplate" id="37">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup36" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup38" inherits="smctGroupTemplate" id="38">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup37" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup39" inherits="smctGroupTemplate" id="39">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup38" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentGroup40" inherits="smctGroupTemplate" id="40">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentGroup39" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+
+      <Button name="$parentClose" inherits="OptionsButtonTemplate" text="CLOSE">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT">
+            <Offset>
+              <AbsDimension x="-15" y="15"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            PlaySound("gsTitleOptionExit");
+            SystemMessageControlToolFrame:Hide();
+          </OnClick>
+        </Scripts>
+      </Button>
+      <!--Button name="$parentDefaults" inherits="OptionsButtonTemplate" text="Defaults">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT" relativeTo="$parentClose" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="0" y="10"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            PlaySound("gsTitleOptionExit");
+            smctResetToDefaults();
+          </OnClick>
+        </Scripts>
+      </Button-->
+      <Button name="$parentProfiles" inherits="OptionsButtonTemplate" text="Profiles >>">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT" relativeTo="$parentClose" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="0" y="20"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            PlaySound("gsTitleOptionExit");
+            smctToggleProfileWindow();
+          </OnClick>
+        </Scripts>
+      </Button>
+    </Frames>
+
+    <Scripts>
+      <OnLoad>
+        SystemMessageControlTool_OnLoad();
+      </OnLoad>
+      <OnEvent>
+        SystemMessageControlTool_OnEvent(event);
+      </OnEvent>
+      <OnShow>
+        SystemMessageControlTool_OnShow();
+      </OnShow>
+      <OnHide>
+        SystemMessageControlTool_OnHide();
+      </OnHide>
+    </Scripts>
+  </Frame>
+
+  <Frame name="SystemMessageControlToolPredefinedColorsFrame" toplevel="true" frameStrata="DIALOG" movable="false" enableMouse="true" hidden="true" parent="UIParent">
+    <Size>
+      <AbsDimension x="120" y="215"/>
+    </Size>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeTo="ColorPickerFrame" relativePoint="TOPRIGHT">
+        <Offset>
+          <AbsDimension x="0" y="0"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="$parentHeaderText" inherits="GameFontHighlightSmall" text="Color groups">
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="-17"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
+    <Frames>
+      <Button name="$parentButton1" inherits="smctTextButtonTemplate" id="1">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="20" y="-30"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton2" inherits="smctTextButtonTemplate" id="2">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton3" inherits="smctTextButtonTemplate" id="3">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton4" inherits="smctTextButtonTemplate" id="4">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton5" inherits="smctTextButtonTemplate" id="5">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton6" inherits="smctTextButtonTemplate" id="6">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton7" inherits="smctTextButtonTemplate" id="7">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton8" inherits="smctTextButtonTemplate" id="8">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton9" inherits="smctTextButtonTemplate" id="9">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton8" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton10" inherits="smctTextButtonTemplate" id="10">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton9" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton11" inherits="smctTextButtonTemplate" id="11">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton10" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+      <Button name="$parentButton12" inherits="smctTextButtonTemplate" id="12">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton11" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Button>
+    </Frames>
+
+    <Scripts>
+      <OnLoad>
+        this:SetBackdropBorderColor(0.8, 0.8, 0.8, 1);
+        this:SetBackdropColor(0.0, 0.0, 0.0, 1);
+      </OnLoad>
+    </Scripts>
+  </Frame>
+
+  <Frame name="SystemMessageControlToolChatWindowsFrame" toplevel="true" frameStrata="DIALOG" enableMouse="true" movable="false" hidden="true" parent="UIParent">
+    <Size>
+      <AbsDimension x="160" y="100"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER">
+        <Offset>
+          <AbsDimension x="0" y="0"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize>
+        <AbsValue val="12"/>
+      </EdgeSize>
+      <TileSize>
+        <AbsValue val="12"/>
+      </TileSize>
+      <BackgroundInsets>
+        <AbsInset left="3" right="3" top="3" bottom="3"/>
+      </BackgroundInsets>
+    </Backdrop>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="$parentHeaderText" inherits="GameFontHighlightSmall" justifyH="center">
+          <Size>
+            <AbsDimension x="140" y="16"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset>
+                <AbsDimension x="10" y="-5"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+  
+    <Frames>
+      <Frame name="$parentButton1" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentHeaderText" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-2"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton2" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton3" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton4" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton5" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton6" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton7" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton8" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton9" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton8" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton10" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton9" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton11" inherits="smctTextCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton10" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+    </Frames>
+
+    <Scripts>
+      <OnLoad>
+        this:SetBackdropBorderColor(0.8, 0.8, 0.8, 1);
+        this:SetBackdropColor(0.0, 0.0, 0.0, 1);
+      </OnLoad>
+    </Scripts>
+  </Frame>
+
+
+  <Frame name="SystemMessageControlToolProfileFrame" toplevel="true" frameStrata="DIALOG" movable="false" enableMouse="true" hidden="true" parent="UIParent">
+    <Size>
+      <AbsDimension x="160" y="480"/>
+    </Size>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeTo="SystemMessageControlToolFrame" relativePoint="TOPRIGHT">
+        <Offset>
+          <AbsDimension x="0" y="0"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="$parentHeaderText" inherits="GameFontHighlightSmall" text="Profiles">
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="-17"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+
+    <Frames>
+      <Frame name="$parentButton1" inherits="smctProfileTemplate" id="1">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="20" y="-30"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton2" inherits="smctProfileTemplate" id="2">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton3" inherits="smctProfileTemplate" id="3">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton4" inherits="smctProfileTemplate" id="4">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton5" inherits="smctProfileTemplate" id="5">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton6" inherits="smctProfileTemplate" id="6">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton7" inherits="smctProfileTemplate" id="7">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton8" inherits="smctProfileTemplate" id="8">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton9" inherits="smctProfileTemplate" id="9">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton8" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton10" inherits="smctProfileTemplate" id="10">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton9" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton11" inherits="smctProfileTemplate" id="11">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton10" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton12" inherits="smctProfileTemplate" id="12">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton11" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton13" inherits="smctProfileTemplate" id="13">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton12" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton14" inherits="smctProfileTemplate" id="14">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton13" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+      <Frame name="$parentButton15" inherits="smctProfileTemplate" id="15">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentButton14" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+      </Frame>
+    </Frames>
+
+    <Scripts>
+      <OnLoad>
+        this:SetBackdropBorderColor(0.8, 0.8, 0.8, 1);
+        this:SetBackdropColor(0.0, 0.0, 0.0, 1);
+      </OnLoad>
+      <OnShow>
+        SystemMessageControlTool_Profiles_OnShow();
+      </OnShow>
+    </Scripts>
+  </Frame>
+</Ui>

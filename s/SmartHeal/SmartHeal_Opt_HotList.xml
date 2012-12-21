@@ -1,0 +1,544 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <!-- Priority Row template -->
+	<Frame name="SH_HotList_ClassType_Row_Template" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="390" y="25"/>
+		</Size>
+		<Frames>
+			<Frame name="$parent_Priority">
+				<Size>
+					<AbsDimension x="70" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" />
+				</Anchors>
+
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Number" inherits="GameFontNormal" justifyH="LEFT" text="" />
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						getglobal(this:GetName().."_Number"):SetText(SH_PRIORITY.." "..this:GetParent():GetID()..":")
+					</OnShow>
+				</Scripts>
+			</Frame>	
+		
+			<Frame name="$parent_Label">
+				<Size>
+					<AbsDimension x="80" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Priority" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="$parent_ClassName" inherits="GameFontNormal" justifyH="LEFT" text="" />
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						local Id=this:GetParent():GetID()
+						local classLabel=SH_UNITCLASS[SmartHeal.HotListClassTypeList[SmartHeal.playerFactionGroup][SmartHeal:getConfig("classtype"..Id,"hotlist")]]
+						getglobal(this:GetName().."_ClassName"):SetText(classLabel)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<EditBox name="$parent_EditBox_triggerclasstype_hotlist" enableMouse="true" letters="3" autoFocus="false">
+				<Size>
+					<AbsDimension x="40" y="25" />
+				</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent_Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0" />
+						</Offset>
+						</Anchor>
+					</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="25" />
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" />
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625" />
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="25" />
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" />
+							</Anchors>
+							<TexCoords left="0.9375" right="1" top="0" bottom="0.625" />
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="25" />
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT" />
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT" />
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625" />
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						local Id=this:GetParent():GetID()
+						this:SetText(SmartHeal:getConfig('Triggerclasstype'..Id,'hotlist'))
+					</OnShow>
+					<OnTextChanged>
+						local Id=this:GetParent():GetID()
+						SmartHeal:setConfig('Triggerclasstype'..Id,this:GetNumber(),'hotlist')
+					</OnTextChanged>
+				</Scripts>
+				<FontString name="$parent_Name" inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="14" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+			</EditBox>
+
+			<Frame name="$parent_TriggerLabel">
+				<Size>
+					<AbsDimension x="40" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_EditBox_triggerclasstype_hotlist" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="5" y="0" />
+					</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_PCT_HP_RATIO" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Button name="$parentMoveUp" inherits="UIPanelScrollUpButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_EditBox_triggerclasstype_hotlist" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="70" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						local Id=tonumber(this:GetParent():GetID())
+						if(Id==1) then
+							this:Hide()
+						else
+							this:Show()
+						end
+					</OnShow>
+					<OnClick>
+						local Id=this:GetParent():GetID()
+						SmartHeal.HotList_MoveClassTypePriority(Id,-1)
+						this:GetParent():GetParent():Hide()
+						this:GetParent():GetParent():Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentMoveDown" inherits="UIPanelScrollDownButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_EditBox_triggerclasstype_hotlist" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="90" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						local Id=tonumber(this:GetParent():GetID())
+						if(Id==table.getn(SmartHeal.HotListClassTypeList[SmartHeal.playerFactionGroup])) then
+							this:Hide()
+						else
+							this:Show()
+						end
+					</OnShow>
+					<OnClick>
+						local Id=this:GetParent():GetID()
+						SmartHeal.HotList_MoveClassTypePriority(Id,1)
+						this:GetParent():GetParent():Hide()
+						this:GetParent():GetParent():Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentColorBox">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_EditBox_triggerclasstype_hotlist" relativePoint="RIGHT">
+						<Offset><AbsDimension x="110" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="26" y="26"/>
+				</Size>
+				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture">
+							<Size><AbsDimension y="16" x="16"/></Size>
+							<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						local Id=this:GetParent():GetID()
+						getglobal(this:GetName().."Texture"):SetTexture(RGB_hextodec(SmartHeal:getConfig("Colorclasstype"..Id,"hotlist")));
+					</OnShow>
+					<OnClick>
+						local Id=this:GetParent():GetID()
+						SmartHeal:ColorPicker_OnClick(this:GetName().."Texture","Colorclasstype"..Id)
+					</OnClick>
+				</Scripts>
+				<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"></HighlightTexture>
+			</Button>
+
+		</Frames>
+		<Scripts>
+			<OnShow>
+				local Id=this:GetID()
+				<!--if(not SmartHeal.HotListClassTypeList[SmartHeal.getConfig("classtype"..Id,"hotlist")]) then
+					this:Hide()
+				end-->
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+    <!-- options frame -->
+    	<Frame name="SH_OptionsFrame3" setAllPoints="true" enableMouse="true" enableKeyboard="true" parent="SH_OptionsFrameCanvas" hidden="true">
+		<Size>
+			<AbsDimension x="390" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+		</Anchors>
+
+		<Frames>
+		
+		
+			<CheckButton name="$parent_CheckButton_enable_hotlist">
+				<Size>
+					<AbsDimension x="24" y="24" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" text="SH_ENABLE_HOTLIST">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						this:SetChecked(SmartHeal:getConfig('enable','hotlist'))
+					</OnShow>
+					<OnClick>
+						SmartHeal:ClickCheckBox(this:GetName(),this:GetChecked())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+			</CheckButton>
+
+			<Frame name="$parent_BackgroundColorLabel">
+				<Size>
+					<AbsDimension x="110" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="200" y="0" />
+					</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_BG_COLOR" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			
+			<Button name="$parentBGColorBox">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_BackgroundColorLabel" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="26" y="26"/>
+				</Size>
+				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture">
+							<Size><AbsDimension y="16" x="16"/></Size>
+							<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						local Id=this:GetParent():GetID()
+						local r,g,b=RGB_hextodec(SmartHeal:getConfig("BGColor","hotlist"))
+						local a=SmartHeal:getConfig("BGColorOpacity","hotlist")
+						getglobal(this:GetName().."Texture"):SetTexture(r,g,b,a);
+					</OnShow>
+					<OnClick>
+						local Id=this:GetParent():GetID()
+						SmartHeal:ColorPicker_OnClick(this:GetName().."Texture","BGColor",1)
+					</OnClick>
+				</Scripts>
+				<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"></HighlightTexture>
+			</Button>
+
+			<Frame name="$parent_HotList_ClassType1" inherits="SH_HotList_ClassType_Row_Template" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButton_enable_hotlist" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType2" inherits="SH_HotList_ClassType_Row_Template" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType1" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType3" inherits="SH_HotList_ClassType_Row_Template" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType2" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType4" inherits="SH_HotList_ClassType_Row_Template" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType3" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType5" inherits="SH_HotList_ClassType_Row_Template" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType4" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType6" inherits="SH_HotList_ClassType_Row_Template" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType5" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType7" inherits="SH_HotList_ClassType_Row_Template" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType6" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType8" inherits="SH_HotList_ClassType_Row_Template" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType7" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType9" inherits="SH_HotList_ClassType_Row_Template" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType8" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_HotList_ClassType10" inherits="SH_HotList_ClassType_Row_Template" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType9" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+			</Frame>
+
+			<Frame name="$parent_setkeybinding_label2">
+				<Size>
+					<AbsDimension x="120" y="20"/>
+				</Size>
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_HotList_ClassType10" relativePoint="BOTTOMLEFT" />
+					<Offset>
+						<AbsDimension x="5" y="-5" />
+					</Offset>
+				</Anchors>
+			
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_WILL_CAST_FIRST_ON_HOTLIST" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Frame name="$parent_hotkey1">
+				<Size>
+					<AbsDimension x="120" y="28"/>
+				</Size>
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_setkeybinding_label2" relativePoint="BOTTOMLEFT" />
+					<Offset>
+						<AbsDimension x="0" y="-5" />
+					</Offset>
+				</Anchors>
+			
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_AUTOTARGET_HOTKEY1" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Frame name="$parent_hotkey2">
+				<Size>
+					<AbsDimension x="120" y="28"/>
+				</Size>
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_hotkey1" relativePoint="BOTTOMLEFT" />
+					<Offset>
+						<AbsDimension x="0" y="-5" />
+					</Offset>
+				</Anchors>
+			
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_AUTOTARGET_HOTKEY2" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Frame name="$parent_hotkey3">
+				<Size>
+					<AbsDimension x="120" y="28"/>
+				</Size>
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_hotkey2" relativePoint="BOTTOMLEFT" />
+					<Offset>
+						<AbsDimension x="0" y="-5" />
+					</Offset>
+				</Anchors>
+			
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_AUTOTARGET_HOTKEY3" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Frame name="$parent_DropDown_hotkey1_hotlist" inherits="UIDropDownMenuTemplate"> 
+				<Size>
+					<AbsDimension x="200" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_hotkey1" relativePoint="RIGHT" />
+					<Offset>
+						<AbsDimension x="5" y="0" />
+					</Offset>
+				</Anchors>
+				<Scripts> 
+				<OnShow> 
+					SmartHeal:DropDownMenuOnLoad(this,SmartHeal.AutoTargetOptionList[SmartHeal.playerClass],
+						SmartHeal:getConfig('hotkey1','hotlist'),
+						SH_AutotargetHotkeyOnSelect,
+						200); 
+				</OnShow> 
+				</Scripts> 
+			</Frame>
+			
+			<Frame name="$parent_DropDown_hotkey2_hotlist" inherits="UIDropDownMenuTemplate"> 
+				<Size>
+					<AbsDimension x="200" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_hotkey2" relativePoint="RIGHT" />
+					<Offset>
+						<AbsDimension x="5" y="0" />
+					</Offset>
+				</Anchors>
+				<Scripts> 
+				<OnShow> 
+					SmartHeal:DropDownMenuOnLoad(this,SmartHeal.AutoTargetOptionList[SmartHeal.playerClass],
+						SmartHeal:getConfig('hotkey2','hotlist'),
+						SH_AutotargetHotkeyOnSelect,
+						200); 
+				</OnShow> 
+				</Scripts> 
+			</Frame>
+			
+			<Frame name="$parent_DropDown_hotkey3_hotlist" inherits="UIDropDownMenuTemplate"> 
+				<Size>
+					<AbsDimension x="200" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_hotkey3" relativePoint="RIGHT" />
+					<Offset>
+						<AbsDimension x="5" y="0" />
+					</Offset>
+				</Anchors>
+				<Scripts> 
+				<OnShow> 
+					SmartHeal:DropDownMenuOnLoad(this,SmartHeal.AutoTargetOptionList[SmartHeal.playerClass],
+						SmartHeal:getConfig('hotkey3','hotlist'),
+						SH_AutotargetHotkeyOnSelect,
+						200); 
+				</OnShow> 
+				</Scripts> 
+			</Frame>
+			
+			<Frame name="$parent_setkeybinding_label">
+				<Size>
+					<AbsDimension x="120" y="20"/>
+				</Size>
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_hotkey3" relativePoint="BOTTOMLEFT" />
+					<Offset>
+						<AbsDimension x="0" y="-5" />
+					</Offset>
+				</Anchors>
+			
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Name" inherits="GameFontNormal" justifyH="LEFT" text="SH_SET_YOUR_KEYBINDINGS_LABEL" />
+					</Layer>
+				</Layers>
+			</Frame>
+			
+		</Frames>
+
+	</Frame>
+</UI>

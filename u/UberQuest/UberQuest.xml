@@ -1,0 +1,1594 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	
+	
+	<Frame name="UberQuest" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Scripts>
+        		<OnLoad>
+            			UberQuest_OnLoad()
+			</OnLoad>
+			<OnEvent>
+				UberQuest_OnEvent(event)
+			</OnEvent>
+			<OnUpdate>
+				UberQuest_DelayedConfigInit_OnUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+    	</Frame>
+	<Button name="UberQuest_TitleButtonTemplate" virtual="true">
+		<!-- Copied from QuestLogFrame.xml QuestLogTitleButtonTemplate -->
+		<Size>
+			<AbsDimension x="300" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentTag" inherits="GameFontNormal" justifyH="RIGHT">
+					<Size>
+						<AbsDimension x="80" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentGroupMates" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Size>
+						<AbsDimension x="0" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="8" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			</OnLoad>
+			<OnClick>
+				UberQuest_TitleButton_OnClick(arg1)
+			</OnClick>
+			<OnEnter>
+				QuestLogTitleButton_OnEnter()
+				getglobal(this:GetName().."Tag"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+			</OnEnter>
+			<OnLeave>
+				if (this:GetID() ~= (UberQuest_List.selectedButtonID - FauxScrollFrame_GetOffset(UberQuest_List_Scroll))) 
+					then getglobal(this:GetName().."Tag"):SetTextColor(this.r, this.g, this.b)
+				end
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-MinusButton-UP">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture name="$parentHighlight" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+		<ButtonText name="$parentNormalText" nonspacewrap="true">
+			<Size>
+				<AbsDimension x="275" y="10"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="35" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors> 
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<Frames>
+			<CheckButton name="$parent_MinionSelect" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						UberQuest_MinionSelect_OnClick()
+					</OnClick>
+				</Scripts>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="25" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors> 
+			</CheckButton>
+		</Frames>
+	</Button>
+
+
+	<Frame name="UberQuest_List" toplevel="true" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="45"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnLoad>
+				UberQuest_List_OnLoad()
+			</OnLoad>
+			<OnMouseDown>
+				if arg1 == "LeftButton" then
+					UberQuest_List:StartMoving()
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if arg1 == "LeftButton" then
+					UberQuest_List:StopMovingOrSizing()
+				end
+			</OnMouseUp>	
+		</Scripts>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Title" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture file="Interface\QuestFrame\UI-QuestLog-BookIcon">
+					<Size>
+						<AbsDimension x="60" y="60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTopLeft" file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTopRight" file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBottomLeft" file="Interface\FriendsFrame\UI-IgnoreFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBottomRight" file="Interface\FriendsFrame\UI-IgnoreFrame-BotRight">
+
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_CountRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-47" y="-41"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parent_CountMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="100" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parent_CountRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parent_CountLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parent_CountMiddle" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<FontString name="$parent_QuestCount" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parent_CountRight">
+							<Offset>
+								<AbsDimension x="-6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_CloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						UberQuest_ListShowHide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_AbandonButton" inherits="UIPanelButtonTemplate" text="UBERQUEST_ABANDON">
+				<Size>
+					<AbsDimension x="131" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="18" y="80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SetAbandonQuest()
+						StaticPopup_Show("ABANDON_QUEST", GetAbandonQuestName())
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(ABANDON_QUEST, 1.0, 1.0, 1.0, NEWBIE_TOOLTIP_ABANDONQUEST, 1)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parent_ShareButton" inherits="UIPanelButtonTemplate" text="UBERQUEST_SHARE">
+				<Size>
+					<AbsDimension x="66" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_AbandonButton"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						QuestLogPushQuest()
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(SHARE_QUEST, 1.0, 1.0, 1.0, NEWBIE_TOOLTIP_SHAREQUEST, 1)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parent_ConfigButton" inherits="UIPanelButtonTemplate" text="UBERQUEST_CONFIG">
+				<Size>
+					<AbsDimension x="66" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="159" y="-33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:Disable()
+					</OnLoad>
+					<OnClick>
+						UberQuest_ConfigShowHide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_SummonMinion" inherits="UIPanelButtonTemplate" text="UBERQUEST_SUMMONMINION">
+				<Size>
+					<AbsDimension x="125" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ConfigButton"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:Disable()
+					</OnLoad>
+					<OnClick>
+						UberQuest_MinionShowHide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_CloseButton2" inherits="UIPanelButtonTemplate" text="UBERQUEST_EXIT">
+				<Size>
+					<AbsDimension x="131" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-40" y="80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						UberQuest_ListShowHide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<ScrollFrame name="$parent_Scroll" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="296" y="332"/> 
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-66" y="-78"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(UBERQUEST_QUESTLINE_HEIGHT, UberQuest_List_Update)
+					</OnVerticalScroll>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_BarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="108"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.421875"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</ScrollFrame>
+			<Frame name="$parent_HighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="293" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parent_SkillHighlight" file="Interface\QuestFrame\UI-QuestLogTitleHighlight" alphaMode="ADD"/>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Button name="$parent_Title1" inherits="UberQuest_TitleButtonTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="19" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title2" inherits="UberQuest_TitleButtonTemplate" id="2" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title3" inherits="UberQuest_TitleButtonTemplate" id="3" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title4" inherits="UberQuest_TitleButtonTemplate" id="4" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title5" inherits="UberQuest_TitleButtonTemplate" id="5" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title6" inherits="UberQuest_TitleButtonTemplate" id="6" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title7" inherits="UberQuest_TitleButtonTemplate" id="7" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title8" inherits="UberQuest_TitleButtonTemplate" id="8" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title9" inherits="UberQuest_TitleButtonTemplate" id="9" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title10" inherits="UberQuest_TitleButtonTemplate" id="10" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title11" inherits="UberQuest_TitleButtonTemplate" id="11" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title12" inherits="UberQuest_TitleButtonTemplate" id="12" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title13" inherits="UberQuest_TitleButtonTemplate" id="13" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title14" inherits="UberQuest_TitleButtonTemplate" id="14" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title15" inherits="UberQuest_TitleButtonTemplate" id="15" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title16" inherits="UberQuest_TitleButtonTemplate" id="16" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title17" inherits="UberQuest_TitleButtonTemplate" id="17" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title18" inherits="UberQuest_TitleButtonTemplate" id="18" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title19" inherits="UberQuest_TitleButtonTemplate" id="19" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title18" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title20" inherits="UberQuest_TitleButtonTemplate" id="20" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title21" inherits="UberQuest_TitleButtonTemplate" id="21" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Title22" inherits="UberQuest_TitleButtonTemplate" id="22" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Title21" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Frame name="$parent_ExpandButtonFrame">
+				<Size>
+					<AbsDimension x="54" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="$parent_CollapseAllButton" hidden="false" inherits="QuestLogTitleButtonTemplate">
+						<Size>
+							<AbsDimension x="40" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parent_ExpandTabLeft" file="Interface\QuestFrame\UI-QuestLogSortTab-Left">
+									<Size>
+										<AbsDimension x="8" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-6" y="8"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+								<Texture name="$parent_ExpandTabMiddle" file="Interface\QuestFrame\UI-QuestLogSortTab-Middle">
+									<Size>
+										<AbsDimension x="38" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parent_ExpandTabLeft" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+								<Texture file="Interface\QuestFrame\UI-QuestLogSortTab-Right">
+									<Size>
+										<AbsDimension x="8" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parent_ExpandTabMiddle" relativePoint="RIGHT"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName()):SetText(ALL)
+							</OnLoad>
+							<OnClick>
+								QuestLogCollapseAllButton_OnClick()
+							</OnClick>
+							<OnEnter>
+								--
+							</OnEnter>
+							<OnLeave>
+								--
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="UberQuest_Details" hidden="true">
+				<Size>
+					<AbsDimension x="384" y="512"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-50" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="30" top="0" bottom="45"/>
+				</HitRectInsets>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parent_Title" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture file="Interface\QuestFrame\UI-QuestLog-BookIcon">
+							<Size>
+								<AbsDimension x="60" y="60"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="7" y="-6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentTopLeft" file="Interface\QuestFrame\UI-QuestGreeting-TopLeft">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentTopRight" file="Interface\QuestFrame\UI-QuestGreeting-TopRight">
+							<Size>
+								<AbsDimension x="128" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentBottomLeft" file="Interface\QuestFrame\UI-QuestGreeting-BotLeft">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT"/>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentBottomRight" file="Interface\QuestFrame\UI-QuestGreeting-BotRight">
+							<Size>
+								<AbsDimension x="128" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\QuestFrame\UI-Quest-BotLeftPatch">
+							<Size>
+								<AbsDimension x="128" y="64" />
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="22" y="68" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parent_CloseButton" inherits="UIPanelCloseButton">
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-26" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								UberQuest_DetailsShowHide()
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parent_Exit" inherits="UIPanelButtonTemplate" text="CLOSE">
+						<Size>
+							<AbsDimension x="78" y="22" />
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-39" y="73" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(UberQuest_Details)
+							</OnClick>
+						</Scripts>
+					</Button>
+					<!--Details-->
+					<ScrollFrame name="$parent_Scroll" inherits="UIPanelScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="300" y="334"/> 
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="23" y="-81"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<ScrollChild>
+							<Frame name="$parentChild">
+								<Size>
+									<AbsDimension x="300" y="334"/>
+								</Size>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<FontString name="$parent_QuestTitle" inherits="QuestTitleFont" justifyH="LEFT" text="Quest title">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT">
+													<Offset>
+														<AbsDimension x="5" y="-5"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_ObjectivesText" inherits="QuestFont" justifyH="LEFT">
+											<Size>
+												<AbsDimension x="275" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_QuestTitle" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-5"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_TimerText" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_ObjectivesText" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-10"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective1" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_TimerText" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-10"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective2" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective1" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective3" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective2" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective4" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective3" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective5" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective4" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective6" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective5" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective7" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective6" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective8" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective7" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective9" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective8" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_Objective10" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective9" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_RequiredMoneyText" inherits="QuestFontNormalSmall" text="REQUIRED_MONEY">
+											<Anchors>
+												<Anchor point="TOPLEFT"/>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_DescriptionTitle" inherits="QuestTitleFont" justifyH="LEFT" text="QUEST_DESCRIPTION">
+											<Size>
+												<AbsDimension x="285" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_Objective10" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-10"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_QuestDescription" inherits="QuestFont" justifyH="LEFT">
+											<Size>
+												<AbsDimension x="270" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_DescriptionTitle" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-5"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_RewardTitleText" inherits="QuestTitleFont" text="QUEST_REWARDS" justifyH="LEFT">
+											<Size>
+												<AbsDimension x="300" y="18"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_QuestDescription" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-15"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_ItemChooseText" inherits="QuestFont" text="REWARD_CHOICES" hidden="true" justifyH="LEFT">
+											<Size>
+												<AbsDimension x="295" y="0"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parent_RewardTitleText" relativePoint="BOTTOMLEFT">
+													<Offset>
+														<AbsDimension x="0" y="-5"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parent_ItemReceiveText" inherits="QuestFont" text="Reward receive text" hidden="true" justifyH="LEFT">
+											<Anchors>
+												<Anchor point="TOPLEFT"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Frames>
+									<Button name="$parent_Item1" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item2" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item3" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item4" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item5" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item6" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item7" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item8" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item9" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Button name="$parent_Item10" inherits="QuestLogRewardItemTemplate" hidden="true">
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+									</Button>
+									<Frame name="$parent_MoneyFrame" inherits="MoneyFrameTemplate">
+										<Anchors>
+											<Anchor point="LEFT" relativeTo="$parent_ItemReceiveText" relativePoint="RIGHT">
+												<Offset>
+													<AbsDimension x="15" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												QuestMoneyFrame_OnLoad()
+											</OnLoad>
+										</Scripts>
+									</Frame>
+									<Frame name="$parent_RequiredMoneyFrame" inherits="MoneyFrameTemplate">
+										<Anchors>
+											<Anchor point="LEFT" relativeTo="$parent_RequiredMoneyText" relativePoint="RIGHT">
+												<Offset>
+													<AbsDimension x="10" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												SmallMoneyFrame_OnLoad()
+												MoneyFrame_SetType("STATIC")
+											</OnLoad>
+										</Scripts>
+									</Frame>
+									<Frame name="$parent_SpacerFrame">
+										<Size>
+											<AbsDimension x="5" y="25"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOP">
+												<Offset>
+													<AbsDimension x="0" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+									</Frame>
+								</Frames>
+							</Frame>
+						</ScrollChild>
+					</ScrollFrame>
+				</Frames>
+			</Frame>
+			<Frame name="UberQuest_ConfigFrame" hidden="true" frameStrata="HIGH">
+				<Size>
+					<AbsDimension x="250" y="270"/> <!-- EMERALD -->
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\RaidFrame\UI-RaidFrame-GroupBg"> 
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="5" y="-5"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-5" y="5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentBackdrop" frameStrata="BACKGROUND" setAllPoints="true">
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel("1")
+								this:SetBackdropBorderColor(
+									TOOLTIP_DEFAULT_COLOR.r,
+									TOOLTIP_DEFAULT_COLOR.g,
+									TOOLTIP_DEFAULT_COLOR.b)
+								this:SetBackdropColor(
+									TOOLTIP_DEFAULT_BACKGROUND_COLOR.r,
+									TOOLTIP_DEFAULT_BACKGROUND_COLOR.g,
+									TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<CheckButton name="$parent_ShowQuestLevels" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_QLEVELS)
+								this.tooltipText=UBERQUEST_QLEVELS_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config.showquestlevels = 1
+								else
+									UberQuest_Config.showquestlevels = nil
+								end
+								UberQuest_Config_Update()
+								UberQuest_List_Update()
+								UberQuest_Minion_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parent_UseMinion" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ShowQuestLevels">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_QMINION)
+								this.tooltipText=UBERQUEST_QMINION_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config.useminion = 1
+									UberQuest_Minion_OnOff(true)
+								else
+									UberQuest_Config.useminion = nil
+									UberQuest_Minion_OnOff(nil)
+								end
+								UberQuest_Config_Update()
+								UberQuest_List_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parent_LockMinion" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_UseMinion">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_LMINION)
+								this.tooltipText=UBERQUEST_LMINION_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config[UberQuest_Player].lockminion = 1
+									UberQuest_Minion_Move:Hide()
+								else
+									UberQuest_Config[UberQuest_Player].lockminion = nil
+									UberQuest_Minion_Move:Show()
+								end
+								UberQuest_Config_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parent_MinionAddNew" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_LockMinion">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_ADD_QMINION)
+								this.tooltipText=UBERQUEST_ADD_QMINION_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config.addnewquests = 1
+								else
+									UberQuest_Config.addnewquests = nil
+								end
+								UberQuest_Config_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parent_ToggleMinionText" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent_MinionAddNew" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_NOTEXT)
+								this.tooltipText = UBERQUEST_NOTEXT_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config[UberQuest_Player].hidetext = 1
+								else
+									UberQuest_Config[UberQuest_Player].hidetext = nil
+								end
+								UberQuest_Config_Update()
+								UberQuest_Minion_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parent_ExpireQuest" inherits="OptionsCheckButtonTemplate" id="1"> <!-- EMERALD START -->
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ToggleMinionText">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_COQ_MINION)
+								this.tooltipText=UBERQUEST_COQ_MINION_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config[UberQuest_Player].expirequests = 1
+								else
+									UberQuest_Config[UberQuest_Player].expirequests = nil
+								end
+								UberQuest_Config_Update()
+								UberQuest_Minion_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parent_ExpireObjective" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ExpireQuest">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_COMO_MINION)
+								this.tooltipText=UBERQUEST_COMO_MINION_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config[UberQuest_Player].expireobjectives = 1
+								else
+									UberQuest_Config[UberQuest_Player].expireobjectives = nil
+								end
+								UberQuest_Config_Update()
+								UberQuest_Minion_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton> <!-- EMERALD END -->
+					<CheckButton name="$parent_ColorizeObjective" inherits="OptionsCheckButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ExpireObjective"> <!-- EMERALD -->
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_COL_MINION)
+								this.tooltipText=UBERQUEST_COL_MINION_TOOLTIP
+							</OnLoad>
+							<OnClick>
+								if (this:GetChecked()) then
+									UberQuest_Config[UberQuest_Player].colorizeobjectives = 1
+								else
+									UberQuest_Config[UberQuest_Player].colorizeobjectives = nil
+								end
+								UberQuest_Config_Update()
+								UberQuest_Minion_Update()
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					
+					
+					<Button name="$parent_BGColor">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ColorizeObjective">
+								<Offset>
+									<AbsDimension x="0" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentSwatchBg">
+									<Size>
+										<AbsDimension x="14" y="14"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1" g="1" b="1"/>
+								</Texture>
+							</Layer>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(UBERQUEST_BG_MINION)
+							</OnLoad>
+							<OnClick>
+								UberQuest_Minion_ColorPick()
+							</OnClick>
+							<OnEnter>
+								getglobal(this:GetName().."SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+							</OnEnter>
+							<OnLeave>
+								if (UberQuest_Config.color) then
+									getglobal(this:GetName().."SwatchBg"):SetVertexColor(UberQuest_Config.color.r, UberQuest_Config.color.g, UberQuest_Config.color.b)
+								else
+									getglobal(this:GetName().."SwatchBg"):SetVertexColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b)
+								end
+							</OnLeave>
+						</Scripts>
+					</Button>
+
+
+		<Slider name="UberMinionScale" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="180" y="16"/>
+				</Size>
+				<Anchors>
+							<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="0" y="37"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+				<Scripts>
+					<OnLoad>
+						
+						 getglobal(this:GetName().."Text"):SetText(UBERQUEST_MINIONSCALE.." ["..this:GetValue().."%]")   
+								this.tooltipText=UBERQUEST_MINIONSCALE_TOOLTIP
+							getglobal(this:GetName().."High"):SetText()
+							getglobal(this:GetName().."Low"):SetText()
+						UberMinionScale:SetMinMaxValues(50,150)
+						UberMinionScale:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>
+						UberMinion_Scale_Update()
+						getglobal(this:GetName().."Text"):SetText(UBERQUEST_MINIONSCALE.." ["..this:GetValue().."%]")
+						
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+
+					<Button name="$parent_ResetMinion" inherits="UIPanelButtonTemplate" text="UBERQUEST_MINIONREST">
+						<Size>
+							<AbsDimension x="125" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								UberQuest_Minion_Reset()
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="$parent_CloseButton" inherits="UIPanelButtonTemplate" text="UBERQUEST_SAVE">
+						<Size>
+							<AbsDimension x="125" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								UberQuest_ConfigShowHide()
+							</OnClick>
+						</Scripts>
+					</Button>
+				
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="UberQuest_Minion" toplevel="true" parent="UIParent" hidden="true" frameStrata="BACKGROUND" enableMouse="false" movable="true">
+		<Size>
+			<AbsDimension x="210" y="48"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="$parent_Move" enableMouse="true" setAllPoints="true">
+				<Scripts>
+					<OnLoad>
+						this:RegisterForDrag("LeftButton", "RightButton")
+					</OnLoad>
+					<OnDragStart>
+						UberQuest_Minion:StartMoving()
+					</OnDragStart>
+					<OnDragStop>
+						UberQuest_Minion:StopMovingOrSizing()
+						UberQuest_Minion_LockCornerForGrowth()
+					</OnDragStop>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentBackdrop" frameStrata="BACKGROUND" setAllPoints="true">
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel("1")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parent_Text" inherits="GameTooltipText" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>

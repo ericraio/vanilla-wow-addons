@@ -1,0 +1,174 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="actionBarGlobal.lua"/>
+	
+	<!-- Global Actionbar Settings Panel -->
+	<Frame name="BongosOptionsActionBar" inherits="BongosOptionsPanel" virtual="true">
+		<Frames>
+			<CheckButton name="$parentTooltips" inherits="BongosCheckButtonTemplate" text="Show Button Tooltips">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="4" y="6"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BActionSets_SetTooltips(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentRange" inherits="BongosCheckButtonTemplate" text="Enable Range Coloring">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTooltips" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BActionSets_SetColorOutOfRange(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<!-- out of range coloring swatch thing -->
+			<Button name="$parentRangeColor" text="Out of Range Color">
+				<Size x="32" y="32"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRange" relativePoint="BOTTOMLEFT">
+						<Offset x="4" y="2"/>
+					</Anchor>
+				</Anchors>
+				
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBackground">
+							<Size x="24" y="24"/>
+							
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+							
+							<Color r="0.5" g="0.5" b="0.5"/>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch">
+					<Size x="30" y="30"/>
+					
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset x="-3" y="0"/>
+						</Anchor>
+					</Anchors>
+				</NormalTexture>
+				
+				<ButtonText>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNormalTexture" relativePoint="RIGHT">
+							<Offset x="-2" y="0"/>
+						</Anchor>
+					</Anchors>
+				</ButtonText>
+				
+				<NormalFont font="GameFontNormalSmall" justifyH="RIGHT"/>
+				<HighlightFont font="GameFontHighlightSmall" justifyH="RIGHT"/>
+				
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						BOptionsRangeColor_OnClick();
+					</OnClick>
+					<OnHide>
+						this:UnlockHighlight();
+					</OnHide>
+				</Scripts>
+			</Button>
+			
+			<CheckButton name="$parentMacroText" inherits="BongosCheckButtonTemplate" text="Hide Macro Text">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRangeColor" relativePoint="BOTTOMLEFT">
+						<Offset x="-3" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BActionSets_SetMacroText(not this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentHotkeysText" inherits="BongosCheckButtonTemplate" text="Hide Hotkeys">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentMacroText" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BActionSets_SetHotkeys(not this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentSelfCast" inherits="BongosCheckButtonTemplate" text="Automatic Selfcast">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHotkeysText" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							SetCVar("autoSelfCast", 1);
+						else
+							SetCVar("autoSelfCast", 0);
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<Frame name="$parentAltCast" inherits="BongosOptionsDropDown">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSelfCast" relativePoint="BOTTOMLEFT">
+						<Offset x="-14" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						BOptionsAltCast_OnShow();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			
+			<Slider name="$parentNumActionBars" inherits="BongosOptionsSlider" minValue="1" maxValue="120" valuestep="1">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="6" y="16"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText("ActionBars");
+						getglobal(this:GetName() .. "Low"):SetText(1);
+						getglobal(this:GetName() .. "High"):SetText(120);
+					</OnLoad>
+					<OnValueChanged>
+						if not this:GetParent().onShow then
+							BActionBar.SetNumber(this:GetValue())
+						end
+						getglobal(this:GetName() .. "ValText"):SetText(this:GetValue());
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				BOptionsActionBarGlobal_OnLoad();
+			</OnLoad>
+			<OnShow>
+				BOptionsActionBarGlobal_OnShow();
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

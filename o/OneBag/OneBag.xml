@@ -1,0 +1,178 @@
+<!--$Id: OneBag.xml 5631 2006-07-25 04:04:28Z kaelten $-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML\UI.xsd">
+	
+	<Frame name="OneBagFrame" inherits="OneBagFrameTemplate" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOPLEFT" >
+				<Offset>
+					<AbsDimension x="400" y="-300"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<CheckButton name="OneKeyRingButton">
+				<Size x="15" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBagButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Model name="$parentItemAnim" inherits="ItemAnimTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Model>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetID(KEYRING_CONTAINER);
+
+						local name = getglobal(this:GetParent():GetName().."Name")
+						name:ClearAllPoints()
+						name:SetPoint("LEFT", this:GetName(), "RIGHT", 5, 1)
+					</OnLoad>
+					<OnClick>
+						OneBag:OnKeyRingButtonClick()
+					</OnClick>
+					<OnReceiveDrag>
+						if (CursorHasItem()) then
+							PutKeyInKeyRing();
+						end
+					</OnReceiveDrag>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(KEYRING, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+						GameTooltip:AddLine();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Button-KeyRing">
+					<TexCoords left="0" right="0.5625" top="0" bottom="0.609375"/>
+				</NormalTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Button-KeyRing-Highlight" alphaMode="ADD">
+					<TexCoords left="0" right="0.5625" top="0" bottom="0.609375"/>
+				</HighlightTexture>
+				<PushedTexture file="Interface\Buttons\UI-Button-KeyRing-Down">
+					<TexCoords left="0" right="0.5625" top="0" bottom="0.609375"/>
+				</PushedTexture>
+			</CheckButton>
+		</Frames>
+	</Frame>
+	
+	<Frame name="OBBagFram" inherits="OneBagBaseFrameTemplate" parent="UIParent">
+		<Size>
+			<AbsDimension x="60" y="223"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="OneBagFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="5" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<CheckButton name="$parentBackpackButton" inherits="OneBagBagTemplate" id="0">
+				<Size>
+					<AbsDimension x="37" y="37"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Model name="$parentItemAnim" inherits="ItemAnimTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Model>
+				</Frames>
+				<Scripts>
+					<OnClick>
+						PlaySound("BAGMENUBUTTONPRESS")
+						
+						PutItemInBackpack()
+						
+						if not this:GetChecked() then
+							OneBag:UnhighlightBagSlots(0)
+							OneBag.frame.bags[0].colorLocked = false
+						else
+							OneBag.frame.bags[0].colorLocked = true
+						end
+						OneBag:OrganizeFrame(true)
+					</OnClick>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+						getglobal(this:GetName().."IconTexture"):SetTexture("Interface\\Buttons\\Button-Backpack-Up");
+					</OnLoad>
+					<OnReceiveDrag>
+						BackpackButton_OnClick();
+					</OnReceiveDrag>
+					<OnEnter>
+						OneBag:HighlightBagSlots(0)
+					</OnEnter>
+					<OnLeave>
+						if not this:GetChecked() then
+							OneBag:UnhighlightBagSlots(0)
+							OneBag.frame.bags[0].colorLocked = false
+						else
+							OneBag.frame.bags[0].colorLocked = true
+						end
+					</OnLeave>
+				</Scripts>
+				<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+			</CheckButton>
+			<CheckButton name="$parentBag0Slot" inherits="OneBagBagTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBackpackButton" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag1Slot" inherits="OneBagBagTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBag0Slot" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag2Slot" inherits="OneBagBagTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBag1Slot" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag3Slot" inherits="OneBagBagTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBag2Slot" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+		</Frames>
+	</Frame>
+</Ui>

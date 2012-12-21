@@ -1,0 +1,246 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <!-- TargetList Unit StatusBar template -->
+	<Frame name="SH_HotList_StatusBarTemplate" hidden="false" virtual="true">
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" />
+			<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" />
+		</Anchors>
+		<Frames>
+			<Button	name="$parent_UnitButton" setAllPoints="true">
+				<NormalText name="$parentLabel" inherits="TextStatusBarText" justifyH="LEFT" nonspacewrap="true">
+				<Anchors>
+					<Anchor point="LEFT" />
+				</Anchors>
+
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp","MiddleButtonUp","RightButtonUp","Button4Up","Button5Up");
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<StatusBar name="$parent_StatusBar" drawLayer="ARTWORK" minValue="0" maxValue="1" defaultValue="0" setAllPoints="true">
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+			</StatusBar>
+		</Frames>
+	</Frame>
+
+
+
+    <!-- options frame -->
+    	<Frame name="SH_HotListFrame" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+        <Size>
+            <AbsDimension x="130" y="81"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+
+        <Frames>
+		<Frame name="$parentTitleButton">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+				<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" />
+			</Anchors>
+			<Size>
+				<AbsDimension y="20"/>
+			</Size>	
+			<Layers>
+				<Layer level="BACKGROUND">					
+					<!-- The title bar background -->
+					<Texture name="$parentBackground" >
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="5" y="-5"/>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset x="-5" y="-2"/>
+							</Anchor>
+						</Anchors>
+						<Color r="1.0" g="1.0" b="1.0" a="1.0"/> 
+						<Gradient orientation="VERTICAL">
+							<MinColor r="0.2" g="0" b="0" a="1" />
+							<MaxColor r="0.7" g="0" b="0" a="1" />
+						</Gradient>
+					</Texture>
+					<FontString name="$parentText" inherits="GameFontNormal" text="SMH HotList">
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset x="10" y="-2"/>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+				<Layer level="BORDER">
+				<!-- a dividing line between the title bar and the options -->
+					<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-4" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			
+		</Frame>
+		
+		<Button name="$parentOptionButton">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentTitleButton" relativePoint="RIGHT">
+					<Offset x="-5" y="-3"/>
+				</Anchor>
+			</Anchors>
+			<Size>
+				<AbsDimension x="18" y="18"/>
+			</Size>
+			<Scripts>					
+				<OnClick>
+					ToggleDropDownMenu(1, nil, SH_HotListFrameDropDown, "SH_HotListFrameOptionButton", 10, 10);
+				</OnClick>
+				<OnShow>
+					UIDropDownMenu_Initialize(getglobal(this:GetParent():GetName().."DropDown"),SH_HotList_PrepareMenu,"MENU")
+				</OnShow>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up" />
+			<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down" />
+		</Button>
+		
+		<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true" />
+		
+		<Frame name="$parentCanvas">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					 <Offset><AbsDimension x="5" y="-25"/></Offset>
+				</Anchor>
+				<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+					 <Offset><AbsDimension x="-5" y="-25"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+					 <Offset><AbsDimension x="5" y="5"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+					 <Offset><AbsDimension x="-5" y="5"/></Offset>
+				</Anchor>
+			</Anchors>
+
+			<Frames>
+				<Frame name="$parent_Unit1" inherits="SH_HotList_StatusBarTemplate" id="1"></Frame>
+				<Frame name="$parent_Unit2" inherits="SH_HotList_StatusBarTemplate" id="2"></Frame>
+				<Frame name="$parent_Unit3" inherits="SH_HotList_StatusBarTemplate" id="3"></Frame>
+				<Frame name="$parent_Unit4" inherits="SH_HotList_StatusBarTemplate" id="4"></Frame>
+				<Frame name="$parent_Unit5" inherits="SH_HotList_StatusBarTemplate" id="5"></Frame>
+				<Frame name="$parent_Unit6" inherits="SH_HotList_StatusBarTemplate" id="6"></Frame>
+				<Frame name="$parent_Unit7" inherits="SH_HotList_StatusBarTemplate" id="7"></Frame>
+				<Frame name="$parent_Unit8" inherits="SH_HotList_StatusBarTemplate" id="8"></Frame>
+				<Frame name="$parent_Unit9" inherits="SH_HotList_StatusBarTemplate" id="9"></Frame>
+				<Frame name="$parent_Unit10" inherits="SH_HotList_StatusBarTemplate" id="10"></Frame>
+				<Frame name="$parent_Unit11" inherits="SH_HotList_StatusBarTemplate" id="11"></Frame>
+				<Frame name="$parent_Unit12" inherits="SH_HotList_StatusBarTemplate" id="12"></Frame>
+				<Frame name="$parent_Unit13" inherits="SH_HotList_StatusBarTemplate" id="13"></Frame>
+				<Frame name="$parent_Unit14" inherits="SH_HotList_StatusBarTemplate" id="14"></Frame>
+				<Frame name="$parent_Unit15" inherits="SH_HotList_StatusBarTemplate" id="15"></Frame>
+
+			</Frames>
+			<Scripts>
+				<OnShow>
+					this:RegisterEvent("UNIT_HEALTH")
+					this:RegisterEvent("UNIT_MAXHEALTH")
+					this:RegisterEvent("SPELLCAST_FAILED")
+				</OnShow>
+				<OnHide>
+					this:UnregisterEvent("UNIT_HEALTH")
+					this:UnregisterEvent("UNIT_MAXHEALTH")
+					this:UnregisterEvent("SPELLCAST_FAILED")
+				</OnHide>	
+				<OnEvent>
+					SmartHeal:HotListOnEvent(event)
+				</OnEvent>
+				<OnUpdate>
+					SmartHeal:HotListVisualOnUpdate()
+				</OnUpdate>
+				
+			</Scripts>
+		</Frame>
+		
+
+        </Frames>
+		<Scripts>
+			<OnLoad>
+				ResizeableFrame:SetFrameBorderSize(5,5,5,5)
+				ResizeableFrame:SetHeightIncrement(SmartHeal.HotListStatusBarHeight)
+				ResizeableFrame:SetMinHeight(47)
+				ResizeableFrame:SetOffsetHeight(5)
+			</OnLoad>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnMouseDown>
+				ResizeableFrame:OnMouseDown()
+			</OnMouseDown>
+			<OnMouseUp>
+				 ResizeableFrame:OnMouseUp()
+			</OnMouseUp>
+			<OnDragStop>
+				ResizeableFrame:OnDragStop()
+			</OnDragStop>
+			<OnUpdate>
+				SmartHeal:AutoTargetUpdateBlackList(arg1)
+				ResizeableFrame:OnUpdate()
+				SmartHeal:setConfig("listlength",this:GetHeight(),"hotlist")
+				SmartHeal:setConfig("listwidth",this:GetWidth(),"hotlist")
+				local r,g,b=RGB_hextodec(SmartHeal:getConfig("BGColor","hotlist"))
+				local a=SmartHeal:getConfig("BGColorOpacity","hotlist")
+				this:SetBackdropColor(r,g,b,a)
+			</OnUpdate>
+			
+		</Scripts>
+	</Frame>
+
+	<Frame name="SH_HotListHiddenFrame" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				--if(SmartHeal.Loaded) then	
+				if(GetNumPartyMembers()>0 and SmartHeal.Loaded) then
+					if (SmartHeal:getConfig("enable","hotlist") and SmartHeal:getConfig("enable")) then
+						if(not SH_HotListFrame:IsShown()) then
+							SH_HotListFrame:Show()
+							SH_HotListFrame:SetHeight(SmartHeal:getConfig("listlength","hotlist"))
+							SH_HotListFrame:SetWidth(SmartHeal:getConfig("listwidth","hotlist"))
+						end
+					else
+						if(SH_HotListFrame:IsShown()) then
+							SH_HotListFrame:Hide()
+							SmartHeal:ReinitializeHotList()
+						end
+					end
+				elseif(SH_HotListFrame:IsShown()) then
+					SH_HotListFrame:Hide()
+					SmartHeal:ReinitializeHotList()
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</UI>

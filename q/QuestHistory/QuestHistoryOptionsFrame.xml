@@ -1,0 +1,822 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Frame name="QuestHistoryOptionsFrame" frameStrata="DIALOG" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="-104"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+ 		<Backdrop name="QuestHistoryOptionsFrameBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="QuestHistoryOptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="320" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="QUESTHISTORY_OPTIONS_MENU">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="QuestHistoryOptionsFrameShow" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="359" y="66"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton1" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton2" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="110" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton3" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton2" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="100" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Button name="QuestHistoryOptionsFrameAbandonedColorSwatch" inherits="QuestHistoryColorSwatchTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="QuestHistoryOptionsFrameCheckButton1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="25" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								QuestHistoryColorSwatch_OnShow("Abandoned");
+							</OnShow>
+						</Scripts>
+					</Button>
+					<Button name="QuestHistoryOptionsFrameCompletedColorSwatch" inherits="QuestHistoryColorSwatchTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="QuestHistoryOptionsFrameCheckButton3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="25" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								QuestHistoryColorSwatch_OnShow("Completed");
+							</OnShow>
+						</Scripts>
+					</Button>
+					<Frame name="QuestHistoryOptionsFrameCharacterDropDown" inherits="UIDropDownMenuTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="QuestHistoryOptionsFrameCheckButton1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="90" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontNormalSmall" text="QUESTHISTORY_CHARACTER_DROPDOWN_TEXT">
+									<Anchors>
+										<Anchor point="RIGHT" relativeTo="QuestHistoryOptionsFrameCharacterDropDown" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="15" y="2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+								QuestHistoryOptionsFrameCharacterDropDown_OnShow();
+							</OnShow>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(QUESTHISTORY_OPTION_TOOLTIP_SELECT_CHARACTER, nil, nil, nil, nil, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(QUESTHISTORY_SHOW);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="QuestHistoryOptionsFrameLog" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="359" y="240"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="QuestHistoryOptionsFrameShow" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton4" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton5" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton4" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton6" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton5" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton7" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton6" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton8" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton7" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton9" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton8" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton10" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton9" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton11" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton10" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton12" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton11" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton13" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton12" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton14" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="QuestHistoryOptionsFrameCheckButton13" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton15" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton4" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton16" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton5" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton17" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton6" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton18" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton7" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton19" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton8" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton20" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton9" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton21" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton10" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton22" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton11" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton23" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton12" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton24" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton13" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton25" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton14" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="140" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Button name="QuestHistoryOptionsFrameAddButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_ADD_TEXT">
+						<Size>
+							<AbsDimension x="90" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								QuestHistoryOptionsFrameOkayButton_OnClick();
+								QuestHistory_AddQuest();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(QUESTHISTORY_OPTION_TOOLTIP_ADD_QUEST, nil, nil, nil, nil, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+					<Button name="QuestHistoryOptionsFramePurgeButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_PURGE_TEXT">
+						<Size>
+							<AbsDimension x="90" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								QuestHistoryOptionsFrameOkayButton_OnClick();
+								QuestHistoryConfirmFrameExplanation:SetText(QUESTHISTORY_PURGE_CONFIRM_EXPLANATION);
+								ShowUIPanel(QuestHistoryConfirmFrame);
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(QUESTHISTORY_OPTION_TOOLTIP_PURGE, nil, nil, nil, nil, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+					<Button name="QuestHistoryOptionsFrameDeleteButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_DELETE_TEXT">
+						<Size>
+							<AbsDimension x="90" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-20" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								QuestHistoryOptionsFrameDeleteButton_OnClick()
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(QUESTHISTORY_OPTION_TOOLTIP_DELETE_CHARACTER, nil, nil, nil, nil, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(QUESTHISTORY_LOG);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="QuestHistoryOptionsFrameRepair" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="359" y="37"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="QuestHistoryOptionsFrameLog" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton26" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton27" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton26" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="110" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Button name="QuestHistoryOptionsFrameRepairButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_REPAIR">
+						<Size>
+							<AbsDimension x="90" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton27" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="97" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								QuestHistoryOptionsFrameOkayButton_OnClick();
+								QuestHistoryConfirmFrameExplanation:SetText(QUESTHISTORY_REPAIR_CONFIRM_EXPLANATION);
+								ShowUIPanel(QuestHistoryConfirmFrame);
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(QUESTHISTORY_OPTION_TOOLTIP_REPAIR, nil, nil, nil, nil, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(QUESTHISTORY_REPAIR);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="QuestHistoryOptionsFrameOther" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="359" y="37"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="QuestHistoryOptionsFrameRepair" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton28" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton29" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton28" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="100" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="QuestHistoryOptionsFrameCheckButton30" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QuestHistoryOptionsFrameCheckButton29" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="80" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(QUESTHISTORY_OTHER);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="QuestHistoryOptionsFrameCancelButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_CANCEL_TEXT">
+				<Size>
+					<AbsDimension x="90" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(QuestHistoryOptionsFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="QuestHistoryOptionsFrameOkayButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_OKAY_TEXT">
+				<Size>
+					<AbsDimension x="90" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="QuestHistoryOptionsFrameCancelButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						QuestHistoryOptionsFrameOkayButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				QuestHistoryOptionsFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				PlaySound("gsTitleOptionExit");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="QuestHistoryConfirmFrame" frameStrata="DIALOG" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="-104"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+ 		<Backdrop name="QuestHistoryConfirmFrameBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="QuestHistoryConfirmFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="320" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="QUESTHISTORY_OPTIONS_MENU">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="QuestHistoryConfirmFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontNormalLarge" text="QUESTHISTORY_CONFIRM_TEXT" justifyH="CENTER">
+					<Size>
+						<AbsDimension x="320" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-75"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="QuestHistoryConfirmFrameExplanation" inherits="GameFontHighlightLarge" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="320" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-150"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="QuestHistoryConfirmFrameCancelButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_CANCEL_TEXT">
+				<Size>
+					<AbsDimension x="90" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(QuestHistoryConfirmFrame);
+						ShowUIPanel(QuestHistoryOptionsFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="QuestHistoryConfirmFrameOkayButton" inherits="UIPanelButtonTemplate" text="QUESTHISTORY_OKAY_TEXT">
+				<Size>
+					<AbsDimension x="90" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="14" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						QuestHistoryConfirmFrameOkayButton_OnClick();
+						HideUIPanel(QuestHistoryConfirmFrame);
+						ShowUIPanel(QuestHistoryOptionsFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnHide>
+				PlaySound("gsTitleOptionExit");
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

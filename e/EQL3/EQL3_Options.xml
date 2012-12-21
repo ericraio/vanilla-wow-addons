@@ -1,0 +1,2054 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	
+	<Script file="EQL3_Options.lua"/>
+	
+	<Frame name="EQL3_OptionsFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="640" y="500"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="CENTER">
+ 				<Offset>
+ 					<AbsDimension x="0" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="EQL3_OptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="440" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="EQL3_OPTIONS_TITLE">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="EQL3_OptionsFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		
+		<Frames>
+			<Button name="EQL3_OptionsFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="EQL3_OptionsFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnHide>
+						-- Hide ColorPicker IF visible
+						if (ColorPickerFrame:IsVisible()) then
+							ColorPickerFrame:Hide();
+						end
+					</OnHide>
+				</Scripts>
+			</Button>
+			
+			<Button name="EQL3_OptionsFrameLoadButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="EQL3_OptionsFrameCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+
+				<Frames>
+					<Frame name="EQL3_RealmDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-80" y="-35"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								EQL3_RealmDropDown_OnLoad();
+							</OnLoad>
+							<OnShow>
+								EQL3_RealmDropDown_OnLoad();
+							</OnShow>
+						</Scripts>
+					</Frame>
+				</Frames>
+
+				
+				<Scripts>
+					<OnClick>
+						EQL3_ShowLoadDropDown(arg1);
+						PlaySound("UChatScrollButton");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(EQL3_LOAD_TIP, nil,nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\EQL3\Images\LoadButton-Up"/>
+				<PushedTexture file="Interface\Addons\EQL3\Images\LoadButton-Down"/>
+				<DisabledTexture file="Interface\Addons\EQL3\Images\LoadButton-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" AlphaMode="ADD"/>
+			</Button>
+			
+			
+			
+			
+			<Frame name="EQL3_OptionsFrame_Header_Log">
+				<Size>
+					<AbsDimension x="304" y="218"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="16" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+          <BackgroundInsets>
+            <AbsInset left="5" right="5" top="5" bottom="5" />
+          </BackgroundInsets>
+          <TileSize>
+            <AbsValue val="16" />
+          </TileSize>
+          <EdgeSize>
+            <AbsValue val="16" />
+          </EdgeSize>
+        </Backdrop>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Header_Log_Label" inherits="GameFontNormal" text="EQL3_LOG_OPTIONS">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.5, 0.5, 0.5);
+						this:SetBackdropColor(0.5, 0.5, 0.5);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_ShowQuestLevels" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Header_Log" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_ShowQuestLevels_Label" inherits="GameFontNormalSmall" text="EQL3_SHOW_QUEST_LEVELS">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_QuestLevels();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_QuestLevelsOnlyInLog" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_ShowQuestLevels" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_QuestLevelsOnlyInLog_Label" inherits="GameFontNormalSmall" text="EQL3_LEVELS_ONLY_IN_LOG">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_OnlyLevelsInLog();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_RestoreUponSelect" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_QuestLevelsOnlyInLog" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-20" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_RestoreUponSelect_Label" inherits="GameFontNormalSmall" text="EQL3_RESTORE_UPON_SELECT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_RestoreUponSelect();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_MinimizeUponClose" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_RestoreUponSelect" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_MinimizeUponClose_Label" inherits="GameFontNormalSmall" text="EQL3_MINIMIZE_UPON_CLOSE">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_MinimizeUponClose();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_AutoCompleteQuests" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_MinimizeUponClose" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_AutoCompleteQuests_Label" inherits="GameFontNormalSmall" text="EQL3_AUTO_COMPLETE_QUESTS">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_AutoCompleteQuests();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_InfoOnQuestComplete" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_AutoCompleteQuests" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_InfoOnQuestComplete_Label" inherits="GameFontNormalSmall" text="EQL3_INFO_ON_QUEST_COMPLETE">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_InfoOnQuestComplete();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_LockQuestLog" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_InfoOnQuestComplete" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_LockQuestLog_Label" inherits="GameFontNormalSmall" text="EQL3_LOCK_QUESTLOG">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_LockQuestLog();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<Button name="EQL3_OptionsFrame_Button_QuestLog" inherits="UIPanelButtonTemplate" text="EQL3_RESTORE">
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_LockQuestLog" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="140" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						EQL3_RestoreQuestLog();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Slider name="EQL3_OptionsFrame_Slider_LogOpacity" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="288" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_LockQuestLog" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(EQL3_OPACITY);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0.25, 1.0);
+						this:SetValueStep(0.01);
+						this.tooltipText = EQL3_OPACITY_INFO;
+					</OnLoad>
+					<OnShow>
+							this:SetValue(QuestlogOptions[EQL3_Player].LogOpacity);
+							getglobal(this:GetName().."Text"):SetText(EQL3_OPACITY.." : "..floor(this:GetValue() * 100).."%");
+					</OnShow>
+					<OnValueChanged>
+						QuestlogOptions[EQL3_Player].LogOpacity = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(EQL3_OPACITY.." : "..floor(this:GetValue() * 100).."%");
+						EQL3_QuestLogFrame:SetAlpha(this:GetValue());
+						GameTooltip:Hide();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			
+			
+
+
+
+			<Frame name="EQL3_OptionsFrame_Header_Color">
+				<Size>
+					<AbsDimension x="304" y="210"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Header_Log" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+          <BackgroundInsets>
+            <AbsInset left="5" right="5" top="5" bottom="5" />
+          </BackgroundInsets>
+          <TileSize>
+            <AbsValue val="16" />
+          </TileSize>
+          <EdgeSize>
+            <AbsValue val="16" />
+          </EdgeSize>
+        </Backdrop>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Header_Color_Label" inherits="GameFontNormal" text="EQL3_COLOR_OPTIONS">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.5, 0.5, 0.5);
+						this:SetBackdropColor(0.5, 0.5, 0.5);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_CustomZoneColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Header_Color" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_CustomZoneColor_Label" inherits="GameFontNormalSmall" text="EQL3_ZONE_COLOR">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_CustomZoneColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_CustomHeaderColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomZoneColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_CustomHeaderColor_Label" inherits="GameFontNormalSmall" text="EQL3_HEADER_COLOR">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_CustomHeaderColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_FadeHeaderColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomHeaderColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_FadeHeaderColor_Label" inherits="GameFontNormalSmall" text="EQL3_FADE_HEADER">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_FadeHeaderColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_CustomObjectiveColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_FadeHeaderColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-10" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_CustomObjectiveColor_Label" inherits="GameFontNormalSmall" text="EQL3_OBJECTIVE_COLOR">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_CustomObjectiveColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_FadeObjectiveColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomObjectiveColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_FadeObjectiveColor_Label" inherits="GameFontNormalSmall" text="EQL3_FADE_OBJECTIVE">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_FadeObjectiveColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_CustomTrackerBGColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_FadeObjectiveColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-10" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_CustomTrackerBGColor_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_BG">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_CustomTrackerBGColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_CustomTooltipInfoColor" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomTrackerBGColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_CustomTooltipInfoColor_Label" inherits="GameFontNormalSmall" text="EQL3_TOOLTIP_COLOR">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_CustomTooltipInfoColor();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_Zone" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomZoneColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="248" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("Zone", false, "EQL3_OptionsFrame_ColorSwatch_Zone");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_Zone_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_Zone_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_Header_Empty" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomHeaderColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="224" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("HeaderEmpty", false, "EQL3_OptionsFrame_ColorSwatch_Header_Empty");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_Header_Empty_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_Header_Empty_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_Header_Complete" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomHeaderColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="248" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("HeaderComplete", false, "EQL3_OptionsFrame_ColorSwatch_Header_Complete");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_Header_Complete_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_Header_Complete_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_Objective_Empty" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomObjectiveColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="224" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("ObjectiveEmpty", false, "EQL3_OptionsFrame_ColorSwatch_Objective_Empty");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_Objective_Empty_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_Objective_Empty_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_Objective_Complete" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomObjectiveColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="248" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("ObjectiveComplete", false, "EQL3_OptionsFrame_ColorSwatch_Objective_Complete");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_Objective_Complete_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_Objective_Complete_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_TrackerBG" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomTrackerBGColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="248" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("TrackerBG", true, "EQL3_OptionsFrame_ColorSwatch_TrackerBG");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_TrackerBG_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_TrackerBG_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			
+			<Button name="EQL3_OptionsFrame_ColorSwatch_TooltipInfo" hidden="false" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomTooltipInfoColor" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="248" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="18" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OpenColorPicker("Tooltip", false, "EQL3_OptionsFrame_ColorSwatch_TooltipInfo");
+					</OnClick>
+					<OnEnter>
+						EQL3_OptionsFrame_ColorSwatch_TooltipInfo_SwatchBg:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						EQL3_OptionsFrame_ColorSwatch_TooltipInfo_SwatchBg:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			<Button name="EQL3_OptionsFrame_Button_RestoreColors" inherits="UIPanelButtonTemplate" text="EQL3_RESTORE_COLORS">
+				<Size>
+					<AbsDimension x="180" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_CustomTooltipInfoColor" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="54" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						 EQL3_RestoreColors();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			
+			
+			
+			
+			
+			
+			<Frame name="EQL3_OptionsFrame_Header_Tracker">
+				<Size>
+					<AbsDimension x="304" y="368"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="EQL3_OptionsFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-16" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+          <BackgroundInsets>
+            <AbsInset left="5" right="5" top="5" bottom="5" />
+          </BackgroundInsets>
+          <TileSize>
+            <AbsValue val="16" />
+          </TileSize>
+          <EdgeSize>
+            <AbsValue val="16" />
+          </EdgeSize>
+        </Backdrop>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Header_Tracker_Label" inherits="GameFontNormal" text="EQL3_TRACKER_OPTIONS">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.5, 0.5, 0.5);
+						this:SetBackdropColor(0.5, 0.5, 0.5);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			
+					
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_ShowObjectiveMarkers" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Header_Tracker" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_ShowObjectiveMarkers_Label" inherits="GameFontNormalSmall" text="EQL3_SHOW_OBJECTIVE_MARKERS">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_ShowObjectiveMarkers();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			
+					
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_UseTrackerListing" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_ShowObjectiveMarkers" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_UseTrackerListing_Label" inherits="GameFontNormalSmall" text="EQL3_USE_TRACKER_LISTING">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_UseTrackerListing();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_List1" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_UseTrackerListing" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_List1_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_LIST_1">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerListing(0);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_List2" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_List1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_List2_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_LIST_2">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerListing(1);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_List3" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_List2" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_List3_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_LIST_3">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerListing(2);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_List4" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_List3" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_List4_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_LIST_4">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerListing(3);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_Symbol1" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_List1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_Symbol1_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_SYMBOL_1">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerSymbol(0);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_Symbol2" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_Symbol1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_Symbol2_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_SYMBOL_2">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerSymbol(1);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_Symbol3" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_Symbol2" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_Symbol3_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_SYMBOL_3">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerSymbol(2);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_Symbol4" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_Symbol3" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_Symbol4_Label" inherits="GameFontNormalSmall" text="EQL3_TRACKER_SYMBOL_4">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Set_TrackerSymbol(3);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+	
+	
+	
+	
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_ShowZones" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_Symbol1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-40" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_ShowZones_Label" inherits="GameFontNormalSmall" text="EQL3_SHOW_ZONES">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_ShowZones();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_SortTracker" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_ShowZones" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_SortTracker_Label" inherits="GameFontNormalSmall" text="EQL3_SORT_TRACKER">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_SortTracker();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_LockTracker" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_SortTracker" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_LockTracker_Label" inherits="GameFontNormalSmall" text="EQL3_LOCK_TRACKER">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_LockTracker();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<Button name="EQL3_OptionsFrame_Button_RestoreTracker" inherits="UIPanelButtonTemplate" text="EQL3_RESTORE">
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_LockTracker" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="140" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						EQL3_RestoreTracker();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_AddNew" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_LockTracker" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_AddNew_Label" inherits="GameFontNormalSmall" text="EQL3_ADD_NEW">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_AddNew();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_RemoveFinished" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_AddNew" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_RemoveFinished_Label" inherits="GameFontNormalSmall" text="EQL3_REMOVE_FINISHED">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_RemoveFinished();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_MinimizeFinished" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_RemoveFinished" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_MinimizeFinished_Label" inherits="GameFontNormalSmall" text="EQL3_MINIMIZE_FINISHED">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_MinimizeFinished();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_HideCompletedObjectives" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_MinimizeFinished" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_HideCompletedObjectives_Label" inherits="GameFontNormalSmall" text="EQL3_HIDE_COMPLETED_OBJECTIVES">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_HideCompletedObjectives();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_AddUntracked" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_HideCompletedObjectives" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_AddUntracked_Label" inherits="GameFontNormalSmall" text="EQL3_ADD_UNTRACKED">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_AddUntracked();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_ShowMinimizer" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_AddUntracked" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_ShowMinimizer_Label" inherits="GameFontNormalSmall" text="EQL3_SHOW_MINIMIZER">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_ShowMinimizer();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<Slider name="EQL3_OptionsFrame_Slider_TrackerFontSize" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="288" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_ShowMinimizer" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(EQL3_TRACKERFONTSIZE);
+						getglobal(this:GetName().."High"):SetText("20");
+						getglobal(this:GetName().."Low"):SetText("8");
+						this:SetMinMaxValues(8, 20);
+						this:SetValueStep(1);
+						this.tooltipText = EQL3_TRACKERFONTSIZE_INFO;
+					</OnLoad>
+					<OnShow>
+							this:SetValue(QuestlogOptions[EQL3_Player].TrackerFontHeight);
+							getglobal(this:GetName().."Text"):SetText(EQL3_TRACKERFONTSIZE.." : "..this:GetValue());
+					</OnShow>
+					<OnValueChanged>
+						QuestlogOptions[EQL3_Player].TrackerFontHeight = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(EQL3_TRACKERFONTSIZE.." : "..this:GetValue());
+						
+						SetTrackerFontSize();
+						
+						GameTooltip:Hide();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			
+			<!-- New stuff -->
+			
+			<Frame name="EQL3_OptionsFrame_Header_Tooltip">
+				<Size>
+					<AbsDimension x="304" y="60"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Header_Tracker" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+          <BackgroundInsets>
+            <AbsInset left="5" right="5" top="5" bottom="5" />
+          </BackgroundInsets>
+          <TileSize>
+            <AbsValue val="16" />
+          </TileSize>
+          <EdgeSize>
+            <AbsValue val="16" />
+          </EdgeSize>
+        </Backdrop>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Header_Log_Label" inherits="GameFontNormal" text="EQL3_TOOLTIP_OPTIONS">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.5, 0.5, 0.5);
+						this:SetBackdropColor(0.5, 0.5, 0.5);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_ShowItemTooltip" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Header_Tooltip" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_ShowItemTooltip_Label" inherits="GameFontNormalSmall" text="EQL3_SHOW_ITEM_TOOLTIP">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_ShowItemTooltip();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			
+			<CheckButton name="EQL3_OptionsFrame_Checkbox_ShowMobTooltip" virtual="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_OptionsFrame_Checkbox_ShowItemTooltip" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_OptionsFrame_Checkbox_ShowMobTooltip_Label" inherits="GameFontNormalSmall" text="EQL3_SHOW_MOB_TOOLTIP">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="1" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_ShowMobTooltip();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+		</Frames>
+		
+		
+		<Scripts>
+			<OnLoad>
+				EQL_Options_OnLoad();
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnEvent>
+				EQL_Options_OnEvent(event);
+			</OnEvent>
+			<OnDragStart>
+				 this:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				 this:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+</Ui>

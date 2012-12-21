@@ -1,0 +1,1988 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <!--
+    Decursive (v 1.9.7) add-on for World of Warcraft UI
+    Copyright (C) 2005 Archarodim ( http://www.2072productions.com/?to=decursive-continued.txt )
+    This is the continued work of the original Decursive (v1.9.4) by Quu
+    Decursive 1.9.4 is in public domain ( www.quutar.com )
+
+    License:
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+    -->
+
+    <Script file="Decursive.lua"/>
+
+    <Button name="DecursiveDebuffTemplate" virtual="true">
+
+	<Size>
+	    <AbsDimension x="30" y="30"/>
+	</Size>
+
+	<Layers>
+	    <Layer level="OVERLAY">
+		<Texture name="$parentIcon"/>
+	    </Layer>
+	</Layers>
+
+	<Scripts>
+	    <OnLoad>
+		this.unit = "player";
+		this.debuff = 1;
+	    </OnLoad>
+	    <OnEnter>
+		Dcr_DebuffTemplate_OnEnter();
+	    </OnEnter>
+	    <OnLeave>
+		DcrDisplay_Tooltip:Hide();
+	    </OnLeave>
+	    <OnClick>
+		Dcr_Clean(this.unit, (arg1 == "RightButton"));
+	    </OnClick>
+	</Scripts>
+    </Button>
+
+    <Frame name="DecursiveAfflictedTemplate" frameStrata="LOW" virtual="true" hidden="true">
+	<Size>
+	    <AbsDimension x="180" y="32"/>
+	</Size>
+
+	<Backdrop name="$parentBackdrop" bgFile="Interface\AddOns\Decursive\BackDrop.tga" tile="true">
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	</Backdrop>
+
+	<!-- The "name" field... is on a layer-->
+	<Layers>
+	    <Layer level="OVERLAY">
+		<FontString name="$parentName" justifyH="LEFT" inherits="GameFontNormalSmall" maxLines="1" text="Name">
+		    <Size>
+			<AbsDimension x="148" y="10"/>
+		    </Size>
+		    <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent">
+			    <Offset>
+				<AbsDimension x="32" y="-2"/>
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+		<FontString name="$parentAffliction" justifyH="LEFT" inherits="GameFontNormalSmall" maxLines="1" text="Affliction">
+		    <Size>
+			<AbsDimension x="148" y="10"/>
+		    </Size>
+		    <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent">
+			    <Offset>
+				<AbsDimension x="32" y="-15"/>
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		    
+		</FontString>
+	    </Layer>
+	</Layers>
+	<Frames>
+	    <Button name="$parentDebuff" inherits="DecursiveDebuffTemplate" hidden="false">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentClickMe" >
+
+		<Size>
+		    <AbsDimension x="150" y="32"/>
+		</Size>
+
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentDebuff"/>
+		</Anchors>
+
+		<Scripts>
+		    <OnLoad>
+			this.unit = "player";
+			this.debuff = 1;
+			this:RegisterForClicks('LeftButtonDown', 'RightButtonDown', 'MiddleButtonDown', 'Button4Down', 'Button5Down');
+		    </OnLoad>
+		    <OnClick>
+			Dcr_Clean(this.unit, (arg1 == "RightButton"));
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DebuffTemplate_OnEnter();
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+	</Frames>
+	<Scripts>
+	    <OnLoad>
+		this.unit = "player";
+		this.debuff = 1;
+		this.UpdateMe = false;
+	    </OnLoad>
+	    <OnUpdate>
+		Dcr_LiveListItem_OnUpdate();
+	    </OnUpdate>
+	</Scripts>
+    </Frame>
+
+
+    <Button name="DecursivePriorityListEntryTemplate" hidden="true" virtual="true" >
+	<Size>
+	    <AbsDimension x="150" y="16"/>
+	</Size>
+	<NormalText name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT" text="Assistant">
+	    <Size>
+		<AbsDimension x="150" y="16"/>
+	    </Size>
+	    <Anchors>
+		<Anchor point="TOPRIGHT"/>
+	    </Anchors>
+	</NormalText>
+	<Scripts>
+	    <OnLoad>
+		this.Priority = true;
+		this:RegisterForClicks('LeftButtonDown', 'RightButtonDown', 'MiddleButtonDown', 'Button4Down', 'Button5Down');
+	    </OnLoad>
+	    <OnShow>
+		this.UpdateYourself = true;
+	    </OnShow>
+	    <OnClick>
+		Dcr_PriorityListEntryTemplate_OnClick();
+	    </OnClick>
+	    <OnUpdate>
+		Dcr_PriorityListEntryTemplate_OnUpdate();
+	    </OnUpdate>
+	    <OnEnter>
+		Dcr_DisplayTooltip(DCR_RREMOVE_ID, this);
+	    </OnEnter>
+	    <OnLeave>
+		DcrDisplay_Tooltip:Hide();
+	    </OnLeave>
+	</Scripts>
+    </Button>
+
+    <Button name="DecursiveSkipListEntryTemplate" hidden="true" virtual="true" inherits="DecursivePriorityListEntryTemplate">
+	<Scripts>
+	    <OnLoad>
+		this.Priority = false;
+	    </OnLoad>
+	</Scripts>
+    </Button>
+
+    <Frame name="DecursiveAfflictedListFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="false" parent="UIParent">
+	<Size>
+	    <AbsDimension x="80" y="25" />
+	</Size>
+
+	<Anchors>
+	    <Anchor point="TOP">
+		<Offset>
+		    <AbsDimension x="0" y="-50"/>
+		</Offset>
+	    </Anchor>
+	</Anchors>
+
+	<!--
+	<TitleRegion setAllPoints="true"/>
+	-->
+
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+	    <EdgeSize>
+		<AbsValue val="16"/>
+	    </EdgeSize>
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	    <BackgroundInsets>
+		<AbsInset left="5" right="5" top="5" bottom="5"/>
+	    </BackgroundInsets>
+	</Backdrop>
+
+	<Layers>
+	    <Layer level="OVERLAY">
+		<FontString name="$parentText" inherits="GameFontNormal" text="BINDING_HEADER_DECURSIVE">
+		    <Anchors>
+			<Anchor point="TOP" relativePoint="TOP">
+			    <Offset>
+				<AbsDimension x="0" y="-5"/>
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+	    </Layer>
+	</Layers>
+
+	<Scripts>
+	    <OnUpdate>
+		Dcr_AfflictedListFrame_OnUpdate(arg1);
+	    </OnUpdate>
+	    <OnEnter>
+		Dcr_DisplayTooltip(DCR_VERSION_STRING, this);
+	    </OnEnter>
+	    <OnLeave>
+		DcrDisplay_Tooltip:Hide();
+	    </OnLeave>
+
+	    <OnMouseUp>
+		if ( this.isMoving ) then
+		this:StopMovingOrSizing();
+		this.isMoving = false;
+		end
+	    </OnMouseUp>
+	    <OnMouseDown>
+		if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+		this:StartMoving();
+		this.isMoving = true;
+		end
+		if (arg1 == "RightButton") then
+		    Dcr_ShowHideButtons();
+		end
+	    </OnMouseDown>
+	    <OnHide>
+		if ( this.isMoving ) then
+		this:StopMovingOrSizing();
+		this.isMoving = false;
+		end
+	    </OnHide>
+
+
+	</Scripts>
+
+	<Frames>
+
+	    <Button name="$parentPriority" inherits="GameMenuButtonTemplate" text="P">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnLoad>
+			this:SetText(DCR_PRIORITY_SHOW);
+		    </OnLoad>
+		    <OnClick>
+			Dcr_ShowHidePriorityListUI();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_PRIORITY_LIST, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentSkip" inherits="GameMenuButtonTemplate" text="S">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentPriority">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_SKIP_SHOW);
+			</OnLoad>
+		    <OnClick>
+			Dcr_ShowHideSkipListUI();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_SKIP_LIST_STR, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentOptions" inherits="GameMenuButtonTemplate" text="O">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSkip">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_OPTION_SHOW);
+			</OnLoad>
+		    <OnClick>
+			Dcr_ShowHideOptionsUI();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_SKIP_OPT_STR, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentHide" inherits="GameMenuButtonTemplate" text="X">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentOptions">
+			<Offset>
+			    <AbsDimension x="2" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_ShowHideAfflictedListUI();
+			Dcr_println( DCR_RESHOW_MSG);
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_HIDE_MAIN, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Frame name="$parentListItem1" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="5" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem2" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem1">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem3" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem2">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem4" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem3">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem5" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem4">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem6" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem5">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem7" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem6">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem8" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem7">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem9" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem8">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem10" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem9">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem11" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem10">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem12" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem11">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem13" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem12">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem14" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem13">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+
+	    <Frame name="$parentListItem15" inherits="DecursiveAfflictedTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentListItem14">
+			<Offset>
+			    <AbsDimension x="0" y="1" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Frame>
+	</Frames>
+    </Frame>
+
+    <Frame name="DecursivePriorityListFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+	<Size>
+	    <AbsDimension x="150" y="230" />
+	</Size>
+
+	<Anchors>
+	    <Anchor point="CENTER" />
+	</Anchors>
+
+	<TitleRegion setAllPoints="true"/>
+
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+	    <EdgeSize>
+		<AbsValue val="16"/>
+	    </EdgeSize>
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	    <BackgroundInsets>
+		<AbsInset left="5" right="5" top="5" bottom="5"/>
+	    </BackgroundInsets>
+	</Backdrop>
+
+	<Scripts>
+	    <OnEnter>
+		Dcr_DisplayTooltip(DCR_PRIORITY_LIST, this);
+	    </OnEnter>
+	    <OnLeave>
+		DcrDisplay_Tooltip:Hide();
+	    </OnLeave>
+	    <OnLoad>
+		this.Offset = 0;
+	    </OnLoad>
+	    <OnShow>
+		this.UpdateYourself = true;
+	    </OnShow>
+
+	    <OnUpdate>
+		Dcr_PriorityListFrame_OnUpdate();
+	    </OnUpdate>
+	</Scripts>
+
+	<Layers>
+	    <Layer level="BACKGROUND">
+		<FontString name="$parentText" inherits="GameFontNormal" text="DCR_STR_DCR_PRIO">
+		    <Anchors>
+			<Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+			    <Offset>
+				<AbsDimension x="0" y="-5" />
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		    
+		</FontString>
+	    </Layer>
+	</Layers>
+
+	<Frames>
+
+	    <Button name="$parentClear" inherits="GameMenuButtonTemplate" text="C">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="0" y="-20" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_CLEAR_PRIO);
+			</OnLoad>
+		    <OnClick>
+			Dcr_ClearPriorityList();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(BINDING_NAME_DCRPRCLEAR, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentClose" inherits="GameMenuButtonTemplate" text="X">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentClear"/>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this:GetParent():Hide();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(BINDING_NAME_DCRPRSHOW, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+
+	    <Button name="$parentPopulate" inherits="GameMenuButtonTemplate" text="P">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentClear"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_POPULATE);
+			</OnLoad>
+		    <OnClick>
+			DecursivePopulateListFrame.addFunction = DcrAddUnitToPriorityList;
+			DecursivePopulateListFrameText:SetText(DCR_PRIORITY_LIST);
+			DecursivePopulateListFrame:Show();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_POPULATE_LIST, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentAdd" inherits="GameMenuButtonTemplate" text="+">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentPopulate"/>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_AddTargetToPriorityList();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(BINDING_NAME_DCRPRADD, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentUp" inherits="GameMenuButtonTemplate" text="UP">
+		<Size>
+		    <AbsDimension x="30" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="5" y="5" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_UP);
+			</OnLoad>
+		    <OnClick>
+			this:GetParent().Offset = this:GetParent().Offset - 1;
+			this:GetParent().UpdateYourself = true;
+		    </OnClick>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentDown" inherits="GameMenuButtonTemplate" text="DOWN">
+		<Size>
+		    <AbsDimension x="50" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="-5" y="5" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_DOWN);
+			</OnLoad>
+		    <OnClick>
+			this:GetParent().Offset = this:GetParent().Offset + 1;
+			this:GetParent().UpdateYourself = true;
+		    </OnClick>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentIndex01" id="1" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" >
+			<Offset>
+			    <AbsDimension x="5" y="-40" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex02" id="2" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex01"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex03" id="3" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex02"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex04" id="4" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex03"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex05" id="5" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex04"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex06" id="6" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex05"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex07" id="7" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex06"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex08" id="8" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex07"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex09" id="9" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex08"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex10" id="10" inherits="DecursivePriorityListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex09"/>
+		</Anchors>
+	    </Button>
+
+	</Frames>
+    </Frame>
+
+    <Frame name="DecursiveSkipListFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+	<Size>
+	    <AbsDimension x="150" y="230" />
+	</Size>
+
+	<Anchors>
+	    <Anchor point="CENTER" />
+	</Anchors>
+
+	<TitleRegion setAllPoints="true"/>
+
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+	    <EdgeSize>
+		<AbsValue val="16"/>
+	    </EdgeSize>
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	    <BackgroundInsets>
+		<AbsInset left="5" right="5" top="5" bottom="5"/>
+	    </BackgroundInsets>
+	</Backdrop>
+
+	<Scripts>
+	    <OnEnter>
+		Dcr_DisplayTooltip(DCR_SKIP_LIST_STR, this);
+	    </OnEnter>
+	    <OnLeave>
+		DcrDisplay_Tooltip:Hide();
+	    </OnLeave>
+	    <OnLoad>
+		this.Offset = 0;
+	    </OnLoad>
+	    <OnShow>
+		this.UpdateYourself = true;
+	    </OnShow>
+	    <OnUpdate>
+		Dcr_SkipListFrame_OnUpdate();
+	    </OnUpdate>
+	</Scripts>
+
+	<Layers>
+	    <Layer level="BACKGROUND">
+		<FontString name="$parentText" inherits="GameFontNormal" text="DCR_STR_DCR_SKIP">
+		    <Anchors>
+			<Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+			    <Offset>
+				<AbsDimension x="0" y="-5" />
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+	    </Layer>
+	</Layers>
+
+	<Frames>
+
+	    <Button name="$parentClear" inherits="GameMenuButtonTemplate" text="C">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="0" y="-20" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_CLEAR_SKIP);
+			</OnLoad>
+		    <OnClick>
+			Dcr_ClearSkipList();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(BINDING_NAME_DCRSKCLEAR, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentClose" inherits="GameMenuButtonTemplate" text="X">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentClear"/>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this:GetParent():Hide();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(BINDING_NAME_DCRSKSHOW, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+
+	    <Button name="$parentPopulate" inherits="GameMenuButtonTemplate" text="P">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentClear"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_POPULATE);
+			</OnLoad>
+		    <OnClick>
+			DecursivePopulateListFrame.addFunction = DcrAddUnitToSkipList;
+			DecursivePopulateListFrameText:SetText(DCR_SKIP_LIST_STR);
+			DecursivePopulateListFrame:Show();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_POPULATE_LIST, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentAdd" inherits="GameMenuButtonTemplate" text="+">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentPopulate"/>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_AddTargetToSkipList();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(BINDING_NAME_DCRSKADD, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentUp" inherits="GameMenuButtonTemplate" text="UP">
+		<Size>
+		    <AbsDimension x="30" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="5" y="5" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_UP);
+			</OnLoad>
+		    <OnClick>
+			this:GetParent().Offset = this:GetParent().Offset - 1;
+			this:GetParent().UpdateYourself = true;
+		    </OnClick>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentDown" inherits="GameMenuButtonTemplate" text="DOWN">
+		<Size>
+		    <AbsDimension x="50" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="-5" y="5" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_DOWN);
+			</OnLoad>
+		    <OnClick>
+			this:GetParent().Offset = this:GetParent().Offset + 1;
+			this:GetParent().UpdateYourself = true;
+		    </OnClick>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentIndex01" id="1" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" >
+			<Offset>
+			    <AbsDimension x="5" y="-40" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex02" id="2" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex01"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex03" id="3" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex02"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex04" id="4" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex03"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex05" id="5" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex04"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex06" id="6" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex05"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex07" id="7" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex06"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex08" id="8" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex07"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex09" id="9" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex08"/>
+		</Anchors>
+	    </Button>
+	    <Button name="$parentIndex10" id="10" inherits="DecursiveSkipListEntryTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIndex09"/>
+		</Anchors>
+	    </Button>
+
+	</Frames>
+    </Frame>
+
+    <Frame name="DecursivePopulateListFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+	<Size>
+	    <AbsDimension x="168" y="245" />
+	</Size>
+
+	<Anchors>
+	    <Anchor point="CENTER" />
+	</Anchors>
+
+	<TitleRegion setAllPoints="true"/>
+
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+	    <EdgeSize>
+		<AbsValue val="16"/>
+	    </EdgeSize>
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	    <BackgroundInsets>
+		<AbsInset left="5" right="5" top="5" bottom="5"/>
+	    </BackgroundInsets>
+	</Backdrop>
+
+	<Scripts>
+	    <OnShow>
+		local _, faction = UnitFactionGroup("player");
+		if (faction == DCR_ALLIANCE_NAME) then
+		DecursivePopulateListFrameOther:SetText(DCR_LOC_CLASS_PALADIN);
+		DecursivePopulateListFrameOther.ClassType = DCR_CLASS_PALADIN;
+		else
+		DecursivePopulateListFrameOther:SetText(DCR_LOC_CLASS_SHAMAN);
+		DecursivePopulateListFrameOther.ClassType = DCR_CLASS_SHAMAN;
+		end
+	    </OnShow>
+	</Scripts>
+	<Layers>
+	    <Layer level="BACKGROUND">
+		<FontString name="$parentTitle" inherits="GameFontNormal" text="DCR_STR_QUICK_POP">
+		    <Anchors>
+			<Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+			    <Offset>
+				<AbsDimension x="0" y="-10" />
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+		<FontString name="$parentText" inherits="GameFontNormal" text="DCR_STR_POP">
+		    <Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTitle">
+			    <Offset>
+				<AbsDimension x="0" y="-5" />
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+	    </Layer>
+	</Layers>
+	<Frames>
+
+	    <Button name="$parentGroup1" inherits="GameMenuButtonTemplate" text="Group 1">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="5" y="-45" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 1;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '1');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup2" inherits="GameMenuButtonTemplate" text="Group 2">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="-5" y="-45" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 2;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '2');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup3" inherits="GameMenuButtonTemplate" text="Group 3">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup1">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 3;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '3');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup4" inherits="GameMenuButtonTemplate" text="Group 4">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup2">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 4;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '4');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup5" inherits="GameMenuButtonTemplate" text="Group 5">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup3">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 5;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '5');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup6" inherits="GameMenuButtonTemplate" text="Group 6">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup4">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 6;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '6');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup7" inherits="GameMenuButtonTemplate" text="Group 7">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup5">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 7;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '7');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentGroup8" inherits="GameMenuButtonTemplate" text="Group 8">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup6">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.GroupNumber = 8;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_GROUP .. '8');
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentWarrior" inherits="GameMenuButtonTemplate" text="Warrior">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup7">
+			<Offset>
+			    <AbsDimension x="0" y="-5" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_WARRIOR;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_WARRIOR);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentPriest" inherits="GameMenuButtonTemplate" text="Priest">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroup8">
+			<Offset>
+			    <AbsDimension x="0" y="-5" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_PRIEST;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_PRIEST);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentMage" inherits="GameMenuButtonTemplate" text="Mage">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentWarrior">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_MAGE;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_MAGE);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentWarlock" inherits="GameMenuButtonTemplate" text="Warlock">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentPriest">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_WARLOCK;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_WARLOCK);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentHunter" inherits="GameMenuButtonTemplate" text="Hunter">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMage">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_HUNTER;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_HUNTER);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentRogue" inherits="GameMenuButtonTemplate" text="Rogue">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentWarlock">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_ROGUE;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_ROGUE);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentDruid" inherits="GameMenuButtonTemplate" text="Druid">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentHunter">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			this.ClassType = DCR_CLASS_DRUID;
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_LOC_CLASS_DRUID);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentOther" inherits="GameMenuButtonTemplate" text="Other">
+		<Size>
+		    <AbsDimension x="80" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentRogue">
+			<Offset>
+			    <AbsDimension x="0" y="0" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			--this.ClassType = "OTHER";
+			Dcr_PopulateButtonPress();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_OTHER);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+
+	    <Button name="$parentClose" inherits="GameMenuButtonTemplate" text="Close">
+		<Size>
+		    <AbsDimension x="100" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="0" y="10" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			DecursivePopulateListFrame:Hide();
+		    </OnClick>
+		    <OnLoad>
+			this:SetText(DCR_STR_CLOSE);
+		    </OnLoad>
+		</Scripts>
+	    </Button>
+	</Frames>
+    </Frame>
+
+    <!-- ================================================================== -->
+    <!-- The options frame -->
+    <Frame name="DcrOptionsFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+	<Size>
+	    <AbsDimension x="270" y="460" />
+	</Size>
+
+	<Anchors>
+	    <Anchor point="CENTER" />
+	</Anchors>
+
+	<TitleRegion setAllPoints="true"/>
+
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+	    <EdgeSize>
+		<AbsValue val="16"/>
+	    </EdgeSize>
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	    <BackgroundInsets>
+		<AbsInset left="5" right="5" top="5" bottom="5"/>
+	    </BackgroundInsets>
+	</Backdrop>
+
+	<Layers>
+	    <Layer level="BACKGROUND">
+		<FontString name="$parentText" inherits="GameFontNormal" text="DCR_STR_OPTIONS">
+		    <Anchors>
+			<Anchor point="TOP">
+			    <Offset>
+				<AbsDimension x="0" y="-8"/>
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+	    </Layer>
+	</Layers>
+
+
+	<Frames>
+	    <Button name="$parentAnchor" inherits="GameMenuButtonTemplate" text="A">
+		<Size>
+		    <AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="-10" y="-10" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnLoad>
+			this:SetText(DCR_ANCHOR_SHOW);
+		    </OnLoad>
+		    <OnClick>
+			Dcr_ShowHideTextAnchor();
+		    </OnClick>
+		    <OnEnter>
+			Dcr_DisplayTooltip(DCR_ANCHOR, this);
+		    </OnEnter>
+		    <OnLeave>
+			DcrDisplay_Tooltip:Hide();
+		    </OnLeave>
+		</Scripts>
+	    </Button>
+	    <Slider name="$parentAmountOfAfflictedSlider" inherits="OptionsSliderTemplate">
+		<Size>
+		    <AbsDimension x="220" y="17"/>
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPLEFT" >
+			<Offset>
+			    <AbsDimension x="10" y="-45" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnValueChanged>
+			Dcr_AmountOfAfflictedSlider_OnValueChanged();
+		    </OnValueChanged>
+		    <OnShow>
+			Dcr_AmountOfAfflictedSlider_OnShow();
+		    </OnShow>
+		</Scripts>
+	    </Slider>
+
+
+	    <Slider name="$parentCureBlacklistSlider" inherits="OptionsSliderTemplate">
+		<Size>
+		    <AbsDimension x="220" y="17"/>
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentAmountOfAfflictedSlider">
+			<Offset>
+			    <AbsDimension x="0" y="-40" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnValueChanged>
+			Dcr_CureBlacklistSlider_OnValueChanged();
+		    </OnValueChanged>
+		    <OnShow>
+			Dcr_CureBlacklistSlider_OnShow();
+		    </OnShow>
+		</Scripts>
+	    </Slider>
+
+	    <Slider name="$parentScanTimeSlider" inherits="OptionsSliderTemplate">
+		<Size>
+		    <AbsDimension x="220" y="17"/>
+		</Size>
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentCureBlacklistSlider">
+			<Offset>
+			    <AbsDimension x="0" y="-40" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnValueChanged>
+			Dcr_ScanTimeSlider_OnValueChanged();
+		    </OnValueChanged>
+		    <OnShow>
+			Dcr_ScanTimeSlider_OnShow();
+		    </OnShow>
+		</Scripts>
+	    </Slider>
+
+	    <CheckButton name="$parentPrintDefault" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentScanTimeSlider">
+			<Offset>
+			    <AbsDimension x="-5" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Print_ChatFrame = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_PRINT_CHATFRAME);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Print_ChatFrame) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentPrintCustomFrame" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentPrintDefault">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Print_CustomFrame = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_PRINT_CUSTOM);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Print_CustomFrame) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentCheckForAbolish" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentPrintCustomFrame">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Check_For_Abolish = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_ABOLISH_CHECK);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Check_For_Abolish) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+	    <!--
+	    <CheckButton name="$parentCheckForRange" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentCheckForAbolish">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.RangeCheck = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_CHECK_RANGE);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.RangeCheck) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+	    -->
+
+	    <CheckButton name="$parentDoNotBLPrio" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentCheckForAbolish">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.DoNot_Blacklist_Prio_List = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_DONOT_BL_PRIO);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.DoNot_Blacklist_Prio_List) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentAlwaysUseBestSpell" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentDoNotBLPrio">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.AlwaysUseBestSpell = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_BEST_SPELL);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.AlwaysUseBestSpell) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentRandomOrder" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentAlwaysUseBestSpell">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Random_Order = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_RANDOM_ORDER);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Random_Order) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentCurePets" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentRandomOrder">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Scan_Pets = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_CURE_PETS);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Scan_Pets) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentSkipStealth" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentCurePets">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Ingore_Stealthed = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_IGNORE_STEALTH);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Ingore_Stealthed) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+	    <CheckButton name="$parentPlaySound" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentSkipStealth">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.PlaySound = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_PLAY_SOUND);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.PlaySound) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+	    <CheckButton name="$parentPrintError" inherits="OptionsCheckButtonTemplate">
+		<Anchors>
+		    <Anchor point="TOPLEFT" relativeTo="$parentPlaySound">
+			<Offset>
+			    <AbsDimension x="0" y="-25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+		    <OnClick>
+			Dcr_Saved.Print_Error = (this:GetChecked() == 1);
+		    </OnClick>
+		    <OnLoad>
+			Dcr_ThisSetText(DCR_PRINT_ERRORS);
+		    </OnLoad>
+		    <OnShow>
+			if (Dcr_Saved.Print_Error) then
+			this:SetChecked(1);
+			else
+			this:SetChecked(0);
+			end
+		    </OnShow>
+		</Scripts>
+	    </CheckButton>
+
+
+
+	    <Button name="$parentSave" inherits="GameMenuButtonTemplate" text="CLOSE">
+		<Anchors>
+		    <Anchor point="CENTER" relativePoint="BOTTOM" relativeTo="$parent">
+			<Offset>
+			    <AbsDimension x="0" y="25" />
+			</Offset>
+		    </Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+			    this:SetText(DCR_STR_CLOSE);
+			</OnLoad>
+		    <OnClick>
+			Dcr_ShowHideOptionsUI();
+		    </OnClick>
+		</Scripts>
+	    </Button>
+	</Frames>
+
+    </Frame>
+
+    <Frame name="DecursiveAnchor" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+	<Size>
+	    <AbsDimension x="150" y="25"/>
+	</Size>
+
+	<Anchors>
+	    <Anchor point="TOP" relativeTo="UIErrorsFrame" relativePoint="BOTTOM">
+		<Offset>
+		    <AbsDimension x="0" y="0"/>
+		</Offset>
+	    </Anchor>
+	</Anchors>
+
+	<TitleRegion setAllPoints="true"/>
+
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+	    <EdgeSize>
+		<AbsValue val="16"/>
+	    </EdgeSize>
+	    <TileSize>
+		<AbsValue val="16"/>
+	    </TileSize>
+	    <BackgroundInsets>
+		<AbsInset left="5" right="5" top="5" bottom="5"/>
+	    </BackgroundInsets>
+	</Backdrop>
+
+	<Layers>
+	    <Layer level="BACKGROUND">
+		<FontString name="$parentText" inherits="GameFontNormal" text="DCR_ANCHOR">
+		    <Anchors>
+			<Anchor point="TOP">
+			    <Offset>
+				<AbsDimension x="0" y="-5"/>
+			    </Offset>
+			</Anchor>
+		    </Anchors>
+		</FontString>
+	    </Layer>
+	</Layers>
+    </Frame>
+
+    <MessageFrame name="DecursiveTextFrame" insertMode="TOP" parent="UIParent" frameStrata="HIGH" toplevel="true" >
+	<Size>
+	    <AbsDimension x="600" y="140"/>
+	</Size>
+	<Anchors>
+	    <Anchor point="TOP" relativeTo="DecursiveAnchor" relativePoint="BOTTOM">
+		<Offset>
+		    <AbsDimension x="0" y="0"/>
+		</Offset>
+	    </Anchor>
+	</Anchors>
+
+	<FontString inherits="MasterFont" font="Fonts\FRIZQT__.TTF" justifyH="CENTER">
+	    <FontHeight>
+		<AbsValue val="12"/>
+	    </FontHeight>
+	</FontString>
+    </MessageFrame>
+
+    <!-- read http://www.wowwiki.com/UIOBJECT_GameTooltip for more information -->
+    <GameTooltip name="Dcr_ScanningTooltip" inherits="GameTooltipTemplate">
+	<Scripts>
+	    <Onload>
+		this:SetOwner(this, "ANCHOR_NONE");
+	    </Onload>
+	</Scripts>
+    </GameTooltip>
+
+    <GameTooltip name="DcrDisplay_Tooltip" hidden="true" inherits="GameTooltipTemplate" parent="DecursiveAfflictedListFrame" />
+
+    <!-- Frame to handle all core events -->
+    <Frame name="Decursive">
+	<Scripts>
+	    <OnLoad>
+		Dcr_OnLoad(this);
+
+	    </OnLoad>
+	    <OnEvent>
+		Dcr_OnEvent(event);
+
+
+	    </OnEvent>
+	    <OnUpdate>
+		Dcr_OnUpdate(arg1);
+	    </OnUpdate>
+	</Scripts>
+    </Frame>
+    <GameTooltip name="Dcr_Tooltip" hidden="true" inherits="GameTooltipTemplate"/>
+</Ui>

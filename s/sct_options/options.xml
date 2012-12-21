@@ -1,0 +1,2111 @@
+<!-- Options Pane Definition -->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+	
+	<!-- CHECKBUTTON TEMPLATE -->
+	<CheckButton name="SCTCheckTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				if ( this:GetChecked() ) then
+					PlaySound("igMainMenuOptionCheckBoxOff");
+				else
+					PlaySound("igMainMenuOptionCheckBoxOn");
+				end
+				SCT:OptionsCheckButtonOnClick();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	
+	<!-- RADIO BUTTON TEMPLATE -->
+	<CheckButton name="SCTRadioTemplate" inherits="UIRadioButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOptionCheckBoxOff");
+				SCT:OptionsRadioButtonOnClick(this:GetID(),this:GetParent():GetName());
+			</OnClick>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+	
+	<!-- SLIDER READONLY TEMPLATE -->
+	<Frame name="SCTSliderTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="160" y="18"/>
+		</Size>
+		<Frames>
+			<Slider name="$parentSlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnValueChanged>
+						SCT:OptionsSliderOnValueChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Frame>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentEditBox" inherits="GameFontHighlightSmall">
+							<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentSlider" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="7" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+	
+	<!-- SLIDER EDIT TEMPLATE -->
+	<Frame name="SCTSliderEditTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="160" y="18"/>
+		</Size>
+		<Frames>
+			<Slider name="$parentSlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnValueChanged>
+						SCT:OptionsSliderOnValueChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<EditBox name="$parentEditBox" letters="5" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="30" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSlider" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="7" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<FontString inherits="GameFontHighlightSmall"/>
+				<Scripts>
+					<OnEnterPressed>
+						SCT:OptionsEditBoxOnValueChanged()
+						this:ClearFocus()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:ClearFocus()
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+		</Frames>
+	</Frame>
+	
+	<!-- DROPDOWN TEMPLATE -->
+	<Frame name="SCTDropdownTemplate" inherits="UIDropDownMenuTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="128" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="21" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				UIDropDownMenu_Initialize(this, function() SCT:DropDown_Initialize() end);
+			</OnLoad>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	
+	<!-- EVENT TEMPLATE -->
+	<Frame name="SCTEventOptionTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="160" y="22"/>
+		</Size>
+		<Frames>
+			<Button name="$parent_ColorSwatch">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="14" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SCT:OpenColorPicker(this:GetParent());
+					</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			
+			<CheckButton name="$parent_RadioFrame1Button" inherits="SCTRadioTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_ColorSwatch" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID(SCT.FRAME1);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_RadioFrame2Button" inherits="SCTRadioTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_RadioFrame1Button" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID(SCT.FRAME2);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_RadioMsgButton" inherits="SCTRadioTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_RadioFrame2Button" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID(SCT.MSG);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parent_CritCheckButton" inherits="SCTCheckTemplate">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_RadioMsgButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="$parent_CheckButton" inherits="SCTCheckTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_CritCheckButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+		</Frames>
+	</Frame>
+		
+	<!-- SAVE TEMPLATE -->
+	<Button name = "SCTSaveTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="140" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parent_Name" inherits="GameFontHighlightSmall" wraponspaces="false" justifyH="LEFT" text="">
+					<Size>
+						<AbsDimension x="140" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+				<Texture name="$parent_BackTexture" file="Interface\DialogFrame\UI-DialogBox-Background">
+					<Size>
+						<AbsDimension x="140" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<!-- SAVE LIST TEMPLATE -->
+	<Button name = "SCTSaveListTemplate" inherits="SCTSaveTemplate" virtual="true">
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Scripts>
+			<OnClick>
+				SCT:SaveList_OnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<!-- BUTTON TEMPLATE -->
+	<Button name="SCTButtonTemplate" inherits="OptionsButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	
+	<!-- PROFILE BUTTON TEMPLATE -->
+	<Button name="SCTProfileButtonTemplate" inherits="UIPanelButtonGrayTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="145" y="25"/>
+		</Size>
+		<NormalText inherits="GameFontHighlightSmall"/>
+		<DisabledText inherits="GameFontDisableSmall"/>
+		<HighlightText inherits="GameFontHighlightSmall"/>
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	
+	<!-- MAIN OPTION FRAME -->
+	<Frame name="SCTOptions" toplevel="true" frameStrata="LOW" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<TitleRegion>
+		  <Size>
+				<AbsDimension x="150" y="40" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="20" />
+					</Offset>
+				</Anchor>
+			</Anchors>
+	  </TitleRegion>
+
+		<Size>
+			<AbsDimension x="620" y="620"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+			tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />	
+				<Size>
+					<AbsDimension x="128" y="17" />
+				</Size>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="SCTFrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="276" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="SCTOptionsFrame_Misc1" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SCTOptions">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>				
+
+		<Frames>
+		
+			<!-- EVENTS OPTION FRAME -->
+			<Frame name="SCTOptions_EventsFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="385" y="305"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_EventsFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc2" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+			
+					<CheckButton name="SCTOptionsFrame_CheckButton1" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SCTOptions_EventsFrame" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="28" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									SCT:ToggleActive(true);
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									SCT:ToggleActive(false);
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								SCT:OptionsCheckButtonOnClick();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+		
+					<Frame name="SCTOptionsFrame1" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SCTOptions_EventsFrame" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-32" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame2" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame1" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame3" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame2" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame4" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame3" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame5" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame4" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame6" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame5" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame7" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame6" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame21" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame7" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame8" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame21" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame19" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame8" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame9" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame1" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="180" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame17" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame9" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame18" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame17" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame10" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame18" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame13" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame10" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame14" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame13" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame15" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame14" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame16" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame15" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame20" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame16" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame22" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame20" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+				</Frames>
+			</Frame>
+			
+			<!-- TEXT OPTION FRAME -->
+			<Frame name="SCTOptions_TextFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="190" y="375"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTOptions_EventsFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_TextFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc3" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider2" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptions_TextFrame" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-43" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider5" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider2" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider7" inherits="SCTSliderEditTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider5" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider8" inherits="SCTSliderEditTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider7" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Selection3" inherits="SCTDropdownTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SCTOptionsFrame_Slider8">
+								<Offset>
+									<AbsDimension x="-20" y="-23"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Selection4" inherits="SCTDropdownTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Selection3" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Selection1" inherits="SCTDropdownTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Selection4" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Selection2" inherits="SCTDropdownTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Selection1" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton4" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SCTOptionsFrame_Selection1">
+								<Offset>
+									<AbsDimension x="15" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			
+			<!-- MESSAGE OPTION FRAME -->
+			<Frame name="SCTOptions_MessageFrame" inherits="OptionFrameBoxTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="190" y="375"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTOptions_EventsFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_MessageFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc16" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider12" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptions_MessageFrame" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-43" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider11" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider12" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+		
+					<Frame name="SCTOptionsFrame_Slider9" inherits="SCTSliderEditTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider11" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider10" inherits="SCTSliderEditTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider9" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Selection5" inherits="SCTDropdownTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SCTOptionsFrame_Slider10">
+								<Offset>
+									<AbsDimension x="-20" y="-25"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Selection6" inherits="SCTDropdownTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Selection5" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+				</Frames>
+			</Frame>
+						
+			<!-- MISC FLAG OPTION FRAME -->
+			<Frame name="SCTOptions_MiscFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="190" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTOptions_EventsFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_MiscFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc4" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton13" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SCTOptions_MiscFrame" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton2" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SCTOptionsFrame_CheckButton13" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton5" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton2" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								SCT:OptionsCheckButtonOnClick();
+								SCT:ChangeStickyMode(this:GetChecked());
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton15" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton5" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="65" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton7" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton5" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton9" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton7" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton14" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton9" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								SCT:OptionsCheckButtonOnClick();
+								SCT:ChangeLightMode(this:GetChecked(), true);
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					
+				</Frames>
+			</Frame>
+			
+			<!-- SPELL OPTION FRAME -->
+			<Frame name="SCTOptions_SpellFrame" inherits="OptionFrameBoxTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="190" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTOptions_EventsFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_SpellFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc17" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton3" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SCTOptions_MiscFrame" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton6" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton3" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton12" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton6" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+										
+					<CheckButton name="SCTOptionsFrame_CheckButton8" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton12" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton10" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton8" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<Frame name="SCTOptionsFrame_Slider13" inherits="SCTSliderEditTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame_CheckButton10" relativePoint="left">
+								<Offset>
+									<AbsDimension x="5" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+			
+			<!-- WARNING OPTION FRAME -->
+			<Frame name="SCTOptions_WarningFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="190" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTOptions_MiscFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_WarningFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc5" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<CheckButton name="SCTOptionsFrame_CheckButton11" inherits="SCTCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SCTOptions_WarningFrame" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-25" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					
+					<Frame name="SCTOptionsFrame11" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_CheckButton11" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="70" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider3" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame11" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame12" inherits="SCTEventOptionTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame11" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="-65" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider4" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SCTOptionsFrame12" relativePoint="left">
+								<Offset>
+									<AbsDimension x="0" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+			
+			<!-- ANIMATION  FRAME -->
+			<Frame name="SCTOptions_AnimationFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="190" y="130"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="SCTOptions_WarningFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+				<Frames>
+				
+					<Frame name="SCTOptions_AnimationFrameTitle">
+						<Size>
+							<AbsDimension x="140" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>			
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer>
+                <FontString name="SCTOptionsFrame_Misc6" inherits="GameFontHighlight">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>								
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+								this:SetBackdropColor(0.15, 0.15, 0.15);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+										
+					<Frame name="SCTOptionsFrame_Slider1" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptions_AnimationFrame" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-45" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<Frame name="SCTOptionsFrame_Slider6" inherits="SCTSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SCTOptionsFrame_Slider1" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+				</Frames>
+			</Frame>
+			
+			<!-- Profiles Frame -->
+			<Frame name="SCTOptions_ProfilesFrame">
+				<Size>
+					<AbsDimension x="380" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="SCTOptions">
+						<Offset>
+							<AbsDimension x="5" y="39" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			
+				<Frames>
+						<!-- Select Profile Button -->
+						<Button name="SCTOptionsFrame_Misc10" inherits="SCTButtonTemplate">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SCTOptions_ProfilesFrame">
+									<Offset>
+										<AbsDimension x="0" y="-2" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnClick>
+									if ( ColorPickerFrame:IsVisible() ) then
+										ColorPickerFrame:Hide();
+									end
+									SCTOptions_SaveLoadFrame:Show()
+									<!--SCT:DropMenu(this);-->
+								</OnClick>
+							</Scripts>
+						</Button>
+						
+						<!-- Profile Edit Box -->
+						<EditBox name="SCTOptionsProfileEditBox" letters="1000" autoFocus="false" inherits="InputBoxTemplate" frameStrata="HIGH">
+							<Size>
+								<AbsDimension x="150" y="22"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="SCTOptionsFrame_Misc10">
+									<Offset>
+										<AbsDimension x="10" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontString inherits="ChatFontNormal" font="Fonts\ARIALN.TTF">
+								<Color r="1" g="1" b="0"/>
+								<FontHeight>
+									<AbsValue val="12"/>
+								</FontHeight>
+							</FontString>
+						</EditBox>
+						
+						<!-- Load Profile Button -->
+						<Button name="SCTOptionsFrame_Misc11" inherits="SCTButtonTemplate">
+							<Size>
+								<AbsDimension x="50" y="21"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="SCTOptionsProfileEditBox">
+									<Offset>
+										<AbsDimension x="5" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnClick>
+									SCT:LoadProfile();
+								</OnClick>
+							</Scripts>
+						</Button>
+						
+						<!-- Delete Profile Button -->
+						<Button name="SCTOptionsFrame_Misc12" inherits="SCTButtonTemplate">
+							<Size>
+								<AbsDimension x="50" y="21"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="SCTOptionsFrame_Misc11">
+									<Offset>
+										<AbsDimension x="5" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnClick>
+									SCT:DeleteProfile();
+								</OnClick>
+							</Scripts>
+						</Button>
+					</Frames>
+			</Frame>
+			
+			<!-- Example Frame  -->
+			<Frame name="SCT_EXAMPLETEXT" toplevel="true" frameStrata="HIGH" hidden="true">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SCTaniExampleData1" inherits="MasterFont"/>
+						<FontString name="SCTaniExampleData2" inherits="MasterFont"/>
+					</Layer>		
+				</Layers>
+			</Frame>
+			
+			<!-- Example MSG Frame  -->
+			<Frame name="SCT_EXAMPLEMSG" toplevel="true" frameStrata="HIGH" hidden="true">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="210"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SCTMsgExample1" inherits="MasterFont" font="Fonts\FRIZQT__.TTF" justifyH="CENTER" outline="NORMAL">
+							<FontHeight>
+								<AbsValue val="20"/>
+							</FontHeight>
+						</FontString>
+					</Layer>		
+				</Layers>
+			</Frame>
+			
+			<!-- Save Button -->
+			<Button name="SCTOptionsFrame_Misc8" inherits="SCTButtonTemplate">
+				<Size>
+					<AbsDimension x="110" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="SCTOptions">
+						<Offset>
+							<AbsDimension x="15" y="16" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( ColorPickerFrame:IsVisible() ) then
+							ColorPickerFrame:Hide();
+						end
+						<!--SCT:SaveCurrentSettings();-->
+						SCT:AniInit();
+						SCT:HideMenu();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!-- Reset Button -->
+			<Button name="SCTOptionsFrame_Misc9" inherits="SCTButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						StaticPopupDialogs["SCT_RESET"] = {
+						  text = SCT.LOCALS.OPTION_MISC9.tooltipText,
+						  button1 = TEXT(OKAY) ,
+						  button2 = TEXT(CANCEL) ,
+						  OnAccept = function()
+						      SCT:Reset();
+						  end,
+						  timeout = 0,
+						  whileDead = 1,
+						  hideOnEscape = 1,
+						  showAlert = 1
+						};
+					</OnLoad>
+					<OnClick>
+						StaticPopup_Show("SCT_RESET");
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!-- Scrolling Text Button -->
+			<Button name="SCTOptionsFrame_Misc14" inherits="TabButtonTemplate" text="test1234">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="SCTOptions_TextFrame">
+						<Offset>
+							<AbsDimension x="0" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc15);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc20);
+						SCTOptions_MessageFrame:Hide();
+						SCTOptions_TextFrame:Show();
+						SCT:ChangeFrameTab(SCT.FRAME1);
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_TabResize(-17, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 16);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
+			<!-- Scrolling Text 2 Button -->
+			<Button name="SCTOptionsFrame_Misc20" inherits="TabButtonTemplate" text="test1234">
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="SCTOptions_TextFrame">
+						<Offset>
+							<AbsDimension x="-7" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc15);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc14);
+						SCTOptions_MessageFrame:Hide();
+						SCTOptions_TextFrame:Show();
+						SCT:ChangeFrameTab(SCT.FRAME2);
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_DeselectTab(this);
+						PanelTemplates_TabResize(-17, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 16);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
+			<!-- Message Text Button -->
+			<Button name="SCTOptionsFrame_Misc15" inherits="TabButtonTemplate" text="test123456">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="SCTOptions_TextFrame">
+						<Offset>
+							<AbsDimension x="0" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc14);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc20);
+						SCTOptions_TextFrame:Hide();
+						SCTOptions_MessageFrame:Show();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_DeselectTab(this);
+						PanelTemplates_TabResize(-17, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 16);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
+			<!-- Misc Button -->
+			<Button name="SCTOptionsFrame_Misc18" inherits="TabButtonTemplate" text="test1234">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="SCTOptions_MiscFrame">
+						<Offset>
+							<AbsDimension x="10" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc19);
+						SCTOptions_SpellFrame:Hide();
+						SCTOptions_MiscFrame:Show();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_TabResize(-10, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 16);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
+			<!-- Spell Button -->
+			<Button name="SCTOptionsFrame_Misc19" inherits="TabButtonTemplate" text="test123456">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="SCTOptions_SpellFrame">
+						<Offset>
+							<AbsDimension x="-10" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(SCTOptionsFrame_Misc18);
+						SCTOptions_MiscFrame:Hide();
+						SCTOptions_SpellFrame:Show();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_DeselectTab(this);
+						PanelTemplates_TabResize(-10, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 16);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
+		</Frames>
+		<Scripts>
+			<OnShow>
+				SCT:OptionsFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				SCTOptions_SaveLoadFrame:Hide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	<!-- LOAD OPTION FRAME (HIDDEN) -->
+	<Frame name="SCTOptions_SaveLoadFrame" inherits="OptionFrameBoxTemplate" hidden="true" frameStrata="DIALOG" parent="UIParent">
+		<Size>
+			<AbsDimension x="190" y="275"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOM" relativeTo="SCTOptionsFrame_Misc10" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+				this:SetBackdropColor(0, 0, 0);
+			</OnLoad>
+		</Scripts>
+		<Frames>
+		
+			<Frame name="SCTOptions_SaveLoadFrameTitle">
+				<Size>
+					<AbsDimension x="140" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>			
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer>
+            <FontString name="SCTOptionsFrame_Misc7" inherits="GameFontHighlight">
+                <Anchors>
+                    <Anchor point="CENTER">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+			<ScrollFrame name="SCTScrollBar" inherits="FauxScrollFrameTemplate" hidden="false">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-8"/>
+            </Offset>
+          </Anchor>
+          <Anchor point="BOTTOMRIGHT">
+            <Offset>
+              <AbsDimension x="-30" y="8"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnVerticalScroll>
+            FauxScrollFrame_OnVerticalScroll(16, SCT.ScrollBar_Update);
+          </OnVerticalScroll>
+          <OnShow>
+            SCT:ScrollBar_Update()
+          </OnShow>
+        </Scripts>
+      </ScrollFrame>
+			
+			<Button name = "SCTList1" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTOptions_SaveLoadFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList2" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList3" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList4" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList5" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList6" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList7" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList8" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList9" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "SCTList10" inherits="SCTSaveListTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SCTList9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			
+			<!-- Cancel Button -->
+			<Button name="SCTOptionsFrame_Misc13" inherits="SCTButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTList10" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SCTOptions_SaveLoadFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+		<OnShow>
+			SCTOptions:SetAlpha(.33);
+			SCTOptions_BuiltInConfigFrame:Show();
+		</OnShow>
+		<OnHide>
+			SCTOptions:SetAlpha(1);
+			SCTOptions_BuiltInConfigFrame:Hide();
+		</OnHide>
+	</Scripts>
+	</Frame>
+	
+	<!-- LOAD BULIT IN CONFIG OPTION FRAME (HIDDEN) -->
+	<Frame name="SCTOptions_BuiltInConfigFrame" inherits="OptionFrameBoxTemplate" hidden="true" frameStrata="DIALOG" parent="UIParent">
+		<Size>
+			<AbsDimension x="190" y="170"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOM" relativeTo="SCTOptions_SaveLoadFrame" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+				this:SetBackdropColor(0, 0, 0);
+			</OnLoad>
+		</Scripts>
+		<Frames>
+		
+			<Frame name="SCTOptions_BuiltInConfigFrameTitle">
+				<Size>
+					<AbsDimension x="140" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>			
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer>
+            <FontString name="SCTOptionsFrame_Misc26" inherits="GameFontHighlight">
+                <Anchors>
+                    <Anchor point="CENTER">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+													
+			<!-- Classic Button -->
+			<Button name="SCTOptionsFrame_Misc22" inherits="SCTProfileButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTOptions_BuiltInConfigFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SCTOptions_SaveLoadFrame:Hide()
+						SCT:CopyProfile(SCT.db.profile, SCT:GetClassicConfig());
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!-- Performance Button -->
+			<Button name="SCTOptionsFrame_Misc23" inherits="SCTProfileButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTOptionsFrame_Misc22" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SCTOptions_SaveLoadFrame:Hide()
+						SCT:CopyProfile(SCT.db.profile, SCT:GetPerformanceConfig());
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!-- Split Button -->
+			<Button name="SCTOptionsFrame_Misc24" inherits="SCTProfileButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTOptionsFrame_Misc23" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SCTOptions_SaveLoadFrame:Hide()
+						SCT:CopyProfile(SCT.db.profile, SCT:GetSplitConfig());
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!-- Split SCTD Button -->
+			<Button name="SCTOptionsFrame_Misc27" inherits="SCTProfileButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTOptionsFrame_Misc24" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SCTOptions_SaveLoadFrame:Hide()
+						SCT:CopyProfile(SCT.db.profile, SCT:GetSplitSCTDConfig());
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<!-- Grayhoof Button -->
+			<Button name="SCTOptionsFrame_Misc25" inherits="SCTProfileButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SCTOptionsFrame_Misc27" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SCTOptions_SaveLoadFrame:Hide()
+						SCT:CopyProfile(SCT.db.profile, SCT:GetGrayhoofConfig());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

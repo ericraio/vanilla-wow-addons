@@ -1,0 +1,82 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+-- Create MiniMapCords Frame
+<Frame name="MiniCoordsFrame" parent="Minimap"	enableMouse="true" hidden="false"	frameStrata="MEDIUM" movable="true">
+		<Size>
+			<AbsDimension	x="40" y="10"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="BOTTOM" relativeTo="Minimap"	relativePoint="BOTTOM">
+				<Offset>
+					<AbsDimension	x="0"	y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+-- Create a FontString within the MiniMapCords Frame
+				<FontString	name="MiniCoords" toplevel="true" hidden="false"	inherits="GameFontNormal"	text="">
+					<Anchors>
+						<Anchor	point="CENTER">
+							<Offset>
+								<AbsDimension	x="0"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+-- Registering the event and set the Initalizing text
+				this:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+				MiniCoords:SetText("Initalizing...");
+				MiniCoords:SetTextColor(0.5, 1, 0.5);
+			</OnLoad>
+			<OnEvent>
+-- If we go to a new area, need to set the map that region to get the exact coords.
+				if (event == "ZONE_CHANGED_NEW_AREA") then
+					SetMapToCurrentZone();
+				end
+			</OnEvent>
+			<OnUpdate>
+-- Write the coordinates if it's valid, or "instance" if we're an Instance (maybe get this message in another circumstances)
+				if Minimap:IsVisible() then
+					local px, py = GetPlayerMapPosition("player");
+					if (px > 0 and py  > 0) then
+						MiniCoords:Show();
+						local output = "";						
+						local mult = 10^0;
+						output = math.floor(((px * 100) * mult + 0.5) / mult)..","..math.floor(((py * 100) * mult + 0.5) / mult);						
+						MiniCoords:SetText(output);
+						MiniCoords:SetTextColor(0.5, 1, 0.5);
+					else
+						MiniCoords:SetText("Instance");
+						MiniCoords:SetTextColor(1, 0.5, 0.5);
+					end
+				end
+			</OnUpdate>
+			<OnMouseDown>
+-- We can drag the coords text via the LeftMouseButton or paste our position in the chat editbox
+				if(arg1== "LeftButton")	then
+					if(IsShiftKeyDown())	then
+						if (ChatFrameEditBox:IsVisible()) then
+							local msg = "My location: "..GetRealZoneText().." ("..MiniCoords:GetText()..")";
+							ChatFrameEditBox:Insert(msg);
+						end
+					else
+						this:StartMoving();
+					end
+				end
+					this.isMoving = true;		
+			</OnMouseDown>
+			<OnMouseUp>
+				if(this.isMoving) then
+					this:StopMovingOrSizing();
+					this.isMoving = false;
+				end		
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+</Ui>

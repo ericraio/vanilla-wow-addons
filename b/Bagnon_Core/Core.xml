@@ -1,0 +1,141 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<!-- A bag frame template -->
+	<Button name="BagnonBagFrame" frameStrata="MEDIUM" movable="true" enableMouse="true" parent="UIParent" hidden="true" virtual="true">
+	
+		<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="$parentTitle">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-4"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parentCloseButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<NormalText font="GameFontNormal" justifyH="LEFT" setAllPoints="true"/>
+				<HighlightText font="GameFontHighlight" justifyH="LEFT" setAllPoints="true"/>
+				
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnDoubleClick>
+						BagnonCore_OnDoubleClick(this:GetParent());
+					</OnDoubleClick>
+					<OnDragStart>
+						BagnonCore_StartMoving(this:GetParent());
+					</OnDragStart>
+					<OnMouseDown>
+						BagnonCore_StartMoving(this:GetParent());
+					</OnMouseDown>
+					<OnMouseUp>
+						BagnonCore_OnClick(this:GetParent(), arg1);
+						BagnonCore_StopMoving(this:GetParent());
+					</OnMouseUp>
+					<OnEnter>
+						BagnonCore_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						BagnonCore_OnLeave();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<Frames>
+					<Button name="$parentHoverFrame">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+						
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel() + 1);
+							</OnLoad>
+							<OnClick>
+								BagnonCoreMoney_OnClick();
+							</OnClick>
+							<OnEnter>
+								BagnonCoreMoney_OnEnter();
+							</OnEnter>
+							<OnLeave>
+								BagnonCoreMoney_OnLeave();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				
+				<Scripts>
+					<OnShow>
+						if(not this:GetParent().player or this:GetParent().player == UnitName("player") ) then
+							MoneyFrame_UpdateMoney();
+						end
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+		
+		<Scripts>
+			<OnMouseDown>
+				BagnonCore_StartMoving(this);
+			</OnMouseDown>
+			<OnMouseUp>
+				BagnonCore_StopMoving(this);
+			</OnMouseUp>
+			<OnHide>
+				BagnonCore_OnHide();
+			</OnHide>
+		</Scripts>
+	</Button>
+	
+	<!-- Global Event Handler -->
+	<Frame name="BagnonEvents" hidden="true">
+		<Scripts>
+			<OnLoad>
+				BagnonEvents_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				BagnonEvents_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,193 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="HA_debug.lua"/> 
+
+  <Frame name="HADebugFrame" parent="UIParent" hidden="true" toplevel="true" enableMouse="true" movable="true">
+    <Size>
+      <AbsDimension x="490" y="490"/>
+    </Size>
+    <Anchors>
+      <Anchor point="TOPLEFT">
+        <Offset>
+          <AbsDimension x="100" y="-104"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize>
+        <AbsValue val="16"/>
+      </EdgeSize>
+      <TileSize>
+        <AbsValue val="16"/>
+      </TileSize>
+      <BackgroundInsets>
+        <AbsInset left="3" right="5" top="3" bottom="5"/>
+      </BackgroundInsets>
+    </Backdrop>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="$parentTitel" inherits="GameFontNormal" text="Healers Assist Debug Log">
+          <Anchors>
+            <Anchor point="TOP" relativePoint="TOP">
+              <Offset>
+                <AbsDimension x="0" y="-6"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+	<Frames>
+		<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="2" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<ScrollingMessageFrame name="HADebug_Log" displayDuration="1200.0" maxLines="2000">
+			<Size>
+				<AbsDimension x="450" y="450"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="22" y="-22"/>
+					</Offset>
+				</Anchor>
+			</Anchors>						
+			<Frames>
+				<Button name="$parentBottomButton">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="-32" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Layers>
+						<Layer level="OVERLAY">
+							<Texture name="$parentFlash" file="Interface\ChatFrame\UI-ChatIcon-BlinkHilight" hidden="true"/>
+						</Layer>
+					</Layers>
+					<Scripts>
+						<OnClick>
+							PlaySound("igChatBottom");
+							this:GetParent():ScrollToBottom();
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Up"/>
+					<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Down"/>
+					<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Disabled"/>
+					<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+				</Button>
+				<Button name="$parentDownButton">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="$parentBottomButton" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							MessageFrameScrollButton_OnLoad();
+						</OnLoad>
+						<OnUpdate>
+							MessageFrameScrollButton_OnUpdate(arg1);
+						</OnUpdate>
+						<OnClick>
+							if ( this:GetButtonState() == "PUSHED" ) then
+								this.clickDelay = MESSAGE_SCROLLBUTTON_INITIAL_DELAY;
+							else
+								PlaySound("igChatScrollDown");
+								this:GetParent():ScrollDown();
+							end
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+					<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+					<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+					<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+				</Button>
+				<Button name="$parentUpButton">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativeTo="$parentDownButton" relativePoint="TOP"/>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							MessageFrameScrollButton_OnLoad();
+						</OnLoad>
+						<OnUpdate>
+							MessageFrameScrollButton_OnUpdate(arg1);
+						</OnUpdate>
+						<OnClick>
+							if ( this:GetButtonState() == "PUSHED" ) then
+								this.clickDelay = MESSAGE_SCROLLBUTTON_INITIAL_DELAY;
+							else
+								PlaySound("igChatScrollUp");
+								this:GetParent():ScrollUp();
+							end
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up"/>
+					<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down"/>
+					<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Disabled"/>
+					<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+				</Button>
+			</Frames>
+			<Scripts>
+				<OnHyperlinkClick>
+					ChatFrame_OnHyperlinkShow(arg1, arg2, arg3);
+				</OnHyperlinkClick>
+				<OnLoad>
+					this:SetBackdropColor(1,1,1,1);
+					this:EnableMouseWheel(1);
+				</OnLoad>
+			</Scripts>
+			<FontString justifyH="LEFT" font="Fonts\ARIALN.TTF">
+				<FontHeight>
+					<AbsValue val="12"/>
+				</FontHeight>
+				<Shadow>
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Shadow>
+			</FontString>								
+		</ScrollingMessageFrame>						
+	</Frames>
+    <Scripts>
+      <OnMouseUp>
+        if ( this.isMoving ) then
+          this:StopMovingOrSizing();
+          this.isMoving = false;
+        end
+      </OnMouseUp>
+      <OnMouseDown>
+        if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+          this:StartMoving();
+          this.isMoving = true;
+        end
+      </OnMouseDown>
+      <OnHide>
+        if ( this.isMoving ) then
+          this:StopMovingOrSizing();
+          this.isMoving = false;
+        end
+      </OnHide>
+    </Scripts>
+  </Frame>
+  
+</Ui>

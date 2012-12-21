@@ -1,0 +1,366 @@
+<?xml-stylesheet type="text/xsl" href="/css/wowui.xsl"?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+  <Script file="localisation.en.lua"/>
+  <Script file="localisation.cn.lua"/>
+  <Script file="localisation.de.lua"/>
+  <Script file="localisation.fr.lua"/>
+  <Script file="localisation.ko.lua"/>
+  <Script file="localisation.tw.lua"/>
+  <Script file="Defaults.lua"/>
+  <Script file="FlightMap.lua"/>
+
+  <!-- Hook OnLoad and OnEvent -->
+  <Frame name="FlightMapFrame" parent="UIParent" hidden="true">
+    <Scripts>
+      <OnLoad>
+        FlightMap_OnLoad();
+      </OnLoad>
+      <OnEvent>
+        FlightMap_OnEvent(event);
+      </OnEvent>
+    </Scripts>
+  </Frame>
+
+  <!-- Create a new tooltip for this AddOn, so the original WorldMap tip
+       still works -->
+  <GameTooltip name="FlightMapTooltip" parent="WorldMapFrame" hidden="true"
+               frameStrata="TOOLTIP" inherits="GameTooltipTemplate">
+    <Scripts>
+      <OnLoad>
+          this:SetBackdropBorderColor(
+              TOOLTIP_DEFAULT_COLOR.r,
+              TOOLTIP_DEFAULT_COLOR.g,
+              TOOLTIP_DEFAULT_COLOR.b,
+              0
+          );
+          this:SetBackdropColor(
+              TOOLTIP_DEFAULT_BACKGROUND_COLOR.r,
+              TOOLTIP_DEFAULT_BACKGROUND_COLOR.g,
+              TOOLTIP_DEFAULT_BACKGROUND_COLOR.b,
+              0
+          );
+      </OnLoad>
+    </Scripts>
+  </GameTooltip>
+
+  <!-- Flight path lines; thanks to MapNotes! -->
+  <Texture name="FlightMapPathTemplate" hidden="true" virtual="true"
+           file="Interface\AddOns\FlightMap\FlightMapUp">
+    <Size>
+      <AbsDimension x="512" y="512"/>
+    </Size>
+    <Anchors>
+      <Anchor point="TOPLEFT"/>
+    </Anchors>
+  </Texture>
+
+  <!-- Extra POI icons for flight masters -->
+  <Button name="FlightMapPOITemplate" hidden="true" virtual="true">
+    <Size>
+      <AbsDimension x="16" y="16"/>
+    </Size>
+    <NormalTexture file="Interface\TaxiFrame\UI-Taxi-Icon-Green"/>
+    <HighlightTexture file="Interface\TaxiFrame\UI-Taxi-Icon-Highlight">
+      <Size x="32" y="32"/>
+      <Anchors>
+        <Anchor point="CENTER">
+          <Offset>
+            <AbsDimension x="0" y="0"/>
+          </Offset>
+        </Anchor>
+      </Anchors>
+    </HighlightTexture>
+    <Scripts>
+      <OnEnter>
+          FlightMapPOIButton_OnEnter();
+      </OnEnter>
+      <OnLeave>
+          WorldMapTooltip:Hide();
+      </OnLeave>
+    </Scripts>
+  </Button>
+  
+  <Texture name="FlightMapIconTemplate" hidden="true" virtual="true"
+           file="Interface\TaxiFrame\UI-Taxi-Icon-Green">
+    <Size>
+      <AbsDimension x="16" y="16"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+  </Texture>
+
+  <Frame name="FlightMapPathFrame" parent="WorldMapDetailFrame" hidden="false">
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture name="FlightMapPath1" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath2" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath3" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath4" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath5" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath6" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath7" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath8" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath9" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath10" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath11" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath12" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath13" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath14" inherits="FlightMapPathTemplate"/>
+        <Texture name="FlightMapPath15" inherits="FlightMapPathTemplate"/>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Button name="FlightMapPOI1" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI2" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI3" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI4" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI5" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI6" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI7" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI8" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI9" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI10" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI11" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI12" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI13" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI14" inherits="FlightMapPOITemplate"/>
+      <Button name="FlightMapPOI15" inherits="FlightMapPOITemplate"/>
+    </Frames>
+  </Frame>
+
+  <!-- Configuration checkbox template -->
+  <CheckButton name="FlightMapOptionsCheckButtonTemplate"
+               inherits="UICheckButtonTemplate" virtual="true">
+    <Scripts>
+      <OnClick>
+        if (this:GetChecked()) then
+            PlaySound("igMainMenuOptionCheckBoxOff");
+        else
+            PlaySound("igMainMenuOptionCheckBoxOn");
+        end
+        FlightMapOptionsCheckButton_OnClick();
+      </OnClick>
+      <OnEnter>
+        if (this.tooltipText) then
+            GameTooltip_AddNewbieTip(this.tooltipText, 1, 1, 1);
+        end
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+    </Scripts>
+  </CheckButton>
+
+  <!-- Configuration window -->
+  <Frame name="FlightMapOptionsFrame" toplevel="true" frameStrata="DIALOG"
+         movable="true" enableMouse="true" hidden="true" parent="UIParent"
+         enableKeyboard="true">
+    <Size>
+      <AbsDimension x="350" y="265"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+              edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture name="FlightMapOptionsFrameHeader"
+                 file="Interface\DialogFrame\UI-DialogBox-Header">
+          <Size>
+            <AbsDimension x="256" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="12"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+        <FontString inherits="GameFontNormal" name="FlightMapOptionsFrameTitle"
+                    text="FlightMap Options">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="FlightMapOptionsFrameHeader">
+              <Offset>
+                <AbsDimension x="0" y="-14"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <!-- Option #1; row 1, column 1 -->
+      <CheckButton name="$parentOpt1"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-25"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #2; row 2, column 1 -->
+      <CheckButton name="$parentOpt2"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-55"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #3; row 3, column 1 -->
+      <CheckButton name="$parentOpt3"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-85"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #4; row 4, column 1 -->
+      <CheckButton name="$parentOpt4"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-115"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #5; row 5, column 1 -->
+      <CheckButton name="$parentOpt5"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-145"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #6; row 1, column 2 -->
+      <CheckButton name="$parentOpt6"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="-185" y="-25"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #7; row 2, column 2 -->
+      <CheckButton name="$parentOpt7"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="-175" y="-55"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #8; row 3, column 2 -->
+      <CheckButton name="$parentOpt8"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="-175" y="-85"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #9; row 4, column 2 -->
+      <CheckButton name="$parentOpt9"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="-175" y="-115"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #10; row 5, column 2 -->
+      <CheckButton name="$parentOpt10"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="-185" y="-145"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #11; row 6, column 1 -->
+      <CheckButton name="$parentOpt11"
+                   inherits="FlightMapOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-175"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <Button name="FlightMapOptionsFrameClose"
+              inherits="OptionsButtonTemplate" text="Close">
+        <Anchors>
+          <Anchor point="BOTTOM">
+            <Offset>
+              <AbsDimension x="0" y="16"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+         <OnClick>
+            PlaySound("gsTitleOptionOK");
+            HideUIPanel(FlightMapOptionsFrame);
+          </OnClick>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnShow>
+        FlightMapOptionsFrame_OnShow();
+      </OnShow>
+      <OnHide>
+        FlightMapOptionsFrame_OnHide();
+      </OnHide>
+    </Scripts>
+  </Frame>
+
+</Ui>

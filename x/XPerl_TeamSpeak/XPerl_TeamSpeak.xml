@@ -1,0 +1,94 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+        <Script file="Localization.lua"/>
+        <Script file="XPerl_TeamSpeak.lua"/>
+        <Script file="XPerl_TeamSpeak.zhTW.lua"/>
+
+        <Frame name="XPerl_TeamSpeak_Events">
+		<Scripts>
+			<OnLoad>
+                                this:RegisterEvent("PLAYER_ENTERING_WORLD")
+                                this:RegisterEvent("CHAT_MSG_ADDON")
+			</OnLoad>
+			<OnEvent>
+                                XPerl_TeamSpeak_OnEvent(event)
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+        <Frame name="XPerl_TeamSpeak_Frame" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" clampedToScreen="true">
+                <Size><AbsDimension x="16" y="16"/></Size>
+                <Anchors>
+                        <Anchor point="TOPLEFT">
+                                <Offset>
+                                        <AbsDimension x="200" y="-150"/>
+                                </Offset>
+                        </Anchor>
+                </Anchors>
+                <Frames>
+                        <Frame name="XPerl_TeamSpeak_DropDown" inherits="UIDropDownMenuTemplate" id="1">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT"/>
+                                </Anchors>
+                                <Scripts>
+                                        <OnLoad>
+                                                XPerl_Teamspeak_Dropdown_OnLoad()
+                                        </OnLoad>
+                                        <OnShow>
+                                                XPerl_Teamspeak_Dropdown_OnLoad()
+                                        </OnShow>
+                                </Scripts>
+                        </Frame>
+                </Frames>
+                <Layers>
+                        <Layer level="BACKGROUND">
+                                <Texture name="XPerl_TeamSpeakIcon" file="Interface\Addons\XPerl_Teamspeak\XPerl_Speakers">
+                                        <TexCoords left="0.75" right="1" top="0" bottom="1"/>
+                                        <Size><AbsDimension x="18" y="18"/></Size>
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT"/>
+                                        </Anchors>
+                                </Texture>
+                        </Layer>
+                        <Layer level="OVERLAY">
+                                <FontString name="XPerl_TeamSpeakText" inherits="GameFontNormalSmall">
+                                        <Size><AbsDimension x="150" y="400"/></Size>
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="XPerl_TeamSpeakIcon"/>
+                                        </Anchors>
+                                </FontString>
+                        </Layer>
+                </Layers>
+                <Scripts>
+                        <OnLoad>
+                                this:RegisterForDrag("LeftButton")
+                        </OnLoad>
+                        <OnMouseUp>
+                                if (arg1 == "RightButton") then
+                                        XPerl_TeamSpeakMenu()
+                                end
+                        </OnMouseUp>
+                        <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
+                                GameTooltip:SetText(XPerl_TS_ProductName.." - "..XPerl_TS_Version, 1, 1, 1)
+                                GameTooltip:AddLine(XPERL_TEAMSPEAK_HELP1)
+                                GameTooltip:AddLine(XPERL_TEAMSPEAK_HELP2)
+                                GameTooltip:Show()
+                        </OnEnter>
+                        <OnLeave>
+                                GameTooltip:Hide()
+                        </OnLeave>
+                        <OnShow>
+                                XPerlTeamSpeak.tsFrame = true
+                        </OnShow>
+                        <OnHide>
+                                XPerlTeamSpeak.tsFrame = nil
+                        </OnHide>
+                        <OnDragStart>
+                                this:StartMoving()
+                        </OnDragStart>
+                        <OnDragStop>
+                                this:StopMovingOrSizing()
+                        </OnDragStop>
+                </Scripts>
+        </Frame>
+</Ui>

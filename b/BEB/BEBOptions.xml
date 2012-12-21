@@ -1,0 +1,2255 @@
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\UI.xsd">
+	<Script file="BEBOptions.lua"/>
+	
+	<CheckButton name="BEBOptionsCheckButtonTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				BEBOptions_CheckButton_OnClick()
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	
+	<Button name="BEBNudgeTemplate" inherits="UIPanelButtonTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+			</OnLoad>
+			<OnMouseDown>
+				if (arg1 == "MiddleButton") then
+					BEBNudging = this:GetName();
+					BEBNudgeTime = 0
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "MiddleButton") then
+					BEBNudging = nil;
+					BEBNudgeTime = nil
+				else
+					BEBOptions_Nudge(arg1,this:GetName());
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+	
+	<Button name="BEBColorButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="25" y="25"/>
+		</Size>
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Text"):SetWidth(105);
+			</OnLoad>
+			<OnClick>
+				BEBOptions_ColorPicker_OnClick();
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD">
+		</HighlightTexture>
+	</Button>
+	
+	<Button name="BEB_MenuOptionTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="170" y="15"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT"></Anchor>
+						<Anchor point="BOTTOMRIGHT"></Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				this:GetParent().timer = nil;
+			</OnEnter>
+			<OnClick>
+				BEBOptions_MenuOptionOnClick()
+			</OnClick>
+		</Scripts>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-Button-Highlight">
+			<TexCoords left="0" right="0.625" top="0.1" bottom="0.6875"/>
+		</HighlightTexture>
+	</Button>
+
+
+	
+
+	<Frame name="BEBConfigFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true" enableKeyboard="false" movable="true">
+		<Size>
+			<AbsDimension x="320" y="380"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="24"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="BEBConfigHeader" enableMouse="true ">
+				<Size>
+					<AbsDimension x="140" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormal" text="BEB Config" justifyV="MIDDLE">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="BEBConfigHeader">
+									<Offset>
+										<AbsDimension y="-4" x="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnMouseDown>
+						BEBOptions_OnMouseDown()
+					</OnMouseDown>
+					<OnMouseUp>
+						BEBOptions_OnMouseUp()
+					</OnMouseUp>
+				</Scripts>
+			</Frame>
+			<Button name="BEBGeneralSelector" inherits="OptionsButtonTemplate">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-105" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.index = "General"
+					</OnLoad>
+					<OnClick>
+						BEBOptions_SelectFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BEBColorsSelector" inherits="OptionsButtonTemplate">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.index = "Colors"
+					</OnLoad>
+					<OnClick>
+						BEBOptions_SelectFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BEBPlacementSelector" inherits="OptionsButtonTemplate">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="105" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.index = "Placement"
+					</OnLoad>
+					<OnClick>
+						BEBOptions_SelectFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BEBConfigFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BEBDefaultsButton" inherits="OptionsButtonTemplate" text="Defaults">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="13" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BEBOptions_LoadDefaults()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			
+			
+			<Frame name="BEBConfigGeneralFrame" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BEBConfigFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension y="-20" x="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="BEBConfigFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension y="20" x="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+				
+					<CheckButton name="BEBEnabledButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBConfigGeneralFrame" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "Disabled"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBShowMarksButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBEnabledButton" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="115" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "MarksHide"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBShowXpTicksButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBEnabledButton" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "XpTickHide"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBShowRestedXpTicksButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBShowXpTicksButton" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="115" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "RestedXpTickHide"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBShowBackgroundButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBShowXpTicksButton" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "BackgroundHide"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBShowXpTextButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBShowBackgroundButton" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="115" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "XpTextHide"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBFlashHighlightButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBShowBackgroundButton" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.index = "HighlightFlashing"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBTextOnMouseoverButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBFlashHighlightButton" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="115" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.index = "XpTextOnMouseOver"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBShowRestedBarButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBFlashHighlightButton" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "RestBarHide"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="BEBUnlockBarButton" inherits="BEBOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBShowRestedBarButton" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="115" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.notindex = "FrameLocked"
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					
+					<Frame name="BEB_TextStringFrame">
+						<Size>
+							<AbsDimension y="24" x="290"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension y="-190" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativePoint="TOP">
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<EditBox name="$parentEditBox" inherits="InputBoxTemplate" autoFocus="false" multiLine="false" numeric="false" letters="120">
+								<Size>
+									<AbsDimension x="280" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parent">
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetText()
+									</OnEditFocusGained>
+									<OnEnterPressed>
+										BEBOption_ChangeText()
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+							<Button name="$parentButton" inherits="OptionsButtonTemplate" text="v" frameLevel="7">
+								<Size>
+									<AbsDimension x="20" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.table = "BEB_VARIABLE_FUNCTIONS_DESCIPTIONS"
+										this.how = "Insert"
+										this.whatindex = "BarText"
+										this.typeindex = "text"
+										this.subindex = "string"
+										this.controlbox = this:GetParent():GetName().."EditBox"
+									</OnLoad>
+									<OnClick>
+										BEBOptions_ShowMenu();
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+					
+				</Frames>
+				<Scripts>
+					<OnShow>
+						BEBOptions_OnShow("General")
+					</OnShow>
+				</Scripts>
+			</Frame>
+			
+			
+			
+			<Frame name="BEBConfigColorsFrame" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BEBConfigFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension y="-20" x="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="BEBConfigFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension y="20" x="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BEBXpBarHeading" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension y="-30" x="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="BEBRestedBarHeading" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension y="-70" x="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="BEBMarkerHeading" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension y="-110" x="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="BEBTickHeading" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension y="-150" x="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="BEBRestedTickHeading" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension y="-190" x="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="BEBBarTextHeading" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension y="-230" x="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+				
+					<Button name="BEBBackgroundColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension y="-15" x="-33"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\PlainBackdrop">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+								</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "Background"
+							this.whenindex = "unrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBXpUnrestedColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="BEBXpBarHeading">
+								<Offset>
+									<AbsDimension y="0" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-BarFill-RoundedLightSample">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+								</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "XpBar"
+							this.whenindex = "unrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBXpRestedColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBXpBarHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="100"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-BarFill-RoundedLightSample">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "XpBar"
+							this.whenindex = "restcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBXpMaxRestedColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBXpBarHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="200"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-BarFill-RoundedLightSample">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "XpBar"
+							this.whenindex = "maxrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBRestedBarColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBRestedBarHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-BarFill-RoundedLightSample">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "RestBar"
+							this.whenindex = "restcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBRestedBarMaxColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBRestedBarHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="150"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-BarFill-RoundedLightSample">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "RestBar"
+							this.whenindex = "maxrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBMarkerUnrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBMarkerHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExperienceBarMarkers">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.046875" bottom="1" right="0.0625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "Marks"
+							this.whenindex = "unrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBMarkerRestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBMarkerHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="100"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExperienceBarMarkers">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.046875" bottom="1" right="0.0625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "Marks"
+							this.whenindex = "restcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBMarkerMaxrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBMarkerHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="200"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExperienceBarMarkers">
+									<Size>
+										<AbsDimension y="16" x="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.046875" bottom="1" right="0.0625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "Marks"
+							this.whenindex = "maxrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBTickUnrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBTickHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExhaustionTicks">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.5" bottom="0.5" right="1"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "XpTick"
+							this.whenindex = "unrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBTickRestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBTickHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="100"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExhaustionTicks">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.5" bottom="0.5" right="1"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "XpTick"
+							this.whenindex = "restcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBTickMaxrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBTickHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="200"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExhaustionTicks">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.5" bottom="0.5" right="1"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "XpTick"
+							this.whenindex = "maxrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBRestedTickRestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBRestedTickHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExhaustionTicks">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.5" bottom="0.5" right="1"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "RestedXpTick"
+							this.whenindex = "restcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBRestedTickMaxrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBRestedTickHeading" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension y="0" x="150"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture" file="Interface\AddOns\BEB\BEB-ExhaustionTicks">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<TexCoords top="0" left="0.5" bottom="0.5" right="1"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "RestedXpTick"
+							this.whenindex = "maxrestcolor"
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBBarTextUnrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="BEBBarTextHeading">
+								<Offset>
+									<AbsDimension y="0" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTexture" inherits="GameFontNormal" justifyH="CENTER" justifyV="MIDDLE" text="Abc def">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<Color b="1" r="1" g="1"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "BarText"
+							this.whenindex = "unrestcolor"
+							getglobal(this:GetName().."Texture"):SetTextHeight(9);
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBBarTextRestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="BEBBarTextHeading">
+								<Offset>
+									<AbsDimension y="0" x="100"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTexture" inherits="GameFontNormal" justifyH="CENTER" justifyV="MIDDLE" text="Abc def">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<Color b="1" r="1" g="1"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "BarText"
+							this.whenindex = "restcolor"
+							getglobal(this:GetName().."Texture"):SetTextHeight(9);
+						</OnLoad>
+						</Scripts>
+					</Button>
+					
+					<Button name="BEBBarTextMaxrestColorButton" inherits="BEBColorButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="BEBBarTextHeading">
+								<Offset>
+									<AbsDimension y="0" x="200"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTexture" inherits="GameFontNormal" justifyH="CENTER" justifyV="MIDDLE" text="Abc def">
+									<Size>
+										<AbsDimension y="24" x="24"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativePoint="CENTER">
+									</Anchor>
+									</Anchors>
+									<Color b="1" r="1" g="1"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+							this.objindex = "BarText"
+							this.whenindex = "maxrestcolor"
+							getglobal(this:GetName().."Texture"):SetTextHeight(9);
+							</OnLoad>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						BEBOptions_OnShow("Colors")
+					</OnShow>
+				</Scripts>
+			</Frame>
+			
+			
+			
+			
+			
+			<Frame name="BEBConfigPlacementFrame" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BEBConfigFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension y="-20" x="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="BEBConfigFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension y="20" x="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="BEBMainSizeHeading" inherits="GameFontNormal" justifyH="CENTER">
+							<Anchors>
+								<Anchor point="TOP" relativePoint="TOP">
+									<Offset>
+										<AbsDimension y="-15" x="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="0.8" b="0"/>
+						</FontString>
+						<FontString name="BEBTickSizeHeading" inherits="GameFontNormal" justifyH="CENTER">
+							<Anchors>
+								<Anchor point="TOP" relativePoint="TOP">
+									<Offset>
+										<AbsDimension y="-65" x="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="0.8" b="0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Slider name="BEBMainHeightSlider" inherits="OptionsSliderTemplate" minValue="2" maxValue="32" valueStep="1">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="BEBMainSizeHeading" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension y="0" x="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativePoint="TOP"/>
+									</Anchors>
+									<Color r="1.0" g="0.8" b="0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<EditBox multiLine="false" name="$parent_EditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension y="3" x="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_SliderEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this.objindex = "BEBMain"
+								this.whatindex = "size"
+								this.axisindex = "y"
+								this.label = "height"
+								getglobal(this:GetName().."Low"):SetTextHeight(10);
+								getglobal(this:GetName().."Low"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."High"):SetTextHeight(10);
+								getglobal(this:GetName().."High"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."_Label"):SetTextHeight(10);
+							</OnLoad>
+							<OnValueChanged>
+							BEBOptions_SliderOnChange()
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					
+					<Slider name="BEBMainWidthSlider" inherits="OptionsSliderTemplate" minValue="50" maxValue="1536" valueStep="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBMainSizeHeading" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension y="0" x="15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<EditBox multiLine="false" name="$parent_EditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension y="3" x="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_SliderEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this.objindex = "BEBMain"
+								this.whatindex = "size"
+								this.axisindex = "x"
+								this.label = "width"
+								getglobal(this:GetName().."Low"):SetTextHeight(10);
+								getglobal(this:GetName().."Low"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."High"):SetTextHeight(10);
+								getglobal(this:GetName().."High"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."_Label"):SetTextHeight(10);
+							</OnLoad>
+							<OnValueChanged>
+							BEBOptions_SliderOnChange()
+							</OnValueChanged>
+						</Scripts>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativePoint="TOP"/>
+									</Anchors>
+									<Color r="1.0" g="0.8" b="0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Slider>
+					
+					<Slider name="BEBTickHeightSlider" inherits="OptionsSliderTemplate" minValue="2" maxValue="64" valueStep="1">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="BEBTickSizeHeading" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension y="0" x="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<EditBox multiLine="false" name="$parent_EditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension y="3" x="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_SliderEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+						</Frames>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativeTo="" relativePoint="TOP"/>
+									</Anchors>
+									<Color r="1.0" g="0.8" b="0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this.objindex = "Tick"
+								this.whatindex = "size"
+								this.axisindex = "y"
+								this.label = "height"
+								getglobal(this:GetName().."Low"):SetTextHeight(10);
+								getglobal(this:GetName().."Low"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."High"):SetTextHeight(10);
+								getglobal(this:GetName().."High"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."_Label"):SetTextHeight(10);
+							</OnLoad>
+							<OnValueChanged>
+							BEBOptions_SliderOnChange()
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					
+					<Slider name="BEBTickWidthSlider" inherits="OptionsSliderTemplate" minValue="2" maxValue="64" valueStep="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="BEBTickSizeHeading" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension y="0" x="15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<EditBox multiLine="false" name="$parent_EditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension y="3" x="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_SliderEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this.objindex = "Tick"
+								this.whatindex = "size"
+								this.axisindex = "x"
+								this.label = "width"
+								getglobal(this:GetName().."Low"):SetTextHeight(10);
+								getglobal(this:GetName().."Low"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."High"):SetTextHeight(10);
+								getglobal(this:GetName().."High"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."_Label"):SetTextHeight(10);
+							</OnLoad>
+							<OnValueChanged>
+							BEBOptions_SliderOnChange()
+							</OnValueChanged>
+						</Scripts>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativePoint="TOP"/>
+									</Anchors>
+									<Color r="1.0" g="0.8" b="0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Slider>
+					
+					<Slider name="BEBFontHeightSlider" inherits="OptionsSliderTemplate" minValue="6" maxValue="27" valueStep="0.25">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="BEBConfigPlacementFrame" relativePoint="TOP">
+								<Offset>
+									<AbsDimension y="-120" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<EditBox multiLine="false" name="$parent_EditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension y="3" x="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_SliderEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+						</Frames>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativePoint="TOP">
+											<Offset>
+												<AbsDimension y="0" x="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1.0" g="0.8" b="0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this.objindex = "BarText"
+								this.whatindex = "size"
+								this.axisindex = "y"
+								this.label = "fontsize"
+								getglobal(this:GetName().."Low"):SetTextHeight(10);
+								getglobal(this:GetName().."Low"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."High"):SetTextHeight(10);
+								getglobal(this:GetName().."High"):SetTextColor(1,0.8,0);
+								getglobal(this:GetName().."_Label"):SetTextHeight(12);
+							</OnLoad>
+							<OnValueChanged>
+							BEBOptions_SliderOnChange()
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					
+					<Frame name="BEBMainPositionControls">
+						<Size>
+							<AbsDimension y="100" x="150"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOP">
+								<Offset>
+									<AbsDimension y="-155" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTitle" inherits="GameFontNormal" justifyH="CENTER">
+									<Anchors>
+										<Anchor point="TOP">
+										</Anchor>
+									</Anchors>
+									<FontHeight val="10">
+									</FontHeight>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Button name="$parentNudge0" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-40"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "0"
+										this:SetText("0");
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeUp" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="BOTTOM" relativeTo="$parentNudge0" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "up"
+										this:SetText("^");
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeDown" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentNudge0" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "down"
+										this:SetText("v");
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeLeft" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="$parentNudge0" relativePoint="LEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "left"
+										this:SetText(BEB_ARROWLEFT);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeRight" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="$parentNudge0" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "right"
+										this:SetText(BEB_ARROWRIGHT);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<EditBox multiLine="false" name="$parentxEditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="$parentNudge0" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension y="-2" x="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "x"
+									</OnLoad>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_PositionEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+								<Layers>
+									<Layer>
+										<FontString inherits="GameFontNormal" text="x" justifyH="CENTER">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP">
+													<Offset>
+														<AbsDimension y="0" x="-6"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</EditBox>
+							<EditBox multiLine="false" name="$parentyEditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentNudge0" relativePoint="BOTTOMRIGHT">
+										<Offset>
+											<AbsDimension y="-2" x="14"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "y"
+									</OnLoad>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_PositionEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+								<Layers>
+									<Layer>
+										<FontString inherits="GameFontNormal" text="y" justifyH="CENTER">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP">
+													<Offset>
+														<AbsDimension y="0" x="-6"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this.index = "BEBMain"
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<Frame name="BEBTickPositionControls">
+						<Size>
+							<AbsDimension y="100" x="150"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOP">
+								<Offset>
+									<AbsDimension y="-155" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTitle" inherits="GameFontNormal" justifyH="CENTER">
+									<Anchors>
+										<Anchor point="TOP">
+										</Anchor>
+									</Anchors>
+									<FontHeight val="10">
+									</FontHeight>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Button name="$parentNudge0" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-40"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "0"
+										this:SetText("0");
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeUp" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="BOTTOM" relativeTo="$parentNudge0" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "up"
+										this:SetText("^");
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeDown" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentNudge0" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText("v");
+										this.index = "down"
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeLeft" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="$parentNudge0" relativePoint="LEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText(BEB_ARROWLEFT);
+										this.index = "left"
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentNudgeRight" inherits="BEBNudgeTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="$parentNudge0" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText(BEB_ARROWRIGHT);
+										this.index = "right"
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<EditBox multiLine="false" name="$parentxEditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="$parentNudge0" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension y="-2" x="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "x"
+									</OnLoad>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_PositionEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+								<Layers>
+									<Layer>
+										<FontString inherits="GameFontNormal" text="x" justifyH="CENTER">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP">
+													<Offset>
+														<AbsDimension y="0" x="-6"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</EditBox>
+							<EditBox multiLine="false" name="$parentyEditBox" inherits="InputBoxTemplate" letters="5" autoFocus="false">
+								<Size>
+									<AbsDimension x="47" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentNudge0" relativePoint="BOTTOMRIGHT">
+										<Offset>
+											<AbsDimension y="-2" x="14"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.index = "y"
+									</OnLoad>
+									<OnEditFocusGained>
+									this.prevvals = this:GetNumber()
+									</OnEditFocusGained>
+									<OnTextChanged>
+										BEBOptions_PositionEditBox_OnValueChange()
+									</OnTextChanged>
+									<OnEnterPressed>
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+								<Layers>
+									<Layer>
+										<FontString inherits="GameFontNormal" text="y" justifyH="CENTER">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP">
+													<Offset>
+														<AbsDimension y="0" x="-6"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this.index = "Tick"
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					
+					<Button name="BEB_MainAttachPointButton">
+						<Size>
+							<AbsDimension x="100" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOP">
+								<Offset>
+									<AbsDimension y="-265" x="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormal" justifyH="CENTER">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT">
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this.table = "BEB_ATTACHPOINTS"
+								this.whatindex = "BEBMain"
+								this.typeindex = "location"
+								this.subindex = "point"
+								this.controlbox = this:GetName().."Text"
+							</OnLoad>
+							<OnClick>
+								BEBOptions_ShowMenu();
+							</OnClick>
+						</Scripts>
+						<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-Button-Highlight">
+							<TexCoords left="0" right="0.625" top="0.1" bottom="0.6875"/>
+						</HighlightTexture>
+					</Button>
+					
+					<Button name="BEB_MainAttachToPointButton">
+						<Size>
+							<AbsDimension x="100" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOP">
+								<Offset>
+									<AbsDimension y="-265" x="40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentText" inherits="GameFontNormal" justifyH="CENTER">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT">
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this.table = "BEB_ATTACHPOINTS"
+								this.whatindex = "BEBMain"
+								this.typeindex = "location"
+								this.subindex = "relpoint"
+								this.controlbox = this:GetName().."Text"
+							</OnLoad>
+							<OnClick>
+								BEBOptions_ShowMenu();
+							</OnClick>
+						</Scripts>
+						<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-Button-Highlight">
+							<TexCoords left="0" right="0.625" top="0.1" bottom="0.6875"/>
+						</HighlightTexture>
+					</Button>
+					
+					<Frame name="BEB_MainAttachToFrame">
+						<Size>
+							<AbsDimension y="24" x="214"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension y="-300" x="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parent_Label" inherits="GameFontNormal">
+									<Anchors>
+										<Anchor point="BOTTOM" relativePoint="TOP">
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<EditBox name="$parentEditBox" inherits="InputBoxTemplate" autoFocus="false" multiLine="false" numeric="false" letters="40">
+								<Size>
+									<AbsDimension x="200" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parent">
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnEditFocusGained>
+									this.prevvals = this:GetText()
+									</OnEditFocusGained>
+									<OnEnterPressed>
+										BEBOption_ChangeAttachTo()
+										this:ClearFocus()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if (this.prevvals) then
+											this:SetText(this.prevvals)
+										end
+										this:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
+							<Button name="$parentButton" inherits="OptionsButtonTemplate" text="v" frameLevel="7">
+								<Size>
+									<AbsDimension x="20" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.table = "BEB_UIATTACHFRAMES"
+										this.whatindex = "BEBMain"
+										this.typeindex = "location"
+										this.subindex = "relto"
+										this.controlbox = this:GetParent():GetName().."EditBox"
+									</OnLoad>
+									<OnClick>
+										BEBOptions_ShowMenu();
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+
+					
+				</Frames>
+				<Scripts>
+					<OnUpdate>
+						BEBOptions_Placement_OnUpdate(arg1)
+					</OnUpdate>
+					<OnShow>
+						BEBOptions_OnShow("Placement")
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="BEB_DropDownMenu" enableMouse="true" hidden="true" frameLevel="15">
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+					<Button name="$parent_Button1" id="1" inherits="BEB_MenuOptionTemplate">
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset><AbsDimension y="-10" x="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parent_Button2" id="2" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button1" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button3" id="3" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button2" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button4" id="4" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button3" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button5" id="5" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button4" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button6" id="6" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button5" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button7" id="7" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button6" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button8" id="8" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button7" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button9" id="9" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button8" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button10" id="10" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button9" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button11" id="11" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button10" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button12" id="12" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button11" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button13" id="13" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button12" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button14" id="14" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button13" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button15" id="15" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button14" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button16" id="16" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button15" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button17" id="17" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button16" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button18" id="18" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button17" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button19" id="19" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button18" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+					<Button name="$parent_Button20" id="20" inherits="BEB_MenuOptionTemplate">
+						<Anchors><Anchor point="TOP" relativeTo="$parent_Button19" relativePoint="BOTTOM"></Anchor></Anchors>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this.count = 20
+					</OnLoad>
+					<OnEnter>
+						this.timer = nil
+					</OnEnter>
+					<OnLeave>
+						this.timer = 5
+					</OnLeave>
+					<OnUpdate>
+						BEBOptions_DDM_OnUpdate(arg1)
+					</OnUpdate>
+					<OnHide>
+						this.how = nil
+						this.timer = nil
+					</OnHide>
+				</Scripts>
+			</Frame>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,"BEBConfigFrame");
+				tinsert(UISpecialFrames,"BEBEnableFrame");
+				BEBCurrentFrame = "General"
+			</OnLoad>
+			<OnShow>
+				BEBOptions_OnShow("Options")
+			</OnShow>
+			<OnMouseDown>
+				BEBOptions_OnMouseDown()
+			</OnMouseDown>
+			<OnMouseUp>
+				BEBOptions_OnMouseUp()
+			</OnMouseUp>
+			<OnHide>
+				BEB_DropDownMenu:Hide()
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	
+	
+	<Frame name="BEBEnableFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="260" y="260"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString inherits="GameFontNormal" text="BEB Config">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parent"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BEBEnableFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BEBEnableButton" inherits="OptionsButtonTemplate" text="Enable">
+				<Size>
+					<AbsDimension y="60" x="100"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BEBOptions_EnableAddon()
+						this:GetParent():Hide();
+						BEBConfigFrame:Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

@@ -1,0 +1,2484 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+	<!-- nil/1/0 checkboxes for cloak/helm -->
+	<CheckButton name="ItemRackTristateTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="18" y="18"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				ItemRack_TriStateCheck_OnLoad()
+			</OnLoad>
+			<OnClick>
+				ItemRack_TriStateCheck_OnClick()
+			</OnClick>
+			<OnEnter>
+				ItemRack_TriStateCheck_Tooltip()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<!-- template for scrollable options -->
+	<Button name="ItemRackOptListTemplate" enableMouse="false" virtual="true">
+		<Size>
+			<AbsDimension x="168" y="19"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentCheckButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						ItemRack_OptList_OnEnter()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						ItemRack_OptList_OnClick()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		<Scripts>
+			<OnMouseDown>
+				if arg1=="LeftButton" then
+					ItemRack_SetsFrame:StartMoving()
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				ItemRack_SetsFrame:StopMovingOrSizing()
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+
+	<!-- template for single-line edit boxes -->
+	<EditBox name="ItemRackEditBoxTemplate" historyLines="0" enableMouse="true" autoFocus="false" letters="256" virtual="true">
+		<Size>
+			<AbsDimension x="160" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="12" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-11" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="12" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="4" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentLeft" relativePoint="TOPRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentRight" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+					<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<FontString inherits="GameFontHighlightSmall"/>
+		<Scripts>
+			<OnEnter>
+				ItemRack_Opt_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnEscapePressed>
+				this:ClearFocus()
+			</OnEscapePressed>
+			<OnEnterPressed>
+				this:ClearFocus()
+			</OnEnterPressed>
+		</Scripts>
+	</EditBox>
+
+	<Button name="ItemRackTabTemplate" inherits="UIPanelButtonGrayTemplate" text="Options" virtual="true">
+		<NormalText inherits="GameFontHighlightSmall"/>
+		<DisabledText inherits="GameFontDisableSmall"/>
+		<HighlightText inherits="GameFontHighlightSmall"/>
+		<Scripts>
+			<OnClick>
+				ItemRack_Tab(this:GetID())
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name="ItemRackSetsButtonTemplate" inherits="GameMenuButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="55" y="26"/>
+		</Size>
+		<NormalText inherits="GameFontNormalSmall"/>
+		<DisabledText inherits="GameFontDisableSmall"/>
+		<HighlightText inherits="GameFontNormalSmall"/>
+		<Scripts>
+			<OnEnter>
+				ItemRack_Opt_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Button name="ItemRackEventListTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="140" y="26"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="Event Name">
+					<Size>
+						<AbsDimension x="96" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="48" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentIcon">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Icons\INV_Misc_QuestionMark"/>
+				<PushedTexture file="Interface\Icons\INV_Misc_QuestionMark">
+					<Size>
+						<AbsDimension x="22" y="22"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<TexCoords left=".15" right=".85" top=".15" bottom=".85"/>
+				</PushedTexture>
+				<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+				<Scripts>
+					<OnEnter>
+						ItemRack_EventsListIcon_OnEnter()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						ItemRack_EventsListIcon_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="$parentEnable" inherits="ItemRackCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						ItemRack_OnTooltip(ItemRackText.ENABLEEVENT_TEXT,ItemRackText.ENABLEEVENT_TOOLTIP)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						ItemRack_EventsList_EnableOnClick()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Scripts>
+			<OnEnter>
+				ItemRack_EventsList_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				ItemRack_EventsList_OnClick(arg1)
+			</OnClick>
+			<OnDoubleClick>
+				ItemRack_EventButtons("Edit")
+			</OnDoubleClick>
+		</Scripts>
+	</Button>
+
+	<Button name="ItemRackSetsCompactTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="140" y="21"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon">
+					<Size>
+						<AbsDimension x="18" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT" text="Set Name">
+					<Size>
+						<AbsDimension x="108" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="4" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Scripts>
+			<OnEnter>
+				ItemRack_Sets_Saved_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				ItemRack_Sets_Saved_OnClick(arg1)
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<Button name="ItemRackSetsSavedIconTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="140" y="28"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon">
+					<Size>
+						<AbsDimension x="26" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT" text="Set Name">
+					<Size>
+						<AbsDimension x="108" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIcon" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="4" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCount" inherits="GameFontHighlightSmall" justifyH="LEFT" text="10 slots">
+					<Size>
+						<AbsDimension x="50" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentIcon" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentKey" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="CTRL+1">
+					<Size>
+						<AbsDimension x="50" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-4" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Scripts>
+			<OnEnter>
+				ItemRack_Sets_Saved_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				ItemRack_Sets_Saved_OnClick(arg1)
+			</OnClick>
+		</Scripts>
+	</Button>				
+
+	<CheckButton name="ItemRackSetsInvTemplate" inherits="ActionButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp","RightButtonUp")
+			</OnLoad>
+			<OnEnter>
+				ItemRack_Inv_Tooltip()
+				ItemRack_Sets_Inv_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				ItemRack_Sets_InvToggle()
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<Button name="ItemRackSetsIconTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="28" y="28"/>
+		</Size>
+		<NormalTexture file="Interface\Icons\INV_Misc_Coin_02"/>
+		<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+		<PushedTexture file="Interface\Icons\INV_Misc_Coin_02"/>
+		<Scripts>
+			<OnClick>
+				ItemRack_Sets_Icon_OnClick()
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="ItemRack_SetsFrame" hidden="true" movable="true" toplevel="true" enableMouse="true"> 
+		<Size>
+			<AbsDimension x="280" y="334"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="100"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="ItemRack_Sets_Title" inherits="GameFontNormalSmall" text="ItemRack">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ItemRack_SetsFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r=".65" g=".65" b=".65"/>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+
+			<Button name="ItemRack_Sets_Close">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons">
+					<TexCoords left=".5" right=".75" top=".25" bottom=".5"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons">
+					<TexCoords left=".75" right="1" top=".25" bottom=".5"/>
+				</PushedTexture>
+				<HighlightTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons" alphaMode="ADD">
+					<TexCoords left=".25" right=".5" top=".5" bottom=".75"/>
+				</HighlightTexture>
+				<Scripts>
+					<OnEnter>
+						ItemRack_Opt_OnEnter()
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						ItemRack_SetsFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="ItemRack_Sets_Lock" inherits="ItemRackControlButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Close" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons">
+					<TexCoords left=".5" right=".75" top="0" bottom=".25"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons">
+					<TexCoords left=".75" right="1" top="0" bottom=".25"/>
+				</PushedTexture>
+			</Button>
+
+			<CheckButton name="ItemRack_Sets_Inv1" inherits="ItemRackSetsInvTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_SetsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv2" inherits="ItemRackSetsInvTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv3" inherits="ItemRackSetsInvTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv15" inherits="ItemRackSetsInvTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv5" inherits="ItemRackSetsInvTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv4" inherits="ItemRackSetsInvTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv19" inherits="ItemRackSetsInvTemplate" id="19">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv9" inherits="ItemRackSetsInvTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Inv19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="ItemRack_Sets_Inv16" inherits="ItemRackSetsInvTemplate" id="16">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="ItemRack_SetsFrame" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-57" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv17" inherits="ItemRackSetsInvTemplate" id="17">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_Inv16" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv18" inherits="ItemRackSetsInvTemplate" id="18">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_Inv17" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv0" inherits="ItemRackSetsInvTemplate" id="0">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_Inv18" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="ItemRack_Sets_Inv10" inherits="ItemRackSetsInvTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_SetsFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv6" inherits="ItemRackSetsInvTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv10" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv7" inherits="ItemRackSetsInvTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv6" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv8" inherits="ItemRackSetsInvTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv7" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv11" inherits="ItemRackSetsInvTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv8" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv12" inherits="ItemRackSetsInvTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv11" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv13" inherits="ItemRackSetsInvTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv12" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ItemRack_Sets_Inv14" inherits="ItemRackSetsInvTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="ItemRack_Sets_Inv13" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<!-- Options tab -->
+			<Frame name="ItemRack_Sets_SubFrame1" hidden="true">
+				<Size>
+					<AbsDimension x="186" y="270"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="9" />
+					</EdgeSize>
+				</Backdrop>
+
+				<Layers>
+					<Layer level="BORDER">
+						<Texture file="Interface\ChatFrame\ChatFrameBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_SubFrame1" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-28" y="-7"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_SubFrame1" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Gradient>
+								<MaxColor r="0.1" g="0.1" b="0.1"/>
+								<MinColor r=".25" g=".25" b=".25"/>
+							</Gradient>
+						</Texture>
+						<Texture file="Interface\ChatFrame\ChatFrameBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_SubFrame1" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="3" y="-7"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_SubFrame1" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="28" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Gradient>
+								<MinColor r="0.1" g="0.1" b="0.1"/>
+								<MaxColor r=".25" g=".25" b=".25"/>
+							</Gradient>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<Frames>
+					<Frame name="ItemRack_Sets_OptList">
+						<Size>
+							<AbsDimension x="172" y="228"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="8"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="3" right="3" top="6" bottom="6"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Frames>
+							<Button name="ItemRackOptList1" inherits="ItemRackOptListTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-28" y="-4"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList2" inherits="ItemRackOptListTemplate" id="2">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList1" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList3" inherits="ItemRackOptListTemplate" id="3">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList2" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList4" inherits="ItemRackOptListTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList3" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList5" inherits="ItemRackOptListTemplate" id="5">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList4" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList6" inherits="ItemRackOptListTemplate" id="6">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList5" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList7" inherits="ItemRackOptListTemplate" id="7">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList6" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList8" inherits="ItemRackOptListTemplate" id="8">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList7" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList9" inherits="ItemRackOptListTemplate" id="9">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList8" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList10" inherits="ItemRackOptListTemplate" id="10">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList9" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRackOptList11" inherits="ItemRackOptListTemplate" id="11">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="ItemRackOptList10" relativePoint="BOTTOMRIGHT"/>
+								</Anchors>
+							</Button>
+							<ScrollFrame name="ItemRack_OptList_ScrollFrame" inherits="FauxScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="172" y="208"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-28" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll(19, ItemRack_OptList_ScrollFrame_Update)
+									</OnVerticalScroll>
+									<OnShow>
+										ItemRack_OptList_ScrollFrame_Update()
+									</OnShow>
+								</Scripts>
+							</ScrollFrame>
+
+						</Frames>
+					</Frame>
+					<Button name="ItemRack_ResetButton" inherits="UIPanelButtonGrayTemplate" text="Reset Bar">
+						<Size>
+							<AbsDimension x="80" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-8" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalText inherits="GameFontHighlightSmall"/>
+						<DisabledText inherits="GameFontDisableSmall"/>
+						<HighlightText inherits="GameFontHighlightSmall"/>
+						<Scripts>
+							<OnEnter>
+								ItemRack_Opt_OnEnter()
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide()
+							</OnLeave>
+							<OnClick>
+								ItemRack_Reset()
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="ItemRack_ResetEventsButton" inherits="UIPanelButtonGrayTemplate" text="Reset Events">
+						<Size>
+							<AbsDimension x="80" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="8" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalText inherits="GameFontHighlightSmall"/>
+						<DisabledText inherits="GameFontDisableSmall"/>
+						<HighlightText inherits="GameFontHighlightSmall"/>
+						<Scripts>
+							<OnEnter>
+								ItemRack_Opt_OnEnter()
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide()
+							</OnLeave>
+							<OnClick>
+								ItemRack_SlashHandler("reset events")
+							</OnClick>
+						</Scripts>
+					</Button>
+
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(.25,.25,.25,1)
+					</OnLoad>
+				</Scripts>
+
+			</Frame>
+
+			<!-- Help tab -->
+			<Frame name="ItemRack_Sets_SubFrame3" hidden="true">
+				<Size>
+					<AbsDimension x="186" y="270"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="9" />
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="BORDER">
+						<Texture file="Interface\ChatFrame\ChatFrameBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_SubFrame3" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-28" y="-7"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_SubFrame3" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Gradient>
+								<MaxColor r="0.1" g="0.1" b="0.1"/>
+								<MinColor r=".25" g=".25" b=".25"/>
+							</Gradient>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<ScrollFrame name="ItemRack_Help" inherits="UIPanelScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="150" y="246"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<ScrollChild>
+							<Frame name="ItemRack_Help_ScrollChildFrame" enableMouse="true">
+								<Size>
+									<AbsDimension x="150" y="246"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="8" y="-12"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<EditBox name="ItemRack_Help_EditBox" letters="2000" multiLine="true" enableMouse="false" autoFocus="false">
+										<Size>
+											<AbsDimension x="150" y="246"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												this:SetText("ItemRack version "..ItemRack_Version.."\n\n"..ItemRackText.HELP)
+											</OnLoad>
+											<OnEditFocusGained>
+												this:ClearFocus()
+											</OnEditFocusGained>
+											<OnTextChanged>
+												local scrollBar = getglobal(this:GetParent():GetParent():GetName().."ScrollBar")
+												this:GetParent():GetParent():UpdateScrollChildRect()
+												local min
+												local max
+												min, max = scrollBar:GetMinMaxValues()
+												if ( max > 0 and (this.max ~= max) ) then
+													this.max = max
+													scrollBar:SetValue(min)
+												end
+											</OnTextChanged>
+											<OnMouseDown>
+												if arg1=="LeftButton" then
+													ItemRack_SetsFrame:StartMoving()
+												end
+											</OnMouseDown>
+											<OnMouseUp>
+												ItemRack_SetsFrame:StopMovingOrSizing()
+											</OnMouseUp>
+										</Scripts>
+										<FontString font="Fonts\ARIALN.TTF">
+											<FontHeight>
+												<AbsValue val="12"/>
+											</FontHeight>
+											<Color r="1.0" g="1.0" b="1.0"/>
+											<Shadow>
+												<Offset>
+													<AbsDimension x="1" y="-1"/>
+												</Offset>
+												<Color r="0" g="0" b="0"/>
+											</Shadow>
+										</FontString>
+										<HighlightColor r="0" g="0" b="0" a="0"/>
+									</EditBox>
+								</Frames>
+							</Frame>
+						</ScrollChild>
+					</ScrollFrame>		
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(.25,.25,.25,1)
+					</OnLoad>
+				</Scripts>
+			
+			</Frame>
+
+			<!-- Sets tab -->
+			<Frame name="ItemRack_Sets_SubFrame2" hidden="true">
+				<Size>
+					<AbsDimension x="186" y="270"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="9" />
+					</EdgeSize>
+				</Backdrop>
+
+				<Layers>
+
+					<Layer level="ARTWORK">
+						<FontString name="ItemRack_Sets_NameLabel" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="16" y="-8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="ItemRack_DropTextureLeft" file="Interface\Glues\CharacterCreate\CharacterCreate-LabelFrame">
+							<Size>
+								<AbsDimension x="25" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-11" y="-4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.1953125" top="0" bottom="1"/>
+						</Texture>
+						<Texture name="ItemRack_DropTextureMiddle" file="Interface\Glues\CharacterCreate\CharacterCreate-LabelFrame">
+							<Size>
+								<AbsDimension x="156" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="ItemRack_DropTextureLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.1953125" right="0.8046875" top="0" bottom="1"/>
+						</Texture>
+						<Texture name="ItemRack_DropTextureRight" file="Interface\Glues\CharacterCreate\CharacterCreate-LabelFrame">
+							<Size>
+								<AbsDimension x="25" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="ItemRack_DropTextureMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.8046875" right="1" top="0" bottom="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="ItemRack_Sets_DropDownButton">
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="ItemRack_DropTextureRight">
+								<Offset>
+									<AbsDimension x="-16" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn")
+								ItemRack_Sets_DropDownButton_OnClick()
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up">
+							<Size>
+								<AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT"/>
+							</Anchors>
+						</NormalTexture>
+						<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down">
+							<Size>
+								<AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT"/>
+							</Anchors>
+						</PushedTexture>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD">
+							<Size>
+								<AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT"/>
+							</Anchors>
+						</HighlightTexture>
+					</Button>
+
+					<EditBox name="ItemRack_Sets_Name" letters="256" historyLines="0" autoFocus="false">
+						<Size>
+							<AbsDimension x="160" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_NameLabel" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="2" y="-17"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString inherits="GameFontHighlight"/>
+						<Scripts>
+							<OnTextChanged>
+								ItemRack_Sets_Name_OnTextChanged()
+							</OnTextChanged>
+							<OnEscapePressed>
+								this:ClearFocus()
+							</OnEscapePressed>
+							<OnEnterPressed>
+								this:ClearFocus()
+							</OnEnterPressed>
+						</Scripts>
+					</EditBox>
+
+					<!-- sub-frame of 25 icons in a scrollable 5x5 list -->
+					<Frame name="ItemRack_Sets_Icons">
+						<Size>
+							<AbsDimension x="172" y="156"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-48"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="8"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="3" right="3" top="6" bottom="6"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icons" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="-27" y="-8"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_Icons" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="-3" y="8"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MinColor r="0.125" g="0.125" b="0.125"/>
+										<MaxColor r="0" g="0" b="0"/>
+									</Gradient>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Frames>
+							<ScrollFrame name="ItemRack_Sets_ScrollFrame" inherits="FauxScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="171" y="140"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-28" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll(24, ItemRack_Sets_ScrollFrame_Update)
+									</OnVerticalScroll>
+									<OnShow>
+										ItemRack_Sets_ScrollFrame_Update()
+									</OnShow>
+								</Scripts>
+							</ScrollFrame>
+							<Button name="ItemRack_Sets_Icon1" inherits="ItemRackSetsIconTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="6" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon2" inherits="ItemRackSetsIconTemplate" id="2">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon1" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon3" inherits="ItemRackSetsIconTemplate" id="3">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon2" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon4" inherits="ItemRackSetsIconTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon3" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon5" inherits="ItemRackSetsIconTemplate" id="5">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon4" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+
+							<Button name="ItemRack_Sets_Icon6" inherits="ItemRackSetsIconTemplate" id="6">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon1" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon7" inherits="ItemRackSetsIconTemplate" id="7">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon6" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon8" inherits="ItemRackSetsIconTemplate" id="8">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon7" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon9" inherits="ItemRackSetsIconTemplate" id="9">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon8" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon10" inherits="ItemRackSetsIconTemplate" id="10">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon9" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+
+							<Button name="ItemRack_Sets_Icon11" inherits="ItemRackSetsIconTemplate" id="11">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon6" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon12" inherits="ItemRackSetsIconTemplate" id="12">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon11" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon13" inherits="ItemRackSetsIconTemplate" id="13">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon12" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon14" inherits="ItemRackSetsIconTemplate" id="14">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon13" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon15" inherits="ItemRackSetsIconTemplate" id="15">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon14" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+
+							<Button name="ItemRack_Sets_Icon16" inherits="ItemRackSetsIconTemplate" id="16">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon11" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon17" inherits="ItemRackSetsIconTemplate" id="17">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon16" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon18" inherits="ItemRackSetsIconTemplate" id="18">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon17" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon19" inherits="ItemRackSetsIconTemplate" id="19">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon18" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon20" inherits="ItemRackSetsIconTemplate" id="20">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon19" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+
+							<Button name="ItemRack_Sets_Icon21" inherits="ItemRackSetsIconTemplate" id="21">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon16" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon22" inherits="ItemRackSetsIconTemplate" id="22">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon21" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon23" inherits="ItemRackSetsIconTemplate" id="23">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon22" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon24" inherits="ItemRackSetsIconTemplate" id="24">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon23" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Icon25" inherits="ItemRackSetsIconTemplate" id="25">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Icon24" relativePoint="TOPRIGHT"/>
+								</Anchors>
+							</Button>
+
+							<Button name="ItemRack_Sets_ChosenIcon">
+								<Size>
+									<AbsDimension x="36" y="36"/>
+								</Size>
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_SubFrame2" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="16" y="28"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Icons\INV_Misc_Coin_02"/>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentName" inherits="GameFontHighlightSmallOutline">
+											<Size>
+												<AbsDimension x="36" y="10"/>
+											</Size>
+											<Anchors>
+												<Anchor point="BOTTOM">
+													<Offset>
+														<AbsDimension x="0" y="2"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parentHotKey" inherits="NumberFontNormalSmallGray" justifyH="RIGHT">
+											<Size>
+												<AbsDimension x="32" y="10"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT">
+													<Offset>
+														<AbsDimension x="2" y="-4"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnEnter>
+										ItemRack_Sets_Tooltip(nil,1)
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide()
+									</OnLeave>
+									<OnClick>
+										ItemRack_Sets_ChosenIcon_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button>
+
+							<CheckButton name="ItemRack_Sets_HideSet" inherits="ItemRackCheckTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_ChosenIcon" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="-4" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+
+							<Button name="ItemRack_Sets_BindButton" inherits="ItemRackSetsButtonTemplate" text="Bind Key">
+								<Anchors>
+									<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_SubFrame2" relativePoint="BOTTOMRIGHT">
+										<Offset>
+											<AbsDimension x="-16" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										PlaySound("GAMEGENERICBUTTONPRESS")
+										ItemRack_Sets_Name:ClearFocus()
+										ItemRack_KeyBindFrame:Show()
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="ItemRack_Sets_SaveButton" inherits="ItemRackSetsButtonTemplate" text="Save">
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_BindButton" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="0" y="2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										PlaySound("GAMEGENERICBUTTONPRESS")
+										ItemRack_Sets_Save_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="ItemRack_Sets_RemoveButton" inherits="ItemRackSetsButtonTemplate" text="Remove">
+								<Anchors>
+									<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_BindButton" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										PlaySound("GAMEGENERICBUTTONPRESS")
+										ItemRack_Sets_Remove_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button>
+							<CheckButton name="ItemRack_ShowHelm" inherits="ItemRackTristateTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_RemoveButton" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="0" y="32"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="ItemRack_ShowCloak" inherits="ItemRackTristateTemplate">
+								<Size>
+									<AbsDimension x="18" y="18"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_ShowHelm" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="4"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+
+						</Frames>
+
+					</Frame>
+
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(.25,.25,.25,1)
+					</OnLoad>
+				</Scripts>
+
+			</Frame>
+
+			<Frame name="ItemRack_Sets_SubFrame4" hidden="true">
+				<Size>
+					<AbsDimension x="186" y="270"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="9" />
+					</EdgeSize>
+				</Backdrop>
+				<Frames>
+					<Frame name="ItemRack_Sets_EventsView">
+						<Size>
+							<AbsDimension x="172" y="196"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-28"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="8"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="3" right="3" top="6" bottom="6"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_EventsView" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="-27" y="-8"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_EventsView" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="-3" y="8"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MinColor r="0.125" g="0.125" b="0.125"/>
+										<MaxColor r="0" g="0" b="0"/>
+									</Gradient>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="ItemRack_Opt_EnableEvents" inherits="ItemRackCheckTemplate">
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_EventsView" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="4" y="-1"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="ItemRack_Opt_ShowAllEvents" inherits="ItemRackCheckTemplate">
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_EventsView" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-70" y="-1"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<Button name="ItemRack_Events_DeleteButton" inherits="ItemRackSetsButtonTemplate" text="Delete">
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativeTo="ItemRack_Sets_SubFrame4" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="8" y="16"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										ItemRack_EventButtons("Delete")
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="ItemRack_Events_EditButton" inherits="ItemRackSetsButtonTemplate" text="Edit">
+								<Anchors>
+									<Anchor point="BOTTOM" relativeTo="ItemRack_Sets_SubFrame4" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="16"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										ItemRack_EventButtons("Edit")
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="ItemRack_Events_NewButton" inherits="ItemRackSetsButtonTemplate" text="New">
+								<Anchors>
+									<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_SubFrame4" relativePoint="BOTTOMRIGHT">
+										<Offset>
+											<AbsDimension x="-8" y="16"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										ItemRack_EventButtons("New")
+									</OnClick>
+								</Scripts>
+							</Button>
+
+							<ScrollFrame name="ItemRack_Events_ScrollFrame" inherits="FauxScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="171" y="180"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-28" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll(26, ItemRack_Events_ScrollFrame_Update)
+									</OnVerticalScroll>
+									<OnShow>
+										ItemRack_Events_ScrollFrame_Update()
+									</OnShow>
+								</Scripts>
+							</ScrollFrame>
+
+							<Button name="ItemRack_Event1" inherits="ItemRackEventListTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_EventsView" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="2" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Event2" inherits="ItemRackEventListTemplate" id="2">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Event1" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Event3" inherits="ItemRackEventListTemplate" id="3">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Event2" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Event4" inherits="ItemRackEventListTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Event3" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Event5" inherits="ItemRackEventListTemplate" id="5">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Event4" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Event6" inherits="ItemRackEventListTemplate" id="6">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Event5" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Event7" inherits="ItemRackEventListTemplate" id="7">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Event6" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+
+						</Frames>
+					</Frame>
+
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(.25,.25,.25,1)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="ItemRack_Sets_SetSelect" hidden="true">
+				<Size>
+					<AbsDimension x="186" y="270"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="9" />
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontHighlightSmall" text="Choose a set">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="16" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton name="ItemRack_Opt_CompactList" inherits="ItemRackCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-60" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<!-- sub-frame of saved sets (drop-down) in a scrollable list -->
+					<Frame name="ItemRack_Sets_Saved" hidden="false">
+						<Size>
+							<AbsDimension x="172" y="242"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="8"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="8"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="3" right="3" top="6" bottom="6"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="-27" y="-8"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_Saved" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="-3" y="8"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MinColor r="0.125" g="0.125" b="0.125"/>
+										<MaxColor r="0" g="0" b="0"/>
+									</Gradient>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Frames>
+							<ScrollFrame name="ItemRack_Sets_SavedScrollFrame" inherits="FauxScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="171" y="210"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-28" y="-24"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll((ItemRack_Settings.CompactList=="OFF") and 28 or 21, ItemRack_Sets_SavedScrollFrame_Update)
+									</OnVerticalScroll>
+									<OnShow>
+										ItemRack_Sets_SavedScrollFrame_Update()
+									</OnShow>
+								</Scripts>
+							</ScrollFrame>
+
+							<Button name="ItemRack_SavedSets_Close">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-6" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons">
+									<TexCoords left=".5" right=".75" top=".25" bottom=".5"/>
+								</NormalTexture>
+								<PushedTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons">
+									<TexCoords left=".75" right="1" top=".25" bottom=".5"/>
+								</PushedTexture>
+								<HighlightTexture file="Interface\AddOns\ItemRack\ItemRack-Buttons" alphaMode="ADD">
+									<TexCoords left=".25" right=".5" top=".5" bottom=".75"/>
+								</HighlightTexture>
+								<Scripts>
+									<OnEnter>
+										ItemRack_Opt_OnEnter()
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide()
+									</OnLeave>
+									<OnClick>
+										ItemRack_Sets_SetSelect:Hide()
+--										ItemRack_SavedSets_OnClose()
+									</OnClick>
+								</Scripts>
+							</Button>
+
+							<Button name="ItemRack_Sets_Compact1" inherits="ItemRackSetsCompactTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="6" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact2" inherits="ItemRackSetsCompactTemplate" id="2">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact1" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact3" inherits="ItemRackSetsCompactTemplate" id="3">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact2" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact4" inherits="ItemRackSetsCompactTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact3" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact5" inherits="ItemRackSetsCompactTemplate" id="5">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact4" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact6" inherits="ItemRackSetsCompactTemplate" id="6">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact5" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact7" inherits="ItemRackSetsCompactTemplate" id="7">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact6" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact8" inherits="ItemRackSetsCompactTemplate" id="8">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact7" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact9" inherits="ItemRackSetsCompactTemplate" id="9">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact8" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact10" inherits="ItemRackSetsCompactTemplate" id="10">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact9" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Compact11" inherits="ItemRackSetsCompactTemplate" id="11">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Compact10" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+
+							<Button name="ItemRack_Sets_Saved1" inherits="ItemRackSetsSavedIconTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="6" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved2" inherits="ItemRackSetsSavedIconTemplate" id="2">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved1" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved3" inherits="ItemRackSetsSavedIconTemplate" id="3">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved2" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved4" inherits="ItemRackSetsSavedIconTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved3" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved5" inherits="ItemRackSetsSavedIconTemplate" id="5">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved4" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved6" inherits="ItemRackSetsSavedIconTemplate" id="6">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved5" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved7" inherits="ItemRackSetsSavedIconTemplate" id="7">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved6" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="ItemRack_Sets_Saved8" inherits="ItemRackSetsSavedIconTemplate" id="8">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_Saved7" relativePoint="BOTTOMLEFT"/>
+								</Anchors>
+							</Button>
+						</Frames>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(.25,.25,.25,1)
+					</OnLoad>
+					<OnShow>
+						ItemRack_SetSelect_OnShow()
+					</OnShow>
+					<OnHide>
+						ItemRack_SetSelect_OnHide()
+					</OnHide>
+				</Scripts>
+			</Frame>
+
+			<Frame name="ItemRack_EditEvent" toplevel="true" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="276" y="316"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="9" />
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+
+					<Layer level="ARTWORK">
+						<Texture file="Interface\ChatFrame\ChatFrameBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-24" y="-7"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Gradient>
+								<MaxColor r="0.1" g="0.1" b="0.1"/>
+								<MinColor r=".25" g=".25" b=".25"/>
+							</Gradient>
+						</Texture>
+						<Texture file="Interface\ChatFrame\ChatFrameBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="3" y="-7"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="24" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Gradient>
+								<MinColor r="0.1" g="0.1" b="0.1"/>
+								<MaxColor r=".25" g=".25" b=".25"/>
+							</Gradient>
+						</Texture>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontHighlightSmall" text="Name">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="60" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="Trigger">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="60" y="-40"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="Delay">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="60" y="-64"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="seconds">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="124" y="-64"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="ItemRack_EditEvent_Test" inherits="ItemRackSetsButtonTemplate" text="Test">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="48" y="16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								ItemRack_EventButtons("Test")
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="ItemRack_EditEvent_Save" inherits="ItemRackSetsButtonTemplate" text="Save">
+						<Anchors>
+							<Anchor point="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								ItemRack_EventButtons("Save")
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="ItemRack_EditEvent_Cancel" inherits="ItemRackSetsButtonTemplate" text="Cancel">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-48" y="16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								ItemRack_EditEvent:Hide()
+							</OnClick>
+						</Scripts>
+					</Button>
+					<EditBox name="ItemRack_EventName" inherits="ItemRackEditBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="76" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTabPressed>
+								ItemRack_EventTrigger:SetFocus()
+							</OnTabPressed>
+						</Scripts>
+					</EditBox>
+					<EditBox name="ItemRack_EventTrigger" inherits="ItemRackEditBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="76" y="-36"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTabPressed>
+								ItemRack_EventDelay:SetFocus()
+							</OnTabPressed>
+						</Scripts>
+					</EditBox>
+					<EditBox name="ItemRack_EventDelay" inherits="ItemRackEditBoxTemplate">
+						<Size>
+							<AbsDimension x="40" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="76" y="-60"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTabPressed>
+								ItemRack_EventScript:SetFocus()
+							</OnTabPressed>
+						</Scripts>
+					</EditBox>
+					<CheckButton name="ItemRack_Opt_LargeFont" inherits="ItemRackCheckTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="ItemRack_EventDelay" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="60" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+
+					<Frame name="ItemRack_ScriptEditFrame">
+						<Size>
+							<AbsDimension x="256" y="192"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-80"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+							<BackgroundInsets>
+								<AbsInset left="3" right="3" top="6" bottom="6" />
+							</BackgroundInsets>
+							<TileSize>
+								<AbsValue val="16" />
+							</TileSize>
+							<EdgeSize>
+								<AbsValue val="9" />
+							</EdgeSize>
+						</Backdrop>
+
+						<Frames>
+							
+							<ScrollFrame name="ItemRackEventEditScrollFrame" inherits="UIPanelScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="222" y="176"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="6" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BORDER">
+										<Texture file="Interface\ChatFrame\ChatFrameBackground">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="ItemRackEventEditScrollFrame" relativePoint="TOPRIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="BOTTOMRIGHT" relativeTo="ItemRackEventEditScrollFrame" relativePoint="BOTTOMRIGHT">
+													<Offset>
+														<AbsDimension x="26" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<Gradient>
+												<MinColor r="0.1" g="0.1" b="0.1"/>
+												<MaxColor r="0" g="0" b="0"/>
+											</Gradient>
+										</Texture>
+									</Layer>
+								</Layers>
+
+								<ScrollChild>
+									<EditBox name="ItemRack_EventScript" multiLine="true" maxLines="9" letters="4096" nonspacewrap="true" spacing="1" autoFocus="false">
+										<Size>
+											<AbsDimension x="222" y="176"/>
+										</Size>
+										<Scripts>
+											<OnTextChanged>
+												local scrollBar = getglobal(this:GetParent():GetName().."ScrollBar")
+												this:GetParent():UpdateScrollChildRect();
+												local min;
+												local max;
+												min, max = scrollBar:GetMinMaxValues();
+												if ( max > 0 and (this.max ~= max) ) then
+													this.max = max;
+													scrollBar:SetValue(max);
+												end
+											</OnTextChanged>
+											<OnEscapePressed>
+												this:ClearFocus();
+											</OnEscapePressed>
+											<OnTabPressed>
+												ItemRack_EventName:SetFocus()
+											</OnTabPressed>
+										</Scripts>
+										<FontString inherits="GameFontHighlightSmall"/>
+									</EditBox>
+								</ScrollChild>
+							</ScrollFrame>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropColor(.1,.1,.1,1)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Button name="ItemRackEventScriptOverlay">
+						<Size>
+							<AbsDimension x="228" y="180"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="ItemRack_EventScript" relativePoint="TOPLEFT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								ItemRack_EventScript:SetFocus()
+							</OnClick>
+							<OnEnter>
+								ItemRack_OnTooltip("Event Script","Here you can enter a script to run on the event given above.\n\nEquipSet() : Equip set associated with this event.\nSaveSet() : Remember the gear currently in the slots of the associated set.\nLoadSet() : Equip the gear saved from SaveSet()")
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide()
+							</OnLeave>
+						</Scripts>
+					</Button>
+
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(.25,.25,.25,1)
+					</OnLoad>
+					<OnShow>
+						ItemRack_EditEvent_OnShow()
+					</OnShow>
+					<OnHide>
+						ItemRack_EditEvent_OnHide()
+					</OnHide>
+					<OnMouseDown>
+						if arg1=="LeftButton" then
+							ItemRack_SetsFrame:StartMoving()
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						ItemRack_SetsFrame:StopMovingOrSizing()
+					</OnMouseUp>
+				</Scripts>
+			</Frame>
+
+			<Button name="ItemRack_Sets_Tab1" inherits="ItemRackTabTemplate" id="1" text="Options">
+				<Size>
+					<AbsDimension x="50" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_SubFrame2" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ItemRack_Sets_Tab2" inherits="ItemRackTabTemplate" id="2" text="Sets">
+				<Size>
+					<AbsDimension x="50" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_Tab1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDImension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ItemRack_Sets_Tab4" inherits="ItemRackTabTemplate" id="4" text="Events">
+				<Size>
+					<AbsDimension x="50" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_Tab2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDImension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ItemRack_Sets_Tab3" inherits="ItemRackTabTemplate" id="3" text="?">
+				<Size>
+					<AbsDimension x="18" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="ItemRack_Sets_Tab4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDImension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+		</Frames>
+
+		<Scripts>
+			<OnMouseDown>
+				if arg1=="LeftButton" then
+					this:StartMoving()
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing()
+			</OnMouseUp>
+			<OnShow>
+				ItemRack_SetsFrame_OnShow()
+			</OnShow>
+			<OnHide>
+				ItemRack_SetsFrame_OnHide()
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<!-- This frame grabs a keypress from user to bind to a key -->
+	<Frame name="ItemRack_KeyBindFrame" parent="ItemRack_SetsFrame" enableKeyboard="true" hidden="true">
+		<Size>
+			<AbsDimension x="55" y="26"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ItemRack_Sets_BindButton" relativePoint="TOPLEFT"/>
+		</Anchors>
+		<Frames>
+			<Button name="ItemRack_Sets_CancelButton" inherits="ItemRackSetsButtonTemplate" text="Cancel">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ItemRack_KeyBindFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ItemRack_KeyBindFrame_Message" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormalLarge" text="Press a key to bind to this set.">
+							<Size>
+								<AbsDimension x="150" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="ItemRack_SetsFrame">
+									<Offset>
+										<AbsDimension x="0" y="50"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontNormal" text="Hit ESC to unbind.">
+							<Size>
+								<AbsDimension x="150" y="50"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="ItemRack_SetsFrame">
+									<Offset>
+										<AbsDimension x="0" y="-25"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						ItemRack_Sets_Icons:Hide()
+						ItemRack_Sets_Saved:Hide()
+					</OnShow>
+					<OnHide>
+						ItemRack_Sets_Icons:Show()
+					</OnHide>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				ItemRack_Sets_BindButton:Hide()
+				ItemRack_KeyBindFrame_Message:Show()
+			</OnShow>
+			<OnHide>
+				ItemRack_Sets_BindButton:Show()
+				ItemRack_KeyBindFrame_Message:Hide()
+			</OnHide>
+			<OnKeyDown>
+				ItemRack_Sets_KeyBind_OnKeyDown(arg1)
+			</OnKeyDown>
+		</Scripts>
+	</Frame>
+
+	<!-- separate frame to receive events, so we can turn events on/off without affecting the mod's events -->
+	<Frame name="ItemRack_RegisterFrame" hidden="true">
+		<Scripts>
+			<OnEvent>
+				ItemRack_RegisterFrame_OnEvent(event)
+			</OnEvent>
+			<OnUpdate>
+				ItemRack_RegisterFrame_OnUpdate()
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<!-- custom tooltip to display quick information (set loaded, set saved, etc) -->
+	<GameTooltip name="ItemRack_Sets_Message" inherits="GameTooltipTemplate" parent="ItemRack_SetsFrame" hidden="true">
+		<Anchors>
+			<Anchor point="TOP" relativeTo="ItemRack_SetsFrame" relativePoint="BOTTOM"/>
+		</Anchors>
+	</GameTooltip>
+
+</Ui>

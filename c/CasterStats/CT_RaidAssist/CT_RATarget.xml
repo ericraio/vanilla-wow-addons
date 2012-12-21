@@ -1,0 +1,452 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RATarget.lua"/>
+	<Button name="CT_RATargetMTTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="220" y="15"/>
+		</Size>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" text="MT #1:" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentMouseOver" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.3"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		
+		<Scripts>
+			<OnEnter>
+				CT_RATargetFrame.MTOver = getglobal(this:GetName() .. "MouseOver");
+				if ( CT_RATargetFrame.mtFunction ) then
+					getglobal(this:GetName() .. "MouseOver"):Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				CT_RATargetFrame.MTOver = nil;
+				getglobal(this:GetName() .. "MouseOver"):Hide();
+			</OnLeave>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				if ( arg1 == "LeftButton" ) then
+					if ( CT_RATargetFrame.mtFunction ) then
+						getglobal(CT_RATargetFrame.mtFunction)(this:GetID(), CT_RATargetFrame.mtArgs);
+					end
+				else
+					CT_RATarget_RemoveMT(this:GetID());
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Frame name="CT_RATargetTargetTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="220" y="15"/>
+		</Size>
+		
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" text="Target #5:" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentMouseOver" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.3"/>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentError" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.3"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		
+		<Scripts>
+			<OnEnter>
+				this.isOver = 1;
+				if ( not this.lock and CT_RATargetFrame.targetFunction ) then
+					getglobal(this:GetName() .. "MouseOver"):Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				this.isOver = nil;
+				getglobal(this:GetName() .. "MouseOver"):Hide();
+			</OnLeave>
+			<OnClick>
+				if ( arg1 == "RightButton" and CT_RATargetFrame.rightClickFunction ) then
+					getglobal(CT_RATargetFrame.rightClickFunction)(this:GetID(), CT_RATargetFrame.rightClickArgs);
+				elseif ( CT_RATargetFrame.targetFunction ) then
+					getglobal(CT_RATargetFrame.targetFunction)(this:GetID(), CT_RATargetFrame.targetArgs);
+				end
+			</OnClick>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="CT_RATargetFrame" hidden="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="450" y="275"/>
+		</Size>
+		
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle" text="Target Management" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCurrentTarget" text="Current Target:" justifyH="LEFT" justifyV="TOP" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="$parentCloseButton" hidden="false">
+				<Size>
+					<AbsDimension x="42" y="42"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentMT1" inherits="CT_RATargetMTTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT2" inherits="CT_RATargetMTTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT1"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT3" inherits="CT_RATargetMTTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT2"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT4" inherits="CT_RATargetMTTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT3"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT5" inherits="CT_RATargetMTTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT4"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT6" inherits="CT_RATargetMTTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT5"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT7" inherits="CT_RATargetMTTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT6"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT8" inherits="CT_RATargetMTTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT7"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT9" inherits="CT_RATargetMTTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT8"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentMT10" inherits="CT_RATargetMTTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMT9"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget1" inherits="CT_RATargetTargetTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="225" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget2" inherits="CT_RATargetTargetTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget1"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget3" inherits="CT_RATargetTargetTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget2"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget4" inherits="CT_RATargetTargetTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget3"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget5" inherits="CT_RATargetTargetTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget4"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget6" inherits="CT_RATargetTargetTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget5"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget7" inherits="CT_RATargetTargetTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget6"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget8" inherits="CT_RATargetTargetTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget7"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget9" inherits="CT_RATargetTargetTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget8"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentTarget10" inherits="CT_RATargetTargetTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentTarget9"/>
+				</Anchors>
+			</Button>
+			
+			<Button name="$parentInfoBox">
+				<Size>
+					<AbsDimension x="440" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentMouseOver" hidden="true">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="0.3"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						this.isOver = 1;
+						if ( not this.lock ) then
+							getglobal(this:GetName() .. "MouseOver"):Show();
+						end
+					</OnEnter>
+					<OnLeave>
+						this.isOver = nil;
+						getglobal(this:GetName() .. "MouseOver"):Hide();
+					</OnLeave>
+					<OnClick>
+						if ( not this.lock and this.clickFunction and getglobal(this.clickFunction) ) then
+							getglobal(this.clickFunction)(this.functionArg);
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		
+		<Scripts>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnLoad>
+				CT_RATarget_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				CT_RATarget_OnEvent(event);
+			</OnEvent>
+			<OnUpdate>
+				CT_RATarget_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_AssistFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="325" y="125"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="Assist">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal">
+					<Size>
+						<AbsDimension x="350" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentAssistButton" hidden="false" inherits="GameMenuButtonTemplate" text="Assist">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						for i = 1, GetNumRaidMembers(), 1 do
+							if ( UnitName("raid" .. i) == CT_RATarget.assistPerson[1] ) then
+								AssistUnit("raid" .. i);
+								break;
+							end
+						end
+						CT_RATarget.assistPerson = nil;
+						this:GetParent():Hide();
+						PlaySound("UChatScrollButton");
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("TellMessage");
+				getglobal(this:GetName() .. "Info"):SetText("'|c00FFFFFF" .. CT_RATarget.assistPerson[1] .. "|r' wants you to assist him/her.\nPress Assist to assist.");
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

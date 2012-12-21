@@ -1,0 +1,808 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="Moog_MH.lua"/>
+	<Script file="Moog_Hud.lua"/>
+
+	<!-- Aura Template -->
+	<Button name="Moog_HudAuraTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="13" y="13"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" setAllPoints="true"/>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentBorder" file="Interface\Buttons\UI-Debuff-Border" hidden="true">
+					<Size>
+						<AbsDimension x="13" y="13"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentCount" inherits="NumberFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-1" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				local icon = getglobal(this:GetName().."Icon");
+				icon:SetTexture("Interface\\Icons\\INV_Misc_Ear_Human_02");
+			</OnLoad>
+			<OnEnter>
+				Moog_HudSetAuraTooltip();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Frame name="Moog_Hud" parent="UIParent" hidden="false" frameStrata="LOW">
+		<Size>
+			<AbsDimension x="50" y="350"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="50"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="Moog_SelfHud" parent="Moog_Hud" hidden="false" frameStrata="LOW">
+		<Size>
+			<AbsDimension x="50" y="350"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="Moog_Hud" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level = "BACKGROUND">
+				<FontString name="Moog_HudCombo" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="CENTER">
+					<FontHeight>
+						<AbsValue val="30"/>
+					</FontHeight>
+					<Color r="1" g="1" b="0"/>
+					<Size>
+						<AbsDimension x="50" y="30"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="Moog_HudHealthText" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="RIGHT">
+					<FontHeight>
+						<AbsValue val="14"/>
+					</FontHeight>
+					<Color r="1" g="1" b="0"/>
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeTo="Moog_HudCombo" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="Moog_HudManaText" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="LEFT">
+					<FontHeight>
+						<AbsValue val="14"/>
+					</FontHeight>
+					<Color r="1" g="1" b="0"/>
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="Moog_HudCombo" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="Moog_Player_Icon" parent="Moog_SelfHud" hidden="false" frameStrata="LOW" enableMouse="true" movable="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="Moog_HudCombo" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="Moog_Player_ClassTexture" file="Interface\Glues\CharacterCreate\UI-CharacterCreate-Classes" enableMouse="true">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<!-- Seal: Added -->
+						<Texture name="Moog_Hud_player_StatusTexture" file="Interface\CharacterFrame\UI-StateIcon" enableMouse="false" hidden="true">
+							<Size>
+								<AbsDimension x="12" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" relativeTo="Moog_Player_ClassTexture" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="Moog_Hud_player_PvPTexture" file="Interface\\TargetingFrame\\UI-PVP-FFA" enableMouse="false" hidden="true">
+							<Size>
+								<AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="Moog_Player_ClassTexture" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="-11"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="Moog_Hud_player_LeaderTexture" file="Interface\GroupFrame\UI-Group-LeaderIcon" enableMouse="false" hidden="true">
+							<Size>
+								<AbsDimension x="12" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="Moog_Player_ClassTexture" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="Moog_Hud_player_LootTexture" file="Interface\GroupFrame\UI-Group-MasterLooter" enableMouse="false" hidden="true">
+							<Size>
+								<AbsDimension x="11" y="11"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="Moog_Player_ClassTexture" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<!-- Seal: End Add-->
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnMouseDown>
+						Moog_Player_MouseDown(arg1);
+					</OnMouseDown>
+					<OnMouseUp>
+						Moog_Player_MouseUp(arg1);
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Frame name="Moog_Player_DropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Moog_Player_ClassTexture" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						Moog_PlayerDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+			</Frame>
+			<Frame name="Moog_HudLeft" parent="Moog_Hud" hidden="false" frameStrata="LOW">
+				<Size>
+					<AbsDimension x="50" y="350"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="Moog_Hud" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="Moog_HealthHud" file="Interface\AddOns\Moog_Hud\Icons\health_sphere.tga">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level = "BACKGROUND">
+						<Texture name="Moog_HealthHudBG" file="Interface\AddOns\Moog_Hud\Icons\health_sphere.tga">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="Moog_HudRight" parent="Moog_Hud" hidden="false" frameStrata="LOW">
+				<Size>
+					<AbsDimension x="50" y="350"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="Moog_Hud" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="Moog_ManaHud" file="Interface\AddOns\Moog_Hud\Icons\mana_sphere_r.tga">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level = "BACKGROUND">
+						<Texture name="Moog_ManaHudBG" file="Interface\AddOns\Moog_Hud\Icons\mana_sphere_r.tga">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<FontString name="Moog_HudCastTime" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="RIGHT">
+							<FontHeight>
+								<AbsValue val="13"/>
+							</FontHeight>
+							<Color r="1" g="1" b="0"/>
+							<Size>
+								<AbsDimension x="50" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="Moog_HudRight" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="-8" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="Moog_TargetHud" parent="Moog_Hud" hidden="false">
+				<Size>
+					<AbsDimension x="300" y="100"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="Moog_Hud" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="Moog_TargetHudName" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="CENTER">
+							<FontHeight>
+								<AbsValue val="15"/>
+							</FontHeight>
+							<Color r="1" g="1" b="1"/>
+							<Size>
+								<AbsDimension x="300" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="Moog_TargetHudHPText" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="RIGHT">
+							<FontHeight>
+								<AbsValue val="13"/>
+							</FontHeight>
+							<Color r="1" g="1" b="1"/>
+							<Size>
+								<AbsDimension x="100" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="Moog_TargetHudName" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="Moog_TargetHudMPText" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="LEFT">
+							<FontHeight>
+								<AbsValue val="13"/>
+							</FontHeight>
+							<Color r="1" g="1" b="1"/>
+							<Size>
+								<AbsDimension x="100" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="Moog_TargetHudName" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="Moog_TargetHudLevel" outline="NORMAL" font="Fonts\FRIZQT__.TTF" justifyH="CENTER">
+							<FontHeight>
+								<AbsValue val="13"/>
+							</FontHeight>
+							<Color r="1" g="1" b="1"/>
+							<Size>
+								<AbsDimension x="40" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="Moog_TargetHudName" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+			<Button name="Moog_Target_Icon" parent="Moog_TargetHud" frameStrata="LOW" enableMouse="true" movable="true" hidden="false">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="Moog_TargetHudLevel" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="Moog_Target_ClassTexture" file="Interface\Glues\CharacterCreate\UI-CharacterCreate-Classes" enableMouse="true">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<!-- Seal: Added-->
+						<Texture name="Moog_Hud_target_StatusTexture" file="Interface\CharacterFrame\UI-StateIcon" enableMouse="false" hidden="true">
+							<Size>
+								<AbsDimension x="15" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="Moog_Target_ClassTexture" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="Moog_Hud_target_PvPTexture" file="Interface\\TargetingFrame\\UI-PVP-FFA" enableMouse="false" hidden="true">
+							<Size>
+								<AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="Moog_Target_ClassTexture" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<!-- Seal: End Add-->
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnMouseDown>
+						Moog_Target_MouseDown(arg1);
+					</OnMouseDown>
+					<OnMouseUp>
+						Moog_Target_MouseUp(arg1);
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Frame name="Moog_Target_DropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Moog_Target_ClassTexture" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						Moog_TargetDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+					<Button name="Moog_TargetHudBuff1" inherits="Moog_HudAuraTemplate" id="1" hidden="true">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Moog_TargetHudHPText" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff2" inherits="Moog_HudAuraTemplate" id="2" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff1" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff3" inherits="Moog_HudAuraTemplate" id="3" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff2" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff4" inherits="Moog_HudAuraTemplate" id="4" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff3" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff5" inherits="Moog_HudAuraTemplate" id="5" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff4" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff6" inherits="Moog_HudAuraTemplate" id="6" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff5" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff7" inherits="Moog_HudAuraTemplate" id="7" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff6" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff8" inherits="Moog_HudAuraTemplate" id="8" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff7" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Button name="Moog_TargetHudBuff9" inherits="Moog_HudAuraTemplate" id="9" hidden="true">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Moog_TargetHudBuff1" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff10" inherits="Moog_HudAuraTemplate" id="10" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff9" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff11" inherits="Moog_HudAuraTemplate" id="11" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff10" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff12" inherits="Moog_HudAuraTemplate" id="12" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff11" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff13" inherits="Moog_HudAuraTemplate" id="13" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff12" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff14" inherits="Moog_HudAuraTemplate" id="14" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff13" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff15" inherits="Moog_HudAuraTemplate" id="15" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff14" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudBuff16" inherits="Moog_HudAuraTemplate" id="16" hidden="true">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="Moog_TargetHudBuff15" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					
+					<Button name="Moog_TargetHudDeBuff1" inherits="Moog_HudAuraTemplate" id="1" hidden="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Moog_TargetHudMPText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff2" inherits="Moog_HudAuraTemplate" id="2" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff3" inherits="Moog_HudAuraTemplate" id="3" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff2" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff4" inherits="Moog_HudAuraTemplate" id="4" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff3" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff5" inherits="Moog_HudAuraTemplate" id="5" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff4" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff6" inherits="Moog_HudAuraTemplate" id="6" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff5" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff7" inherits="Moog_HudAuraTemplate" id="7" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff6" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff8" inherits="Moog_HudAuraTemplate" id="8" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff7" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Button name="Moog_TargetHudDeBuff9" inherits="Moog_HudAuraTemplate" id="9" hidden="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Moog_TargetHudDeBuff1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff10" inherits="Moog_HudAuraTemplate" id="10" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff9" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff11" inherits="Moog_HudAuraTemplate" id="11" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff10" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff12" inherits="Moog_HudAuraTemplate" id="12" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff11" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff13" inherits="Moog_HudAuraTemplate" id="13" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff12" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff14" inherits="Moog_HudAuraTemplate" id="14" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff13" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff15" inherits="Moog_HudAuraTemplate" id="15" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff14" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Moog_TargetHudDeBuff16" inherits="Moog_HudAuraTemplate" id="16" hidden="true">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="Moog_TargetHudDeBuff15" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-1" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:RegisterEvent("PLAYER_TARGET_CHANGED");
+					</OnLoad>
+					<OnEvent>
+						Moog_HudTargetUpdate();
+					</OnEvent>
+					<OnHide>
+						HideDropDownMenu(1, nil, Moog_Target_DropDown);
+					</OnHide>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				Moog_Hud_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				Moog_HudOnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,2393 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<!-- <Script file="SW_BarFrames.lua" /> -->
+	<Frame name="SW_BarFrame1" inherits="SW_Frame" enableMouse="true" movable="true" resizable="true"
+		frameStrata="MEDIUM" frameLevel="150" parent="UIParent">
+		<Scripts>
+			<OnLoad>this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+				this.swoBarX = 5;
+				this.swoBarY = -26;
+				this.swBarSettings = {};
+				--table.insert(SW_Registerd_BF_Titles, this:GetName().."_Title");
+			</OnLoad>
+			<OnHide>
+				if getglobal("SW_BarSettingsFrameV2"):IsVisible() then
+					getglobal("SW_BarSettingsFrameV2"):Hide()
+				end
+			</OnHide>
+			<OnShow>
+				if SW_Settings["OPT_ShowSyncB"] ~= nil then
+					getglobal("SW_BarFrame1_Title_Sync"):Show();
+				else
+					getglobal("SW_BarFrame1_Title_Sync"):Hide();
+				end
+				if SW_Settings["OPT_ShowConsoleB"] ~= nil then
+					getglobal("SW_BarFrame1_Title_Console"):Show();
+				else
+					getglobal("SW_BarFrame1_Title_Console"):Hide();
+				end
+			</OnShow>
+		</Scripts>
+		<Backdrop bgFile="Interface\AddOns\SW_Stats\images\back" edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+			tile="true">
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5" />
+			</BackgroundInsets>
+		</Backdrop>
+		<Size>
+			<AbsDimension x="135" y="300" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_BarFrame1" />
+			<Frame name="$parent_Title" inherits="SW_BarFrame_Title">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-4" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-24" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parent_SyncIcon" hidden="true">
+						<Scripts>
+							<OnLoad>
+								this.oldShow = this.Show;
+								this.oldHide = this.Hide;
+								this.TxtToMove = getglobal(this:GetParent():GetName().."_Text");
+								this.TextureArrows = getglobal(this:GetName().."_Texture");
+								this.Show = function(self)
+									self.TxtToMove:SetPoint("TOPLEFT", self, "TOPRIGHT", 1, -3);
+									self.oldShow(self);
+								end
+								this.Hide = function(self)
+									self.TxtToMove:SetPoint("TOPLEFT", self, "TOPLEFT", 0, -3);
+									self.oldHide(self);
+								end
+								this.UpdateColor = function(self, color)
+									if color then
+										self.TextureArrows:SetVertexColor(unpack(color));
+									else
+										self.TextureArrows:SetVertexColor(0,1,0,1);
+									end
+								end
+							</OnLoad>
+							<OnShow>
+								this:UpdateColor();
+							</OnShow>
+							<OnEnter>
+								if SW_Settings["SYNCLastChan"] ~= nil then
+									GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+									GameTooltip:SetText(SW_GS_EditBoxes["SW_SetSyncChanTxtFrame"][2].."\r\n"..SW_Settings["SYNCLastChan"],nil,nil,nil,nil,1);
+								end
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+						<Size>
+							<AbsDimension x="16" y="16" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parent_Texture" file="Interface\AddOns\SW_Stats\images\sync">
+									<Color r="0" g="1" b="0" a="1" />
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parent_Close" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>SW_Settings["SHOWMAIN"] = nil; this:GetParent():GetParent():Hide();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, "X");
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Settings" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-25" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>
+								sF = getglobal("SW_BarSettingsFrameV2");
+								if sF ~= nil then
+									if sF:IsVisible() then
+										sF:Hide();
+									else
+										getglobal("SW_BarSettings_Visuals").caller = this:GetParent():GetParent():GetName();
+										getglobal("SW_BarSettings_Data").caller = this:GetParent():GetParent():GetName();
+										getglobal("SW_BarSettings_Pets").caller = this:GetParent():GetParent():GetName();
+										sF:Show();
+									end
+								end
+							</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, SW_B_SETTINGS);
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Report" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parent_Settings">
+								<Offset>
+									<AbsDimension x="-3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>SW_ToggleReport(this:GetParent():GetParent():GetName());</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, SW_B_REPORT);
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Console" inherits="SW_RoundButton" hidden="true">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parent_Report">
+								<Offset>
+									<AbsDimension x="-3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>SW_ToggleConsole();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, SW_B_CONSOLE);
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Sync" inherits="SW_RoundButton" hidden="true">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parent_Console">
+								<Offset>
+									<AbsDimension x="-3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>SW_ToggleSync();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, SW_B_SYNC);
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_Selector" hidden="false">
+				<Size>
+					<AbsDimension x="135" y="50" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="0" />
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="SW_OptChk_Running" inherits="SW_OptChk_TT" hidden="false">
+						<Size>
+							<AbsDimension x="15" y="15" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								--SW_ToggleRunning(SW_Settings["IsRunning"]);
+								-- 1.5.3 changed this, on show only important for visuals
+								-- and toggle running would leave sync on relog in 1.5.3 because of retaining visual state
+								if SW_Settings["IsRunning"] then
+									this:SetChecked(true);
+								else
+									this:SetChecked(false);
+								end
+								
+							</OnShow>
+							<OnClick>
+								if this:GetChecked() then
+									SW_ToggleRunning(true);
+								else
+									SW_ToggleRunning(false);
+								end
+								
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<Frame name="$parent_Opt1" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="SW_OptChk_Running">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "1",nil,7);
+								this.optID =1;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt2" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt1">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "2",nil,7);
+								this.optID =2;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt3" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt2">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "3",nil,7);
+								this.optID =3;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt4" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt3">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "4",nil,7);
+								this.optID =4;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt5" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt4">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "5",nil,7);
+								this.optID =5;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt6" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt5">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "6",nil,7);
+								this.optID =6;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt7" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt6">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "7",nil,7);
+								this.optID =7;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt8" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt7">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "8",nil,7);
+								this.optID =8;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt9" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt8">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "9",nil,7);
+								this.optID =9;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parent_Opt10" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_Opt9">
+								<Offset>
+									<AbsDimension x="3" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>SW_SetOptTxt(this);</OnShow>
+							<OnMouseUp>SW_SelOpt(this);</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,1}, "10",nil,7);
+								this.optID =10;
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<StatusBar name="$parent_Bar1" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar2" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar3" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar4" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar5" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar6" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar7" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar8" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar9" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar10" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar11" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar12" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar13" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar14" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar15" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar16" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar17" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar18" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar19" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar20" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar21" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar22" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar23" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar24" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar25" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar26" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar27" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar28" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar29" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar30" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar31" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar32" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar33" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar34" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar35" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar36" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar37" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar38" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar39" inherits="SW_BarTemplate" />
+			<StatusBar name="$parent_Bar40" inherits="SW_BarTemplate" />
+		</Frames>
+	</Frame>
+	<Frame name="SW_TextWindow" inherits="SW_Frame" enableMouse="true" movable="true" frameStrata="MEDIUM"
+		resizable="true" frameLevel="185" parent="UIParent">
+		<Scripts>
+			<OnLoad>this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+				
+			</OnLoad>
+			<OnShow>
+				local str = SW_TE_Functions[getglobal("SW_TextWindowExportSlider"):GetValue()][1](this.repMeta, this.repData);
+				local outBox = getglobal("SW_TextWindow_EditBox");
+				outBox:SetText(str);
+				outBox:HighlightText();
+			</OnShow>
+		</Scripts>
+		<Size>
+			<AbsDimension x="220" y="180" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_TextWindow" />
+			<Frame name="$parent_Title" inherits="SW_BarFrame_Title">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-4" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-24" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parent_Close" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>this:GetParent():GetParent():Hide();</OnMouseUp>
+							<OnLoad>
+								SW_RoundButtonRegister(this, {1,0,0,0.9}, "X");
+								table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Slider name="$parentExportSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-40" />
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						getglobal(this:GetName().."Low"):SetText("1");
+						getglobal(this:GetName().."High"):SetText(getn(SW_TE_Functions));
+						this:SetMinMaxValues(1, getn(SW_TE_Functions));
+						this:SetValueStep(1);
+						this:SetValue(1);
+					</OnShow>
+					<OnValueChanged>
+						getglobal(this:GetName().."Text"):SetText(SW_TE_Functions[this:GetValue()][2]);
+						local str = SW_TE_Functions[this:GetValue()][1](this:GetParent().repMeta, this:GetParent().repData);
+						local outBox = getglobal("SW_TextWindow_EditBox");
+						outBox:SetText(str);
+						outBox:HighlightText();
+						
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<EditBox name="$parent_EditBox" multiLine="true">
+				<Size>
+					<AbsDimension x="100" y="30"></AbsDimension>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-70" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="20" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.3" g="0.3" b="0.3" />
+							<Anchors>
+								<Anchor point="TOPLEFT" />
+								<Anchor point="BOTTOMRIGHT" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts></Scripts>
+				<FontString inherits="GameFontNormalSmall">
+					<FontHeight>
+						<AbsValue val="10" />
+					</FontHeight>
+				</FontString>
+			</EditBox>
+		</Frames>
+	</Frame>
+	<Frame name="SW_BarReportFrame" inherits="SW_Frame" enableMouse="true" movable="true" frameStrata="MEDIUM"
+		frameLevel="180" parent="UIParent">
+		<Scripts>
+			<OnLoad>this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+				this.chkPerRow = 3;
+			</OnLoad>
+			<OnShow>
+				if getglobal("SW_RepTo_Whisper"):GetChecked() == 1 or getglobal("SW_RepTo_Channel"):GetChecked() == 1 then
+					getglobal(this:GetName().."_VarText"):Show();
+				else
+					getglobal(this:GetName().."_VarText"):Hide();
+				end
+			</OnShow>
+		</Scripts>
+		<Size>
+			<AbsDimension x="220" y="185" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<!-- <Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_BarReportFrame" /> -->
+			<Frame name="$parent_Title" inherits="SW_BarFrame_Title">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-4" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-24" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parent_Close" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>this:GetParent():GetParent():Hide();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, "X");
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<CheckButton name="SW_RepTo_Say" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						this.swoX = 5;
+						this.swoY = -25;
+						SW_ChkRegister(this, "", true, "RepTarget");
+						this.SW_TargetChat = "SAY";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Hide();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Group" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "PARTY";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Hide();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Raid" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "RAID";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Hide();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Guild" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "GUILD";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Hide();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Channel" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "CHANNEL";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Show();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Whisper" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "WHISPER";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Show();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Officer" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "OFFICER";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Hide();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_RepTo_Clipboard" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "RepTarget");
+						this.SW_TargetChat = "CLIP";
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						getglobal(this:GetParent():GetName().."_VarText"):Hide();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="$parentRepAmountSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="200" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-90" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Low"):SetText("1");
+						getglobal(this:GetName().."High"):SetText("40");
+						this:SetMinMaxValues(1, 40);
+						this:SetValueStep(1);
+					</OnLoad>
+					<OnShow>
+						this:SetValue(SW_Settings["ReportAmount"]);
+						getglobal(this:GetName().."Text"):SetText("#:"..this:GetValue());
+					</OnShow>
+					<OnValueChanged>
+						getglobal(this:GetName().."Text"):SetText("#:"..this:GetValue());
+						SW_Settings["ReportAmount"] = this:GetValue();
+						
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Frame name="$parent_VarText" hidden="true">
+				<Size>
+					<AbsDimension x="300" y="40" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-115" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<FontString name="$parent_Lbl" inherits="GameFontNormalSmall" text="Var:">
+							<Anchors>
+								<Anchor point="TOPLEFT" />
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="$parent_EditBox" letters="30">
+						<Size>
+							<AbsDimension x="100" y="10"></AbsDimension>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="55" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture>
+									<Color r="0.3" g="0.3" b="0.3" />
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts></Scripts>
+						<FontString inherits="GameFontNormalSmall">
+							<FontHeight>
+								<AbsValue val="10" />
+							</FontHeight>
+						</FontString>
+					</EditBox>
+					<Button name="$parent_SetTextFromTarget" inherits="GameMenuButtonTemplate" text="FromTarget">
+						<Size>
+							<AbsDimension x="80" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent_EditBox">
+								<Offset>
+									<AbsDimension x="0" y="-5" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								local unitName = UnitName("target");
+								if unitName == nil then return; end
+								getglobal(this:GetParent():GetName().."_EditBox"):SetText(unitName);
+								--local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+								--barSettings["TV"] = unitName;
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_ChkContainer" hidden="false">
+				<Size>
+					<AbsDimension x="100" y="40" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="SW_Chk_RepMulti" inherits="SW_Chk_Template">
+						<Scripts>
+							<OnLoad>
+								this.swoX = 10;
+								this.swoY = -10;
+								SW_ChkRegister(this, "RE_Multiline", true);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Button name="$parent_SendReport" inherits="GameMenuButtonTemplate" text="Send">
+				<Size>
+					<AbsDimension x="80" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						getglobal("SW_TextWindow"):Hide();
+						SW_SendReport(this:GetParent().caller, getglobal(this:GetParent():GetName().."_VarText_EditBox"):GetText())
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<Frame name="SW_BarSyncFrame" inherits="SW_Frame" enableMouse="true" movable="true" frameStrata="MEDIUM"
+		frameLevel="190" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+				this.chkPerRow = 3;
+				function this:UpdateARPVis()
+					if UnitInRaid("player") then
+						if IsRaidLeader() or IsRaidOfficer() then
+							getglobal("SW_BarSyncFrame_SyncARPY"):Show();
+							getglobal("SW_BarSyncFrame_SyncARPN"):Show();
+						else
+							getglobal("SW_BarSyncFrame_SyncARPY"):Hide();
+							getglobal("SW_BarSyncFrame_SyncARPN"):Hide();
+						end
+					else
+						getglobal("SW_BarSyncFrame_SyncARPY"):Hide();
+						getglobal("SW_BarSyncFrame_SyncARPN"):Hide();
+					end
+				end
+			</OnLoad>
+			<OnShow>
+				this:UpdateARPVis();
+			</OnShow>
+		</Scripts>
+		<Size>
+			<AbsDimension x="280" y="120" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<!-- <Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_BarSyncFrame" /> -->
+			<Frame name="$parent_Title" inherits="SW_BarFrame_Title">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-4" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-24" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parent_Close" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>this:GetParent():GetParent():Hide();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, "X");
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="SW_SetSyncChanTxtFrame" inherits="SW_Frame_EditTxt">
+				<Size>
+					<AbsDimension x="200" y="30" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						
+						this.SWUpdateFunc = SW_UpdateSyncChanText;
+						this.SWUpdateInfo = nil;
+						this.maxLetters = 30;
+						
+						if SW_Settings["SYNCLastChan"] == nil or SW_SyncChanID == 0 then
+							this.CurrentVal = NONE;
+						else
+							if SW_SyncCheckInChan(SW_Settings["SYNCLastChan"]) then
+								this.CurrentVal = SW_Settings["SYNCLastChan"];
+							else
+								this.CurrentVal = NONE;
+							end
+						end
+						this:ChangeText();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Button name="$parent_SyncLeave" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-55" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>SW_SyncSendLeave();
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_SyncARPY" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_SyncLeave">
+						<Offset>
+							<AbsDimension x="10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>SW_SyncSendARP(true);</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText(SW_GS_Tooltips["SW_AllowARP"]);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parent_SyncARPN" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_SyncARPY">
+						<Offset>
+							<AbsDimension x="10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>SW_SyncSendARP(false);</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText(SW_GS_Tooltips["SW_DisAllowARP"]);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parent_SyncSend" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-85" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local sc = getglobal("SW_SetSyncChanTxtFrame").CurrentVal;
+						if tonumber(sc) then
+							StaticPopup_Show("SW_InvalidChan");
+						else
+							if sc ~= NONE then
+								sTarget = getglobal(SW_Settings["SyncBCTarget"]).SW_TargetChat;
+								SendChatMessage(string.format(SW_SYNC_CHAN_ANNOUNCE, sc), sTarget, nil, nil);	
+							end
+						end
+						
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="$parent_OptGuild" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						this.swoX = 95;
+						this.swoY = -85;
+						SW_ChkRegister(this, "", true, "SyncBCTarget");
+						this.SW_TargetChat = "GUILD";
+					</OnLoad>
+					<OnClick>SW_ChkClick(this);</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_OptGroup" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "SyncBCTarget");
+						this.SW_TargetChat = "PARTY";
+					</OnLoad>
+					<OnClick>SW_ChkClick(this);</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_OptRaid" inherits="SW_Chk_Template">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "", false, "SyncBCTarget");
+						this.SW_TargetChat = "RAID";
+					</OnLoad>
+					<OnClick>SW_ChkClick(this);</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+	</Frame>
+	<Frame name="SW_GeneralSettings" inherits="SW_Frame" enableMouse="true" movable="true"
+		frameStrata="MEDIUM" frameLevel="195" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+				this.chkPerRow = 2;
+			</OnLoad>
+			<OnShow>
+				if ButtonHole and ButtonHole.application.IsOn() then
+					SW_GeneralSettingsIconSlider:Hide();
+					SW_GeneralSettingsIconRadiusSlider:Hide();
+				else
+					SW_GeneralSettingsIconSlider:Show();
+					SW_GeneralSettingsIconRadiusSlider:Show();
+				end
+				if SW_BarSettingsFrameV2:IsVisible() then
+					SW_BarSettingsFrameV2:Hide();
+				end
+			</OnShow>
+		</Scripts>
+		<Size>
+			<AbsDimension x="310" y="230" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<!-- <Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_GeneralSettings" /> -->
+			<Frame name="$parent_Title" inherits="SW_BarFrame_Title">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-4" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-24" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parent_Close" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>this:GetParent():GetParent():Hide();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, "X");
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<CheckButton name="SW_Chk_ShowOnlyFriends" inherits="SW_Chk_Template">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="1" y="-8" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.swoX = 5;
+						this.swoY = -25;
+						SW_ChkRegister(this, "INF_ShowOnlyFriends", true);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_Chk_ShowSyncB" inherits="SW_Chk_Template" hidden="false">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "OPT_ShowSyncB", false);
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						if SW_Settings["OPT_ShowSyncB"] ~= nil then
+							getglobal("SW_BarFrame1_Title_Sync"):Show();
+						else
+							getglobal("SW_BarFrame1_Title_Sync"):Hide();
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_Chk_ShowConsoleB" inherits="SW_Chk_Template" hidden="false">
+				<Scripts>
+					<OnLoad>SW_ChkRegister(this, "OPT_ShowConsoleB", false);</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+						if SW_Settings["OPT_ShowConsoleB"] ~= nil then
+							getglobal("SW_BarFrame1_Title_Console"):Show();
+						else
+							getglobal("SW_BarFrame1_Title_Console"):Hide();
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SW_Chk_ShowDPS" inherits="SW_Chk_Template" hidden="false">
+				<Scripts>
+					<OnLoad>
+						SW_ChkRegister(this, "OPT_ShowMainWinDPS", false);
+					</OnLoad>
+					<OnClick>
+						SW_ChkClick(this);
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<!-- TODO: take this out, take translations out, check any dependencies-->
+			<CheckButton name="SW_Chk_MergePets" inherits="SW_Chk_Template" hidden="true">
+				<Scripts>
+					<OnLoad>SW_ChkRegister(this, "INF_MergePets", false);</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<Frame name="SW_CS_Damage" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-70" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this.TargetColor = SW_Settings["Colors"]["Damage"];
+						this.What = "DIRECT";
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_CS_Heal" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_CS_Damage">
+						<Offset>
+							<AbsDimension x="150" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this.TargetColor = SW_Settings["Colors"]["Heal"];
+						this.What = "DIRECT";
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_CS_TitleBar" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_Damage">
+						<Offset>
+							<AbsDimension x="0" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this.TargetColor = SW_Settings["Colors"]["TitleBars"];
+						this.What = "DIRECT";
+						this.CallOnUpdate = SW_UpdateTitleColor;
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_CS_TitleFont" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_Heal">
+						<Offset>
+							<AbsDimension x="0" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this.TargetColor = SW_Settings["Colors"]["TitleBarsFont"];
+						this.What = "DIRECT";
+						this.CallOnUpdate = SW_UpdateTitleTextColor;
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_CS_Backdrops" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_TitleBar">
+						<Offset>
+							<AbsDimension x="0" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this.TargetColor = SW_Settings["Colors"]["Backdrops"];
+						this.What = "DIRECT";
+						this.CallOnUpdate = SW_UpdateFrameBackdrops;
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_CS_MainWinBack" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_TitleFont">
+						<Offset>
+							<AbsDimension x="0" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this.TargetColor = SW_Settings["Colors"]["MainWinBack"];
+						this.What = "DIRECT";
+						this.CallOnUpdate = SW_UpdateMainWinBack;
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_CS_ClassCAlpha" inherits="SW_ColorSwatch">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_Backdrops">
+						<Offset>
+							<AbsDimension x="0" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						SW_DummyColor = {1,1,1, SW_Settings["Colors"]["MAGE"][4]};
+						this.TargetColor = SW_DummyColor;
+						this.What = "DIRECT";
+						this.CallOnUpdate = SW_UpdateClassColorAlpha;
+						this:SetColor(this.TargetColor);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Slider name="SW_OptCountSlider" inherits="SW_OptSlider">
+				<Size>
+					<AbsDimension x="150" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_ClassCAlpha">
+						<Offset>
+							<AbsDimension x="0" y="-10" />
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."High"):SetText(SW_OPT_COUNT);
+						getglobal(this:GetName().."Low"):SetText("0");
+						this:SetMinMaxValues(0, SW_OPT_COUNT);
+						this:SetValueStep(1);
+					</OnLoad>
+					<OnShow>
+						this:SetValue(SW_Settings["QuickOptCount"]);
+						getglobal(this:GetName().."Text"):SetText("# "..this:GetValue());
+					</OnShow>
+					<OnValueChanged>
+						SW_Settings["QuickOptCount"] = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText("# "..this:GetValue());
+						SW_UpdateOptVis(true);
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider name="$parentIconSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="140" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="8" y="8" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 360);
+						this:SetValueStep(1);
+					</OnLoad>
+					<OnShow>
+						if SW_Settings["SW_IconPos"] ~= nil then
+							this:SetValue(SW_Settings["SW_IconPos"]);
+						else
+							this:SetValue(20);
+							SW_Settings["SW_IconPos"] = 20;
+						end
+						getglobal(this:GetName().."Text"):SetText("SW Icon "..this:GetValue().."\194\176");
+					</OnShow>
+					<OnValueChanged>
+						if SW_Settings["SW_IconPosR"] == nil then
+							SW_Settings["SW_IconPosR"] =80;
+						end
+						SW_Settings["SW_IconPos"] = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText("SW Icon "..this:GetValue().."\194\176");
+						SW_UpdateIconPos();
+						
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider name="$parentIconRadiusSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="140" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="$parentIconSlider">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(40, 150);
+						this:SetValueStep(1);
+					</OnLoad>
+					<OnShow>
+						if SW_Settings["SW_IconPosR"] ~= nil then
+							this:SetValue(SW_Settings["SW_IconPosR"]);
+						else
+							this:SetValue(80);
+							SW_Settings["SW_IconPosR"] = 80;
+						end
+						getglobal(this:GetName().."Text"):SetText("SW Icon "..this:GetValue().."r");
+					</OnShow>
+					<OnValueChanged>
+						SW_Settings["SW_IconPosR"] = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText("SW Icon "..this:GetValue().."r");
+						SW_UpdateIconPos();
+						
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+	</Frame>
+	<Frame name="SW_BarSettingsFrameV2" inherits="SW_Frame" enableMouse="true" movable="true"
+		frameStrata="MEDIUM" frameLevel="160" parent="UIParent">
+		<Scripts>
+			<OnLoad>this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+				
+			</OnLoad>
+			<OnShow>if SW_GeneralSettings:IsVisible() then
+						SW_GeneralSettings:Hide();
+					end
+			</OnShow>
+		</Scripts>
+		<Size>
+			<AbsDimension x="275" y="260" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<!-- <Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_BarSettingsFrameV2" /> -->
+			<Frame name="$parent_Title" inherits="SW_BarFrame_Title">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-4" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-24" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parent_Close" inherits="SW_RoundButton" hidden="false">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnMouseUp>this:GetParent():GetParent():Hide();</OnMouseUp>
+							<OnLoad>SW_RoundButtonRegister(this, {1,0,0,0.9}, "X");
+							table.insert(SW_Registered_BF_TitleButtons, this:GetName());</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="SW_BarSettings_Data" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-35" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="SW_OptChk_Rank" inherits="SW_OptChk_TT" hidden="false">
+						<Size>
+							<AbsDimension x="20" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								this:SetChecked(barSettings["ShowRank"]);
+							</OnShow>
+							<OnClick>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								if this:GetChecked() then
+									barSettings["ShowRank"] = 1;
+								else
+									barSettings["ShowRank"] = nil;
+								end
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="SW_OptChk_Num" inherits="SW_OptChk_TT" hidden="false">
+						<Size>
+							<AbsDimension x="20" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_OptChk_Rank">
+								<Offset>
+									<AbsDimension x="55" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								this:SetChecked(barSettings["ShowNumber"]);
+							</OnShow>
+							<OnClick>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								if this:GetChecked() then
+									barSettings["ShowNumber"] = 1;
+								else
+									barSettings["ShowNumber"] = nil;
+								end
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="SW_OptChk_Percent" inherits="SW_OptChk_TT" hidden="false">
+						<Size>
+							<AbsDimension x="20" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_OptChk_Num">
+								<Offset>
+									<AbsDimension x="70" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								this:SetChecked(barSettings["ShowPercent"]);
+							</OnShow>
+							<OnClick>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								if this:GetChecked() then
+									barSettings["ShowPercent"] = 1;
+								else
+									barSettings["ShowPercent"] = nil;
+								end
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<Slider name="SW_InfoTypeSlider" inherits="SW_OptSlider">
+						<Size>
+							<AbsDimension x="160" y="17" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_OptChk_Rank">
+								<Offset>
+									<AbsDimension x="0" y="-15" />
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="-10" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Low"):SetText("1");
+								getglobal(this:GetName().."High"):SetText(getn(SW_InfoTypes));
+								this:SetMinMaxValues(1, getn(SW_InfoTypes));
+								this:SetValueStep(1);
+								
+							</OnLoad>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								this:SetValue(barSettings["IN"]);
+								getglobal(this:GetName().."Text"):SetText("Info:"..SW_InfoTypes[this:GetValue()]["t"]);
+							</OnShow>
+							<OnValueChanged>
+								local oP = this:GetParent();
+								local type = SW_InfoTypes[this:GetValue()];
+								
+								local barSettings = SW_GetBarSettings(oP.caller);
+								getglobal(this:GetName().."Text"):SetText("Info:"..type["t"]);
+								barSettings["IN"] = this:GetValue();
+								
+								getglobal("SW_InfoLbl"):SetText(type["d"]);
+								
+								if type["varType"] == nil then
+									getglobal(oP:GetName().."_VarText"):Hide();
+									getglobal(oP:GetName().."_Filters"):Show();
+								else
+									getglobal(oP:GetName().."_Filters"):Hide();
+									if type["varType"] == "TEXT" then
+										getglobal(oP:GetName().."_Filters"):Hide();
+										getglobal(oP:GetName().."_VarText"):Show();
+									elseif type["varType"] == "SELF" then
+										getglobal(oP:GetName().."_Filters"):Hide();
+										getglobal(oP:GetName().."_VarText"):Hide();
+									elseif type["varType"] == "NONE" then
+										getglobal(oP:GetName().."_Filters"):Hide();
+										getglobal(oP:GetName().."_VarText"):Hide();
+									elseif type["varType"] == "PETONLY" then
+										getglobal(oP:GetName().."_Filters"):Hide();
+										getglobal(oP:GetName().."_VarText"):Hide();
+									end
+								end
+								SW_UpdateColor(oP.caller);
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Frame name="$parent_InfoDescription" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_InfoTypeSlider">
+								<Offset>
+									<AbsDimension x="0" y="-10" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="SW_InfoLbl" inherits="GameFontNormalSmall" maxLines="5" justifyV="TOP" justifyH="LEFT"
+									text="TmpTxt">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parent_Filters" hidden="true">
+						<Size>
+							<AbsDimension x="300" y="200" />
+						</Size>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								if barSettings["SF"] == nil then
+									SW_SelectFilter("SW_Filter_None");
+								else
+									SW_SelectFilter(barSettings["SF"]);
+								end
+							</OnShow>
+						</Scripts>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_OptChk_Rank">
+								<Offset>
+									<AbsDimension x="0" y="-100" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parent_Lbl" inherits="GameFontNormalSmall" text="Filter:">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="SW_Filter_None" inherits="SW_OptChk_TT" hidden="false">
+								<Size>
+									<AbsDimension x="20" y="20" />
+								</Size>
+								<Scripts>
+									<OnLoad>this.SW_Filter="NONE"</OnLoad>
+									<OnClick>
+										SW_SelectFilter("SW_Filter_None");
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["SF"] = this:GetName();
+									</OnClick>
+								</Scripts>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="35" y="5" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="SW_Filter_PC" inherits="SW_OptChk_TT" hidden="false">
+								<Size>
+									<AbsDimension x="20" y="20" />
+								</Size>
+								<Scripts>
+									<OnLoad>this.SW_Filter="PC"</OnLoad>
+									<OnClick>
+										SW_SelectFilter("SW_Filter_PC");
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["SF"] = this:GetName();
+									</OnClick>
+								</Scripts>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-15" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="SW_Filter_NPC" inherits="SW_OptChk_TT" hidden="false">
+								<Size>
+									<AbsDimension x="20" y="20" />
+								</Size>
+								<Scripts>
+									<OnLoad>this.SW_Filter="NPC"</OnLoad>
+									<OnClick>
+										SW_SelectFilter("SW_Filter_NPC");
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["SF"] = this:GetName();
+									</OnClick>
+								</Scripts>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_Filter_PC">
+										<Offset>
+											<AbsDimension x="33" y="0" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="SW_Filter_Group" inherits="SW_OptChk_TT" hidden="false">
+								<Size>
+									<AbsDimension x="20" y="20" />
+								</Size>
+								<Scripts>
+									<OnLoad>this.SW_Filter="GROUP"</OnLoad>
+									<OnClick>
+										SW_SelectFilter("SW_Filter_Group");
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["SF"] = this:GetName();
+									</OnClick>
+								</Scripts>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_Filter_NPC">
+										<Offset>
+											<AbsDimension x="43" y="0" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="SW_Filter_EverGroup" inherits="SW_OptChk_TT" hidden="false">
+								<Size>
+									<AbsDimension x="20" y="20" />
+								</Size>
+								<Scripts>
+									<OnLoad>this.SW_Filter="EGROUP"</OnLoad>
+									<OnClick>
+										SW_SelectFilter("SW_Filter_EverGroup");
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["SF"] = this:GetName();
+									</OnClick>
+								</Scripts>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-35" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<Slider name="SW_ClassFilterSlider" inherits="SW_OptSlider">
+								<Size>
+									<AbsDimension x="160" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_Filter_EverGroup">
+										<Offset>
+											<AbsDimension x="0" y="-15" />
+										</Offset>
+									</Anchor>
+									<Anchor point="RIGHT">
+										<Offset>
+											<AbsDimension x="0" y="0" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName().."Low"):SetText("1");
+										getglobal(this:GetName().."High"):SetText(10);
+										this:SetMinMaxValues(1, 10);
+										this:SetValueStep(1);
+										
+									</OnLoad>
+									<OnShow>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										if barSettings["CF"] == nil then
+											barSettings["CF"] = 1;
+										end
+										
+										this:SetValue(barSettings["CF"]);
+										
+									</OnShow>
+									<OnValueChanged>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["CF"] = this:GetValue();
+										local dispText = "";
+										if barSettings["CF"] == 1 then 
+											dispText = NONE;
+										else
+											dispText = SW_ClassNames[ SW_ClassFilters[ barSettings["CF"] ] ];
+											if dispText == "" then 
+												dispText = SW_ClassFilters[ barSettings["CF"] ];
+											end
+										end
+										getglobal(this:GetName().."Text"):SetText(dispText);
+									</OnValueChanged>
+								</Scripts>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parent_VarText">
+						<Size>
+							<AbsDimension x="300" y="40" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_OptChk_Rank">
+								<Offset>
+									<AbsDimension x="0" y="-100" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="SW_VarInfoLbl" inherits="GameFontNormalSmall" maxLines="5" justifyV="TOP"
+									justifyH="LEFT" text="TmpTxt">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Frame name="SW_SetInfoVarTxtFrame" inherits="SW_Frame_EditTxt">
+								<Size>
+									<AbsDimension x="200" y="300" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-40" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnShow>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										this.SWUpdateFunc = SW_UpdateTextSetting;
+										this.SWUpdateInfo = {this:GetParent():GetParent().caller, "TV"};
+										
+										if barSettings["TV"] == nil then
+											this.CurrentVal = "";
+										else
+											this.CurrentVal = barSettings["TV"];
+										end
+										this:ChangeText();
+									</OnShow>
+								</Scripts>
+							</Frame>
+							<Button name="SW_SetInfoVarFromTarget" inherits="GameMenuButtonTemplate" text="FromTarget">
+								<Size>
+									<AbsDimension x="80" y="20" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_SetInfoVarTxtFrame">
+										<Offset>
+											<AbsDimension x="0" y="-25" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										local unitName = UnitName("target");
+										if unitName == nil then return; end
+										--getglobal(this:GetParent():GetName().."_EditBox"):SetText(unitName);
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										barSettings["TV"] = unitName;
+										local tf = getglobal("SW_SetInfoVarTxtFrame");
+										tf.CurrentVal = barSettings["TV"];
+										tf:ChangeText();
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_Tab1" inherits="SW_Frame_Tab" parent="SW_BarSettingsFrameV2">
+				<Scripts>
+					<OnLoad>SW_TabRegister(this, "SW_BarSettings_Data", true);</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_BarSettings_Visuals" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="4" y="-35" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!--
+					<Slider name="SW_BarWidthSlider" inherits="SW_OptSlider">
+						<Size>
+							<AbsDimension x="200" y="17" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="45" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>SW_InitSlider(this, 64, 256, "BW");</OnLoad>
+						</Scripts>
+					</Slider>
+					-->
+					<Slider name="SW_ColCountSlider" inherits="SW_OptSlider">
+						<Size>
+							<AbsDimension x="200" y="17" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="45" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>SW_InitSlider(this, 1, 5, "COLC");</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="SW_BarHeightSlider" inherits="SW_OptSlider" orientation="VERTICAL">
+						<Size>
+							<AbsDimension x="12" y="150" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="15" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>SW_InitSlider(this, 4, 32, "BH");</OnLoad>
+						</Scripts>
+					</Slider>
+					<Frame name="SW_CS_BarC" inherits="SW_ColorSwatch">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="45" y="-35" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								this.TargetColor = this:GetParent().caller;
+								this.What = "BC";
+								this:SetColor(this.TargetColor, this.What);
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="SW_CS_FontC" inherits="SW_ColorSwatch">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_CS_BarC">
+								<Offset>
+									<AbsDimension x="130" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								this.TargetColor = this:GetParent().caller;
+								this.What = "BFC";
+								this:SetColor(this.TargetColor, this.What);
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Slider name="SW_TextureSlider" inherits="SW_OptSlider">
+						<Size>
+							<AbsDimension x="75" y="17" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_BarC">
+								<Offset>
+									<AbsDimension x="0" y="-15" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>SW_InitSlider(this, 1, 10, "BT");</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="SW_FontSizeSlider" inherits="SW_OptSlider">
+						<Size>
+							<AbsDimension x="75" y="17" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_CS_FontC">
+								<Offset>
+									<AbsDimension x="0" y="-15" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>SW_InitSlider(this, 6, 14, "BFS");</OnLoad>
+						</Scripts>
+					</Slider>
+					<Frame name="SW_SetFrameTxtFrame" inherits="SW_Frame_EditTxt">
+						<Size>
+							<AbsDimension x="200" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_TextureSlider">
+								<Offset>
+									<AbsDimension x="0" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								this.SWUpdateFunc = SW_UpdateTextSetting;
+								this.SWUpdateInfo = {this:GetParent().caller, "OTF"};
+								
+								if barSettings["OTF"] == nil then
+									this.CurrentVal = SW_Settings["BarFrames"][this:GetParent().caller]["Selected"];
+								else
+									this.CurrentVal = barSettings["OTF"];
+								end
+								this:ChangeText();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="SW_SetOptTxtFrame" inherits="SW_Frame_EditTxt">
+						<Size>
+							<AbsDimension x="200" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_SetFrameTxtFrame">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								this.SWUpdateFunc = SW_UpdateTextSetting;
+								this.SWUpdateInfo = {this:GetParent().caller, "OT"};
+								this.maxLetters = 2;
+								if barSettings["OT"] == nil then
+									this.CurrentVal = SW_Settings["BarFrames"][this:GetParent().caller]["Selected"];
+								else
+									this.CurrentVal = barSettings["OT"];
+								end
+								this:ChangeText();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="SW_CS_OptC" inherits="SW_ColorSwatch">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="SW_SetOptTxtFrame">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								this.TargetColor = this:GetParent().caller;
+								this.What = "OC";
+								this:SetColor(this.TargetColor, this.What);
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<CheckButton name="SW_ColorsOptUseClass" inherits="SW_OptChk_TT" hidden="false">
+						<Size>
+							<AbsDimension x="20" y="20" />
+						</Size>
+						<Scripts>
+							<OnShow>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								if barSettings["UCC"] ~= nil then
+									this:SetChecked(1);
+								else
+									this:SetChecked(0);
+								end
+							</OnShow>
+							<OnClick>
+								local barSettings = SW_GetBarSettings(this:GetParent().caller);
+								if this:GetChecked() then
+									barSettings["UCC"] = 1;
+								else
+									barSettings["UCC"] = nil;
+									SW_UpdateColor(this:GetParent().caller);
+								end
+								
+							</OnClick>
+						</Scripts>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="SW_CS_OptC">
+								<Offset>
+									<AbsDimension x="115" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_Tab2" inherits="SW_Frame_Tab" parent="SW_BarSettingsFrameV2">
+				<Scripts>
+					<OnLoad>SW_TabRegister(this, "SW_BarSettings_Visuals");</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_BarSettings_Pets" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="4" y="-35" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						local barSettings = SW_GetBarSettings(this.caller);
+						local showPF = SW_InfoTypes[ barSettings["IN"] ]["showPF"];
+						if showPF then 
+							getglobal("SW_Pets_Nothing"):Hide();
+							getglobal("SW_Pets_Settings"):Show();
+							if barSettings["PF"] == nil then
+								barSettings["PF"] = "SW_PF_Inactive";
+							end
+							SW_ChkClick(getglobal(barSettings["PF"]), barSettings, true);
+							
+						else
+							getglobal("SW_Pets_Nothing"):Show();
+							getglobal("SW_Pets_Settings"):Hide();
+						end
+					</OnShow>
+				</Scripts>
+				<Frames>
+					<Frame name="SW_Pets_Nothing" hidden="false">
+						<Size>
+							<AbsDimension x="300" y="40" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="4" y="-4" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-4" y="4" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="SW_NoPetInfoLabel" inherits="GameFontNormalSmall" maxLines="5" justifyV="CENTER"
+									justifyH="LEFT" text="TmpTxt">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="SW_Pets_Settings" hidden="true">
+						<Size>
+							<AbsDimension x="300" y="40" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="4" y="-4" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-4" y="4" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.chkPerRow = 1;
+							</OnLoad>
+						</Scripts>
+						<Frames>
+							<CheckButton name="SW_PF_Inactive" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										this.swoX = 5;
+										this.swoY = 0;
+										SW_ChkRegister(this, "", true, "PF");
+										this.petFil = {Inactive = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_Active" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {Active = true, latePets = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_Current" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {Current = true, latePets = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_VPP" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {VPP = true, latePets = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_VPR" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {VPR = true, latePets = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_MM" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {MM = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_MR" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {MR = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_MB" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {MB = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="SW_PF_Ignore" inherits="SW_Chk_Template">
+								<Scripts>
+									<OnLoad>
+										SW_ChkRegister(this, "", false, "PF");
+										this.petFil = {Ignore = true, latePets = true};
+									</OnLoad>
+									<OnClick>
+										local barSettings = SW_GetBarSettings(this:GetParent():GetParent().caller);
+										SW_ChkClick(this, barSettings);
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_Tab3" inherits="SW_Frame_Tab" parent="SW_BarSettingsFrameV2">
+				<Scripts>
+					<OnLoad>SW_TabRegister(this, "SW_BarSettings_Pets");</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

@@ -1,0 +1,1529 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Script file="DFM_Options.lua"/>
+
+<CheckButton name="DFM_ScrollButtonTemplate" inherits="DL_ScrollButtonTemplate" virtual="true">
+	<Size><AbsDimension x="160" y="20"/></Size>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+		</OnLoad>
+	</Scripts>
+</CheckButton>
+
+<Button name="DFM_NudgeTemplate" inherits="DL_NudgeTemplate" virtual="true">
+	<Scripts>
+		<OnMouseUp>
+			if (arg1 == "MiddleButton") then
+				this.movingframe = nil;
+			else
+				DFM_Nudge(arg1);
+			end
+		</OnMouseUp>
+		<OnUpdate>
+			DFM_Nudge_OnUpdate(arg1);
+		</OnUpdate>
+	</Scripts>
+</Button>
+
+<Button name="DFM_OptionsFrameTemplate" hidden="true" virtual="true" frameStrata="HIGH">
+	<Size><AbsDimension x="300" y="40"/></Size>
+	<Frames>
+		<Button name="$parent_Help" frameStrata="HIGH">
+			<Size><AbsDimension x="15" y="15"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset><AbsDimension x="-47" y="2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<Texture>
+						<Size><AbsDimension x="15" y="15"/></Size>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+						<Color r=".3" g="0" b="0"/>
+					</Texture>
+				</Layer>
+				<Layer level="OVERLAY">
+					<FontString inherits="GameFontNormal" text="?">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnEnter>
+					if (this:GetParent().help) then
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this:GetParent().help, 1, 1, 1, 1, 1);
+					end
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_1" letters="1000" autoFocus="false" inherits="InputBoxTemplate" hidden="true" frameStrata="HIGH">
+			<Size><AbsDimension x="253" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-11"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnEscapePressed>
+					if (this.prevvalue) then
+						this:SetText(this.prevvalue);
+					else
+						this:SetText("");
+					end
+					this:ClearFocus();
+				</OnEscapePressed>
+				<OnEnterPressed>
+					DFM_EditBox_OnEnterPressed();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_2" inherits="DiscordLib_TooltipBackdropTemplate" hidden="true" frameStrata="HIGH">
+			<Size><AbsDimension x="245" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-11"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Frames>
+				<Button name="$parent_Button">
+					<Size><AbsDimension x="32" y="32"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension x="-29" y="-1"/></Offset>
+						</Anchor>
+					</Anchors>
+					<HitRectInsets>
+						<AbsInset left="6" right="6" top="7" bottom="7"/>
+					</HitRectInsets>
+					<Scripts>
+						<OnClick>
+							DL_Show_Menu(1);
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Up"/>
+					<PushedTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Down"/>
+					<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+					<HighlightTexture alphaMode="ADD" file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Highlight"/>
+				</Button>		
+			</Frames>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Setting" inherits="GameFontNormal">
+						<Color r="1.0" g="1.0" b="0.0"/>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset><AbsDimension x="3" y="0"/></Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset><AbsDimension x="-20" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0,0,0);
+				</OnLoad>
+				<OnClick>
+					DL_Show_Menu();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="$parent_3" hidden="true" frameStrata="HIGH">
+			<Size><AbsDimension x="240" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-11"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Frames>
+				<Button name="$parent_Button">
+					<Size><AbsDimension x="36" y="36"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension x="-17" y="-1"/></Offset>
+						</Anchor>
+					</Anchors>
+					<HitRectInsets>
+						<AbsInset left="6" right="6" top="7" bottom="7"/>
+					</HitRectInsets>
+					<Scripts>
+						<OnClick>
+							DL_Show_Menu(1);
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Up"/>
+					<PushedTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Down"/>
+					<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+					<HighlightTexture alphaMode="ADD" file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Highlight"/>
+				</Button>
+				<EditBox name="$parent_Setting" letters="1000" autoFocus="false" inherits="InputBoxTemplate" frameStrata="HIGH">
+					<Size><AbsDimension x="100" y="22"/></Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+						<Anchor point="RIGHT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+					<FontString inherits="ChatFontNormal" font="Fonts\ARIALN.TTF">
+						<Color r="1" g="1" b="0"/>
+						<FontHeight>
+							<AbsValue val="12"/>
+						</FontHeight>
+					</FontString>
+					<Scripts>
+						<OnEscapePressed>
+							if (this:GetParent().prevvalue) then
+								this:SetText(this:GetParent().prevvalue);
+							else
+								this:SetText("");
+							end
+							this:ClearFocus();
+						</OnEscapePressed>
+						<OnEnterPressed>
+							DFM_EditBox_OnEnterPressed(1);
+						</OnEnterPressed>
+					</Scripts>
+				</EditBox>
+			</Frames>
+		</Frame>
+		<Slider name="$parent_4" orientation="HORIZONTAL" hidden="true" enableMouse="true">
+			<Size><AbsDimension x="190" y="17"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<HitRectInsets>
+				<AbsInset left="0" right="0" top="-10" bottom="-10"/>
+			</HitRectInsets>
+			<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+				<EdgeSize>
+					<AbsValue val="8"/>
+				</EdgeSize>
+				<TileSize>
+					<AbsValue val="8"/>
+				</TileSize>
+				<BackgroundInsets>
+					<AbsInset left="3" right="3" top="6" bottom="6"/>
+				</BackgroundInsets>
+			</Backdrop>
+			<Frames>
+				<EditBox name="$parent_Display" letters="6" autoFocus="false" inherits="InputBoxTemplate" justifyH="CENTER" frameStrata="HIGH" virtual="true">
+					<Size><AbsDimension x="53" y="20"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension x="5" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							this:SetTextColor(1,1,0);
+						</OnLoad>
+						<OnEnterPressed>
+							DFM_SliderEditBox_OnEnterPressed();
+						</OnEnterPressed>
+						<OnEscapePressed>
+							this:SetText(this:GetParent():GetValue());
+							this:ClearFocus();
+						</OnEscapePressed>
+					</Scripts>
+				</EditBox>
+			</Frames>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parentLow" inherits="GameFontHighlightSmall" text="LOW">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="2" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parentHigh" inherits="GameFontHighlightSmall" text="HIGH">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-2" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+			</ThumbTexture>
+			<Scripts>
+				<OnValueChanged>
+					DFM_Slider_OnValueChanged();
+				</OnValueChanged>
+			</Scripts>
+		</Slider>
+		<CheckButton name="$parent_5" inherits="UICheckButtonTemplate" frameStrata="HIGH" hidden="true">
+			<Size><AbsDimension x="30" y="30"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.dynamicPosition = 1;
+				</OnLoad>
+				<OnClick>
+					DFM_CheckBox_OnClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<Button name="$parent_6" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH" hidden="true">
+			<Size><AbsDimension x="30" y="30"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.dynamicPosition = 1;
+				</OnLoad>
+				<OnClick>
+					DFM_ColorPicker_OnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_7" letters="1000" autoFocus="false" inherits="InputBoxTemplate" hidden="true" frameStrata="HIGH">
+			<Size><AbsDimension x="75" y="25"/></Size>
+			<Frames>
+				<Button inherits="UIPanelButtonTemplate">
+					<Size><AbsDimension x="20" y="20"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension x="-9" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							this:SetText("+");
+						</OnLoad>
+						<OnClick>
+							DFM_PlusButton_OnClick();
+						</OnClick>
+					</Scripts>
+				</Button>
+				<Button inherits="UIPanelButtonTemplate">
+					<Size><AbsDimension x="20" y="20"/></Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT">
+							<Offset><AbsDimension x="-7" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							this:SetText("-");
+						</OnLoad>
+						<OnClick>
+							DFM_MinusButton_OnClick();
+						</OnClick>
+					</Scripts>
+				</Button>
+			</Frames>
+			<Scripts>
+				<OnLoad>
+					this.number = true;
+					this.dynamicPosition = 21;
+				</OnLoad>
+				<OnEscapePressed>
+					if (this.prevvalue) then
+						this:SetText(this.prevvalue);
+					else
+						this:SetText("");
+					end
+					this:ClearFocus();
+				</OnEscapePressed>
+				<OnEnterPressed>
+					DFM_EditBox_OnEnterPressed();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+
+		<CheckButton name="$parent_Use" inherits="UICheckButtonTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="20" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset><AbsDimension x="5" y="2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="DFM_USETEXT">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					DFM_UseCheckBox_OnClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Lock" inherits="UICheckButtonTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="20" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Use" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="DFM_LOCKTEXT">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					DFM_LockCheckBox_OnClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+	</Frames>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Text" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</FontString>
+		</Layer>
+		<Layer level="OVERLAY">
+			<Texture name="$parent_Border">
+				<Size><AbsDimension x="310" y="2"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Color r=".3" g="0" b="0"/>
+			</Texture>
+		</Layer>
+	</Layers>
+</Button>
+
+<Button name="DFM_Options" inherits="DiscordLib_OptionsTemplate" hidden="true">
+	<Size><AbsDimension x="570" y="590"/></Size>
+	<Frames>
+		<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate" frameStrata="HIGH">
+			<Scripts>
+				<OnClick>
+					DFM_Options:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<ScrollFrame name="$parent_FrameMenu" inherits="DL_ScrollFrameTemplate">
+			<Size><AbsDimension x="170" y="290"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="15" y="-40"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."_OuterBorder_Header"):SetText(DFM_TEXT.Frames);
+				</OnLoad>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(20, DFM_FrameMenu_Update);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<CheckButton name="$parent_FrameMenu_Button1" inherits="DFM_ScrollButtonTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_FrameMenu">
+					<Offset><AbsDimension x="5" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parent_FrameMenu_Button2" inherits="DFM_ScrollButtonTemplate" id="2"/>
+		<CheckButton name="$parent_FrameMenu_Button3" inherits="DFM_ScrollButtonTemplate" id="3"/>
+		<CheckButton name="$parent_FrameMenu_Button4" inherits="DFM_ScrollButtonTemplate" id="4"/>
+		<CheckButton name="$parent_FrameMenu_Button5" inherits="DFM_ScrollButtonTemplate" id="5"/>
+		<CheckButton name="$parent_FrameMenu_Button6" inherits="DFM_ScrollButtonTemplate" id="6"/>
+		<CheckButton name="$parent_FrameMenu_Button7" inherits="DFM_ScrollButtonTemplate" id="7"/>
+		<CheckButton name="$parent_FrameMenu_Button8" inherits="DFM_ScrollButtonTemplate" id="8"/>
+		<CheckButton name="$parent_FrameMenu_Button9" inherits="DFM_ScrollButtonTemplate" id="9"/>
+		<CheckButton name="$parent_FrameMenu_Button10" inherits="DFM_ScrollButtonTemplate" id="10"/>
+		<CheckButton name="$parent_FrameMenu_Button11" inherits="DFM_ScrollButtonTemplate" id="11"/>
+		<CheckButton name="$parent_FrameMenu_Button12" inherits="DFM_ScrollButtonTemplate" id="12"/>
+		<CheckButton name="$parent_FrameMenu_Button13" inherits="DFM_ScrollButtonTemplate" id="13"/>
+		<CheckButton name="$parent_FrameMenu_Button14" inherits="DFM_ScrollButtonTemplate" id="14"/>
+
+		<ScrollFrame name="$parent_OptionsMenu" inherits="DL_ScrollFrameTemplate" frameStrata="MEDIUM">
+			<Size><AbsDimension x="310" y="290"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_FrameMenu" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="35" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture>
+						<Size><AbsDimension x="2" y="300"/></Size>
+						<Anchors>
+							<Anchor point="RIGHT">
+								<Offset><AbsDimension x="-50" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Color r=".3" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(40, DFM_OptionsMenu_Update);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Button name="$parent_OptionsMenu_Button1" inherits="DFM_OptionsFrameTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_OptionsMenu">
+					<Offset><AbsDimension x="5" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parent_OptionsMenu_Button2" inherits="DFM_OptionsFrameTemplate" id="2"/>
+		<Button name="$parent_OptionsMenu_Button3" inherits="DFM_OptionsFrameTemplate" id="3"/>
+		<Button name="$parent_OptionsMenu_Button4" inherits="DFM_OptionsFrameTemplate" id="4"/>
+		<Button name="$parent_OptionsMenu_Button5" inherits="DFM_OptionsFrameTemplate" id="5"/>
+		<Button name="$parent_OptionsMenu_Button6" inherits="DFM_OptionsFrameTemplate" id="6"/>
+		<Button name="$parent_OptionsMenu_Button7" inherits="DFM_OptionsFrameTemplate" id="7"/>
+
+		<Frame name="$parent_LocBG" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="MEDIUM">
+			<Size><AbsDimension x="346" y="121"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_OptionsMenu" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="-5" y="-6"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture>
+						<Size><AbsDimension x="336" y="2"/></Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset><AbsDimension x="0" y="-25"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Color r=".3" g="0" b="0"/>
+					</Texture>
+					<FontString inherits="GameFontNormal" text="DFM_FRAMELOC">
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset><AbsDimension x="0" y="-8"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(.8, 0, 0);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Button name="$parent_NudgeReset" inherits="DFM_NudgeTemplate" id="0" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_LocBG">
+					<Offset><AbsDimension x="70" y="-50"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_YOffset";
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeUp" inherits="DFM_NudgeTemplate" id="1" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parent_NudgeReset" relativePoint="TOP"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_YOffset";
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeDown" inherits="DFM_NudgeTemplate" id="2" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_NudgeReset" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_YOffset";
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeLeft" inherits="DFM_NudgeTemplate" id="3" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_NudgeReset" relativePoint="LEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_XOffset";
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeRight" inherits="DFM_NudgeTemplate" id="4" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NudgeReset" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_XOffset";
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_XOffset" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="55" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_LocBG">
+					<Offset><AbsDimension x="25" y="5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label("X:");
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_Update_XOffset();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_YOffset" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="55" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label("Y:");
+					DL_Set_Anchor("_XOffset", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_Update_YOffset();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<CheckButton name="$parent_UseLocation" inherits="UICheckButtonTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="25" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_LocBG">
+					<Offset><AbsDimension x="40" y="-3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Text" inherits="GameFontNormal" text="DFM_USETEXT">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					DFM_UseLocationCheckBox_OnClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_LockLocation" inherits="UICheckButtonTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="25" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_LocBG">
+					<Offset><AbsDimension x="-5" y="-3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Text" inherits="GameFontNormal" text="DFM_LOCKTEXT">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					DFM_LockLocationCheckBox_OnClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<EditBox name="$parent_AnchorFrame" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_LocBG">
+					<Offset><AbsDimension x="2" y="-30"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Frame);
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_Update_AnchorFrame();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AnchorPoint" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="143" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_AnchorFrame" relativePoint="BOTTOMRIGHT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DFM_DropMenu";
+					this.table = "DL_ANCHORS";
+					this.index = "point";
+					DL_Set_Label(DFM_TEXT.Point);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_AnchorTo" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="143" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_AnchorPoint" relativePoint="BOTTOMRIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DFM_DropMenu";
+					this.table = "DL_ANCHORS";
+					this.index = "to";
+					DL_Set_Label(DFM_TEXT.To);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate" hidden="false" text="DFM_DRAGFRAME">
+			<Size><AbsDimension x="145" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_AnchorTo" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_Summon_DragFrame();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Frame name="$parent_AddFrameBG" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="MEDIUM">
+			<Size><AbsDimension x="206" y="121"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_FrameMenu" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="-5" y="-6"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(.8, 0, 0);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<EditBox name="$parent_AddFrame" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Frame);
+					DL_Set_Anchor("_AddFrameBG", 5, -5, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_Options_AddName:SetFocus();
+				</OnEnterPressed>
+				<OnTabPressed>
+					DFM_Options_AddName:SetFocus();
+				</OnTabPressed>
+				<OnTextChanged>
+					if (getglobal(this:GetText())) then
+						DFM_Options_AddFrameButton:Enable();
+					else
+						DFM_Options_AddFrameButton:Disable();
+					end
+				</OnTextChanged>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_AddName" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Name);
+					DL_Set_Anchor("_AddFrameBG", 5, -28, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_Options_AddHeader:SetFocus();
+				</OnEnterPressed>
+				<OnTabPressed>
+					DFM_Options_AddHeader:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_AddHeader" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Header);
+					DL_Set_Anchor("_AddFrameBG", 5, -51, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+				<OnEnterPressed>
+					this:ClearFocus();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<CheckButton name="$parent_AddChildren" inherits="DiscordLib_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_AddFrameBG">
+					<Offset><AbsDimension x="5" y="-75"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.AddChildren);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Button name="$parent_AddFrameButton" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="145" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parent_AddFrameBG">
+					<Offset><AbsDimension x="0" y="5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.AddFrame);
+					this:Disable();
+				</OnLoad>
+				<OnClick>
+					DFM_AddNewFrame();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<EditBox name="$parent_NewProfile" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.NewProfile);
+					DL_Set_Anchor("_AddFrameBG", 5, -17);
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_Create_Profile();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<Button inherits="UIPanelButtonTemplate" text="DL_CREATETEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NewProfile" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_Create_Profile();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_LoadProfile" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="143" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DFM_DropMenu";
+					this.table = "DFM_PROFILES";
+					this.index = "profile";
+					DL_Set_Label(DFM_TEXT.LoadProfile);
+					DL_Set_Anchor("_AddFrameBG", 5, -42);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Load" inherits="UIPanelButtonTemplate" text="DL_LOADTEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_LoadProfile" relativePoint="RIGHT">
+					<Offset><AbsDimension x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_Load_Profile();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate" text="DL_DELETETEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Load" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_Delete_Profile();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parent_Paste" inherits="UIPanelButtonTemplate" text="DL_PASTETEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_LocBG" relativePoint="BOTTOMRIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_Paste_Settings();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate" text="DL_COPYTEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_Paste" relativePoint="LEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_Copy_Settings();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_ShowFrame" inherits="UIPanelButtonTemplate" text="DFM_SHOWTEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_Paste" relativePoint="BOTTOMRIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					if (DFM_SELECTED_INDEX) then
+						getglobal(DFM_FRAME_LIST[DFM_SELECTED_INDEX].frame):Show();
+					end
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate" text="DFM_HIDETEXT">
+			<Size><AbsDimension x="75" y="24"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_ShowFrame" relativePoint="LEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					if (DFM_SELECTED_INDEX) then
+						getglobal(DFM_FRAME_LIST[DFM_SELECTED_INDEX].frame):Hide();
+					end
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_ShowFrame" relativePoint="BOTTOMRIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.FrameFinder);
+				</OnLoad>
+				<OnClick>
+					DFM_Toggle_FrameFinder();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_ShowFrame" relativePoint="BOTTOMRIGHT">
+					<Offset><AbsDimension x="0" y="-24"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.ResetFrame);
+				</OnLoad>
+				<OnEnter>
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText("Clicking this button will clear all saved settings for the frame and return it to defaults the next time you reload the UI.", 1, 1, 1, 1, 1);
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+				<OnClick>
+					DFM_Reset_Frame();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_ShowFrame" relativePoint="BOTTOMRIGHT">
+					<Offset><AbsDimension x="0" y="-48"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.RemoveFromList);
+				</OnLoad>
+				<OnEnter>
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText("Clicking this button will clear all saved settings for the frame, return it to defaults, and remove it from the frame list.", 1, 1, 1, 1, 1);
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+				<OnClick>
+					DFM_Remove_Frame();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT">
+					<Offset><AbsDimension x="15" y="40"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.CreateNewFrame);
+				</OnLoad>
+				<OnClick>
+					DFM_CreateFrameForm:Show();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT">
+					<Offset><AbsDimension x="15" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.ReloadUI);
+				</OnLoad>
+				<OnClick>
+					ReloadUI();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT">
+					<Offset><AbsDimension x="160" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.LoadOnDemand);
+				</OnLoad>
+				<OnClick>
+					if (DFM_LoDFrame:IsVisible()) then
+						DFM_LoDFrame:Hide();
+					else
+						DFM_LoDFrame:Show();
+					end
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_ProfileLabel" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="15" y="-460"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<Texture>
+				<Size><AbsDimension x="397" y="2"/></Size>
+				<Color r=".3" g="0" b="0"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset><AbsDimension x="7" y="65"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+			<Texture>
+				<Size><AbsDimension x="2" y="130"/></Size>
+				<Color r=".3" g="0" b="0"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset><AbsDimension x="-165" y="7"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			DFM_DropMenu:Hide();
+			DFM_ScrollMenu:Hide();
+		</OnClick>
+		<OnShow>
+			DFM_Initialize_AllFrames();
+		</OnShow>
+	</Scripts>
+</Button>
+
+<Button name="DFM_ScrollMenu" inherits="DL_ScrollMenuTemplate" hidden="true" parent="DFM_Options">
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			this.scrollMenu = true;
+			this.updateFunc = DFM_ScrollMenu_Update;
+		</OnLoad>
+	</Scripts>
+</Button>
+
+<Button name="DFM_DropMenu" inherits="DL_DropMenuTemplate" parent="DFM_Options" hidden="true"/>
+
+<Frame name="DFM_ReloadUIFrame" inherits="DiscordLib_DialogueBackdropTemplate" frameStrata="DIALOG" parent="UIParent" hidden="true">
+	<Size><AbsDimension x="300" y="100"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_No" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="70" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset><AbsDimension x="-35" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.No);
+				</OnLoad>
+				<OnClick>
+					DFM_ReloadUIFrame:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Yes" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="70" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset><AbsDimension x="35" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.Yes);
+				</OnLoad>
+				<OnClick>
+					ReloadUI();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Text" inherits="GameFontNormal" text="DFM_RELOADWARNING">
+				<Size><AbsDimension x="270" y="50"/></Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset><AbsDimension x="0" y="-15"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			tinsert(UISpecialFrames,"DFM_ReloadUIFrame");
+		</OnLoad>
+	</Scripts>
+</Frame>
+
+<Button name="DFM_DragFrame" frameStrata="DIALOG" hidden="true" movable="true">
+	<Size><AbsDimension x="50" y="50"/></Size>
+	<Frames>
+		<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate">
+			<Size><AbsDimension x="20" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset><AbsDimension x="5" y="5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DFM_DragFrame:Hide();
+					DFM_DRAG_INDEX = nil;
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parent_NudgeUp" inherits="DFM_NudgeTemplate" id="1">
+			<Anchors>
+				<Anchor point="BOTTOM" relativePoint="TOP"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_YOffset";
+				</OnLoad>
+				<OnMouseUp>
+					if (arg1 == "MiddleButton") then
+						this.movingframe = nil;
+					else
+						DFM_Nudge(arg1, 1);
+					end
+				</OnMouseUp>
+				<OnUpdate>
+					DFM_Nudge_OnUpdate(arg1, 1);
+				</OnUpdate>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeLeft" inherits="DFM_NudgeTemplate" id="3">
+			<Anchors>
+				<Anchor point="RIGHT" relativePoint="LEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_XOffset";
+				</OnLoad>
+				<OnMouseUp>
+					if (arg1 == "MiddleButton") then
+						this.movingframe = nil;
+					else
+						DFM_Nudge(arg1, 1);
+					end
+				</OnMouseUp>
+				<OnUpdate>
+					DFM_Nudge_OnUpdate(arg1, 1);
+				</OnUpdate>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeRight" inherits="DL_NudgeTemplate" id="4">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_XOffset";
+				</OnLoad>
+				<OnMouseUp>
+					if (arg1 == "MiddleButton") then
+						this.movingframe = nil;
+					else
+						DFM_Nudge(arg1, 1);
+					end
+				</OnMouseUp>
+				<OnUpdate>
+					DFM_Nudge_OnUpdate(arg1, 1);
+				</OnUpdate>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeDown" inherits="DL_NudgeTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOP" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_NudgeButton_OnLoad();
+					this.updateFrame = "DFM_Options_YOffset";
+				</OnLoad>
+				<OnMouseUp>
+					if (arg1 == "MiddleButton") then
+						this.movingframe = nil;
+					else
+						DFM_Nudge(arg1, 1);
+					end
+				</OnMouseUp>
+				<OnUpdate>
+					DFM_Nudge_OnUpdate(arg1, 1);
+				</OnUpdate>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="ARTWORK">
+			<Texture name="$parent_Texture">
+				<Color r=".6" g="0" b="0" a=".3"/>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_FrameName" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="5"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForDrag("LeftButton");
+		</OnLoad>
+		<OnDragStart>
+			DFM_Start_Dragging();
+		</OnDragStart>
+		<OnDragStop>
+			DFM_Stop_Dragging();
+		</OnDragStop>
+	</Scripts>
+</Button>
+
+<Frame name="DFM_LoDButtonTemplate" virtual="true" frameStrata="DIALOG">
+	<Size><AbsDimension x="250" y="20"/></Size>
+	<Frames>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="60" y="20"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.Delete);
+				</OnLoad>
+				<OnClick>
+					DFM_Delete_LoDFunc();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Text" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</FontString>
+		</Layer>
+	</Layers>
+</Frame>
+
+<Button name="DFM_LoDFrame" parent="UIParent" inherits="DiscordLib_DialogueBackdropTemplate" hidden="true" movable="true" frameStrata="MEDIUM">
+	<Size><AbsDimension x="315" y="260"/></Size>
+	<Anchors>
+		<Anchor point="LEFT" relativeTo="DFM_Options" relativePoint="RIGHT"/>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate" frameStrata="DIALOG">
+			<Scripts>
+				<OnClick>
+					DFM_LoDFrame:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<ScrollFrame name="$parent_Menu" inherits="DL_ScrollFrameTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="260" y="150"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="15" y="-40"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."_OuterBorder_Header"):SetText(DFM_TEXT.LoDFunc);
+				</OnLoad>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(20, DFM_LoDMenu_Update);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Frame name="$parent_Menu_Button1" inherits="DFM_LoDButtonTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Menu">
+					<Offset><AbsDimension x="5" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Frame>
+		<Frame name="$parent_Menu_Button2" inherits="DFM_LoDButtonTemplate" id="2"/>
+		<Frame name="$parent_Menu_Button3" inherits="DFM_LoDButtonTemplate" id="3"/>
+		<Frame name="$parent_Menu_Button4" inherits="DFM_LoDButtonTemplate" id="4"/>
+		<Frame name="$parent_Menu_Button5" inherits="DFM_LoDButtonTemplate" id="5"/>
+		<Frame name="$parent_Menu_Button6" inherits="DFM_LoDButtonTemplate" id="6"/>
+		<Frame name="$parent_Menu_Button7" inherits="DFM_LoDButtonTemplate" id="7"/>
+
+		<EditBox name="$parent_Func" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="250" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset><AbsDimension x="0" y="40"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnEnterPressed>
+					DFM_Add_LoDFunc();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="100" y="24"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset><AbsDimension x="0" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.AddFunction);
+				</OnLoad>
+				<OnClick>
+					DFM_Add_LoDFunc();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			this:RegisterForDrag("LeftButton");
+		</OnLoad>
+		<OnDragStart>
+			this:StartMoving();
+		</OnDragStart>
+		<OnDragStop>
+			this:StopMovingOrSizing();
+		</OnDragStop>
+	</Scripts>
+</Button>
+
+<Button name="DFM_CreateFrameForm" parent="DFM_Options" inherits="DiscordLib_DialogueBackdropTemplate" hidden="true" movable="true" frameStrata="MEDIUM">
+	<Size><AbsDimension x="300" y="155"/></Size>
+	<Anchors>
+		<Anchor point="LEFT" relativePoint="RIGHT">
+			<Offset><AbsDimension x="10" y="0"/></Offset>
+		</Anchor>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate" frameStrata="HIGH">
+			<Scripts>
+				<OnClick>
+					DFM_CreateFrameForm:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_FrameType" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="170" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DFM_DropMenu";
+					this.table = "DFM_FRAMETYPES";
+					this.index = "FRAMETYPE";
+					this.initFunc = function() end;
+					DL_Set_Label(DFM_TEXT.FrameType);
+					DL_Set_Anchor("", 15, -15, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_AddFrame" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Frame);
+					DL_Set_Anchor("", 15, -40, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_CreateFrameForm_AddName:SetFocus();
+				</OnEnterPressed>
+				<OnTabPressed>
+					DFM_CreateFrameForm_AddName:SetFocus();
+				</OnTabPressed>
+				<OnTextChanged>
+					if (getglobal(this:GetText()) or this:GetText() == "" or (not this:GetText())) then
+						DFM_CreateFrameForm_AddFrameButton:Disable();
+					else
+						DFM_CreateFrameForm_AddFrameButton:Enable();
+					end
+				</OnTextChanged>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_AddName" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Name);
+					DL_Set_Anchor("", 15, -65, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+				<OnEnterPressed>
+					DFM_CreateFrameForm_AddHeader:SetFocus();
+				</OnEnterPressed>
+				<OnTabPressed>
+					DFM_CreateFrameForm_AddHeader:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_AddHeader" inherits="DiscordLib_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DFM_TEXT.Header);
+					DL_Set_Anchor("", 15, -90, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+				<OnEnterPressed>
+					this:ClearFocus();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AddFrameButton" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="145" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset><AbsDimension x="0" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.CreateFrame);
+					this:Disable();
+				</OnLoad>
+				<OnClick>
+					DFM_Create_NewFrame();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			this:RegisterForDrag("LeftButton");
+		</OnLoad>
+		<OnDragStart>
+			this:StartMoving();
+		</OnDragStart>
+		<OnDragStop>
+			this:StopMovingOrSizing();
+		</OnDragStop>
+	</Scripts>
+</Button>
+
+</Ui>

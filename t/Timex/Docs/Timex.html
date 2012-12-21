@@ -1,0 +1,895 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+	<title>Timex Documentation</title>
+	<style type="text/css">
+		body { background-color: rgb(255, 255, 255); font-family: times, serif }
+		h1 { font-family: helvetica, sans-serif; font-size: x-large; font-weight: normal; color: rgb(190, 190, 189) }
+		h2 { font-family: helvetica, sans-serif; font-size: large; font-weight: normal; color: rgb(190, 190, 190) }
+		h3 { font-size: medium; font-weight: bold }
+		pre { font-family: courier new, fixed }
+		code { font-family: courier new, fixed }
+
+		a.toc2 { font-size: large; font-weight: normal; color: rgb(190, 190, 190) }
+
+		dd div { padding-left: 2em }
+
+		.indent { padding-left: 2em }
+		.bold { font-weight: bold }
+		.underline { text-decoration: underline }
+		div.indent .hanging-indent { text-indent: -2em; padding-left: 4em }
+	</style>
+</head>
+<body>
+	<p><img alt="[ TIMEX ]" title="Timex" src="TimexTitle.jpg" style="width: 479px; height: 119px;"/></p>
+
+	<!--------------
+	TOC
+	--------------->
+	<h1>Table of Contents</h1>
+	<a href="#i" class="toc2">i. Developers - Timex Core</a>
+	<p>
+		<a href="#StartupFunctions">Startup Functions</a><br>
+		<a href="#AddingaTimexEntry">Adding a Timex Entry</a><br>
+		<a href="#CheckingaTimexEntry">Checking a Timex Entry</a><br>
+		<a href="#DeletingaTimexEntry">Deleting a Timex Entry</a><br>
+		<a href="#ChanginganEntrysDuration">Changing an Entry's Duration</a><br>
+	</p>
+	<a href="#ii" class="toc2">ii. Developers - Timex Bar</a>
+	<p>
+		<a href="#GettingaTimexBar">Getting a Timex Bar</a><br>
+		<a href="#FormattingaTimexBar">Formatting a Timex Bar</a><br>
+		<a href="#StartingaTimexBar">Starting a Timex Bar</a><br>
+		<a href="#TimexBarExample">An Example</a><br>
+		<a href="#CheckingaTimexBar">Checking a Timex Bar</a><br>
+		<a href="#StoppingaTimexBar">Stopping a Timex Bar</a><br>
+	</p>
+	<a href="#iii" class="toc2">iii. Developers - Miscellaneous</a>
+	<p>
+		<a href="#SyntacticMayhem">Syntactic Mayhem</a><br>
+	</p>
+	<a href="#iv" class="toc2">iv. Players</a>
+	<p>
+		<a href="#TimexCompatibility">Timex Compatibility</a><br>
+		<a href="#ChatCommands">Chat Commands</a><br>
+	</p>
+	<br>
+
+
+	<h1>i. Developers - Timex Core<a name="i"/></h1>
+
+	<!--------------
+	Startup Functions
+	--------------->
+	<h2>Startup Functions<a name="StartupFunctions"/></h2>
+
+	<h3>Timex:AddStartupFunc</h3>
+	<dl>
+		<dt>
+			<pre>void Timex:<b>AddStartupFunc</b>(function&nbsp;f,
+                          object&nbsp;a1,
+                          object&nbsp;a2,
+                          object&nbsp;a3, ...
+                          object&nbsp;a20)</pre>
+		</dt>
+		<dd><div>
+			Adds a startup function to Timex.&nbsp; A startup function runs immediately after Timex has initialized.&nbsp; This is soon after the player logs in or has reloaded their UI,
+			soon after the <code>VARIABLES_LOADED</code> event.&nbsp; It is similar to the <code>Enable</code> method of Ace addons, and is mostly there for use with non-Ace addons.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>f</code> - the startup function.</dd>
+				<dd><code>a1..a20</code> - the arguments (optional).</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example:</dt>
+				<dd>
+					<pre><code>Timex:AddStartupFunc(self.AddonFunc, ace.print, ace, "I have entered the game!")</code></pre>
+
+					This will print "I have entered the game!" to the ChatFrame on login.
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+
+	<!--------------
+	AddSchedule
+	--------------->
+	<h2>Adding a Timex Entry<a name="AddingaTimexEntry"/></h2>
+
+	<h3>Timex:AddSchedule</h3>
+	<dl>
+		<dt>
+			<pre>void Timex:<b>AddSchedule</b>(object&nbsp;id,
+                       number&nbsp;t,
+                       boolean&nbsp;r,
+                       number&nbsp;c,
+                       function/string&nbsp;f,
+                       object&nbsp;a1,
+                       object&nbsp;a2,
+                       object&nbsp;a3, ...
+                       object&nbsp;a20)</pre>
+		</dt>
+		<dd><div>
+			Adds a schedule entry to Timex.&nbsp; This is the fundamental method of Timex.&nbsp; This is used to schedule a function to run, or an event to be triggered, at some
+			point in the future.<br>
+			<br>
+			<u>Argument subsitution:</u>&nbsp;Timex supports argument substition.  If you use one of the following values in the argument list, Timex will substitute the appropriate value
+			when the function/event is called.<br>
+			<br>
+			<dl>
+				<dd><code>Timex.ARG_ID</code> - the id of this schedule.</dd>
+				<dd><code>Timex.ARG_COUNT</code> - the number of times this schedule has run.</dd>
+				<dd><code>Timex.ARG_ELAPSED</code> - the elapsed time since this schedule last fired.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id, for persistent entries (optional).</dd>
+				<dd><code>t</code> - the time delay.</dd>
+				<dd><code>r</code> - whether the schedule should be repeated continuously (optional, not to be used with c).</dd>
+				<dd><code>c</code> - the number of times the schedule should be repeated before removal (optional).</dd>
+				<dd><code>f</code> - the function (pointer) or event (string) to trigger.</dd>
+				<dd><code>a1..a20</code> - the arguments (optional).</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example #1:</dt>
+				<dd>
+					<pre><code>Timex:AddSchedule("MyAddOn", 5, nil, nil, ace.print, ace, "Hello World!")</code></pre>
+
+					This is a standard Timex entry - after two seconds, "Hello World!" will be printed to the ChatFrame.<br>
+					<br>
+				</dd>
+
+				<dt class="underline">Example #2:</dt>
+				<dd>
+					<pre><code>Timex:AddSchedule("MyAddOn", 2, TRUE, nil, ace.print, ace, "Yadda!")</code></pre>
+
+					In this example repeat is being used - this will print "Yadda!" to the ChatFrame every two seconds until the entry is manually deleted.<br>
+					<br>
+				</dd>
+
+				<dt class="underline">Example #3:</dt>
+				<dd>
+					<pre><code>Timex:AddSchedule("MyAddOn", 2, nil, 5, ace.print, ace, "Blah.")</code></pre>
+
+					In this example we see count being used - this will print "Blah." to the ChatFrame every two seconds until it has done this five times, then it will stop.<br>
+					<br>
+				</dd>
+
+				<dt class="underline">Example #4:</dt>
+				<dd>
+					<pre><code>Timex:AddSchedule(timexBar, 0.1, nil, time*10, timexHandler, self, timexBar, Timex.ARG_ELAPSED)</code></pre>
+
+					In this example we see count being used - this will print "Blah." to the ChatFrame every two seconds until it has done this five times, then it will stop.<br>
+					<br>
+				</dd>
+
+				<dt class="underline">Example #5:</dt>
+				<dd>
+					<pre><code>Timex:AddSchedule("MyAddOn", 2, TRUE, nil, "MY_TIMEX_UPDATE", "% has seen %s counts", Timex.ARG_COUNT)
+
+function AddOnName:Enable()
+    self:RegisterEvent("MY_TIMEX_UPDATE")
+end
+
+function AddOnName:MY_TIMEX_UPDATE(msg, c)
+    -- c is the current count.
+    ace:print(format(msg, c)
+    if c == 2 then
+        ace:print("Second.")
+    elseif c == 1 then
+        ace:print("First.")
+    end
+end</code></pre>
+					The fifth example gets more complex.&nbsp; If you enter a string as the function, Timex will fire that event when the schedule is due (the "doTimexEvent" string
+					will actually fire the "TIMEX_UPDATE" event for backwards-compatibility with older versions of Timex).&nbsp; This may be useful if you wish to use an event-driven
+					timing system, rather than one that relies on function calls.&nbsp;  Note that this only works for Ace-developed AddOns, due to the way the event is distributed.<br>
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+
+	<h2>Checking a Timex Entry<a name="CheckingaTimexEntry"/></h2>
+
+	<h3>Timex:ScheduleCheck</h3>
+	<dl>
+		<dt>
+			<pre>boolean/number Timex:<b>ScheduleCheck</b>(object&nbsp;id,
+                                   boolean&nbsp;r)</pre>
+		</dt>
+		<dd><div>
+			This method is used to check the current status of any Timex entries.  It can also be used to check the time that has elapsed on a particular timer.&nbsp; This can be used to
+			check how much time has passed from point A to point B.  You can add a Timex entry without a function for this very purpose.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the entry.</dd>
+				<dd><code>r</code> - whether to return the time elapsed. (optional).</dd>
+				<dt class="bold">Returns:</dt>
+				<dd>If <code>r</code> is <code>FALSE</code> or <code>nil</code>, <code>TRUE</code> if the entry exists, <code>nil</code> otherwise.  If <code>r</code> is not 
+				<code>FALSE</code> or <code>nil</code>, the time elapsed on the entry, <code>nil</code> otherwise.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example #1:</dt>
+				<dd>
+					<pre><code>local a = Timex:ScheduleCheck("MyAddOn")
+if a then
+    ace:print("Exists.")
+end</code></pre>
+					This example will return true if the Timex entry with id "MyAddOn" is present, and nil otherwise.
+				</dd>
+				<br>
+				<dt class="underline">Example #2:</dt>
+				<dd>
+					<pre><code>local a = Timex:ScheduleCheck("MyAddOn", TRUE)
+if a then
+    ace:print(a)
+end</code></pre>
+					This example will return the time remaining for the Timex entry with id "MyAddOn" is present, and nil otherwise.
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+
+	<h2>Deleting a Timex Entry<a name="DeletingaTimexEntry"/></h2>
+
+	<h3>Timex:DeleteSchedule</h3>
+	<dl>
+		<dt>
+			<pre>void Timex:<b>DeleteSchedule</b>(object&nbsp;id)</pre>
+		</dt>
+		<dd><div>
+			This method is used to remove a Timex entry.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the entry.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example:</dt>
+				<dd>
+					<pre><code>Timex:DeleteSchedule("MyAddOn")</code></pre>
+
+					This will delete the "MyAddOn" entry from Timex's database.
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h2>Changing an Entry's Duration<a name="ChanginganEntrysDuration"/></h2>
+
+	<p>
+		This method is used to change a timer's duration while it is running.  For example, it can be used to change the 'tick rate' of a
+		repeating timer.
+	</p>
+
+	<h3>Timex:ChangeDuration</h3>
+	<dl>
+		<dt>
+			<pre>void Timex:<b>ChangeDuration</b>(object&nbsp;id
+			  number&nbsp;t)</pre>
+		</dt>
+		<dd><div>
+			This method is used to remove a Timex entry.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the entry.</dd>
+				<dd><code>t</code> - the new duration of the entry.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example:</dt>
+				<dd>
+					<pre><code>Timex:DeleteSchedule("MyAddOn", 15)</code></pre>
+
+					This will change the duration of the "MyAddOn" timer to 15 seconds.
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+	<br>
+	<br>
+
+
+
+	<h1>ii. Developers - Timex Bars<a name="ii"/></h1>
+
+	<p>
+		This module of timex exists for providing timer bars to both players for their macros and to developers for AddOns that need to display a
+		timer.&nbsp; The bar has two text elements, these are timer and text.&nbsp; The colour of the bar and text are both configurable along with
+		the size and shape of the bar.&nbsp; Further, there's a button to the left of the bar which can display a spell/item texture for easy viewing of
+		whatever's ticking down.  Note that the interface for TimexBar has changed in R23.
+	</p>
+	<p>
+		Here's a visual example of a standard Timex Bar, as shown by the AceTimer AddOn:
+	</p>
+	<p style="text-align: center">
+		<img alt="[ Timex Bars ]"  title="Timex Bars" src="TimexBars.jpg" style="border: 5px solid ; width: 246px; height: 96px;"/>
+	</p>
+	<p>
+		These bars are currently at their default length and size.  Once a bar has finished ticking down, it can fire off a function, so if you want to
+		rearrange your GUI based on when bars show and hide, you can now do so.&nbsp; For example, you could create a bunch of bars which anchor off of
+		each other to the right and when one disappears, the next bar over crops left to take its space.
+	</p>
+	<p>
+		These bars are currently at their default length and size.  Once a bar has finished ticking down, it can fire off a function, so if you want to
+		rearrange your GUI based on when bars show and hide, you can now do so.&nbsp; For example, you could create a bunch of bars which anchor off of
+		each other to the right and when one disappears, the next bar over crops left to take its space.
+	</p>
+	<p>
+		The interface for creating and starting a bar has changed somewhat from pre-R23 versions of Timex.  Essentially, you get Timex to assign a bar
+		from its free pool to your id, then you format the bar and start it.  Note that a bar is only truly reserved (ie removed from the free pool) once
+		it has started.  A bar returns to the free pool when it finishes running, or if it is stopped.
+	</p>
+
+	<h2>Getting a Timex Bar<a name="GettingaTimexBar"/></h2>
+
+	<h3>TimexBar:Get</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>Get</b>(object&nbsp;id)</pre>
+		</dt>
+		<dd><div>
+			This will assign a bar to the id you provide.  Note that you cannot 'Get' a bar, and then format/start it at some later stage.  It is quite likely
+			that the bar will be assigned to another id the next time another 'Get' call is made, so you will have to 'Get' a bar again.  Generally you should
+			get and format a bar at the time that you intend to start it.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:GetName</h3>
+	<dl>
+		<dt>
+			<pre>string TimexBar:<b>GetName</b>(object&nbsp;id)</pre>
+		</dt>
+		<dd><div>
+			Gets the name of the TimexBar assigned to the given id.  Returns <code>nil</code> if no TimexBar is assigned to the id.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dt class="bold">Returns:</dt>
+				<dd>The name of the TimexBar assigned to <code>id</code>, or <code>nil</code>.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+
+	<h2>Formatting a Timex Bar<a name="FormattingaTimexBar"/></h2>
+
+	<p>
+		There are a number of formatting methods to change the appearance of a Timex bar...generally these are similar to the formatting options available
+		on the standard UI Frame elements.  All are optional (ie you don't have to set any of them if you don't wish to).
+	</p>
+
+	<h3>TimexBar:SetColor</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetColor</b>(object&nbsp;id
+                       number&nbsp;red,
+                       number&nbsp;green,
+                       number&nbsp;blue,
+                       number&nbsp;alpha)</pre>
+		</dt>
+		<dd><div>
+			Sets the color of the bar.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>red</code> - red channel.</dd>
+				<dd><code>green</code> - green channel.</dd>
+				<dd><code>blue</code> - blue channel.</dd>
+				<dd><code>alpha</code> - alpha channel (optional).</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetTextColor</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetTextColor</b>(object&nbsp;id
+                           number&nbsp;red,
+                           number&nbsp;green,
+                           number&nbsp;blue,
+                           number&nbsp;alpha)</pre>
+		</dt>
+		<dd><div>
+			Sets the color of the text in the bar.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>red</code> - red channel.</dd>
+				<dd><code>green</code> - green channel.</dd>
+				<dd><code>blue</code> - blue channel.</dd>
+				<dd><code>alpha</code> - alpha channel (optional).</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetPoint</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetPoint</b>(object&nbsp;id
+                       string&nbsp;point,
+                       string&nbsp;relativeFrame,
+                       string&nbsp;relativePoint,
+                       number&nbsp;xOffset,
+                       number&nbsp;xOffset)</pre>
+		</dt>
+		<dd><div>
+			Sets the position of the bar.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>point</code> - the anchor point of the bar.</dd>
+				<dd><code>relativeFrame</code> - the anchor frame (that the bar's position will be relative to).</dd>
+				<dd><code>relativePoint</code> - the anchor point of the anchor frame.</dd>
+				<dd><code>xOffset</code> - X offset.</dd>
+				<dd><code>yOffset</code> - Y offset.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetScale</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetScale</b>(object&nbsp;id
+                       number&nbsp;scale)</pre>
+		</dt>
+		<dd><div>
+			Sets the scale of the bar.  This is best suited to changing the size of the entire bar (the bar, the text, the icon, everything).<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>scale</code> - the scale of the bar.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetWidth</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetWidth</b>(object&nbsp;id
+                       number&nbsp;width)</pre>
+		</dt>
+		<dd><div>
+			Sets the width of the bar.  This is best suited to changing the dimensions of the bar relative to the other elements (eg the icon or
+			the text).<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>width</code> - the width of the bar.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetHeight</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetHeight</b>(object&nbsp;id
+                        number&nbsp;height)</pre>
+		</dt>
+		<dd><div>
+			Sets the height of the bar.  This is best suited to changing the dimensions of the bar relative to the other elements (eg the icon or
+			the text).<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>height</code> - the height of the bar.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetTimeWidth</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetTimeWidth</b>(object&nbsp;id
+                           number&nbsp;timeWidth)</pre>
+		</dt>
+		<dd><div>
+			Sets the width of the 'time' portion of the text display of the bar.  This is best suited to changing the size of the timer relative
+			to the other elements (eg the icon, the bar, or the text).<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>timeWidth</code> - the width of the timer.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetText</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetText</b>(object&nbsp;id
+                      string&nbsp;text)</pre>
+		</dt>
+		<dd><div>
+			Sets the text that the bar will display (ie the label).<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>text</code> - the text of the bar.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetTexture</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetTexture</b>(object&nbsp;id
+                         string&nbsp;texture)</pre>
+		</dt>
+		<dd><div>
+			Sets the texture (icon) that will be displayed next to the bar.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>texture</code> - path to the texture to display with the bar.</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetFunction</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetFunction</b>(object&nbsp;id,
+                          function&nbsp;f,			
+                          object&nbsp;a1,
+                          object&nbsp;a2,
+                          object&nbsp;a3, ...
+                          object&nbsp;a20)</pre>
+		</dt>
+		<dd><div>
+			Sets a function that will be called when the bar finishes.  This will <em>not</em> be called if the bar is stopped manually (ie
+			through the <code>TimexBar:Stop</code> method.<br>
+			<br>
+			<u>Argument subsitution:</u>&nbsp;TimexBars also support argument substition.  If you use one of the following values in the argument list, 
+			Timex will substitute the appropriate value when the function/event is called.<br>
+			<br>
+			<dl>
+				<dd><code>Timex.ARG_ID</code> - the id of this TimexBar.</dd>
+				<dd><code>Timex.ARG_ELAPSED</code> - the elapsed time since this TimexBar was last updated.</dd>
+				<dd><code>Timex.ARG_REMAINING</code> - the time remaining on this TimexBar.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>f</code> - the function to be run.</dd>
+				<dd><code>a1..a20</code> - the arguments (optional).</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h3>TimexBar:SetUpdateFunction</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>SetUpdateFunction</b>(object&nbsp;id,
+                          function&nbsp;f,			
+                          object&nbsp;a1,
+                          object&nbsp;a2,
+                          object&nbsp;a3, ...
+                          object&nbsp;a20)</pre>
+		</dt>
+		<dd><div>
+			Sets a function that will be called every time the bar is updated.  This method also supports argument substitution.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>f</code> - the function to be run.</dd>
+				<dd><code>a1..a20</code> - the arguments (optional).</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h2>Starting a Timex Bar<a name="StartingaTimexBar"/></h2>
+	
+	<p>
+		After assigning and formatting your bar, it is time to start it.  This removes the bar from the free pool and displays it to the user.  It will
+		start running immediately.
+	</p>
+
+	<h3>TimexBar:Start</h3>
+	<dl>
+		<dt>
+			<pre>void TimexBar:<b>Start</b>(object&nbsp;id,
+                    number&nbsp;time,
+                    number&nbsp;res)</pre>
+		</dt>
+		<dd><div>
+			Starts a TimexBar.  This removes the bar from the free pool and displays it. It is possible to alter the resolution of the bar's updates...by default
+			the bar will update every 0.1 seconds, but for a long-running bar, u might want to update it only once every sec, in which case you would set 
+			the <code>res</code> parameter to 1.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>time</code> - The duration of the bar.</dd>
+				<dd><code>res</code> - The resolution of the bar display in seconds (optional, default 0.1).</dd>
+				<dt class="bold">Returns:</dt>
+				<dd>The name of the bar assigned (eg TimexBar3).</dd>
+			</dl>
+		</div></dd>
+	</dl>
+	<p>
+
+	<h2>An Example<a name="TimexBarExample"/></h2>
+	
+	<p>The following code shows how to format and start a TimexBar.</p>
+	
+	
+	<pre class="indent">local toggle;
+local function toggleAppearance(id, remaining)
+    if toggle then
+        TimexBar:SetText(id, "My Bar #2 - " .. remaining);
+        TimexBar:SetColor(id, 1.0, 1.0, 1.0);
+        TimexBar:SetTextColor(id, 0, 0, 0);
+    else
+        TimexBar:SetText("MyBar", "My Bar #1 - " .. remaining)
+        TimexBar:SetColor("MyBar", 1.0, 0.2, 0.2)
+        TimexBar:SetTextColor("MyBar", 1.0, 1.0, 0.2)
+    end
+    toggle = not toggle;
+end
+
+TimexBar:Get("MyBar")
+TimexBar:SetText("MyBar", "My Bar #1")
+TimexBar:SetTexture("MyBar", "Interface\\Icons\\Spell_Nature_ResistNature")
+TimexBar:SetColor("MyBar", 1.0, 0.2, 0.2)
+TimexBar:SetTextColor("MyBar", 1.0, 1.0, 0.2)
+
+TimexBar:SetPoint("MyBar", "BOTTOMLEFT", "UIParent", "CENTER", 40, 40)
+TimexBar:SetWidth("MyBar", "200")
+TimexBar:SetHeight("MyBar", "20")
+TimexBar:SetTimeWidth("MyBar", "50")
+TimexBar:SetScale("MyBar", "1.6")
+
+TimexBar:SetFunction("MyBar", ace.cmd.msg, ace.cmd, "'%s' bar hidden.", TimexBar.ARG_ID)
+
+toggle = true;
+TimexBar:SetUpdateFunction("MyBar", toggleAppearance, TimexBar.ARG_ID, TimexBar.ARG_REMAINING);
+
+local name = TimexBar:Start("MyBar", 10, 0.5)
+ace:print(name.." is active.")</pre>
+
+	<p>First we assign a bar to the id "MyBar" using <code>Timex:Get</code>.  The next two lines set the text and icon of the bar.  After this, we set the color
+		of the bar, and the color of the text displayed.</p>
+		
+	<p>Next we set the bar so that it's bottom-left corner is 40 pixels to the left and 40 pixels above the center of the screen.  We set the width and height
+		of the bar, and set the time display so that it takes up a quarter of the bar's width.  Then we set the scale to 1.6 - the default scale is 0.8, so this
+		bar will appear twice the size as the default.</p>
+		
+	<p>We then set a function so that the bar will print, "'MyBar' bar hidden." to the chat log when it completes.  We also set a function to toggle the
+		appearance of the bar every time it is updated.</p>
+	
+	<p>Lastly, we start the bar so that it updates every half second for 10 seconds, and print the name of the bar to the chat log with a message saying
+		that it has started</p>
+		
+	<h2>Checking a Timex Bar<a name="CheckingaTimexBar"/></h2>
+
+	<h3>TimexBar:Check</h3>
+	<dl>
+		<dt>
+			<pre>boolean/number TimexBar:<b>Check</b>(object&nbsp;id,
+                              boolean&nbsp;r)</pre>
+		</dt>
+		<dd><div>
+			This method is used to check whether a TimexBar exists for the given id, and can optionally return the name of the TimexBar.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+				<dd><code>r</code> - whether to return the name of the bar (optional).</dd>
+				<dt class="bold">Returns:</dt>
+				<dd>If <code>r</code> is <code>FALSE</code> or <code>nil</code>, <code>TRUE</code> if the bar exists, <code>nil</code> otherwise.  If <code>r</code> is not 
+				<code>FALSE</code> or <code>nil</code>, the name of the bar, <code>nil</code> otherwise.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example:</dt>
+				<dd>
+					<pre>local a = TimexBar:Bar("MyBar")
+if a then
+    ace:print("Exists.")
+end</pre>
+
+					This example will print, "Exists." to the chat log if a TimexBar exists for the id "MyBar".
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+	
+	
+	<h2>Stopping a Timex Bar<a name="StoppingaTimexBar"/></h2>
+	
+	<h3>TimexBar:Stop</h3>
+	<dl>
+		<dt>
+			<pre>boolean/number TimexBar:<b>Stop</b>(object&nbsp;id)</pre>
+		</dt>
+		<dd><div>
+			This method is used to stop a TimexBar.<br>
+			<br>
+			<dl>
+				<dt class="bold">Parameters:</dt>
+				<dd><code>id</code> - the id of the bar.</dd>
+			</dl>
+			<br>
+			<dl>
+				<dt class="underline">Example:</dt>
+				<dd>
+					<pre>local a = TimexBar:Bar("MyBar")</pre>
+
+					This example will stop TimexBar for the id "MyBar".
+				</dd>
+			</dl>
+		</div></dd>
+	</dl>
+
+	<h1>iii. Developers - Miscellaneous<a name="iii"/></h1>
+	
+	<h2>Syntactic Mayhem<a name="SyntacticMayhem"/></h2>
+	
+	<p>
+		So you now know the ins and outs of developing using Timex and its Bars
+		module, is there anything to add?&nbsp; Not really, though I would like
+		to explain a few things about syntax first and how syntax differs
+		through code formats.
+	</p>
+		
+	<p>
+		Throughout your days coding for the World of Warcraft community you're
+		going to see many kinds of coding styles, this is going to change how
+		you use Timex as far as the syntax of calling functions is
+		concerned.&nbsp; To avoid confusion later I've decided that it would be
+		best to explain the differences between these and the best way to
+		handle them.&nbsp; Note: I'll be using AddSchedule to demonstrate
+		how these work but these examples will work for any part of Timex that
+		accepts functions.
+	</p>
+	
+	<h3>Scripting</h3>
+	
+	<p>This is a basic function format that's most frequently used.</p>
+	
+	<dl>
+		<dt class="underline">Format:</dt>
+		<dd><div><pre>function AddOn_Function_Blah(arg1, arg2)</pre></div></dd>
+		<dt class="underline">Result:</dt>
+		<dd><div><pre>Timex:AddSchedule(..., AddOn_Function_Blah, arg1, arg2)</div></pre></dd>
+	</dl>
+	
+
+	<h3>Tabled</h3>
+	
+	<p>This is a slightly more advanced format used infrequently.</p>
+	
+	<dl>
+		<dt class="underline">Format:</dt>
+		<dd><div><pre>function Table.Function_Name(arg1, arg2)</pre></div></dd>
+		<dt class="underline">Result:</dt>
+		<dd><div><pre>Timex:AddSchedule(..., Table.Function_Name, arg1, arg2)</div></pre></dd>
+	</dl>
+
+	<h3>Object-Oriented</h3>
+	
+	<p>This is the most advanced form Lua has to offer, all the cool kids are using it.&nbsp; It has a few variations on the basic form.</p>
+
+	<dl>
+		<dt class="underline">Format #1:</dt>
+		<dd><div><pre>function AddonName:DoSomething(arg1, arg2)</pre></div></dd>
+		<dt class="underline">Format #2:</dt>
+		<dd><div><pre>function AddonName.DoSomething(self, arg1, arg2)</pre></div></dd>
+		<dt class="underline">Format #3:</dt>
+		<dd><div><pre>AddOnName {
+    DoSomething = function(self, arg1, arg2),
+}</pre></div></dd>
+		<dt class="underline">Result:</dt>
+		<dd><div><pre>Timex:AddSchedule(..., self.DoSomething, self, arg1, arg2)</div></pre></dd>
+	</dl>
+
+	<p>
+		Note: You only need to pass self if the function you're passing too actually references self.&nbsp; Lua uses pseudo-OO so it's up to you, you can
+		mix and match function types.
+	</p>
+	<br>
+
+	<h1>iv. Players<a name="iv"/></h1>
+	
+	<h2>Timex Compatibility<a name="TimexCompatibility"/></h2>
+
+	<p>
+		The Chronos placeholder addon is provided in case people wish to use Timex in place of Chronos - the aim is to be fully compatible with Chronos where
+		possible.  Drop us a line if you find that in practice Timex is not working properly with Chronos-based addons.
+	<p>
+	<br>
+	
+	<h2>Chat Commands<a name="ChatCommands"/></h2>
+	
+	<p>
+		Timex has a chat-command system for options, it uses a one-line system for ease of typing and to allow for bigger macros (so you don't have to
+		retype our chat-operator on every line).&nbsp; Further, the chat-command system isn't watered down in any way and provides as much of the power of Timex 
+		as we were able to cram in, so it is slightly complex but I shall endeavour to explain how each of the commands works.
+	</p>
+	
+	<h3>The Do Command<a name="TheDoCommand"/></h3>
+	
+	<div class="indent">
+
+		<p>Here's the basic layout of the system:</p>
+	
+		<pre class="indent">/tmx do n="[timer name]" t=[time] r=[repeat] c=[count] f=[function] a=[args]</pre>
+	
+		<p>
+			The first thing to cover is: what's up with those quotation marks?&nbsp; The chat-command system separates by spaces, so if something you want to use 
+			(such as the name or an arg) has a space in it, you'll have to wrap it in quotation marks to ensure that the space inside isn't considered as a 
+			separator.&nbsp; Basically, if you're not actively typing spaces between the commands and you have a space that's not command related, wrap quotation 
+			marks around the entire thing, as shown by 'timer name'.
+		</p>
+	
+		<span class="bold">Parameters:</span><br>
+		<div class="hanging-indent"><code>timer name</code> - this is the name of your timer, you don't have to supply this at all but if you want to be able to stop your timer at 
+			any point, it's a good idea.&nbsp; The format of name is either <code>n=mytimer</code> or <code>n="my timer"</code>.</div>
+		<div class="hanging-indent"><code>time</code></span> - this is the amount of time that will pass before the Timex does its stuff.&nbsp; If you set this to eight seconds 
+			then Timex will delay for 8 seconds before using the function that you gave it.&nbsp; The format of time is <code>t=8</code>.</div>
+		<div class="hanging-indent"><code>repeat</code></span> - repeat will make your timer continuous, so it'll cycle on a basis of the time you gave it.&nbsp; If you provide 
+			it with 8 seconds then every 8 seconds it will fire the function you gave it until it's stopped.&nbsp; To make repeat happen, supply <code>r=TRUE</code> as a command.</div>
+		<div class="hanging-indent"><code>count</code></span> - similar to repeat, however it will only cycle for the amount of times that you specify.&nbsp; If that's three cycles,
+			it will fire your function three times (waiting for the delay first of cocurse), then automatically stop.&nbsp; The format of count is <code>c=8</code>.</div>
+		<div class="hanging-indent"><code>function</code></span> - this is the function you wish to call.&nbsp; It is supplied as a pointer, so if your function is <code>DoThis(a, b)</code>, 
+			you'll have to supply <code>DoThis</code> here.&nbsp; The format of function is <code>f=DoThis</code>.</div>
+		<div class="hanging-indent"><code>args</code></span> - these are the arguments you wish to supply along with your function, so if your function is <code>DoThis(a, b)</code>, 
+			you'll have to supply 'a, b' here.&nbsp; The format of args is either <code>a=arg</code> if it's one arg or <code>a="arg1, arg2, arg3 ... etcetera"</code> 
+			if it's more.</div>
+	
+		<p>Here's an example of the above in action:</p>
+		
+		<pre class="indent">/tmx do n="my print" t=5 f=SendChatMessage a="'Hello World!', SAY"</pre>
+		
+		<p>This would make you say 'Hello World!' after five seconds have passed.</p>
+
+	</div>
+
+	<h3>The Stop Command<a name="TheStopCommand"/></h3>
+	
+	<div class="indent">
+		<p>
+			Now that adding timers is out of the way, how would you go about stopping them?&nbsp; That's easy too.&nbsp; There's a stop command that you can supply a timer name 
+			too, it will look for that timer name and stop it.&nbsp; So if you've decided you don't want a timer to run or you have something on a repeat or a count and you 
+			wish to stop it then you can easily do so with a quickly accessible chat-command.
+		</p>
+		<pre>/tmx stop my print</pre>
+		
+		<p>
+			This would search for the 'my print' timer and stop it.&nbsp; Use both of these commands to your advantage in macros and really take command of your 
+			playing style.
+		</p>
+	</div>
+	
+	<h1>Fin</h1>
+</body>
+</html>

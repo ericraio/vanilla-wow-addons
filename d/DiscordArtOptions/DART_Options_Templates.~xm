@@ -1,0 +1,259 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Button name="DART_MainMenuButton" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+	<Size><AbsDimension x="140" y="22"/></Size>
+</Button>
+
+<Button name="DART_MainMenuButton2" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+	<Size><AbsDimension x="130" y="24"/></Size>
+</Button>
+
+<Button name="DART_MenuOptionTemplate" inherits="DiscordLib_MenuOptionTemplate" virtual="true">
+	<Scripts>
+		<OnClick>
+			DART_Menu_OnClick();
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="DART_TabButtonTemplate" inherits="DiscordLib_PlainBackgroundTemplate" frameStrata="MEDIUM" virtual="true">
+			<Size><AbsDimension x="100" y="25"/></Size>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parent_Texture1">
+						<Size><AbsDimension x="100" y="3"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture2">
+						<Size><AbsDimension x="3" y="25"/></Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture3">
+						<Size><AbsDimension x="100" y="3"/></Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture4">
+						<Size><AbsDimension x="3" y="25"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<NormalText name="$parentText" inherits="GameFontNormal"/>
+			<Scripts>
+				<OnEnter>
+					this:SetBackdropColor(1, 1, 0);
+					this:SetTextColor(1, 0, 0);
+				</OnEnter>
+				<OnLeave>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLeave>
+			</Scripts>
+</Button>
+
+<Slider name="DART_SliderTemplate" inherits="DiscordLib_SliderTemplate" virtual="true">
+	<Frames>
+		<EditBox name="$parent_Display" inherits="DiscordLib_SliderEditBoxTemplate">
+			<Scripts>
+				<OnEnterPressed>
+					DART_Slider_UpdateFromEditBox();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+	</Frames>
+	<Scripts>
+		<OnValueChanged>
+			DART_Slider_Update();
+		</OnValueChanged>
+	</Scripts>
+</Slider>
+
+<CheckButton name="DART_CheckBoxTemplate" inherits="DiscordLib_CheckBoxTemplate" virtual="true">
+	<Scripts>
+		<OnClick>
+			DART_CheckButton_OnClick();
+		</OnClick>
+	</Scripts>
+</CheckButton>
+
+<Button name="DART_ColorPickerTemplate" inherits="DiscordLib_ColorPickerTemplate" virtual="true">
+	<Scripts>
+		<OnClick>
+			DART_ColorPicker_OnClick();
+		</OnClick>
+	</Scripts>
+</Button>
+
+<EditBox name="DART_EditBoxTemplate" inherits="DiscordLib_EditBoxTemplate" virtual="true">
+	<Scripts>
+		<OnEnterPressed>
+			DART_EditBox_Update();
+		</OnEnterPressed>
+	</Scripts>
+</EditBox>
+
+		<Button name="DART_NudgeTemplate" inherits="DART_MainMenuButton" virtual="true">
+			<Size><AbsDimension x="24" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_NUDGE_TEXT[this:GetID()]);
+					this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+				</OnLoad>
+				<OnMouseDown>
+					if (arg1 == "MiddleButton") then
+						this.moving = true;
+					end
+				</OnMouseDown>
+				<OnMouseUp>
+					if (arg1 == "MiddleButton") then
+						this.moving = nil;
+					else
+						DART_Nudge_OnClick(arg1);
+					end
+				</OnMouseUp>
+				<OnUpdate>
+					DART_Nudge_OnUpdate(arg1);
+				</OnUpdate>
+			</Scripts>
+		</Button>
+
+<Frame name="DART_ConditionButtonTemplate" virtual="true">
+	<Size><AbsDimension x="290" y="40"/></Size>
+	<Frames>
+		<Button inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="15" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("^");
+				</OnLoad>
+				<OnClick>
+					DART_Condition_MoveUp();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="15" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("v");
+				</OnLoad>
+				<OnClick>
+					DART_Condition_MoveDown();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Edit" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="30" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetFont("Fonts\\ARIALN.TTF", 10);
+					this:SetText(DART_TEXT.Edit);
+				</OnLoad>
+				<OnClick>
+					DART_Condition_Edit();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Delete" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="30" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset><AbsDimension x="0" y="2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetFont("Fonts\\ARIALN.TTF", 10);
+					this:SetText(DART_TEXT.Delete2);
+				</OnLoad>
+				<OnClick>
+					DART_Condition_Delete();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parentIndex" font="Fonts\ARIALN.TTF" justifyH="CENTER" justifyV="CENTER">
+				<Size><AbsDimension x="20" y="40"/></Size>
+				<Color r="1" g="1" b="0"/>
+				<FontHeight>
+					<AbsValue val="16"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentConditionText" font="Fonts\ARIALN.TTF" justifyH="LEFT" justifyV="CENTER">
+				<Size><AbsDimension x="220" y="20"/></Size>
+				<Color r="0" g="1" b="0"/>
+				<FontHeight>
+					<AbsValue val="10"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="40" y="3"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentResponseText" font="Fonts\ARIALN.TTF" justifyH="LEFT" justifyV="CENTER">
+				<Size><AbsDimension x="220" y="20"/></Size>
+				<Color r=".4" g=".4" b="1"/>
+				<FontHeight>
+					<AbsValue val="10"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="40" y="-10"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentOverrideText" font="Fonts\ARIALN.TTF" justifyH="LEFT" justifyV="CENTER">
+				<Size><AbsDimension x="220" y="20"/></Size>
+				<Color r=".9" g=".4" b=".9"/>
+				<FontHeight>
+					<AbsValue val="10"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="40" y="-23"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<Texture>
+				<Size><AbsDimension x="270" y="1"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM"/>
+				</Anchors>
+				<Color r=".3" g=".3" b=".3"/>
+			</Texture>
+		</Layer>
+	</Layers>
+</Frame>
+
+</Ui>

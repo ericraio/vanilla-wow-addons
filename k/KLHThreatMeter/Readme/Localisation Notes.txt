@@ -1,0 +1,60 @@
+Localisation notes for test versions between R14 and R15.
+
+For potential localisers, my implementation is a bit different to most mods. Due to the inevitable number of transcription errors i will make, there are no string constants; instead everything is put in a multilayered table. Then to get a localised string, you call the function KLHTM_String() with the table keys, and it will return it, or print out an error if the keys are wrong or whatever.
+
+e.g. in the localisation file, there is the variable summarised as
+KLHTM_Localisation = 
+{
+	["enUS"] = 
+	{
+		["spell"] = 
+		{
+
+
+			["heroicstrike"] = "Heroic Strike",
+		},
+	},
+	["frFR"] = 
+	{
+		["spell"] = 
+		{
+
+
+			["heroicstrike"] = "Frappe h\195\169ro\195\175que",
+		},
+	},
+}
+
+The localised version of the string "Heroic Strike" is found by calling the function
+
+	KLHTM_String("spell", "heroicstrike")
+
+The mod will first check your localisation, then look for a table "spell", then look for a key "heroicstrike" in that table. The idea is just to keep things organised, and make it clear what kind of string is being called for in the code.
+
+
+There are two debugging parameters for localisation. They are defined in KLHTM_Trace, which is at the top of KLHThreatMeterConsoleIO.lua. If the value 'KLHTM_Trace.LocalNoOverride' is not nil, the mod will print an error whenever there is no localisation for a particular string. In general there won't be a LUA error if there is no localisation string, because in this case the mod will use the english value. It just means that the mod might not do everything it's supposed to. LocalNoOverride is disabled by default. Uncomment line 23 of KLHThreatMeterConoleIO.lua to enable it.
+
+The second parameter is KLHTM_Trace.LocalInvalidKey . When this is non-nil, the mod will print an error whenever a requested key does not exist in any localisation. This usually means there was a typo in the call to KLHTM_String. e.g. the code
+
+	local x = KLHTM_String("spell", "heroic strike")
+
+would cause such an error, because the wrong key was used - the space between "heroic" and "strike". This is enabled by default, and will sometimes be accompanied by a lua error.
+
+
+Some things are more important to localise than others. The following sections are needed for the mod to run properly:
+	["spell"], ["power"], ["class"], ["boss"], ["misc"], ["combatlog"]
+
+The following sections are used when printing information for the user. They would help but are not critical to the mod working:
+
+	["gui"],["print"], ["threatsource"], ["talent"], ["threatmod"], ["sets"]
+
+
+The following strings aren't localised:
+	• debug prints. e.g. KLHTM_PrintTrace("x", "y"). These are debug stuff, and there's way too many of them.
+	• stuff that i have forgotten. No idea what it might be.
+	• command line interface "/ktm ...". The current format doesn't support localisation naturally. Also i don't want to localise the actual commands, otherwise there could be tech support issues. e.g.
+X: "please help me with this error (...)"
+Y: "run '/ktm test threat', what does it say"
+X: "says that command does not exist. Huh?"
+
+I do plan to fully localise it eventually, however.	

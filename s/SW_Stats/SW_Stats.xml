@@ -1,0 +1,191 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+	<Script file="SW_DefaultMap.lua" />
+	<Script file="SW_Frames.lua" />
+	<Script file="console.lua" />
+	<Script file="SW_TextExport.lua" />
+	<Script file="neutral.lua" />
+	<Script file="localization.DE.lua" />
+	<Script file="localization.FR.lua" />
+	<Script file="localization.zhCN.lua" />
+	<Script file="localization.zhTW.lua" />
+	<Script file="SW_CastTrack.lua" />
+	<Script file="init.lua" />
+	<Script file="SW_Sync.lua" />
+	<Script file="core.lua" />
+	<!-- 1.4 Changed Tooltip to have an owner in OnLoad to make it WoW1.10  ready -->
+	<GameTooltip name="SW_SpellHookTT" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate"
+		parent="UIParent">
+		<Scripts>
+			<OnLoad>this:SetOwner(UIParent, "ANCHOR_NONE");</OnLoad>
+		</Scripts>
+	</GameTooltip>
+	<Frame name="SW_FrameConsole" inherits="SW_Frame" enableMouse="true" movable="true" resizable="true"
+		frameStrata="MEDIUM" frameLevel="200" parent="UIParent">
+		<Scripts>
+			<OnLoad>this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);
+			</OnLoad>
+		</Scripts>
+		<Size>
+			<AbsDimension x="200" y="300" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<Frame name="$parent_Title" inherits="SW_Frame_Title" parent="SW_FrameConsole">
+				<Scripts>
+					<OnLoad>this:SetBackdropBorderColor(SW_COLOR_ACT["r"],SW_COLOR_ACT["g"],SW_COLOR_ACT["b"],1);</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parent_Resizer" inherits="SW_Frame_Resize" parent="SW_FrameConsole" />
+			<Frame name="$parent_Text1" inherits="SW_Console_Text" parent="SW_FrameConsole" />
+			<Frame name="$parent_Tab1" inherits="SW_Frame_Tab" parent="SW_FrameConsole">
+				<Scripts>
+					<OnLoad>SW_TabRegister(this, "SW_FrameConsole_Text1", true);</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="SW_FrameConsole_Events" inherits="SW_Console_Inner" parent="SW_FrameConsole"
+				hidden="true">
+				<Scripts>
+					<OnLoad>this.chkPerRow = 2;</OnLoad>
+				</Scripts>
+				<Frames>
+					<CheckButton name="SW_Chk_ShowEvent" inherits="SW_Chk_Template">
+						<Scripts>
+							<OnLoad>
+								this.swoX = 1;
+								this.swoY = -6;
+								SW_ChkRegister(this, "EI_ShowEvent", true);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="SW_Chk_ShowOrigStr" inherits="SW_Chk_Template">
+						<Scripts>
+							<OnLoad>SW_ChkRegister(this, "EI_ShowOrigStr", false);</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="SW_Chk_ShowRegEx" inherits="SW_Chk_Template">
+						<Scripts>
+							<OnLoad>SW_ChkRegister(this, "EI_ShowRegEx", false);</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="SW_Chk_ShowMatch" inherits="SW_Chk_Template">
+						<Scripts>
+							<OnLoad>SW_ChkRegister(this, "EI_ShowMatch", false);</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="SW_Chk_ShowSyncInfo" inherits="SW_Chk_Template">
+						<Scripts>
+							<OnLoad>SW_ChkRegister(this, "EI_ShowSync", false);</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<Frame name="SW_FrameConsole_Text2" inherits="SW_Msg_Frame" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-60" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_Tab2" inherits="SW_Frame_Tab" parent="SW_FrameConsole">
+				<Scripts>
+					<OnLoad>SW_TabRegister(this, "SW_FrameConsole_Events");</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+	<!-- Thanks asmeroth (ui.worldofwar.net) New button is more blizzard style-->
+	<Frame name="SW_IconFrame" enableMouse="true" hidden="false" parent="Minimap" frameStrata="MEDIUM">
+		<Size>
+			<AbsDimension x="33" y="33" />
+		</Size>
+		<Frames>
+			<Button name="$parent_Button">
+				<Size>
+					<AbsDimension x="24" y="24" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SW_IconMenuInit(); SW_ToggleIconMenu();
+					</OnClick>
+					<OnMouseUp>
+						if arg1 == "RightButton" then
+							SW_ToggleBarFrame();
+						end
+					</OnMouseUp>
+					<OnEnter>
+					GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+					GameTooltip:SetText("SW Stats");
+					</OnEnter>
+					<OnLeave>
+					GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\Addons\SW_Stats\images\SW_Icon">
+							<Size>
+								<AbsDimension x="22" y="22" />
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="5" y="-4" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+							<Size>
+								<AbsDimension x="52" y="52" />
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+			<Frame name="$parent_Menu" inherits="UIDropDownMenuTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+	<!-- "Invis" Frame for OnUpdateEvent need this for events and all timed calls-->
+	<Frame name="SW_CoreFrame" hidden="false" parent="UIParent">
+		<Size>
+			<AbsDimension x="33" y="33" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" />
+		</Anchors>
+		<Scripts>
+			<OnLoad>SW_Stats_OnLoad();</OnLoad>
+			<OnEvent>SW_Stats_OnEvent();</OnEvent>
+			<OnUpdate>SW_Timed_Calls:OnUpdate(arg1);</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

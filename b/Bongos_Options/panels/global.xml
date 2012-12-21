@@ -1,0 +1,77 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="global.lua"/>
+	
+	<!-- Global options panel -->
+	<Frame name="BongosOptionsGlobal" inherits="BongosOptionsPanel" virtual="true">
+		<Frames>
+			<CheckButton name="$parentLock" inherits="BongosCheckButtonTemplate" text="Lock Bar Positions">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="4" y="4"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Bongos_SetLock(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentStickyBars" inherits="BongosCheckButtonTemplate" text="Enable Sticky Bars">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentLock" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Bongos_SetStickyBars(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<Slider name="$parentAlpha" inherits="BongosOptionsOpacitySlider">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="6" y="20"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnValueChanged>
+						if not this:GetParent().onShow then
+							BBar.ForAll(BBar.SetAlpha, this:GetValue()/100, 1);
+						end
+						getglobal(this:GetName() .. "ValText"):SetText( this:GetValue() );
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<Slider name="$parentScale" inherits="BongosOptionsScaleSlider">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parentAlpha" relativePoint="BOTTOM">
+						<Offset x="0" y="40"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnValueChanged>
+						if not this:GetParent().onShow then
+							BBar.ForAll(BBar.SetScale, this:GetValue()/100, 1);
+						end
+						getglobal(this:GetName() .. "ValText"):SetText( this:GetValue() );
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+		
+		<Scripts>
+			<OnLoad>
+				BOptionsGlobal_OnLoad();
+			</OnLoad>
+			<OnShow>
+				BOptionsGlobal_OnShow();
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

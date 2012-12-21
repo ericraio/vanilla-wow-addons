@@ -1,0 +1,1286 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="GEM_calendar.lua"/>
+  
+  <!-- day button header template -->
+  <Button name="GEMCalendarDayHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="16" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+  </Button>
+
+  <!-- day button template -->
+  <Button name="GEMCalendarDayButtonTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="16" y="16"/>
+	</Size>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			GEMCalendar_OnClick();
+		</OnClick>
+	</Scripts>
+	<NormalText name="$parentText" inherits="GameFontNormalSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+  </Button>
+  
+  <Frame name="GEMCalendarFrame" movable="true" frameStrata="HIGH" hidden="true" parent="UIParent" enableMouse="true">
+	<Size>
+		<AbsDimension x="322" y="200"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset>
+				<AbsDimension x="100" y="-104"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<EdgeSize>
+			<AbsValue val="16"/>
+		</EdgeSize>
+		<TileSize>
+			<AbsValue val="16"/>
+		</TileSize>
+		<BackgroundInsets>
+			<AbsInset left="3" right="5" top="3" bottom="5"/>
+		</BackgroundInsets>
+	</Backdrop>
+	 <Layers>
+	     <Layer level="BACKGROUND">
+		 <FontString name="GEMCalendarTitle" inherits="GameFontNormal" text="GEM_TEXT_CALENDAR_HEADER">
+		     <Anchors>
+			 <Anchor point="TOP" relativePoint="TOP">
+			     <Offset>
+				 <AbsDimension x="0" y="-6"/>
+			     </Offset>
+			 </Anchor>
+		     </Anchors>
+		 </FontString>
+	     </Layer>
+	 </Layers>
+	<Frames>
+		<Frame name="GEMCalendarHourBorderFrame" inherits="OptionFrameBoxTemplate">
+			<Size>
+				<AbsDimension x="134" y="44"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="6" y="-22"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(1,1,1,0)
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="GEMCalendarHourDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarHourBorderFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="-10" y="-7"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMCalendarHourDropDown_OnShow(); </OnShow>
+				<OnLoad> GEMCalendarHourDropDown_OnShow(); </OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="GEMCalendarMinuteDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarHourDropDown" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-34" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMCalendarMinuteDropDown_OnShow(); </OnShow>
+				<OnLoad> GEMCalendarMinuteDropDown_OnShow(); </OnLoad>
+			</Scripts>
+		</Frame>
+
+		<Frame name="GEMCalendarTextBorderFrame" inherits="OptionFrameBoxTemplate">
+			<Size>
+				<AbsDimension x="134" y="126"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarHourBorderFrame" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(1,1,1,0)
+				</OnLoad>
+			</Scripts>
+			<Layers>
+				<Layer level="ARTWORK">
+				<FontString inherits="GameFontNormalSmall" text="GEM_TEXT_CALENDAR_HELP" nonspacewrap="false">
+					<Size>
+						<AbsDimension x="116" y="130"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="GEMCalendarTextBorderFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="8"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+
+		<Frame name="GEMCalendarDateBorderFrame" inherits="OptionFrameBoxTemplate">
+			<Size>
+				<AbsDimension x="176" y="170"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarHourBorderFrame" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(1,1,1,0)
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="GEMCalendarMonthDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDateBorderFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="-10" y="-7"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMCalendarMonthDropDown_OnShow(); </OnShow>
+				<OnLoad> GEMCalendarMonthDropDown_OnShow(); </OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="GEMCalendarYearDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarMonthDropDown" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-34" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMCalendarYearDropDown_OnShow(); </OnShow>
+				<OnLoad> GEMCalendarYearDropDown_OnShow(); </OnLoad>
+			</Scripts>
+		</Frame>
+		<Button name="GEMCalendarDayHeader1" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_SUNDAY">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarMonthDropDown" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="37" y="-30"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDayHeader2" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_MONDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMCalendarDayHeader1" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDayHeader3" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_TUESDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMCalendarDayHeader2" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDayHeader4" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_WEDNESDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMCalendarDayHeader3" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDayHeader5" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_THURSDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMCalendarDayHeader4" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDayHeader6" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_FRIDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMCalendarDayHeader5" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDayHeader7" inherits="GEMCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_SATURDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMCalendarDayHeader6" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMCalendarDay11" inherits="GEMCalendarDayButtonTemplate" id="11">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay12" inherits="GEMCalendarDayButtonTemplate" id="12">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay13" inherits="GEMCalendarDayButtonTemplate" id="13">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay14" inherits="GEMCalendarDayButtonTemplate" id="14">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay15" inherits="GEMCalendarDayButtonTemplate" id="15">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay16" inherits="GEMCalendarDayButtonTemplate" id="16">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay17" inherits="GEMCalendarDayButtonTemplate" id="17">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDayHeader7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMCalendarDay21" inherits="GEMCalendarDayButtonTemplate" id="21">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay11" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay22" inherits="GEMCalendarDayButtonTemplate" id="22">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay12" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay23" inherits="GEMCalendarDayButtonTemplate" id="23">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay13" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay24" inherits="GEMCalendarDayButtonTemplate" id="24">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay14" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay25" inherits="GEMCalendarDayButtonTemplate" id="25">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay15" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay26" inherits="GEMCalendarDayButtonTemplate" id="26">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay16" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay27" inherits="GEMCalendarDayButtonTemplate" id="27">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay17" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMCalendarDay31" inherits="GEMCalendarDayButtonTemplate" id="31">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay21" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay32" inherits="GEMCalendarDayButtonTemplate" id="32">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay22" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay33" inherits="GEMCalendarDayButtonTemplate" id="33">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay23" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay34" inherits="GEMCalendarDayButtonTemplate" id="34">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay24" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay35" inherits="GEMCalendarDayButtonTemplate" id="35">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay25" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay36" inherits="GEMCalendarDayButtonTemplate" id="36">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay26" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay37" inherits="GEMCalendarDayButtonTemplate" id="37">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay27" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMCalendarDay41" inherits="GEMCalendarDayButtonTemplate" id="41">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay31" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay42" inherits="GEMCalendarDayButtonTemplate" id="42">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay32" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay43" inherits="GEMCalendarDayButtonTemplate" id="43">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay33" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay44" inherits="GEMCalendarDayButtonTemplate" id="44">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay34" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay45" inherits="GEMCalendarDayButtonTemplate" id="45">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay35" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay46" inherits="GEMCalendarDayButtonTemplate" id="46">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay36" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay47" inherits="GEMCalendarDayButtonTemplate" id="47">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay37" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMCalendarDay51" inherits="GEMCalendarDayButtonTemplate" id="51">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay41" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay52" inherits="GEMCalendarDayButtonTemplate" id="52">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay42" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay53" inherits="GEMCalendarDayButtonTemplate" id="53">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay43" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay54" inherits="GEMCalendarDayButtonTemplate" id="54">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay44" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay55" inherits="GEMCalendarDayButtonTemplate" id="55">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay45" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay56" inherits="GEMCalendarDayButtonTemplate" id="56">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay46" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay57" inherits="GEMCalendarDayButtonTemplate" id="57">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay47" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMCalendarDay61" inherits="GEMCalendarDayButtonTemplate" id="61">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay51" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay62" inherits="GEMCalendarDayButtonTemplate" id="62">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay52" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay63" inherits="GEMCalendarDayButtonTemplate" id="63">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay53" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay64" inherits="GEMCalendarDayButtonTemplate" id="64">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay54" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay65" inherits="GEMCalendarDayButtonTemplate" id="65">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay55" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay66" inherits="GEMCalendarDayButtonTemplate" id="66">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay56" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarDay67" inherits="GEMCalendarDayButtonTemplate" id="57">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMCalendarDay57" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMCalendarCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="1" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+
+	</Frames>
+	<Scripts>
+		<OnMouseUp>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnMouseUp>
+		<OnMouseDown>
+			if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+				this:StartMoving();
+				this.isMoving = true;
+			end
+		</OnMouseDown>
+		<OnHide>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnHide>
+		<OnShow>
+			GEMCalendar_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+
+  <!-- GEM EVENT CALENDAR -->
+
+  <!-- day button header template -->
+  <Button name="GEMEventCalendarDayHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="32" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="32" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<NormalText inherits="GameFontHighlightSmall" justifyH="CENTER">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="32" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+  </Button>
+
+  <!-- day button template -->
+  <Button name="GEMEventCalendarDayButtonTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="32" y="32"/>
+	</Size>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			--GEMEventCalendar_OnClick();
+		</OnClick>
+	</Scripts>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentTexture">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+			</Texture>
+		</Layer>
+		<Layer level="OVERLAY">
+			<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="1" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+  </Button>
+  
+  <Frame name="GEMEventCalendarFrameTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="242" y="220"/>
+	</Size>
+	<Frames>
+		<Button name="$parentDayHeader1" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_SUNDAY">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDayHeader2" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_MONDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentDayHeader1" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDayHeader3" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_TUESDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentDayHeader2" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDayHeader4" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_WEDNESDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentDayHeader3" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDayHeader5" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_THURSDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentDayHeader4" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDayHeader6" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_FRIDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentDayHeader5" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDayHeader7" inherits="GEMEventCalendarDayHeaderTemplate" text="GEM_TEXT_CALENDAR_SATURDAY">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentDayHeader6" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="$parentDay11" inherits="GEMEventCalendarDayButtonTemplate" id="11">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay12" inherits="GEMEventCalendarDayButtonTemplate" id="12">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay13" inherits="GEMEventCalendarDayButtonTemplate" id="13">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay14" inherits="GEMEventCalendarDayButtonTemplate" id="14">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay15" inherits="GEMEventCalendarDayButtonTemplate" id="15">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay16" inherits="GEMEventCalendarDayButtonTemplate" id="16">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay17" inherits="GEMEventCalendarDayButtonTemplate" id="17">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDayHeader7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="$parentDay21" inherits="GEMEventCalendarDayButtonTemplate" id="21">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay11" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay22" inherits="GEMEventCalendarDayButtonTemplate" id="22">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay12" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay23" inherits="GEMEventCalendarDayButtonTemplate" id="23">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay13" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay24" inherits="GEMEventCalendarDayButtonTemplate" id="24">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay14" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay25" inherits="GEMEventCalendarDayButtonTemplate" id="25">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay15" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay26" inherits="GEMEventCalendarDayButtonTemplate" id="26">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay16" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay27" inherits="GEMEventCalendarDayButtonTemplate" id="27">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay17" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="$parentDay31" inherits="GEMEventCalendarDayButtonTemplate" id="31">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay21" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay32" inherits="GEMEventCalendarDayButtonTemplate" id="32">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay22" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay33" inherits="GEMEventCalendarDayButtonTemplate" id="33">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay23" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay34" inherits="GEMEventCalendarDayButtonTemplate" id="34">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay24" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay35" inherits="GEMEventCalendarDayButtonTemplate" id="35">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay25" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay36" inherits="GEMEventCalendarDayButtonTemplate" id="36">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay26" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay37" inherits="GEMEventCalendarDayButtonTemplate" id="37">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay27" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="$parentDay41" inherits="GEMEventCalendarDayButtonTemplate" id="41">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay31" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay42" inherits="GEMEventCalendarDayButtonTemplate" id="42">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay32" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay43" inherits="GEMEventCalendarDayButtonTemplate" id="43">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay33" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay44" inherits="GEMEventCalendarDayButtonTemplate" id="44">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay34" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay45" inherits="GEMEventCalendarDayButtonTemplate" id="45">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay35" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay46" inherits="GEMEventCalendarDayButtonTemplate" id="46">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay36" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay47" inherits="GEMEventCalendarDayButtonTemplate" id="47">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay37" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="$parentDay51" inherits="GEMEventCalendarDayButtonTemplate" id="51">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay41" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay52" inherits="GEMEventCalendarDayButtonTemplate" id="52">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay42" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay53" inherits="GEMEventCalendarDayButtonTemplate" id="53">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay43" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay54" inherits="GEMEventCalendarDayButtonTemplate" id="54">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay44" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay55" inherits="GEMEventCalendarDayButtonTemplate" id="55">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay45" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay56" inherits="GEMEventCalendarDayButtonTemplate" id="56">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay46" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay57" inherits="GEMEventCalendarDayButtonTemplate" id="57">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay47" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="$parentDay61" inherits="GEMEventCalendarDayButtonTemplate" id="61">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay51" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay62" inherits="GEMEventCalendarDayButtonTemplate" id="62">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay52" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay63" inherits="GEMEventCalendarDayButtonTemplate" id="63">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay53" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay64" inherits="GEMEventCalendarDayButtonTemplate" id="64">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay54" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay65" inherits="GEMEventCalendarDayButtonTemplate" id="65">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay55" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay66" inherits="GEMEventCalendarDayButtonTemplate" id="66">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay56" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentDay67" inherits="GEMEventCalendarDayButtonTemplate" id="57">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentDay57" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+
+	</Frames>
+	<Scripts>
+		<OnMouseUp>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnMouseUp>
+		<OnMouseDown>
+			if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+				this:StartMoving();
+				this.isMoving = true;
+			end
+		</OnMouseDown>
+		<OnHide>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnHide>
+	</Scripts>
+  </Frame>
+
+
+</Ui>

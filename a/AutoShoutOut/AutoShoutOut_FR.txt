@@ -1,0 +1,249 @@
+La version française de ce document a été faite par Methos 
+(http://forums.curse-gaming.com/member.php?u=11256).  Merci!
+
+AutoShoutOut par Cosmic Cleric (a.k.a. Effren)
+
+Version 1.15.5 - Automatically notifies others when player/pet stats drop below a certain percentage.
+
+Pour tout commentaire, envoyez les à l'adresse : autoshoutout@cosmiccleric.com.
+
+*** THIS NEEDS TO BE UPDATED FOR THE NEW 'SOULSTONE' EVENT TYPE INTRODUCED IN v1.15.0! ***
+
+Remerciements
+-------------
+
+Merci à Hopman pour son AutoShout qui m'a grandement servi pour la fondation de mon mod !
+http://www.hopman.plus.com/Autoshout/
+
+J'ai pris le code de base d'AutoShout v1.1, et je l'ai remodelé, en ajoutant des améliorations des 
+corrections pour permettre les changements dans le client WoW (voir plus bas pour plus de détails)
+
+
+Introduction
+------------
+
+A partir des réglages de chaque utilisateur, fait des avertissements automatiques.  Peut être utilisé par
+tout joueur qui souhaite avertir les autres du statut de leur personnage. par exemple, j'utilise
+AutoShoutOut quand je joue avec mon prêtre, en instance, Ainsi les autres joueurs du groupe savent quand
+je vais bientôt manquer de mana.  Avertira aussi les autres du niveau de vie de votre familier.
+
+
+Tutorial
+--------
+
+AutoShoutOut fait des 'avertissements'. il y a quatre TYPES d'avertissement, 'santé', 'vie', 'mana',
+et 'santé du familier'.  Pour les types d'avertissement 'santé', 'vie', et 'mana', il y a deux FACONS de
+faire un avertissement instantané, 'cri' et 'message'.  Pour la 'santé du familier', il n'y a qu'un
+'message'.  
+
+Chaque type d'avertissement a un déclencheur qui dit à AutoShoutOut qu'il doit faire quelque chose.  Pour
+les avertissements de type 'santé' et 'vie', le déclencheur est le niveau de vie restant au joueur.  Pour 
+l' avertissement de type 'mana', c'est la quantité de mana restant au joueur.  Pour l'avertissement de
+type 'santé du familier', Le déclencheur est le niveau de vie restant au familier.  Les déclencheurs sont
+définis en pourcentage de vie/mana restant (ex.: 75% de vie restante).
+
+AutoShoutOut peut faire des avertissement de deux façons différentes, par 'cri', ce qui utilise les emotes
+vocales de WoW, et/ou par 'message', ce qui utilise les messages de dialogue de WoW.  Le joueur peut
+configurer AutoShoutOut pour utiliser 'soit l'un soit l'autre'/'aucuns'/'les deux' des types d'avertissements
+possibles, et peut les changer via la barre de dialogue de WoW.
+
+Les emotes vocales qu'utilise AutoShoutOut lors des cris sont "/soin" pour l'avertissement de 'santé', 
+"/aidemoi" pour l'avertissement de 'vie', et '/pdm' pour l'avertissement de 'mana'.  Celles-ci ne peuvent pas
+être changées (pour l'instant).  Il n'y a pas d'emote vocale pour l'avertissement de la 'santé du familier'.
+
+Also, the player can choose if AutoShoutOut does its notifications while they are dueling or not.  Each
+notification type can have its own 'notify during duels' notification setup.
+
+Les messages de dialogue qu'utilise AutoShoutOut peuvent être définis par l'utilisateur, avec une définition
+séparée pour les avertissements de type (santé, vie, mana, et santé du familier).  En plus de définir 
+le message à envoyer, la cible peut aussi être choisie.  Les choix de cibles possibles sont un autre joueur 
+(via chuchotement), localement par la fenêtre de dialogue avec le canal 'LOCAL', 'BANNIERE' pour voir le
+message affiché centré en haut de l'écran, le canal 'DIRE', le canal 'GROUPE', et le canal 'RAID'.
+Les noms de canaux doivent être en majuscules, sinon ils sont supposés comme des noms de personnages joueurs 
+par exemple, s'il y a un personnage joueur nommé 'Groupe', alors écrire le mot 'groupe' ou 'Groupe' ou 'GrOuPe'
+enverra un message privé au joueur, et écrire 'GROUPE' enverra le message sur le canal Groupe (/gr).  S'il il y
+a un doute, utilisez le bouton 'Canaux' pour sélectionner un canal, et tapez y le nom manuellement quand vous
+voulez chuchoter à un autre joueur.
+
+Quand vous définissez le message à envoyer, vous pouvez utiliser des mots clés spéciaux qui sont convertis en
+valeurs au moment de l'envois du message, comme le nombre de points de vie restants, le pourcentage de mana
+restant, etc.  Les mots clés sont :
+
+	$HEALTH			-	Points de vie restant actuellement
+	$HEALTHMAX		-	Points de vie maximum possibles
+	$HEALTHPERCENT	-	Pourcentage de points de vie restant actuellement (23%)
+	$MANA			-	Points de mana restant actuellement
+	$MANAMAX		-	Points de mana maximum possibles
+	$MANAPERCENT	-	Pourcentage de points de mana restant actuellement (54%)
+	$NAME			-   Nom de l'unité concernée par l'avertissement(voir plus bas pour les infos sur l'"unité")
+
+Veuillez noter que, selon le type d'événement qui intervient (ex.: 'santé' vs. 'santé du familier'), 
+l'"unité" faisant l'avertissement peut être différente, et les mots clés listés ci-dessus se rapportent a 
+une unité, donc pas seulement à partir d'une perspective de joueur.  Pour l'événement de type
+'santé du familier',l'"unité" est votre familier.  Pour tous les autres types d'événements, l'"unité"
+est le joueur.  Alors le même mot clé $NAME (par exemple) peut retourner une valeur différente, basée
+sur l'"unité" (joueur vs. familier) qui fait l'avertissement.
+
+Aussi, le joueur peut définir la fréquence à laquelle AutoShoutOut avertit, pour chaque type d'avertissement.
+Par défaut c'est dix secondes (étant donné que la plu part des combats ne durent que  trente secondes), mais 
+peut être changé en n'importe quelle valeur que le joueur souhaite, jusqu'à un maximum de soixante secondes
+(et un minimum de une seconde).  Also, this frequency value is the minimum amount of time to go by before getting a
+notification.  You need to be in combat, or have a buff get applied/wear off, or a system message
+be received, or your Health and/or Mana values change, or change targets, before AutoShoutOut will even 
+bother to check and see if it needs to do any notifications.  Basically a WoW event needs to come in for 
+AutoShoutOut to do its thing.  If, for a particular event notification, a frequency duration has elapsed, 
+but no new WoW events come in, the notification will not happen until the next WoW event comes in, then 
+AutoShoutOut will see that the amount of time that has elapsed is greater than the frequency duration, 
+and will do its notification.
+
+Aussi, le joueur peut choisir si AutoShoutOut fait des avertissements seulement quand le joueur/familier est en 
+train de combattre, ou à chaque fois que l'avertissement devrait être effectué, parce qu'un pourcentage
+déclencheur a été atteint.  Chaque type d'avertissement peut avoir sa propre configuration
+de type 'en combat' vs. 'toujours'.  la détermination est basée sur l'unité.  En d'autres mots, pour un joueur
+la vérification est faite pour voir si le JOUEUR est en train de combattre, et pour un familier, la
+vérification est faite pour voir si le FAMILIER est en combat.
+
+Finalement, pour chaque type d'événement, il y a trois différentes façons de configurer le type d'événement.
+Ces façons sont appelées 'configurations'.  les trois 'configurations' sont  'solo', 'groupe', et 'raid'.
+l'utilisateur peut choisir quelle configuration est active quand il utilis AutoShoutOut, via un
+panneau de contrôle au dessus de l'UI.  par exemple, l'utilisateur peut choisir la configuration 'solo', et
+alors changer le type d'événement 'santé' / 'vie' / 'mana' / 'santé du familier' comme il le souhaite.
+Puis l'utilisateur peut choisir la configuration de 'groupe', alors changer le type d'événement 'santé' /
+'vie' / 'mana' / 'santé du familier' pour cette configuration différemment (par exemple, une fréquence
+d'avertissement différente ou message, etc.).  L'utilisateur peut choisir quelle configuration est active 
+en ouvrant a nouveau l'UI (si elle n'est pas déjà ouverte) et en sélectionnant la configuration qu'il
+souhaite active dans le panneau de contrôle, en haut de la fenêtre.
+
+Ci-dessous une grille résumant ces explications...
+
+  TYPE            TYPE D'          FREQUENCE D'         QUAND                      MOYEN
+DE CONFIG      AVERTISSEMENT      AVERTISSEMENT        AVERTIR                 D'AVERTISSMENT
+========= ====================== =============== ==================== =================================
+                                                                       -- Cri     (Emote Vocale)
+                                                 -- Combat Seulement --|
+                                                 |                     -- Message (Message de dialogue)
+          -------- Santé ---------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+          |                                                            -- Message (Message de dialogue)
+          |   
+          |   
+          |                                                            -- Cri     (Emote Vocale)
+          |                                      -- Combat Seulement --|
+          |                                      |                     -- Message (Message de dialogue)
+          --------- Vie ----------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+ Solo ----|                                                            -- Message (Message de dialogue)
+          |   
+          |   
+          |                                                            -- Cri     (Emote Vocale)
+          |                                      -- Combat Seulement --|
+          |                                      |                     -- Message (Message de dialogue)
+          --------- Mana ---------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+          |                                          		           -- Message (Message de dialogue)
+          | 
+          |                                      -- Combat Seulement ---- Message (Chat Message)
+          -- Santé du Familier ---- Fréquence ---|
+          |                                      ------ Toujours -------- Message (Message de dialogue)
+          | 
+          |                                      -- Combat Seulement ---- Message (Chat Message)
+          -- Soulstone ------------ Fréquence ---|
+                                                 ------ Toujours -------- Message (Message de dialogue)
+                                              
+                                                                       -- Cri     (Emote Vocale)
+                                                 -- Combat Seulement --|
+                                                 |                     -- Message (Message de dialogue)
+          -------- Santé ---------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+          |                                                            -- Message (Message de dialogue)
+          |   
+          |   
+          |                                                            -- Cri     (Emote Vocale)
+          |                                      -- Combat Seulement --|
+          |                                      |                     -- Message (Message de dialogue)
+          --------- Vie ----------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+ Groupe --|                                                            -- Message (Message de dialogue)
+          |   
+          |   
+          |                                                            -- Cri     (Emote Vocale)
+          |                                      -- Combat Seulement --|
+          |                                      |                     -- Message (Message de dialogue)
+          --------- Mana ---------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+          |                                             		       -- Message (Message de dialogue)
+          | 
+          |                                      -- Combat Seulement ---- Message (Chat Message)
+          -- Santé du Familier ---- Fréquence ---|
+          |                                      ------ Toujours -------- Message (Message de dialogue)
+          | 
+          |                                      -- Combat Seulement ---- Message (Chat Message)
+          -- Soulstone ------------ Fréquence ---|
+                                                 ------ Toujours -------- Message (Message de dialogue)
+                                             
+                                                                       -- Cri     (Emote Vocale)
+                                                 -- Combat Seulement --|
+                                                 |                     -- Message (Message de dialogue)
+          -------- Santé ---------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+          |                                                            -- Message (Message de dialogue)
+          |   
+          |   
+          |                                                            -- Cri     (Emote Vocale)
+          |                                      -- Combat Seulement --|
+          |                                      |                     -- Message (Message de dialogue)
+          --------- Vie ----------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+ Raid  ---|                                           		           -- Message (Message de dialogue)
+          |   
+          |   
+          |                                                            -- Cri     (Emote Vocale)
+          |                                      -- Combat Seulement --|
+          |                                      |                     -- Message (Message de dialogue)
+          --------- Mana ---------- Fréquence ---|
+          |                                      |                     -- Cri     (Emote Vocale)
+          |                                      ------ Toujours ------|
+          |                                          		           -- Message (Message de dialogue)
+          | 
+          |                                      -- Combat Seulement ---- Message (Chat Message)
+          -- Santé du Familier ---- Fréquence ---|
+          |                                      ------ Toujours -------- Message (Message de dialogue)
+          | 
+          |                                      -- Combat Seulement ---- Message (Chat Message)
+          -- Soulstone ------------ Fréquence ---|
+                                                 ------ Toujours -------- Message (Message de dialogue)
+ 
+Pour résumer, pour une configuration particulière (solo, groupe, raid), il y a plusieurs types
+d'avertissement.  Pour un type particulier d'avertissement (santé, vie, ou mana) vous pouvez configurer
+la fréquence à laquelle AutoShoutOut fait un avertissement, si il doit faire un avertissement que lorsque
+vous êtes en combat, ou toujours, et s'il doit utiliser les cris (emotes vocales) et/ou les messages
+(message de dialogue WoW) pour avertir les autres.  
+
+
+Commandes
+---------
+
+	/aso (ou /autoshoutout) - Affiches la fenêtre des options
+
+	/aso [activé|désactivé] - active/désactive TOUS les avertissements quels qu'ils soient.
+
+	/aso statut - Bascule en activé/désactivé l'information du statut dans le canal de combat.
+
+	/aso recharger - Réinitialise tous les paramètres d'avertissement à leur valeur par défaut.
+
+	/aso avertissements - Toggles on/off warning messages (ex.: "No 'Soulstone Resurrection' buff!").
+
+
+------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
+Voir l'AutoShoutOut.txt pour de plus amples informations sur des changements entre les versions et à-.
+------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------

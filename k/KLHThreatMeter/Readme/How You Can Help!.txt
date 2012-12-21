@@ -1,0 +1,90 @@
+Last Edit: R15
+
+KLHThreatMeter will always be a work in progress as new items and boss encounters are added to the game that require special handling. Additionally, there are several non-core abilities that haven't been implemented, by which i mean abilties that aren't normally used in raids and whose threat values are not known. Chief examples of these would be searing pain and mind blast. 
+
+The point is, there's no way i am going to take the time to find out these values for abilities that
+- i don't use
+- i don't think other people should use (in a raid environment)
+- i don't have a toon who can use.
+
+However, if someone were to tell me a numerical value with a small error range, i would be happy to add the ability to the mod, and it would take me no time at all. Further down i'll give a guide to getting accurate values for unknown abilities.
+
+The other comment i would like to make it about items or boss encounters is to try to be as specific as possible, or there's really nothing i can do to help you. Here are a few examples:
+
+Bad: 	the mod doesn't work for Fetish of the Sand Reaver.
+Why? 	WTF is Fetish of the Sand Reaver! Never heard of it, what does it do? How am i meant to program this? There is no API PlayerHasJustUsedFetishOfTheSandReaver, sorry!
+
+Good:	the mod doesn't work for Fetish of the Sand Reaver. This is a trinket that reduces your threat by 90% for a limited time when used. On use, a line in the combat log reads "You gain Arcane Shroud.", when it wears off you get "Arcane Shroud fades from you.".
+
+Bad:	the mod doesn't work for Twin Emps.
+Why?	I'm sorry to say i'm not in an uberguild, i don't have personal experience of anything past Firemaw, which includes aq40 and the twin emperors.
+
+Good:	the mod doesn't work for Twin Emps. Firstly there are two bosses that we want to put on the master target, to distinguish from bugs that we have to kill, but we can currently only make on of them the master target. They are called "Emperor Vek'nilash" and "Emperor Vek'lor". Also, they have a spell "Twin Teleport", cast periodically, that wipes all threat and gives a small amount of threat to the closest person. In the combat log you can see "Empoeror Vek'(.+) casts Twin Teleport".
+
+On a side note, the mod is still broken for twin emps fight, but fixes are in the pipe.
+
+
+__________________________________________________________
+A List of Items / Abilities / Bosses that need more input!
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+* Rajxx "knockback". What does he yell when he does his ignore move? It's something like "You no longer interest me, <x>." Need localised versions too.
+
+* Grace of Earth. What comes up in the combat log when you use it?
+
+* Would like experimental data on Earth shock (rank 1 and max rank), mind blast, searing pain, and any other "high threat" abilities that people keep bugging me about.
+
+* Chromaggus time lapse. Does this even wipe threat any more? Deterministic? Keep in mind i haven't seen Chromaggus myself.
+
+* Wing Buffet values for Drakes in BWL. Is -50% too high? Have you had encounters where the tanks, using R14 or later, were holding aggro but appeared to have very low threat on the meter, or lost aggro when the meter said they had much higher threat than anyone else? (Check taunt was working properly, it needs the master target to be set).
+
+* Prophet Skeram in AQ40. Some kind of threat wipe when he clones himself? I don't really know what happens in this encounter at all!
+
+_______________________________________________________________
+Kenco's Guide To Working Out Threat Values For Random Abilities
+
+You need:
+1) 	Player 1, of the class who casts the random ability
+2) 	Player 2, of a class who can generate threat in very small increments. The smaller the amount of threat he can create in one attack / heal / ability, the more accurate things will be. Rogues, Warriors, Hunters are bad, they can't do this at all. Classes with heal over times are excellent; the lowest level ones have very small ticks. Next best is mages and warlocks, because with no melee weapon, their autoattacks are at most 4 damage, and they probably won't have a high unarmed skill. Paladins are good too, just tell them to pretend they are DPSing the mob :D
+3) 	A mob to experiment on. It has to have enough HP to survive the ability that is cast on it, plus the potential damage done for player 2 to gain aggro. You also don't want it to do much damage, because it will be beating on player one for a while when player 2 is gaining threat in small quantities. I found the mobs in Wailing caverns good; as level 18 or so Elites they have enough hit points while doing low damage. Also they are in an instance, so other people can't interrupt you. Other candidates would be random level 30-40 mobs, preferably in the wilderness somewhere.
+
+
+	General strategy:
+
+1) Player 1 does the unknown ability, then waits for any dot effects to wear off, and records the total damage. Mob will probably start beating on Player 1.
+2) Player 2 starts doing his small heals or wimpy autoattacks. 
+3) When the mob aggros player 2, he records the damage / healing done when he gained aggro, and also the damage / healing done immediately before he gained aggro.
+
+To make (3) easier, there is an undocumented feature in KLHThreatMeter, where if you run the command
+
+	/script klhtest()
+
+The mod will automatically send a message to party / raid chat "I gained aggro on <mob name>, my threat is <x>, previously it was <y> then <z>." whenever you gain aggro on your current target. Needless to say, you don't want this to spam your raid after you have finished testing, so make sure you run the same command again after the testing is finished to deactivate it.
+
+Also, if Player 2 is using healing spells, make sure he stand out of melee range of the mob; this will make it more accurate, since he will gain aggro when his threat exceeds 130% of Player 1's, as opposed to 110% when in melee range.
+
+After you have some data, a small amount of number crunching is required. Alternatively, just send all the relevant numbers to me, and i can work it out. As a random unrealistic example, suppose
+
+Player 1 casts searing pain, for 100 damage.
+Player 2 heals Player 1, no aggro at 185 threat, but aggro at 189 threat. Then,
+
+Player 2 threat is from 185 to 189.
+
+Player 1 threat is Player 2 threat / 1.3, since player 1 was at range, i.e.
+Player 1 threat is from 142.3 to 145.4
+
+To get searing pain's actual threat, we need to remove the threat done by the damage, i.e.
+searing pain threat is player 2 threat - 100
+= 42.3 to 45.4 threat. And there you have it!
+
+
+	Some Random Tips
+
+--> For the first run, make sure your experiment is working correctly by testing a known value. e.g. a shadowbolt will cause only as much threat as its damage, so check that you get around 0 for its non-damage threat using the method described above.
+
+--> Make sure Player 1 uses the maximum rank of the spell, since each rank will usually have a different innate threat value. If Player 2 is healing, tell him to remove all his +healing gear to make each heal as small as possible, for greater accuracy. Also, remove any sets pieces that could cause procs for extra threat (e.g. Earthfury 5/8). 
+
+--> Since the total threat generated by player 1 is pretty big, it will take too long to cast level 1 rejuvenation on him all day long. First heal him with medium sized heals, or use level 1 frost bolts, to get a rough target range. Then on the second run, use the medium attacks until you are just about to gain aggro from the rough value, then switch to the micro heals / wimpy melee attacks.
+
+--> Run the experiment a few times to check your values are consistent. This will also decrease your error range significantly. Continuing the last example, if in a second experiment we found searing pain was between  44.1 and 46.8, we can compress the range to 44.1 - 45.4.
+
+--> Patience! This is boring work, but you'll be rewarded! If you find the value for mind blast, every shadow priest in existance will sing your praises!

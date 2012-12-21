@@ -1,0 +1,507 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+	<Script file="smartassistlist.lua"/>
+
+	<!-- this frame was based on ct raidassist, now there is nothing from there anymore :) -->
+	<Button name="SAListTemplate" frameStrata="LOW" toplevel="true" movable="false" virtual="true">
+		<Size>
+			<AbsDimension x="150" y="55"/>
+		</Size>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame setAllPoints="true">
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentMobText" inherits="TextStatusBarText" text="?" nonspacewrap="false"/>
+						<FontString name="$parentTargetText" inherits="TextStatusBarText" text="?" nonspacewrap="false"/>
+					</Layer>
+					
+					<!-- moved to get them higher level -->
+					<Layer level="OVERLAY">
+						<Texture name="$parentTargetIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="false">
+							<TexCoords left="0.00" right="0.25" top="0.00" bottom="0.25"/> <!-- just default to something (star) -->
+							<Size>
+								<AbsDimension x="25" y="25"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-26" y="-28"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentClassIcon" file="Interface\Glues\CharacterCreate\UI-CharacterCreate-Classes" hidden="true">
+							<TexCoords left="0.00" right="0.25" top="0.25" bottom="0.50"/> <!-- just default to something (hunter), without any setup looks awful -->
+							<Size>
+								<AbsDimension x="25" y="25"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-26" y="-3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+
+						<Texture name="$parentHuntersMarkIcon" file="Interface\Icons\Ability_Hunter_SniperShot" hidden="true">
+							<!-- <TexCoords left="0.00" right="0.25" top="0.00" bottom="0.25"/> -->
+							<Size>
+								<AbsDimension x="25" y="25"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-26" y="-28"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						
+					</Layer>
+					
+				</Layers>
+			</Frame>
+			<StatusBar name="$parentMobBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="130" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="1" b="0"/>
+				<Scripts>
+					<OnMouseUp>
+						SA_List_Target_OnClick(this:GetParent());
+					</OnMouseUp>
+					<OnEnter>
+						SA_List_Target_OnEnter(this:GetParent());
+					</OnEnter>
+					<OnLeave>
+						SA_List_Target_OnLeave(this:GetParent());
+					</OnLeave>
+				</Scripts>				
+			</StatusBar>
+			<StatusBar name="$parentTargetBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="130" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="1" b="0"/>
+				<Scripts>
+					<OnMouseUp>
+						SA_List_Target_OnClick(this:GetParent());
+					</OnMouseUp>
+					<OnEnter>
+						SA_List_Target_OnEnter(this:GetParent());
+					</OnEnter>
+					<OnLeave>
+						SA_List_Target_OnLeave(this:GetParent());
+					</OnLeave>
+				</Scripts>				
+			</StatusBar>
+		</Frames>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTargetOf" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="CombatLogFont" text="?" nonspacewrap="true">
+					<Color r="1.0" g="0.82" b="0"/>
+					<Size>
+						<AbsDimension x="140" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-8"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0, 0, 0, 0.5);
+				SA_InitBar(getglobal(this:GetName() .. "MobBar"), getglobal(this:GetName() .. "MobText"));
+				SA_InitBar(getglobal(this:GetName() .. "TargetBar"), getglobal(this:GetName() .. "TargetText"));
+				this.obj = false;
+			</OnLoad>
+			<OnClick>
+				SA_List_Target_OnClick(this);
+			</OnClick>
+			<OnEnter>
+				SA_List_Target_OnEnter(this);
+			</OnEnter>
+			<OnLeave>
+				SA_List_Target_OnLeave(this);
+			</OnLeave>
+		</Scripts>
+	</Button>
+	
+	<Frame name="SAListFrame" hidden="true" frameStrata="MEDIUM" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="150" y="22"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<!-- wrapper for scaling setting, so that the window position stays same -->
+			<Frame name="SAListFrameScaler"> 
+			<Size>
+				<AbsDimension x="12" y="12"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+				<Anchor point="TOPRIGHT"/>
+			</Anchors>
+			<Frames>				
+			
+			<Button name="SAListTitleButton" >
+				<Size>
+					<AbsDimension x="150" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAListFrameScaler">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="4" top="5" bottom="5"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+				</Backdrop>
+				
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="SAListTitle" inherits="GameTooltipTextSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="SAListTitleButton" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						SA_List_TitleButton_OnClick();
+					</OnClick>
+					<OnEnter>
+						SA_List_TitleButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						SA_List_TitleButton_OnLeave();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="Target1" id="1" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAListFrameScaler">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target2" id="2" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target1">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target3" id="3" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target2">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target4" id="4" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target3">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target5" id="5" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target4">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target6" id="6" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target5">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target7" id="6" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target6">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target8" id="6" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target7">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target9" id="6" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target8">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Target10" id="10" inherits="SAListTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Target9">
+						<Offset>
+							<AbsDimension x="0" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+						
+			</Frames>
+			</Frame>
+			
+			<!-- dropdown menu -->
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="50" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SA_List_FrameDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<!-- end of dropdown menu -->
+		
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				SA_List_OnLoad();
+			</OnLoad>
+			<OnShow>
+				SA_List_OnShow();
+			</OnShow>
+			<OnUpdate>
+				SA_List_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+		
+	</Frame>
+	
+	<!-- FILTER FRAME BELOW, credits to link snag -->
+	
+	<Frame name="SAFilterFrame" toplevel="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="400" y="120"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="SAFilterFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="400" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="Filter targetting">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SAFilterFrame">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<EditBox name="SAFilterEditBox" letters="40" historyLines="0" autoFocus="true">
+				<Size>
+					<AbsDimension x="350" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="42" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="318" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<Button name="SAFilterFrameButtonTarget" inherits="UIPanelButtonTemplate" text="Use target">
+				<Size>
+					<AbsDimension x="120" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="30" y="25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (UnitExists("target")) then
+							SAFilterEditBox:SetText(UnitName("target"));
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+						
+			<Button name="SAFilterFrameButtonOK" inherits="UIPanelButtonTemplate" text="OK">
+				<Size>
+					<AbsDimension x="120" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SA_List_FilterButtonOK_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+		</Frames>
+	</Frame>
+
+</Ui>

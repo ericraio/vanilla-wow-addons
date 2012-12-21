@@ -1,0 +1,150 @@
+<Ui>	
+	<Script file="tradeDispenser_OSD.lua"/>
+	<Frame name="tradeDispenserOSD" parent="UIParent" hidden="false"  enableMouse="true" movable="true">		<!-- SHOWs some BUTTONS on the screen  -->
+		<Size>	<AbsDimension x="42" y="116"/>	</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset><AbsDimension x="0" y="0"/></Offset>
+			</Anchor>
+		</Anchors>	
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>	<AbsValue val="16"/>	</EdgeSize>
+			<TileSize>	<AbsValue val="0"/>		</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+		
+			<Button name="$parentActivateBtn" inherits="UIPanelButtonTemplate"  text="">
+				<Size>	<AbsDimension x="32" y="32"/>	</Size>	
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER">
+						<Offset>  <AbsDimension x="0" y="0"/>	</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file=""/>		<PushedTexture file=""/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>					
+				<Scripts>
+					<OnLoad>
+						tradeDispenser_OSD_OnLoad(this);
+					</OnLoad>				
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (arg1=="LeftButton") then
+							tD_Temp.isEnabled = not tD_Temp.isEnabled;
+							tradeDispenser_Eventhandler()
+							tradeDispenserUpdate();
+							tradeDispenserOSD_OnUpdate();
+						else 
+							tradeDispenser_ResetRegistratedChars();  <!-- reset the chars... function found in TradeControl.lua  -->
+						end
+					</OnClick>
+					<OnEnter>
+						tradeDispenserSetTooltipPosition(this:GetParent(),0,0);
+						if (tD_Temp.isEnabled) then
+							GameTooltip:AddLine("|cFFFFFFFF"..tD_Loc.OSD.actbutton.deactivate);
+						else
+							GameTooltip:AddLine("|cFFFFFFFF"..tD_Loc.OSD.actbutton.activate);
+						end
+						GameTooltip:AddLine(tD_Loc.OSD.actbutton.left);
+						if (tD_CharDatas.RegisterCheck) then
+							GameTooltip:AddLine(tD_Loc.OSD.actbutton.right)
+						else 
+							GameTooltip:AddLine(tD_Loc.OSD.actbutton.noright)
+						end
+						GameTooltip:Show();				
+					</OnEnter>
+					<OnLeave>	GameTooltip:Hide();	</OnLeave>								
+				</Scripts>
+			</Button>		
+
+			<Button name="$parentBroadcastBtn" inherits="UIPanelButtonTemplate"  text="">
+				<Size>	<AbsDimension x="32" y="32"/>	</Size>			
+				<NormalTexture file=""/>		<PushedTexture file=""/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>	
+				<Scripts>	
+					<OnLoad>
+						tradeDispenser_OSD_OnLoad(this);
+					</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (not tD_Temp.isEnabled) then
+							DEFAULT_CHAT_FRAME:AddMessage(tD_Loc.OSD.notenabled);
+						else
+							if (arg1=="RightButton") then
+								tD_CharDatas.AutoBroadcast = not tD_CharDatas.AutoBroadcast;
+								tradeDispenserUpdate();
+								tradeDispenser.broadcastSlice=0.2;
+								tradeDispenserOSD_OnUpdate();
+							else				
+								tradeDispenserBroadcastItems()
+							end
+						end
+					</OnClick>
+					<OnEnter>
+						local temp, tradeDispenserChannel = tradeDispenserGetChannel();
+
+						tradeDispenserSetTooltipPosition(this:GetParent(),0,0);
+						GameTooltip:AddLine("|cFFFFFFFF"..tD_Loc.OSD.broadcasttip.title);						
+						GameTooltip:AddLine(tD_Loc.OSD.broadcasttip.channel..tradeDispenserChannel);
+						GameTooltip:AddLine(tD_Loc.OSD.broadcasttip.left);
+						GameTooltip:AddLine(tD_Loc.OSD.broadcasttip.right);
+						GameTooltip:Show();	
+					</OnEnter>
+					<OnLeave>	GameTooltip:Hide();	</OnLeave>						
+				</Scripts>
+			</Button>
+
+		
+			<Button name="$parentConfigBtn" inherits="UIPanelButtonTemplate"  text="">
+				<Size>	<AbsDimension x="32" y="32"/>	</Size>	
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentActivateBtn" relativePoint="BOTTOM">
+						<Offset>  <AbsDimension x="0" y="-5"/>	</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file=""/>			<PushedTexture file=""/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>	
+				<Scripts>
+					<OnLoad>
+						tradeDispenser_OSD_OnLoad(this);
+					</OnLoad>						
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (arg1=="RightButton") then
+							tradeDispenserSettings:Show();
+							tradeDispenserSettingsBtn:LockHighlight();
+							tradeDispenserTradeControl:Show();
+							tradeDispenserTradeControlBtn:LockHighlight();
+						end												
+						tradeDispenserMessages:Hide();
+						tD_Temp.isVisible = not tD_Temp.isVisible;
+						tradeDispenserUpdate();
+						tradeDispenser_EditBoxUpdate();
+						tradeDispenserSettings_OnUpdate();
+						tradeDispenserOSD_OnUpdate();
+					</OnClick>
+					<OnEnter>
+						tradeDispenserSetTooltipPosition(this:GetParent(),0,0);						
+						if (tD_Temp.isVisible) then
+							GameTooltip:AddLine("|cFFFFFFFF"..tD_Loc.OSD.configbtn.hide)
+						else
+							GameTooltip:AddLine("|cFFFFFFFF"..tD_Loc.OSD.configbtn.show)
+						end
+						GameTooltip:AddLine(tD_Loc.OSD.configbtn.left)
+						GameTooltip:AddLine(tD_Loc.OSD.configbtn.right)
+						GameTooltip:Show()	
+					</OnEnter>	
+					<OnLeave>	GameTooltip:Hide()	</OnLeave>		
+				</Scripts>
+			</Button>	
+		</Frames>
+		<Scripts>
+			<OnLoad>	  this:Raise();  this:Raise();  this:Raise();  </OnLoad>
+			<OnMouseDown> if (not tD_CharDatas.OSD.locked) then this:StartMoving()         end </OnMouseDown>
+			<OnMouseUp>   if (not tD_CharDatas.OSD.locked) then this:StopMovingOrSizing()  end</OnMouseUp>
+			<OnDragStop>  if (not tD_CharDatas.OSD.locked) then this:StopMovingOrSizing()  end</OnDragStop>		
+		</Scripts>
+	</Frame>
+</Ui>

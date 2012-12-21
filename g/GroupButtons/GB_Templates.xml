@@ -1,0 +1,371 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+<Script file="localization.lua"/>
+<Script file="GB_Get.lua"/>
+<Script file="GB_Hooks.lua"/>
+<Script file="GB_UnitFrames.lua"/>
+<Script file="GB_Initialization.lua"/>
+<Script file="GB_Main.lua"/>
+<Script file="GB_Options.lua"/>
+<Script file="GB_Bars.lua"/>
+<Script file="GB_Buttons.lua"/>
+<Script file="GB_MiniSpellbook.lua"/>
+
+<Frame name="GB_BGTemplate" hidden="false" virtual="true">
+	<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<EdgeSize>
+			<AbsValue val="16"/>
+		</EdgeSize>
+		<TileSize>
+			<AbsValue val="16"/>
+		</TileSize>
+		<BackgroundInsets>
+			<AbsInset left="5" right="5" top="5" bottom="5"/>
+		</BackgroundInsets>
+	</Backdrop>
+</Frame>
+
+<Button name="GB_ActionButtonTemplate" hidden="true" virtual="true">
+	<Size><AbsDimension x="36" y="36"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT"/>
+	</Anchors>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parent_Icon" file="Interface\AddOns\GroupButtons\EmptyButton">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Frames>
+		<Model name="$parent_Cooldown" inherits="CooldownFrameTemplate"/>
+		<Frame name="$parentTextFrame">
+			<Size><AbsDimension x="36" y="36"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_CooldownCount" inherits="GB_CooldownCountFont" justifyH="CENTER">
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset><AbsDimension x="2" y="0"/></Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset><AbsDimension x="-2" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_HotKey" inherits="GB_KeybindingsFont" justifyH="RIGHT">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset><AbsDimension x="2" y="-2"/></Offset>
+							</Anchor>
+							<Anchor point="TOPRIGHT">
+								<Offset><AbsDimension x="-2" y="-2"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parent_DynamicHotKey" inherits="GB_DynamicKeybindingsFont" justifyH="RIGHT">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset><AbsDimension x="2" y="-12"/></Offset>
+							</Anchor>
+							<Anchor point="TOPRIGHT">
+								<Offset><AbsDimension x="-2" y="-12"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parent_Count" inherits="GB_ItemCountFont" justifyH="RIGHT">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset><AbsDimension x="-2" y="2"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Name" inherits="GB_MacroNameFont" outline="THICK">
+						<Size><AbsDimension x="36" y="10"/></Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset><AbsDimension x="0" y="3"/></Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset><AbsDimension x="0" y="3"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+	</Frames>
+	<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			this:RegisterForDrag("LeftButton");
+			this.inContext = true;
+		</OnLoad>
+		<OnEvent>
+			GB_ActionButton_OnEvent(event);
+		</OnEvent>
+		<OnMouseDown>
+			if (not GB_Settings[GB_INDEX].barsLocked) then
+				GB_StartMoving(this:GetParent());
+			elseif (IsShiftKeyDown() and IsControlKeyDown()) then
+				GB_StartMoving(this:GetParent());
+			end
+		</OnMouseDown>
+		<OnMouseUp>
+			if (not GB_Settings[GB_INDEX].barsLocked) then
+				GB_StopMoving(this:GetParent());
+			elseif (IsShiftKeyDown() and IsControlKeyDown()) then
+				GB_StopMoving(this:GetParent());
+			end
+		</OnMouseUp>
+		<OnHide>
+			if (GB_INITIALIZED and (not GB_Settings[GB_INDEX].barsLocked)) then
+				GB_StopMoving(this:GetParent());
+			end
+		</OnHide>
+		<OnClick>
+			if (GB_MOUSE_ACTION.id and (not GB_Settings[GB_INDEX].buttonsLocked)) then
+				GB_Update_Spellbox(this:GetID(), this:GetParent().index);
+			elseif (GB_Settings[GB_INDEX].barsLocked) then
+				GB_ActionButton_OnClick(this:GetParent():GetName(), this:GetID());
+			end
+		</OnClick>
+		<OnDragStart>
+			if (not GB_Settings[GB_INDEX].buttonsLocked) then
+				GB_Update_Spellbox(this:GetID(), this:GetParent().index);
+			else
+				GB_ActionButton_OnClick(this:GetParent():GetName(), this:GetID());
+			end
+		</OnDragStart>
+		<OnEnter>
+			this:GetParent().timer = nil;
+			GB_Show_Tooltip(this:GetParent().index, this:GetID());
+		</OnEnter>
+		<OnLeave>
+			if (GB_Settings[GB_INDEX][this:GetParent().index].mouseover) then
+				this:GetParent().timer = GB_MOUSEOUT_TIME;
+			end
+			GameTooltip:Hide();
+		</OnLeave>
+		<OnUpdate>
+			GB_ActionButton_OnUpdate(arg1);
+		</OnUpdate>
+		<OnShow>
+			GB_ActionButton_UpdateCooldown();
+		</OnShow>
+	</Scripts>
+</Button>
+
+<Frame name="GB_ActionBarTemplate" hidden="true" virtual="true" frameStrata="low" movable="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Frames>
+		<Frame name="$parent_Label" hidden="true">
+			<Size><AbsDimension x="50" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="$parent_Border">
+						<Size><AbsDimension x="52" y="22"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset><AbsDimension x="-1" y="1"/></Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset><AbsDimension x="1" y="-1"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Color r=".9" g=".9" b="0"/>
+					</Texture>
+					<Texture name="$parent_Background">
+						<Size><AbsDimension x="50" y="20"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+						<Color r=".6" g="0" b="0"/>
+					</Texture>
+				</Layer>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Text" inherits="GameFontNormal" justifyH="CENTER">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+						<Color r="1" g="1" b="0"/>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Button name="$parent_Button_1" inherits="GB_ActionButtonTemplate" id="1"/>
+		<Button name="$parent_Button_2" inherits="GB_ActionButtonTemplate" id="2"/>
+		<Button name="$parent_Button_3" inherits="GB_ActionButtonTemplate" id="3"/>
+		<Button name="$parent_Button_4" inherits="GB_ActionButtonTemplate" id="4"/>
+		<Button name="$parent_Button_5" inherits="GB_ActionButtonTemplate" id="5"/>
+		<Button name="$parent_Button_6" inherits="GB_ActionButtonTemplate" id="6"/>
+		<Button name="$parent_Button_7" inherits="GB_ActionButtonTemplate" id="7"/>
+		<Button name="$parent_Button_8" inherits="GB_ActionButtonTemplate" id="8"/>
+		<Button name="$parent_Button_9" inherits="GB_ActionButtonTemplate" id="9"/>
+		<Button name="$parent_Button_10" inherits="GB_ActionButtonTemplate" id="10"/>
+		<Button name="$parent_Button_11" inherits="GB_ActionButtonTemplate" id="11"/>
+		<Button name="$parent_Button_12" inherits="GB_ActionButtonTemplate" id="12"/>
+		<Button name="$parent_Button_13" inherits="GB_ActionButtonTemplate" id="13"/>
+		<Button name="$parent_Button_14" inherits="GB_ActionButtonTemplate" id="14"/>
+		<Button name="$parent_Button_15" inherits="GB_ActionButtonTemplate" id="15"/>
+		<Button name="$parent_Button_16" inherits="GB_ActionButtonTemplate" id="16"/>
+		<Button name="$parent_Button_17" inherits="GB_ActionButtonTemplate" id="17"/>
+		<Button name="$parent_Button_18" inherits="GB_ActionButtonTemplate" id="18"/>
+		<Button name="$parent_Button_19" inherits="GB_ActionButtonTemplate" id="19"/>
+		<Button name="$parent_Button_20" inherits="GB_ActionButtonTemplate" id="20"/>
+	</Frames>
+	<Scripts>
+		<OnUpdate>
+			GB_Bar_OnUpdate();
+		</OnUpdate>
+		<OnEvent>
+			GB_Bar_OnEvent(event);
+		</OnEvent>
+		<OnHide>
+			if (GB_INITIALIZED and (not GB_Settings[GB_INDEX].barsLocked)) then
+				GB_StopMoving();
+			end
+		</OnHide>
+		<OnShow>
+			if (GB_INITIALIZED) then
+				for i=1, 20 do
+					GB_ActionButton_CheckAllContexts(getglobal(this:GetName().."_Button_"..i));
+				end
+				GB_Set_Layout(this.index, this:GetName());
+			end
+		</OnShow>
+	</Scripts>
+</Frame>
+
+<Button name="GB_ClickboxTemplate" hidden="true" virtual="true">
+	<Size><AbsDimension x="100" y="100"/></Size>
+	<Layers>
+		<Layer level="OVERLAY">
+			<Texture name="$parent_Texture" hidden="true">
+				<Color r=".7" g=".7" b=".7" a=".5"/>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnEnter>
+			GB_UnitFrame_OnEnter();
+		</OnEnter>
+		<OnLeave>
+			GB_UnitFrame_OnLeave();
+		</OnLeave>
+		<OnEvent>
+			GB_UnitFrame_OnEvent(event);
+		</OnEvent>
+		<OnMouseDown>
+			GB_UnitFrame_OnMouseDown(arg1);
+		</OnMouseDown>
+		<OnMouseUp>
+			GB_UnitFrame_OnMouseUp(arg1);
+		</OnMouseUp>
+		<OnClick>
+			GB_UnitFrame_OnClick(arg1);
+		</OnClick>
+		<OnReceiveDrag>
+			GB_UnitFrame_OnReceiveDrag();
+		</OnReceiveDrag>
+		<OnShow>
+			this:Raise()
+		</OnShow>
+	</Scripts>
+</Button>
+
+<Frame name="GB_PetRaidBarTemplate" hidden="true" virtual="true" frameStrata="low" movable="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Frames>
+		<Frame name="$parent_Label" hidden="true">
+			<Size><AbsDimension x="50" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="$parent_Border">
+						<Size><AbsDimension x="52" y="22"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset><AbsDimension x="-1" y="1"/></Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset><AbsDimension x="1" y="-1"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Color r=".9" g=".9" b="0"/>
+					</Texture>
+					<Texture name="$parent_Background">
+						<Size><AbsDimension x="50" y="20"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+						<Color r=".6" g="0" b="0"/>
+					</Texture>
+				</Layer>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Text" inherits="GameFontNormal" justifyH="CENTER">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+						<Color r="1" g="1" b="0"/>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Button name="$parent_Button_1" inherits="GB_ActionButtonTemplate" id="1"/>
+		<Button name="$parent_Button_2" inherits="GB_ActionButtonTemplate" id="2"/>
+		<Button name="$parent_Button_3" inherits="GB_ActionButtonTemplate" id="3"/>
+		<Button name="$parent_Button_4" inherits="GB_ActionButtonTemplate" id="4"/>
+		<Button name="$parent_Button_5" inherits="GB_ActionButtonTemplate" id="5"/>
+		<Button name="$parent_Button_6" inherits="GB_ActionButtonTemplate" id="6"/>
+	</Frames>
+	<Scripts>
+		<OnUpdate>
+			GB_Bar_OnUpdate();
+		</OnUpdate>
+		<OnEvent>
+			GB_Bar_OnEvent(event);
+		</OnEvent>
+		<OnHide>
+			if (GB_INITIALIZED and (not GB_Settings[GB_INDEX].barsLocked)) then
+				GB_StopMoving();
+			end
+		</OnHide>
+		<OnShow>
+			if (GB_INITIALIZED) then
+				for i=1, 6 do
+					GB_ActionButton_CheckAllContexts(getglobal(this:GetName().."_Button_"..i));
+				end
+				GB_Set_Layout(this.index, this:GetName());
+			end
+		</OnShow>
+	</Scripts>
+</Frame>
+
+</Ui>

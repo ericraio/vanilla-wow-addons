@@ -1,0 +1,398 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+        <Script file="XPerl_Party.lua"/>
+
+        <!-- Frame to display Party's health -->
+
+        <Frame name="XPerl_Party_EventFrame">
+                <Scripts>
+                        <OnLoad>
+                                XPerl_Party_OnLoadEvents()
+                        </OnLoad>
+                </Scripts>
+        </Frame>
+
+        <Frame name="XPerl_Party_FrameTemplate" clampedToScreen="true" frameStrata="LOW" movable="true" virtual="true">
+		<Size>
+			<!-- The size of this frame determines what can be clicked for the menu and moving, hence it is the same size as the name frame. -->
+			<AbsDimension x="100" y="60"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="500" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<!-- Script Events -->
+
+		<Scripts>
+			<OnLoad>
+                                XPerl_Party_OnLoad()
+			</OnLoad>
+			<OnEnter>
+                                XPerl_Party_PlayerTip()
+			</OnEnter>
+			<OnLeave>
+                                XPerl_PlayerTipHide()
+			</OnLeave>
+                        <OnShow>
+                                XPerl_Party_UpdatePortrait(this)
+                        </OnShow>
+		</Scripts>
+
+		<Frames>
+                        <!-- Party Portrait -->
+                        <Frame name="$parent_PortraitFrame" inherits="XPerl_Portrait_Template" hidden="true">
+				<Anchors>
+                                        <Anchor point="TOPLEFT"/>
+				</Anchors>
+			</Frame>
+
+			<!-- Party Name -->
+			<Frame name="$parent_NameFrame">
+				<Size>
+                                        <AbsDimension x="100" y="24"/>
+				</Size>
+				<Anchors>
+                                        <Anchor point="TOPLEFT"/>
+				</Anchors>
+                                <Backdrop bgFile="Interface\Addons\XPerl\Images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+                                                <AbsValue val="32"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="OVERLAY">
+						<!-- Leader Icon -->
+						<Texture name="$parent_LeaderIcon" file="Interface\GroupFrame\UI-Group-LeaderIcon" hidden="true">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+                                                                                <AbsDimension x="10" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<!-- Master Icon -->
+						<Texture name="$parent_MasterIcon" file="Interface\GroupFrame\UI-Group-MasterLooter" hidden="true">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+                                                                                <AbsDimension x="25" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+
+                                                <!-- Combat Icon -->
+                                                <Texture name="$parent_ActivityStatus" file="Interface\CharacterFrame\UI-StateIcon" hidden="true">
+							<Size>
+								<AbsDimension x="32" y="31"/>
+							</Size>
+							<Anchors>
+                                                                <Anchor point="RIGHT"/>
+							</Anchors>
+                                                        <TexCoords left="0.5" right = "1.0" top="0.0" bottom="0.5"/>
+						</Texture>
+
+                                                <!-- Warning Icon -->
+                                                <Texture name="$parent_Warning" file="Interface\Minimap\Ping\ping6" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="32" y="31"/>
+							</Size>
+							<Anchors>
+                                                                <Anchor point="TOP" relativePoint="TOP">
+									<Offset>
+                                                                                <AbsDimension x="0" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+
+						<!-- PVP Icon -->
+                                                <Texture name="$parent_PVPStatus" file="Interface\TargetingFrame\UI-PVP-FFA" hidden="true">
+							<Size>
+								<AbsDimension x="48" y="48"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="78" y="5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+
+                                                <!-- Out of Range Icon -->
+                                                <Texture name="$parent_RangeStatus" file="Interface\Addons\XPerl\images\XPerl_30Yard" hidden="true">
+							<Size>
+                                                                <AbsDimension x="48" y="19"/>
+							</Size>
+							<Anchors>
+                                                                <Anchor point="CENTER" relativePoint="TOP">
+									<Offset>
+                                                                                <AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+                                                        <TexCoords left="0" right="1" top="0" bottom="0.4" />
+						</Texture>
+
+                                                <FontString name="$parentText" inherits="GameFontNormal" text="Error!" justifyH="LEFT">
+							<Anchors>
+                                                                <Anchor point="TOPLEFT">
+									<Offset>
+                                                                                <AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+                                                                <Anchor point="BOTTOMRIGHT">
+									<Offset>
+                                                                                <AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+                                                </FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<!-- Party Level Frame -->
+
+			<Frame name="$parent_LevelFrame">
+				<Size>
+					<AbsDimension x="34" y="42"/>
+				</Size>
+				<Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_NameFrame"/>
+				</Anchors>
+                                <Backdrop bgFile="Interface\Addons\XPerl\Images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+                                                <AbsValue val="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="OVERLAY">
+						<!-- Level Text -->
+                                                <FontString name="$parent_LevelBarText" inherits="GameFontNormalSmall" text="Error!" setAllPoints="true">
+                                                        <Size>
+                                                                <AbsDimension x="32" y="12"/>
+                                                        </Size>
+                                                        <Color r="1.0" g="1.0" b="0"/>
+                                                </FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+                        <Frame>
+				<Layers>
+					<Layer level="OVERLAY">
+						<!-- Class Icon -->
+                                                <Texture name="$parent_LevelFrame_ClassTexture" file="Interface\Glues\CharacterCreate\UI-CharacterCreate-Classes">
+							<Size>
+                                                                <AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="5" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<!-- Party Stats -->
+                        <Frame name="$parent_StatsFrame" inherits="XPerl_Stats_Template">
+				<Size>
+                                        <AbsDimension x="140" y="41"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_LevelFrame">
+						<Offset>
+							<AbsDimension x="-4" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                        </Frame>
+
+                        <Button name="$parent_CastClickOverlay" topLevel="true">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent_NameFrame"/>
+                                        <Anchor point="BOTTOMRIGHT" relativeTo="$parent_StatsFrame"/>
+                                </Anchors>
+                                <HighlightTexture file="Interface\Addons\XPerl\Images\XPerl_Highlight" alphaMode="ADD">
+                                        <TexCoords left="0.25" right="0.75" top="0" bottom="0.5"/>
+                                </HighlightTexture>
+                                <Scripts>
+                                        <OnLoad>
+                                                this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+                                                this:RegisterForDrag("LeftButton");
+                                        </OnLoad>
+                                        <OnDragStart>
+                                                if (XPerlLocked == 0) then
+                                                        this:GetParent():StartMoving();
+                                                end
+                                        </OnDragStart>
+                                        <OnDragStop>
+                                                this:GetParent():StopMovingOrSizing();
+                                        </OnDragStop>
+                                        <OnClick>
+                                                XPerl_Party_OnClick(arg1,0);
+                                        </OnClick>
+                                        <OnEnter>
+                                                XPerl_Party_PlayerTip();
+                                        </OnEnter>
+                                        <OnLeave>
+                                                XPerl_PlayerTipHide();
+                                        </OnLeave>
+                                </Scripts>
+                        </Button>
+
+                        <!-- Party Target Frame -->
+                        <Button name="$parent_TargetFrame" hidden="true" frameStrata="MEDIUM">
+				<Size>
+                                        <AbsDimension x="68" y="20"/>
+				</Size>
+				<Anchors>
+                                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="$parent_NameFrame">
+						<Offset>
+                                                        <AbsDimension x="-2" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                                <Backdrop bgFile="Interface\Addons\XPerl\Images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+                                                <AbsValue val="32"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="OVERLAY">
+                                                <!-- Combat Icon -->
+                                                <Texture name="$parent_TargetActivityStatus" file="Interface\CharacterFrame\UI-StateIcon" hidden="true">
+							<Size>
+                                                                <AbsDimension x="22" y="21"/>
+							</Size>
+							<Anchors>
+                                                                <Anchor point="RIGHT"/>
+							</Anchors>
+						</Texture>
+
+						<!-- PVP Icon -->
+                                                <Texture name="$parent_TargetPVPStatus" file="Interface\TargetingFrame\UI-PVP-FFA" hidden="true">
+							<Size>
+                                                                <AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+                                                                                <AbsDimension x="-3" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+
+                                                <FontString name="$parent_Target" inherits="GameFontNormalSmall" text="Error!" setAllPoints="true"/>
+					</Layer>
+				</Layers>
+                                <HighlightTexture file="Interface\Addons\XPerl\Images\XPerl_Highlight" alphaMode="ADD">
+                                        <TexCoords left="0" right="1" top="0.5" bottom="1"/>
+                                </HighlightTexture>
+                                <Scripts>
+                                        <OnLoad>
+                                                this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+                                        </OnLoad>
+                                        <OnClick>
+                                                XPerl_Party_OnClick(arg1,1);
+                                        </OnClick>
+                                        <OnEnter>
+                                                XPerl_Party_PlayerTip(true);
+                                        </OnEnter>
+                                        <OnLeave>
+                                                XPerl_PlayerTipHide();
+                                        </OnLeave>
+                                </Scripts>
+                        </Button>
+
+			<!-- Buffs Frame -->
+                        <Frame name="$parent_BuffFrame">
+				<Size>
+					<AbsDimension x="170" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_StatsFrame">
+						<Offset>
+                                                        <AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+
+        <!-- The Real Frames -->
+
+        <Frame name="XPerl_party1" inherits="XPerl_Party_FrameTemplate" parent="UIParent" toplevel="true" id="1" hidden="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-150"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+        <Frame name="XPerl_party2" inherits="XPerl_Party_FrameTemplate" parent="UIParent" toplevel="true" id="2" hidden="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-230"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+        <Frame name="XPerl_party3" inherits="XPerl_Party_FrameTemplate" parent="UIParent" toplevel="true" id="3" hidden="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-310"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+        <Frame name="XPerl_party4" inherits="XPerl_Party_FrameTemplate" parent="UIParent" toplevel="true" id="4" hidden="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-390"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+</Ui>

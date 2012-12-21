@@ -1,0 +1,428 @@
+<Ui	xmlns="http://www.blizzard.com/wow/ui/"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<script file="MetaMapBWP.lua" />
+<script file="MetaMapBWP.loc" />
+
+<Frame name="BWP_MainFrame" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="false" parent="UIParent">
+	<Size>
+		<AbsDimension x="40" y="40"/>
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			BWP_OnLoad();
+		</OnLoad>
+		<OnEvent>
+			BWP_OnEvent(event);
+		</OnEvent>
+		<OnUpdate>
+			if(not BWP_VarsLoaded) then
+				BWP_SetVars();
+			end
+			BWP_OnUpdate(arg1);
+		</OnUpdate>
+	</Scripts>
+</Frame>
+
+<Frame name="BWP_DisplayFrame" parent="BWP_MainFrame">
+	<Size>
+		<AbsDimension x="40" y="40"/>
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER">
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="BWP_Arrow" file="Interface\AddOns\MetaMapBWP\Artwork\Arrows\forward">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+		<Layer level="BACKGROUND">
+			<FontString name="BWPDestText" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo = "$parent" relativePoint = "BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString> 
+		</Layer>
+		<Layer level="BACKGROUND">
+			<FontString name="BWPDistanceText" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOP" relativeTo = "$parent" relativePoint = "TOP">
+						<Offset>
+							<AbsDimension x="0" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString> 
+		</Layer>
+	</Layers>
+	<Scripts>
+			<OnMouseDown>
+				if(arg1	== "RightButton")	then
+					this:GetParent():StartMoving();
+					this.isMoving	=	true;
+				elseif(arg1	== "LeftButton")	then
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if(this.isMoving and arg1	== "RightButton") then
+					this:GetParent():StopMovingOrSizing();
+					this.isMoving	=	false;
+				elseif(arg1	== "LeftButton")	then
+					MetaMapBWPMenu_Init();
+				end
+			</OnMouseUp>
+			<OnEnter>
+				GameTooltip_SetDefaultAnchor(GameTooltip, UIParent);
+				GameTooltip:SetText(BWP_BUTTON_TOOLTIP);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+	</Scripts>
+</Frame>
+
+<Frame name="BWP_MenuFrame" frameStrata="FULLSCREEN" toplevel="true" enableMouse="true" hidden="true" parent="UIParent">
+	<Size>
+		<AbsDimension x="191" y="50"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="BOTTOMLEFT" >
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentTexture" file="">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Frames>
+		<Frame name="$parent_DropDown" inherits="UIDropDownMenuTemplate" hidden="true" enablemouse ="false" >
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" >
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					BWP_SelectionDropDown_OnLoad();
+				</OnLoad>
+			</Scripts>
+		</Frame>
+	</Frames>
+</Frame>
+
+  <Frame name="BWP_MiniDropMenu" inherits="UIDropDownMenuTemplate" hidden = "true">
+	   <Anchors>
+		  <Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+			 <Offset>
+				<AbsDimension x="0" y="0"/>
+			 </Offset>
+		  </Anchor>
+	   </Anchors>
+	   <Scripts>
+		  <OnLoad>
+			 BWP_MiniDropMenu_OnLoad();
+		  </OnLoad>
+		  <OnShow>
+			 BWP_MiniDropMenu_OnLoad();
+		  </OnShow>
+	   </Scripts>
+	</Frame>
+
+	<Button	name="MetaMapBWPMenu_ButtonTemplate"	virtual="true">
+		<Size>
+			<AbsDimension	x="150"	y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight"	alphaMode="ADD"	setAllPoints="true"	hidden="true"/>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString	name="$parentText" inherits="GameFontGreen"	text="">
+					<Anchors>
+						<Anchor	point="LEFT">
+							<Offset>
+								<AbsDimension	x="-20"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentCheck" file="Interface\Buttons\UI-CheckBox-Check">
+					<Size>
+						<AbsDimension	x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="LEFT">
+							<Offset><AbsDimension	x="-25"	y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="$parentColorSwatch"	hidden="true">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT">
+						<Offset><AbsDimension	x="-6" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension	x="14" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="0"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						getglobal(this:GetName().."SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r,	NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(10);
+			</OnLoad>
+			<OnClick>
+				MetaMapBWPMenu_Select(this:GetID());
+			</OnClick>
+			<OnEnter>
+				getglobal(this:GetName().."Highlight"):Show();
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."Highlight"):Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalFont	name="$parentNormalText" justifyH="LEFT" inherits="GameFontNormalSmall"/>
+		<HighlightFont name="$parentHighlightText" justifyH="LEFT" inherits="GameFontHighlightSmall"/>
+		<DisabledFont	name="$parentDisabledText" justifyH="LEFT" inherits="GameFontDisableSmall"/>
+	</Button>
+
+	<Frame name="MetaMapBWPMenu"	toplevel="true"	frameStrata="FULLSCREEN" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension	x="200"	y="190"/>
+		</Size>
+		<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"	tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString	name="MetaMapBWPMenu_Title" inherits="GameFontGreen"	text="BWP_NAME">
+						<Anchors>
+							<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+								<Offset>
+									<AbsDimension	x="0"	y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		<Frames>
+			<Button	name="MetaMapBWPMenu_Option1" inherits="MetaMapBWPMenu_ButtonTemplate" id="1">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension	x="40" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option2" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="2">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option3" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="3">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option4" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="4">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option5" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="5">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option6" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="6">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option7" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="7">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option8" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="8">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option9" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="9">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option10" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="10">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapBWPMenu_Option11" hidden="true" inherits="MetaMapBWPMenu_ButtonTemplate" id="11">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapBWPMenu_Option10" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Frame name="$parentSliderMenu">
+				<Size>
+					<AbsDimension	x="200"	y="100"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOP"	relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension	x="0"	y="15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"	tile="true">
+					<BackgroundInsets>
+						<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue	val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue	val="32"/>
+					</EdgeSize>
+				</Backdrop>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString	name="BWP_SetDistText" inherits="GameFontGreenSmall">
+						<Anchors>
+							<Anchor	point="TOP">
+								<Offset>
+									<AbsDimension	x="0"	y="-38"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+				<Frames>
+					<Slider	name="BWP_DistanceSlider"	inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension	x="170"	y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+								<Offset>
+									<AbsDimension	x="0"	y="-25"	/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText("Distance for Arrived Message");
+								getglobal(this:GetName().."Low"):SetText("1");
+								getglobal(this:GetName().."High"):SetText("40");
+								this:SetMinMaxValues(0.0005, 0.01);
+								this:SetValueStep(0.0002);
+							</OnLoad>
+							<OnValueChanged>
+								MetaMapBWP_UpdateDistance();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Slider	name="BWP_AlphaSlider"	inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension	x="170"	y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+								<Offset>
+									<AbsDimension	x="0"	y="-65"	/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("Set Waypoint Alpha");
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0.0,1.0);
+						this:SetValueStep(0.01);
+					</OnLoad>
+					<OnValueChanged>
+						MetaMapBWP_UpdateAlpha();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				UIPanelWindows['MetaMapBWPMenu']	=	{area	=	'center',	pushable = 0};
+			</OnLoad>
+			<OnUpdate>
+				MetaMapBWPMenu_OnUpdate();
+			</OnUpdate>
+		</Scripts>		
+	</Frame>
+</Ui>

@@ -1,0 +1,1650 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Program%20Files\World%20of%20Warcraft\UI.xsd">
+
+<Script file="localization.lua"/>
+<Script file="RecapOptions.lua"/>
+<Script file="Recap.lua"/>
+<Script file="RecapPanel.lua"/>
+
+	<FontString name="RecapResetFont" font="Fonts\ARIALN.TTF" virtual="true">
+		<FontHeight>
+			<AbsValue val="12"/>
+		</FontHeight>
+		<Color r="1.0" g="1.0" b="1.0"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="1" y="-1"/>
+			</Offset>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</FontString>
+
+	<Button name = "RecapButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Scripts>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
+		<HighlightTexture file="Interface\AddOns\Recap\Status-Idle" alphaMode="ADD"/>
+	</Button>
+
+	<Button name = "RecapMenuTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="14"/>
+		</Size>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture name="$parent_Check" file="Interface\Buttons\UI-CheckBox-Check">
+					<Size>
+						<AbsDimension x="14" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left=".1" right=".9" top=".1" bottom=".9"/>
+				</Texture>
+				<FontString name="$parent_Text" inherits="GameFontHighlightSmall" wraponspaces="false" justifyH="LEFT" text=" ">
+					<Size>
+						<AbsDimension x="86" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Check" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				RecapMenu_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				RecapMenu_OnClick()
+			</OnClick>
+		</Scripts>
+	</Button>		
+
+	<Button name = "RecapHeaderTemplate" virtual="true">
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="8" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+		<Scripts>
+			<OnEnter>
+				RecapHeader_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnMouseUp>
+				RecapHeader_OnMouseUp(arg1)
+			</OnMouseUp>
+			<OnClick>
+				RecapHeader_OnClick()
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name = "RecapEffectsHeaderTemplate" virtual="true">
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="8" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+		<Scripts>
+			<OnEnter>
+				RecapEffectsHeader_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnMouseUp>
+				RecapEffectsHeader_OnMouseUp(arg1)
+			</OnMouseUp>
+			<OnClick>
+				RecapEffectsHeader_OnClick()
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name = "RecapEffectsTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="14" />
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parent_EName" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" text="Spell or Ability">
+					<Size>
+						<AbsDimension x="124" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_ETotal" inherits="GameFontNormalSmall" justifyH="RIGHT" text="0000">
+					<Size>
+						<AbsDimension x="55" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_EName" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_ETotalP" inherits="GameFontNormalSmall" justifyH="RIGHT" text="100%">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ETotal" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_EMaxAll" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ETotalP" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".85" g=".85" b=".85"/>
+				</FontString>
+				<FontString name="$parent_EHits" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_EMaxAll" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b="1"/>
+				</FontString>
+				<FontString name="$parent_EHitsAvg" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_EHits" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b="1"/>
+				</FontString>
+				<FontString name="$parent_EHitsMax" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_EHitsAvg" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b="1"/>
+				</FontString>
+				<FontString name="$parent_ETicks" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_EHitsMax" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_ETicksAvg" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ETicks" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_ETicksMax" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ETicksAvg" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_ECrits" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ETicksMax" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_ECritsAvg" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ECrits" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_ECritsMax" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ECritsAvg" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_ECritsP" inherits="GameFontNormalSmall" justifyH="RIGHT" text="100%">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ECritsMax" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r=".65" g="1" b=".65"/>
+				</FontString>
+				<FontString name="$parent_EMiss" inherits="GameFontNormalSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_ECritsP" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="1" g=".65" b="1"/>
+				</FontString>
+				<FontString name="$parent_EMissP" inherits="GameFontNormalSmall" justifyH="RIGHT" text="100%">
+					<Size>
+						<AbsDimension x="35" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_EMiss" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="1" g=".65" b="1"/>
+				</FontString>
+
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Scripts>
+			<OnClick>
+				RecapSelf_OnClick()
+			</OnClick>
+			<OnMouseDown>
+				Recap_OnMouseDown(arg1)
+			</OnMouseDown>
+			<OnMouseUp>
+				RecapSelf_OnMouseUp(arg1)
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+
+	<Button name = "RecapTotalsTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="14" />
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parent_Ranks" inherits="GameFontNormalSmall" justifyH="RIGHT" text=" ">
+					<Size>
+						<AbsDimension x="20" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+				<Texture name="$parent_Faction">
+					<Size>
+						<AbsDimension x="14" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Ranks" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left=".1" right="0.55" top=".07" bottom="0.55"/>
+				</Texture>
+				<Texture name="$parent_Class" file="Interface\AddOns\Recap\Recap-Classes">
+					<Size>
+						<AbsDimension x="12" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Faction" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left=".8" right="1" top=".8" bottom="1"/>
+				</Texture>
+				<FontString name="$parent_Name" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" text=" ">
+					<Size>
+						<AbsDimension x="118" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Class" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="3" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_Kills" inherits="GameFontNormalSmall" justifyH="RIGHT" text="Kills">
+					<Size>
+						<AbsDimension x="30" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Name" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_Time" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="Time">
+					<Size>
+						<AbsDimension x="45" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Kills" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_Heal" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="Heals">
+					<Size>
+						<AbsDimension x="55" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Time" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_HealP" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="">
+					<Size>
+						<AbsDimension x="20" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Heal" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_Over" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="">
+					<Size>
+						<AbsDimension x="20" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_HealP" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_DmgIn" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="In">
+					<Size>
+						<AbsDimension x="55" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Over" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_DmgInP" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="">
+					<Size>
+						<AbsDimension x="20" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_DmgIn" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_DmgOut" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="Out">
+					<Size>
+						<AbsDimension x="55" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_DmgInP" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_DmgOutP" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="">
+					<Size>
+						<AbsDimension x="20" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_DmgOut" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_MaxHit" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="9999">
+					<Size>
+						<AbsDimension x="40" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_DmgOutP" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Color r="0.85" g="0.85" b="0.85"/>
+				</FontString>
+				<FontString name="$parent_DPS" inherits="GameFontNormal" justifyH="RIGHT" text="DPS">
+					<Size>
+						<AbsDimension x="45" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_MaxHit" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_DPSvsAll" inherits="GameFontNormal" justifyH="RIGHT" text="DPS">
+					<Size>
+						<AbsDimension x="45" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_DPS" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Level" inherits="GameFontHighlightSmall" wraponspaces="false" justifyH="CENTER" text=" ">
+					<Size>
+						<AbsDimension x="16" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Faction" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-1" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r=".9" g=".9" b=".9"/>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parent_Gauge" file="Interface\TargetingFrame\UI-StatusBar" hidden="true">
+					<Size>
+						<AbsDimension x="116" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent_Name" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left=".8" right="1" top=".8" bottom="1"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLeave>
+				GameTooltip:Hide()
+				RecapPanel_Hide()
+			</OnLeave>
+			<OnMouseDown>
+				Recap_OnMouseDown(arg1)
+			</OnMouseDown>
+			<OnMouseUp>
+				Recap_OnMouseUp(arg1)
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+
+	<Button name="RecapListTemplate" inherits="RecapTotalsTemplate" virtual="true">
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+			</OnLoad>
+			<OnEnter>
+				Recap_List_OnEnter()
+			</OnEnter>
+			<OnClick>
+				Recap_List_OnClick(arg1)
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="RecapFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="200" y="240"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="RecapBackDrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level = "ARTWORK">
+
+				<Texture name="RecapTopBar" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+					<Size>
+						<AbsDimension x="128" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+
+				<Texture name="RecapBottomBar" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+					<Size>
+						<AbsDimension x="128" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="8" y="24"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture name="RecapTitleBack" file="Interface\AddOns\Recap\Recap-TitleBack">
+					<Size>
+						<AbsDimension x="200" y="23"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-5"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT" relativeTo="RecapFrame" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="-24"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="RecapTotals_DPSIn" inherits="GameFontNormal" wraponspaces="false" justifyH="RIGHT" text="000.0">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="90" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+
+			<Button name="RecapMinStatus">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="6" y="-6" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level = "BACKGROUND">
+						<Texture name="RecapStatusTexture" file="Interface\AddOns\Recap\Recap-Status"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Status")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnMouseDown>
+						Recap_OnMouseDown(arg1)
+					</OnMouseDown>
+					<OnMouseUp>
+						Recap_OnMouseUp(arg1)
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Button name = "RecapMinView">
+				<Size>
+					<AbsDimension x="35" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapMinStatus" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level = "BACKGROUND">
+						<FontString name="RecapTitle" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" text="RECAP_RECAP"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnMouseDown>
+						Recap_OnMouseDown(arg1)
+					</OnMouseDown>
+					<OnMouseUp>
+						Recap_OnMouseUp(arg1)
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Button name = "RecapMinYourDPS" hidden="true">
+				<Size>
+					<AbsDimension x="45" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapMinView" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level = "BACKGROUND">
+						<FontString name="RecapMinYourDPS_Text" inherits="GameFontNormal" wraponspaces="false" justifyH="CENTER" text="0.0">
+							<Color r="1" g="1" b="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("TooltipMinYourDPS")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnMouseDown>
+						Recap_OnMouseDown(arg1)
+					</OnMouseDown>
+					<OnMouseUp>
+						Recap_OnMouseUp(arg1)
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Button name = "RecapMinDPSIn" hidden="true">
+				<Size>
+					<AbsDimension x="45" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapMinYourDPS" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level = "BACKGROUND">
+						<FontString name="RecapMinDPSIn_Text" inherits="GameFontNormal" wraponspaces="false" justifyH="CENTER" text="0.0"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("TooltipMinDPSIn")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnMouseDown>
+						Recap_OnMouseDown(arg1)
+					</OnMouseDown>
+					<OnMouseUp>
+						Recap_OnMouseUp(arg1)
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Button name = "RecapMinDPSOut" hidden="true">
+				<Size>
+					<AbsDimension x="45" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapMinDPSIn" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level = "BACKGROUND">
+						<FontString name="RecapMinDPSOut_Text" inherits="GameFontNormal" wraponspaces="false" justifyH="CENTER" text="0.0"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("TooltipMinDPSOut")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnMouseDown>
+						Recap_OnMouseDown(arg1)
+					</OnMouseDown>
+					<OnMouseUp>
+						Recap_OnMouseUp(arg1)
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+
+			<Button name="RecapMinimizeButton" inherits="RecapButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Minimize")
+					</OnEnter>
+					<OnClick>
+						Recap_OnClick("Minimize")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0.25" right="0.495" top="0" bottom="0.245"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0.25" right="0.495" top="0" bottom="0.245"/>
+				</PushedTexture>
+			</Button>
+			<Button name="RecapCloseButton" inherits="RecapButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapMinimizeButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Close")
+					</OnEnter>
+					<OnClick>
+						Recap_OnClick("Close")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0" right="0.245" top="0" bottom="0.245"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0" right="0.245" top="0" bottom="0.245"/>
+				</PushedTexture>
+			</Button>
+			<Button name="RecapPinButton" inherits="RecapButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapCloseButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Pin")
+					</OnEnter>
+					<OnClick>
+						Recap_OnClick("Pin")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0.5" right="0.745" top="0.25" bottom="0.495"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0.5" right="0.745" top="0.25" bottom="0.495"/>
+				</PushedTexture>
+			</Button>
+			<Button name="RecapPauseButton" inherits="RecapButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapPinButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Pause")
+					</OnEnter>
+					<OnClick>
+						Recap_OnClick("Pause")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0.75" right="0.995" top="0" bottom="0.245"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0.75" right="0.995" top="0" bottom="0.245"/>
+				</PushedTexture>
+			</Button>
+			<Button name="RecapOptionsButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapPauseButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Options")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						Recap_OnClick("Options")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0.5" right="0.745" top="0" bottom="0.245"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0.5" right="0.745" top="0" bottom="0.245"/>
+				</PushedTexture>
+				<HighlightTexture file="Interface\AddOns\Recap\Status-Idle" alphaMode="ADD"/>
+			</Button>
+			<Button name="RecapShowAllButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapOptionsButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("ShowAll")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						Recap_OnClick("ShowAll")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0.25" right="0.495" top="0.25" bottom="0.495"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0.25" right="0.495" top="0.25" bottom="0.495"/>
+				</PushedTexture>
+				<HighlightTexture file="Interface\AddOns\Recap\Status-Idle" alphaMode="ADD"/>
+			</Button>
+			<Button name="RecapSelfViewButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapShowAllButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("SelfView")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						Recap_OnClick("SelfView")
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\Recap\RecapButtons-Up">
+					<TexCoords left="0" right="0.245" top="0.25" bottom="0.495"/>
+				</NormalTexture>
+				<PushedTexture file="Interface\AddOns\Recap\RecapButtons-Down">
+					<TexCoords left="0" right="0.245" top="0.25" bottom="0.495"/>
+				</PushedTexture>
+				<HighlightTexture file="Interface\AddOns\Recap\Status-Idle" alphaMode="ADD"/>
+			</Button>
+
+			<Button name="RecapResetButton" text="RECAP_RESET">
+				<Size>
+					<AbsDimension x="38" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="5" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_OnTooltip("Reset")
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						Recap_OnClick("Reset")
+					</OnClick>
+				</Scripts>
+				<NormalText inherits="GameFontNormalSmall"/>
+				<DisabledText inherits="GameFontHighlightSmall"/>
+				<HighlightText inherits="GameFontHighlightSmall"/>
+				<NormalTexture inherits="UIPanelButtonUpTexture"/>
+				<PushedTexture inherits="UIPanelButtonDownTexture"/>
+				<DisabledTexture inherits="UIPanelButtonDisabledTexture"/>
+				<HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
+			</Button>
+
+			<Button name = "RecapSelf1" inherits="RecapEffectsTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf2" inherits="RecapEffectsTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf3" inherits="RecapEffectsTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf4" inherits="RecapEffectsTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf5" inherits="RecapEffectsTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf6" inherits="RecapEffectsTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf7" inherits="RecapEffectsTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf8" inherits="RecapEffectsTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf9" inherits="RecapEffectsTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf10" inherits="RecapEffectsTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf11" inherits="RecapEffectsTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf10" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf12" inherits="RecapEffectsTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf11" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf13" inherits="RecapEffectsTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf12" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf14" inherits="RecapEffectsTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf13" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapSelf15" inherits="RecapEffectsTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapSelf14" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+
+			<Button name = "RecapList1" inherits="RecapListTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList2" inherits="RecapListTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList3" inherits="RecapListTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList4" inherits="RecapListTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList5" inherits="RecapListTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList6" inherits="RecapListTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList7" inherits="RecapListTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList8" inherits="RecapListTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList9" inherits="RecapListTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList10" inherits="RecapListTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList11" inherits="RecapListTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList10" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList12" inherits="RecapListTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList11" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList13" inherits="RecapListTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList12" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList14" inherits="RecapListTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList13" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapList15" inherits="RecapListTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapList14" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+
+			<Button name = "RecapTotals" inherits="RecapTotalsTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="44" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						Recap_Totals_OnEnter()
+					</OnEnter>
+				</Scripts>
+			</Button>
+
+			<Button name = "RecapHeader_Ranks">
+				<Size>
+					<AbsDimension x="20" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-27"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name = "RecapHeader_Faction">
+				<Size>
+					<AbsDimension x="14" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Ranks" relativePoint="TOPRIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapHeader_Class">
+				<Size>
+					<AbsDimension x="14" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Faction" relativePoint="TOPRIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name = "RecapHeader_Name" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="118" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Class" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontNormal" justifyH="LEFT" text="RECAP_COMBATANTS"/>
+			</Button>
+			<Button name = "RecapHeader_Kills" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Name" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_DIED"/>
+			</Button>
+			<Button name = "RecapHeader_Time" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="45" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Kills" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_TIME"/>
+			</Button>
+			<Button name = "RecapHeader_Heal" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="55" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Time" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_HEAL"/>
+			</Button>
+			<Button name = "RecapHeader_HealP" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="20" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Heal" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="%"/>
+			</Button>
+			<Button name = "RecapHeader_Over" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="20" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_HealP" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="%>"/>
+			</Button>
+			<Button name = "RecapHeader_DmgIn" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="55" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_Over" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_IN"/>
+			</Button>
+			<Button name = "RecapHeader_DmgInP" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="20" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_DmgIn" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="%"/>
+			</Button>
+			<Button name = "RecapHeader_DmgOut" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="55" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_DmgInP" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_OUT"/>
+			</Button>
+			<Button name = "RecapHeader_DmgOutP" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="20" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_DmgOut" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="%"/>
+			</Button>
+			<Button name = "RecapHeader_MaxHit" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="40" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_DmgOutP" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_MAX"/>
+			</Button>
+			<Button name = "RecapHeader_DPS" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="45" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_MaxHit" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontNormal" justifyH="RIGHT" text="RECAP_DPS"/>
+			</Button>
+			<Button name = "RecapHeader_DPSvsAll" inherits="RecapHeaderTemplate">
+				<Size>
+					<AbsDimension x="45" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_DPS" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormal" justifyH="RIGHT" text="RECAP_DPS_ALL"/>
+			</Button>
+
+
+			<Button name = "RecapHeader_EName" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="124" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-27"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontNormal" justifyH="LEFT" text="RECAP_SPELL_OR_ABILITY"/>
+			</Button>
+			<Button name = "RecapHeader_ETotal" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_EName" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_SELF_ETOTAL"/>
+			</Button>
+			<Button name = "RecapHeader_ETotalP" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ETotal" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="%"/>
+			</Button>
+			<Button name = "RecapHeader_EMaxAll" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ETotalP" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_MAX"/>
+			</Button>
+			<Button name = "RecapHeader_EHits" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_EMaxAll" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_HITS"/>
+			</Button>
+			<Button name = "RecapHeader_EHitsAvg" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_EHits" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_AVG"/>
+			</Button>
+			<Button name = "RecapHeader_EHitsMax" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_EHitsAvg" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_MAX"/>
+			</Button>
+			<Button name = "RecapHeader_ETicks" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_EHitsMax" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_TICKS"/>
+			</Button>
+			<Button name = "RecapHeader_ETicksAvg" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ETicks" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_AVG"/>
+			</Button>
+			<Button name = "RecapHeader_ETicksMax" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ETicksAvg" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_MAX"/>
+			</Button>
+			<Button name = "RecapHeader_ECrits" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ETicksMax" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_CRITS"/>
+			</Button>
+			<Button name = "RecapHeader_ECritsAvg" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ECrits" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_AVG"/>
+			</Button>
+			<Button name = "RecapHeader_ECritsMax" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ECritsAvg" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_MAX"/>
+			</Button>
+			<Button name = "RecapHeader_ECritsP" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ECritsMax" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_SELF_ECRITSP"/>
+			</Button>
+			<Button name = "RecapHeader_EMiss" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_ECritsP" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_MISS"/>
+			</Button>
+			<Button name = "RecapHeader_EMissP" inherits="RecapEffectsHeaderTemplate">
+				<Size>
+					<AbsDimension x="30" y="14" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapHeader_EMiss" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<NormalText inherits="GameFontNormalSmall" justifyH="RIGHT" text="RECAP_SELF_EMISSP"/>
+			</Button>
+
+			<ScrollFrame name="RecapScrollBar" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="31" y="149"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="RecapFrame">
+						<Offset>
+							<AbsDimension x="-35" y="-32"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+<!--				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="149"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+									<Offset>
+										<AbsDimension x="0" y="7"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+									<Offset>
+										<AbsDimension x="0" y="-3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top=".122" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers> -->
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(10, RecapScrollBar_Update)
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				RecapTopBar:SetVertexColor(.65,.65,.65,1)
+				RecapBottomBar:SetVertexColor(.65,.65,.65,1)
+				Recap_OnLoad()
+			</OnLoad>
+			<OnEvent>
+				Recap_OnEvent()
+			</OnEvent>
+			<OnUpdate>
+				Recap_OnUpdate(arg1)
+			</OnUpdate>
+			<OnMouseDown>
+				Recap_OnMouseDown(arg1)
+			</OnMouseDown>
+			<OnMouseUp>
+				Recap_OnMouseUp(arg1)
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="RecapIdleFrame" toplevel="false" enableMouse="false" movable="false" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="1" y="1"/>
+		</Size>
+		<Scripts>
+			<OnUpdate>
+				Recap_Idle_OnUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+	</Frame>			
+
+	<Frame name="RecapMenu" frameStrata="DIALOG" toplevel="true" enableMouse="true" movable="false" parent="RecapFrame" hidden="true">
+		<Size>
+			<AbsDimension x="108" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Frames>
+			<Frame name="RecapDropSubFrame">
+				<Size>
+					<AbsDimension x="108" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="RecapMenu" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop name="RecapMenuBackdrop" bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="4" right="4" top="4" bottom="4" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16" />
+					</EdgeSize>
+				</Backdrop>
+				<Frames>
+					<Button name="RecapMenu1" inherits="RecapMenuTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="6" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu2" inherits="RecapMenuTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu1" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu3" inherits="RecapMenuTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu2" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu4" inherits="RecapMenuTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu3" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu5" inherits="RecapMenuTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu4" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu6" inherits="RecapMenuTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu5" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu7" inherits="RecapMenuTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu6" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu8" inherits="RecapMenuTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu7" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu9" inherits="RecapMenuTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu8" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu10" inherits="RecapMenuTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu9" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu11" inherits="RecapMenuTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu10" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu12" inherits="RecapMenuTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu11" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu13" inherits="RecapMenuTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu12" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu14" inherits="RecapMenuTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu13" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu15" inherits="RecapMenuTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu14" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="RecapMenu16" inherits="RecapMenuTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="RecapMenu15" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(0,0,0)
+						this:SetBackdropBorderColor(.5,.5,.5,1)
+					</OnLoad>
+					<OnUpdate>
+						RecapMenu_OnUpdate(arg1)
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnMouseDown>
+				RecapMenu:Hide()
+			</OnMouseDown>
+		</Scripts>
+	</Frame>
+
+	<!-- receives combat events so they can be turned on/off completely -->
+	<Frame name="RecapCombatEvents" parent="RecapFrame" hidden="true">
+		<Scripts>
+			<OnEvent>
+				Recap_Combat_OnEvent()
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+</Ui>
+

@@ -1,0 +1,554 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Perl_CombatDisplay.lua"/>
+
+
+	<Frame name="Perl_CombatDisplay_Frame" movable="true" parent="UIParent" enableMouse="true">
+		<Size>
+			<AbsDimension x="211" y="40"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="BOTTOM">
+				<Offset>
+					<AbsDimension x="0" y="300"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<!-- Script Events -->
+		<Scripts>
+			<OnLoad>
+				Perl_CombatDisplay_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				Perl_CombatDisplay_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+
+		<Frames>
+			<!-- Frame for the drop down menu. -->
+			<Frame name="Perl_CombatDisplay_DropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						Perl_CombatDisplayDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+
+			<!-- Frame to display Mana/Energy/Rage/CPs. -->
+			<Frame name="Perl_CombatDisplay_ManaFrame">
+				<Size>
+					<AbsDimension x="220" y="42"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\AddOns\Perl_Config\Perl_Black" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+					<Button name="Perl_CombatDisplay_ManaFrame_CastClickOverlay">
+						<Size>
+							<AbsDimension x="220" y="42"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnClick>
+								Perl_CombatDisplay_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_CombatDisplay_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_CombatDisplay_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+
+					<!-- Health Bar -->
+					<StatusBar name="Perl_CombatDisplay_HealthBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_HealthBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0.8" b="0"/>
+						<Layers>
+							<!-- Health Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_HealthBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_HealthBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0.8" b="0" a="0.25"/>
+					</StatusBar>
+
+					<!-- Mana Bar -->
+					<StatusBar name="Perl_CombatDisplay_ManaBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_CombatDisplay_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_ManaBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="1" b="0"/>
+						<Layers>
+							<!-- Mana Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_ManaBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_ManaBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="1" b="0" a="0.25"/>
+					</StatusBar>
+
+					<!-- Druid Mana Bar -->
+					<StatusBar name="Perl_CombatDisplay_DruidBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_CombatDisplay_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_DruidBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0" b="1"/>
+						<Layers>
+							<!-- Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_DruidBarText" inherits="GameFontNormalSmall" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1" g="1" b="1"/>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_DruidBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_DruidBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0" b="1" a="0.25"/>
+					</StatusBar>
+
+					<!-- Bar for CPs -->
+					<StatusBar name="Perl_CombatDisplay_CPBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_CombatDisplay_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_CPBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="1" g="0" b="0"/>
+						<Layers>
+							<!-- Combo Point Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_CPBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_CPBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_CPBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="1" g="0" b="0" a="0.25"/>
+					</StatusBar>
+
+					<!-- Pet Health Bar -->
+					<StatusBar name="Perl_CombatDisplay_PetHealthBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_CombatDisplay_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_PetHealthBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0.8" b="0"/>
+						<Layers>
+							<!-- Health Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_PetHealthBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_PetHealthBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_PetHealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0.8" b="0" a="0.25"/>
+					</StatusBar>
+
+					<!-- Pet Mana Bar -->
+					<StatusBar name="Perl_CombatDisplay_PetManaBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_CombatDisplay_PetHealthBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_PetManaBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="1" b="0"/>
+						<Layers>
+							<!-- Mana Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_PetManaBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_PetManaBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_PetManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="1" b="0" a="0.25"/>
+					</StatusBar>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+
+
+	<Frame name="Perl_CombatDisplay_Target_Frame" movable="true" parent="UIParent" enableMouse="true">
+		<Size>
+			<AbsDimension x="211" y="40"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="Perl_CombatDisplay_Frame">
+				<Offset>
+					<AbsDimension x="0" y="5"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<!-- Script Events -->
+		<Scripts>
+			<OnLoad>
+				Perl_CombatDisplay_Target_OnLoad();
+			</OnLoad>
+		</Scripts>
+
+		<Frames>
+			<!-- Frame for the drop down menu. -->
+			<Frame name="Perl_CombatDisplay_Target_DropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						Perl_CombatDisplayTargetDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Frame to display Mana/Energy/Rage/CPs. -->
+			<Frame name="Perl_CombatDisplay_Target_ManaFrame">
+				<Size>
+					<AbsDimension x="220" y="42"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\AddOns\Perl_Config\Perl_Black" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+					<Button name="Perl_CombatDisplay_Target_ManaFrame_CastClickOverlay">
+						<Size>
+							<AbsDimension x="220" y="42"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnClick>
+								Perl_CombatDisplay_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_CombatDisplay_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_CombatDisplay_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+
+					<!-- Health Bar -->
+					<StatusBar name="Perl_CombatDisplay_Target_HealthBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_Target_HealthBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0.8" b="0"/>
+						<Layers>
+							<!-- Health Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_Target_HealthBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_Target_HealthBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0.8" b="0" a="0.25"/>
+					</StatusBar>
+
+					<!-- Mana Bar -->
+					<StatusBar name="Perl_CombatDisplay_Target_ManaBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-22"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_CombatDisplay_Target_ManaBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="1" b="0"/>
+						<Layers>
+							<!-- Mana Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_CombatDisplay_Target_ManaBarText" inherits="GameFontNormal" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_CombatDisplay_Target_ManaBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="200" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_CombatDisplay_Target_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="1" b="0" a="0.25"/>
+					</StatusBar>
+				</Frames>
+			</Frame>
+		</Frames>
+
+	</Frame>
+</Ui>

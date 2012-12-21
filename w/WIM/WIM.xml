@@ -1,0 +1,586 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<Script file="localization.lua"/>
+	<Script file="localization.cn.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="localization.kr.lua"/>
+	<Script file="localization.tw.lua"/>
+	<Script file="WIM_ChangeLog.lua"/>
+	<Script file="WIM.lua"/> 
+	<Script file="WIM_Hooks.lua"/> 
+
+
+
+	<Frame name="WIM_Core"> 
+		<Scripts> 
+			<OnLoad> 
+				this:RegisterEvent("VARIABLES_LOADED");
+				this:RegisterEvent("CHAT_MSG_AFK");
+				this:RegisterEvent("CHAT_MSG_DND");
+				this:RegisterEvent("CHAT_MSG_WHISPER");
+				this:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
+				this:RegisterEvent("CHAT_MSG_SYSTEM");
+				this:RegisterEvent("TRADE_SKILL_SHOW");
+				this:RegisterEvent("CRAFT_SHOW");
+				this:RegisterEvent("GUILD_ROSTER_UPDATE");
+				this:RegisterEvent("FRIENDLIST_SHOW");
+				this:RegisterEvent("FRIENDLIST_UPDATE");
+				WIM_OnLoad();
+				WIM_SetUpHooks();
+			</OnLoad> 
+			<OnEvent> 
+				WIM_Incoming(event);
+			</OnEvent> 
+		</Scripts> 
+	</Frame> 
+
+	<CheckButton name="WIM_ShortcutButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="28" y="28"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon"/>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
+			<Size>
+				<AbsDimension x="48" y="48"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp");
+			</OnLoad>
+			<OnClick>
+				this:SetChecked("0");
+				WIM_ShorcutButton_Clicked();
+			</OnClick>
+			<OnEnter>
+				if(WIM_Data.showToolTips == true) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltip);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+
+	<Frame name="WIM_msgFrameTemplate" virtual="true" movable="true" enableMouse="true" toplevel="true" frameStrata="DIALOG" parent="UIParent" hidden="true"  clampedToScreen="true">
+		<Size>
+			<AbsDimension x="384" y="256"/> 
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="25" y="-125"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\AddOns\WIM\Images\WIM_UI_BG" edgeFile="Interface\AddOns\WIM\Images\WIM_UI" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="64" right="64" top="64" bottom="64" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="8" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="64" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentClassIcon" file="Interface\AddOns\WIM\Images\classBLANK">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-10" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentFrom" inherits="GameFontNormalLarge" text="abcdefghijklmnopqrstuvwxyz">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="50" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCharacterDetails" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentExitButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="4" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						if(IsShiftKeyDown()) then
+							WIM_CloseConvo(this:GetParent().theUser);
+						else
+							this:GetParent():Hide();
+						end
+					</OnClick>
+					<OnEnter>
+						if(WIM_Data.showToolTips == true) then
+							GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+							GameTooltip:SetText("Shift &amp; Left-Click to end conversation.");
+							GameTooltip:SetPoint("BOTTOMRIGHT", this, "TOPRIGHT", 0, 0);
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentHistoryButton" hidden="true">
+				<Size>
+					<AbsDimension x="19" y="19"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentExitButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-GuildButton-PublicNote-Up"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						WIM_HistoryView_Name_Selected = this:GetParent().theUser;
+						WIM_HistoryView_Filter_Selected = "";
+						if(WIM_HistoryFrame:IsVisible()) then
+							WIM_HistoryViewNameScrollBar_Update();
+							WIM_HistoryViewFiltersScrollBar_Update();
+						else
+							WIM_HistoryFrame:Show();
+						end
+					</OnClick>
+					<OnEnter>
+						if(WIM_Data.showToolTips == true) then
+							GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+							GameTooltip:SetText("Click to view message history.");
+							GameTooltip:SetPoint("BOTTOMRIGHT", this, "TOPRIGHT", 0, 0);
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			
+			<Button name="$parentScrollUp">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="-39"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						if( IsShiftKeyDown() ) then
+							getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):PageUp();
+						else
+							getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):ScrollUp();
+						end
+						WIM_UpdateScrollBars(getglobal(this:GetParent():GetName().."ScrollingMessageFrame"));
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentScrollDown">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						if( IsShiftKeyDown() ) then
+							getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):PageDown();
+						else
+							getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):ScrollDown();
+						end
+						WIM_UpdateScrollBars(getglobal(this:GetParent():GetName().."ScrollingMessageFrame"));
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<ScrollingMessageFrame name="$parentScrollingMessageFrame" enableMouse="true" fade="false" maxLines="128" movable="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-46" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-32" y="39" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<TextInsets>
+					<AbsInset left="0" right="10" top="0" bottom="0" />
+				</TextInsets>
+				<Scripts>
+					<OnMouseWheel>
+						if(arg1 > 0) then
+							if( IsShiftKeyDown() ) then
+								this:PageUp();
+							else
+								this:ScrollUp();
+							end
+						else
+							if( IsShiftKeyDown() ) then
+								this:PageDown();
+							else
+								this:ScrollDown();
+							end
+						end
+					</OnMouseWheel>
+					<OnHyperlinkClick>
+						ChatFrame_OnHyperlinkShow(arg1, arg2, arg3);
+					</OnHyperlinkClick>
+					<OnMessageScrollChanged>
+						WIM_UpdateScrollBars(this);
+					</OnMessageScrollChanged>
+					<OnMouseDown>
+						this:GetParent():StartMoving();
+						this:GetParent().isMoving = true;
+						this:GetParent().prevLeft = this:GetParent():GetLeft();
+						this:GetParent().prevTop = this:GetParent():GetTop();
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+						this:GetParent().isMoving = false;
+						if(this:GetParent().prevLeft == this:GetParent():GetLeft() and this:GetParent().prevTop == this:GetParent():GetTop()) then
+							--[ Frame was clicked not dragged
+							if(WIM_EditBoxInFocus == nil) then
+								getglobal(this:GetParent():GetName().."MsgBox"):SetFocus();
+							else
+								if(WIM_EditBoxInFocus:GetName() == this:GetParent():GetName().."MsgBox") then
+									getglobal(this:GetParent():GetName().."MsgBox"):Hide();
+									getglobal(this:GetParent():GetName().."MsgBox"):Show();
+								else
+									getglobal(this:GetParent():GetName().."MsgBox"):SetFocus();
+								end
+							end
+						end
+					</OnMouseUp>
+				</Scripts>
+			</ScrollingMessageFrame>
+			<EditBox name="$parentMsgBox" enableMouse="true" ignoreArrows="true" frameStrata="DIALOG" toplevel="true" historyLines="32" letters="255" autoFocus="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentScrollingMessageFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="-5" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<FontString font="Fonts\ARIALN.TTF">
+					<FontHeight>
+						<AbsValue val="14" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<Scripts>
+					<OnEnterPressed>
+						local _, tParent = this:GetParent();
+						SendChatMessage(this:GetText(), "WHISPER", nil, this:GetParent().theUser);
+						
+						this:AddHistoryLine(this:GetText());
+						this:SetText("");
+						if(not WIM_Data.keepFocus) then
+							this:Hide();
+							this:Show();
+						end
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:SetText("");
+						this:Hide();
+						this:Show();
+					</OnEscapePressed>
+					<OnTabPressed>
+						--cycle through windows
+					</OnTabPressed>
+					<OnEditFocusGained>
+						WIM_EditBoxInFocus = this;
+					</OnEditFocusGained>
+					<OnEditFocusLost>
+						WIM_EditBoxInFocus = nil;
+					</OnEditFocusLost>
+				</Scripts>
+			</EditBox>
+			
+			<Frame name="$parentShortcutFrame">
+				<Size>
+					<AbsDimension x="100" y="100" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentScrollUp" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="$parentButton1" inherits="WIM_ShortcutButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parentButton2" inherits="WIM_ShortcutButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parentButton3" inherits="WIM_ShortcutButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parentButton4" inherits="WIM_ShortcutButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parentButton5" inherits="WIM_ShortcutButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Frame name="$parentIgnoreConfirm" hidden="true" frameStrata="DIALOG">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentScrollingMessageFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-8" y="2" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parentScrollingMessageFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="GameFontNormalLarge" text="Are you sure you want to ignore this user?">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="30"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="8" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="8" />
+					</EdgeSize>
+				</Backdrop>
+				<Frames>
+					<Button name="$parentYes" inherits="UIPanelButtonTemplate" text="Yes">
+						<Size>
+							<AbsDimension x="50" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset>
+									<AbsDimension x="-30" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuClose");
+								AddIgnore(this:GetParent():GetParent().theUser);
+								this:GetParent():Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentNo" inherits="UIPanelButtonTemplate" text="No">
+						<Size>
+							<AbsDimension x="50" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset>
+									<AbsDimension x="30" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuClose");
+								this:GetParent():Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						PlaySound("igMainMenuOpen");
+						getglobal(this:GetName().."Text"):SetText("Are you sure you want to\nignore this user?");
+						getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):SetFrameStrata("LOW");
+					</OnShow>
+					<OnHide>
+						getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):SetFrameStrata("DIALOG");
+					</OnHide>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName());
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				this:StartMoving();
+				this.isMoving = true;
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			</OnDragStop>
+			<OnShow>
+				local user = this.theUser;
+				WIM_Windows[user].newMSG = false;
+				WIM_Windows[user].is_visible = true;
+				if(WIM_Data.autoFocus == true) then
+					getglobal(this:GetName().."MsgBox"):SetFocus();
+				end
+				WIM_LoadShortcutFrame();
+			</OnShow>
+			<OnHide>
+				getglobal(this:GetName().."IgnoreConfirm"):Hide();
+				local user = this.theUser;
+				WIM_Windows[user].is_visible = false;
+				WIM_Windows[user].newMSG = false;
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	
+</Ui>

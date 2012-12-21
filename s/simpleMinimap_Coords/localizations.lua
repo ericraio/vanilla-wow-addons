@@ -1,0 +1,40 @@
+local AceLocale = AceLibrary("AceLocale-2.1")
+
+AceLocale:RegisterTranslation("simpleMinimap_Coords", "enUS", function() return({
+	enabled = "enabled",
+		enabled_desc = "enable / disable minimap coordinates",
+
+	alpha = "alpha",
+		alpha_desc = "set coordinates frame alpha",
+	backdrop = "backdrop",
+		backdrop_desc = "show or hide coords frame backdrop",
+	border = "border",
+		border_desc = "show or hide coords frame border",
+	coords = "coordinates",
+		coords_desc = "minimap coordinates frame",
+	fontColor = "font color",
+		fontColor_desc = "change the coordinate font color",
+	position = "position",
+		position_desc = "position of coordinates frame on the minimap",
+	scale = "scale",
+		scale_desc = "set minimap coordinates scale",
+	time = "time",
+		time_desc = "delay, in seconds, between coordinate updates",
+
+	position1 = "bottom inside",
+		position1_desc = "bottom of the minimap, inside the frame",
+	position2 ="bottom outside",
+		position2_desc = "bottom of the minimap, outside the frame",
+	position3 = "top inside",
+		position3_desc = "top of the minimap, inside the frame",
+	position4 ="top outside",
+		position4_desc = "top of the minimap, outside the frame",
+	position5 = "top left",
+		position5_desc = "top left of the minimap",
+	position6 ="bottom left",
+		position6_desc = "bottom left of the minimap",
+	position7 = "top right",
+		position7_desc = "top right of the minimap",
+	position8 ="bottom right",
+		position8_desc = "bottom right of the minimap"
+}) end)

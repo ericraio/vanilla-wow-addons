@@ -1,0 +1,195 @@
+Release Notes
+   Mod:PetFeeder
+Original Author: Jeff Parker
+Author as of 3.3.0: Stephen Blaising
+
+Pet Feeder implements a simple to use drag/drop interface for setting up any number of foods for your pet to eat.  Itwill automatically feed your pet when its happiness falls below the threshold you set (Content/Happy). Add foods by drag/drop them onto the foods list -- no need to specify what kind of food it might be. Remove a food item by clicking on it in the food list. 
+
+Food items can be in any bag and if a food runs out the pet simply moves on to the next food item.
+
+Features:
+- detects certain situations and will not attempt to feed if:
+  - you are Sitting or Mounted 
+  - you are using Feign Death or Shadowmeld.
+  - you are eating or drinking
+  - you are Channeling (mending pet, bandaging, holding breath, etc)
+  - the pet is poisoned
+
+- supports multiple pets and keeps track of foods per pet.
+- Sort your food to consume by. (alpha a-z, alpha z-a, by quantity 1..N, by quantity N..1) or no sorting at all.
+- Consumes the lowest stack of food first when you have more than one stack of one food.
+- Bindable method to force feed the pet  (use /pf feed)
+- Automatically detect and maintain the food list based on your inventory.
+- Automatically detects and removes foods & items the pet does not like to eat.
+- Automatically detects and removes foods that are quest items.
+- Allows you to approve of food before pet tries to eat it.
+
+Quick and simple to setup and very effective.
+
+Use /pf or /petfeeder to bring up the interface. You must have established a pet to bring up the interface.
+
+Pet Feeder Button Bar - 
+	- <Ctrl>Right Click to move.
+Version 3.3.1.3
+  - Fixed a nil error with the sorting array.
+  
+Version 3.3.1.1
+  - Fixed a nil error at PetFeederFrame.lua:967
+  - Removed pet sounds.
+  		
+Version 3.3.1
+  - Uses FeedOMatic database to allow for non-En client food lists.
+  - Hides quest items from food list.
+  - Allows for any item to be added to the food list.
+  - Fixed German localization.
+  - Happiness no longer tested if your toon or pet is dead.   
+  - Pet no longer tries to eat after dying.
+  - Fixed an issue with the Pet eating many times in a row.
+   
+Version 3.3.0.1
+  - Fixed error at PetFeederFrame.lua:1066.
+  
+Version 3.3.0
+  - Tweaked the list update function to stop shuffling the list on every update
+  - Added a Pet Feeder Button Bar that can be enabled via the option frame
+  - Created a button for the Button Bar that shows the pets icon with level and xp bar; on click and hold will allow you to move the bar
+  - Created a button for the Button Bar that shows the pets Happiness level and loyalty bar; on click will open the option frame
+  - Created a button for the Button Bar that shows the icon for the next food to be eaten and a total count of the foods available for consumption; on click will feed the pet
+  - Added informative tooltips for each button with hints as to what occurs when they are clicked
+  
+Version 3.2.3
+- These changes contributed by Stephen Blaising
+  - Added an Approved Foods list
+  - Changed the way the lists get updated, prevents items jumping around while viewing the lists
+  - Added option to only allow pet to use approved food items
+  - Added option to ask user to approve a food before using it for the first time
+  - Fixed bug where wrong food was being removed from list
+  - Some code optimizations
+  - Food list is now per pet/toon
+
+v3.2.2.1
+ - German translation update
+ - possible fix the the 'Unknown Entity' bug (couldn't duplicate)
+
+v3.2.2
+ - fixed issues with detecting when Pet dies
+ - changed up the eventhandler for performance
+ 
+Version 3.2.0
+- updated to work with release 1.10
+   - added event PLAYER_TARGET_CHANGED to catch player initiated event; otherwise feeds will fail
+   - players must select/deselect a target before PetFeeder will fire a feed attempt  
+- fixed bug with identifing food quality related to changes in GameTooltip
+- fixed bug with food-frame drawing
+- updated TOC with the latest interface number
+
+Version 3.1.2
+- made inclusion of Buff foods optional
+
+Version 3.1.1
+- Updated heuristic for looking at foods to eliminate more non-foods
+- Added more checks for food buffs (ie DragonBreath Chili)
+- Fixed so that clicking on item Image removes it from list (instead of just text clickable)
+- Fixed so that removing item from FoodList puts it into the Unliked foods list.
+- Added check for Trade or Loot window open so Pet won't break this event trying to eat
+- Added additional check for PlayerAlive/Dead to avoid errors
+
+Version 3.1
+- Updated for WoW 1.8
+- Fixed bug where PetFeeder flagged multiple items as "unliked" regardless of liking or not.
+- Updated logic to address errors when Pet dies
+- It seems the problem with burning up food in water was resolved by Blizzard.
+- does not add foods to list for pet that will give you buffs.
+
+Version 3.0.1
+- updated checks for DE/FR "Hunter"
+- updated to check for 18 slot bags
+- added texture check for _Fish_ in isFood()
+
+Version 3.0
+- updated interface allows for managing unliked/don't eat foods and displays icon of food
+- added new sorting attribute: Quality
+- added ability to sort on 1 or 2 attributes
+- updated food detection algorithm to take textures into account
+
+Version 2.1.2 -
+- updated localization for German
+- added check/remove for foods that are too low level for your pet
+
+Version 2.1.1 -
+- Detects AFK.
+- localized for German
+- added 'debugtoggle' switch.  Use /pf debugtoggle to turn debug mode on/off.
+- Allow feeding if "Ability_Mount_WhiteTiger" is active as its used for "Aspect of the Pack" as well as a Mount.
+- Fixed bug where Pet is kept in Combat state if it dies.  (although this resolves itself after the next combat sequence)
+- removed VARIABLES_LOADED event registration.
+- added PLAYER_ALIVE event registration to catch event when player is revived, to clear Combat flags.
+- fixed bug where wrong food can be flagged as BadFood for pet if player manually feeds something pet doesn't like
+- fixed bug in sorting where quantities were somehow set wrong.
+
+Version 2.1 - 6/10/05
+- Added check for SITTING.  Pet will not attempt to feed if sitting.  You must stand, jump or move to start feeding again.
+- Added option to automatically detect put all foods in your inventory into the PetFeeder.  You can optionally have
+  PetFeeder keep this list up-to-date for you.  With this feature turned on, foods will be removed as they are depleted
+  from your inventory.
+- Added button to clear all foods.
+- Added checks for whether you are eating or drinking so pet doesn't interrupt.
+- Located one problem: "Aspect of the Pack" is detected as a mount.  Blizzard uses "Ability_Mount_WhiteTiger" for this
+  which is the same buff value used for being mounted on a Tiger. So feeding doesn't work if this is enabled.
+- Fixed problem that incorrectly identified "Aspect of the Cheetah" as a mount ("Ability_Mount_JungleTiger").  This could end up 
+  being a problem in itself if a Tiger mount also resolves to the same buff value.
+- Observed a problem with WoW where PetHappiness events are not thrown correctly.  Seems to be rare and can be fixed by
+  forcing a feeding of the pet.  The pet does not have a happiness icon next to its portrait when this occurs.
+- Keeps track of foods your pet does not like and does not put them back into the list.
+
+Version 2.0.3.4 - 6/9/05
+- patch release for Blizzard changes to TOC version
+
+Version 2.0.3.3 - 6/7/05
+- patch release for Blizzard changes to FauxScrollFrame_Update
+
+Version 2.0.3.2 - 6/6/05
+- Properly updates quantities as consumed or created
+- properly moves to next food items when current food is consumed to zero
+- Pet won't feed when channeling (i.e. bandaging, healing pet)
+- fixed bug when sitting and pet feeds (still can't detect player sitting!)
+
+Version 2.0.3 - 6/4/05
+
+- prevent feeding if:
+ - Underwater breathing
+ - Mounted
+- when eating food in sorted order, choose slot of food with lowest amount
+
+Version 2.0.2 - 5/27/05
+- do not feed if Poisoned or if any Nature based debuff is active on the pet.
+- Added messaging if user does not command a pet as PetFeeder cannot be launched
+- Auto update food list when Pet changes
+- Automatically detects and removes foods/items the pet does not like to eat.
+- fixed redraw bugs on initial view
+- TOC updated to 1300
+
+Version 2.0.1 - 5/19/05
+- bug release to fix typo
+
+Version 2.0 - 5/18/05
+- do not feed if Feigning Death
+- do not feed if Shadowmeld is enabled
+- let player put foods in the order to consume (don't sort)
+- Added support for multiple pets.  Keeps track of foods per pet
+- Added Sorting algorithms for consumption (alpha a-z, alpha z-a, by quantity 1..N, by quantity N..1)
+- Added ability for force feeding (unless already feeding)
+- Added binding support
+- fixed UI redraw bugs
+- fixed UI bug, non responsive to ESC.
+
+
+Thanks for the great feedback!
+
+Fixed the problems with updating quantities as they are consumed or created.  
+
+Confirmed that the problem with exhausting a stack of food and not moving on to another item is resolved.
+
+The pet now won't break channeling events ( bandaging, healing, holding breath) or attempt to feed if you're mounted.
+
+I was unable to reproduce the problem where the pet won't feed after a rez.  I saw this once before and I noticed that the pet didn't have a Happy/Content/Unhappy icon shown when this happened.  I seemed that WoW wasn't firing the correct Pet event and the happiness level couldn't be identified -- this would definitely mess up any happiness based feeder.

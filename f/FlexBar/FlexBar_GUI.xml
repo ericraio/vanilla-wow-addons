@@ -1,0 +1,3656 @@
+<UI>
+	<Script file="FlexBar_GUI.lua"/>
+	<Script file="FlexBar_GUIParamInfo.lua"/>
+	<Script file="FlexBar_GUIEventInfo.lua"/>
+	
+	<EditBox name="FlexBarInputBoxTemplate" enableMouse="true" letters="1024" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="-5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="10" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEscapePressed>
+				this:ClearFocus();
+			</OnEscapePressed>
+			<OnEditFocusLost>
+				this:HighlightText(0, 0);
+			</OnEditFocusLost>
+			<OnEditFocusGained>
+				this:HighlightText();
+			</OnEditFocusGained>
+		</Scripts>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+
+	<Frame name="FBMenuItemTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="170" y="15"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Test Text">
+					<Size>
+						<AbsDimension x="170" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parent" relativepoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				local parent = this:GetParent()
+				local label = getglobal(this:GetName().."Label")
+				local list = parent.list
+				local dispatch = parent.callback
+				dispatch(label:GetText(), "click", this:GetName(), arg1)
+			</OnClick>
+			<OnEnter>
+				local parent = this:GetParent()
+				local label = getglobal(this:GetName().."Label")
+				local list = parent.list
+				local dispatch = parent.callback
+				dispatch(label:GetText(), "enter", this:GetName())
+			</OnEnter>
+		</Scripts>
+	</Frame>
+
+	<Frame name="FBMenuTemplate" toplevel="true" enableMouse="true" hidden="true" virtual="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="200" y="400"/>
+		</Size>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="$parent" relativepoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentScrollUp">
+				<Size>
+					<AbsDimension x="20" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="6" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local scrollamount = this:GetParent().maxitems or 1
+						this:GetParent().CurrentItem = this:GetParent().CurrentItem - scrollamount
+						FB_Menu_Display(this:GetParent():GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentScrollDown">
+				<Size>
+					<AbsDimension x="20" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeto="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="6" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local scrollamount = this:GetParent().maxitems or 1
+						this:GetParent().CurrentItem = this:GetParent().CurrentItem + scrollamount
+						FB_Menu_Display(this:GetParent():GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parent1" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="32" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent2" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent1" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent3" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent2" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent4" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent3" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent5" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent4" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent6" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent5" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent7" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent6" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent8" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent7" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent9" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent8" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent10" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent9" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent11" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent10" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent12" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent11" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent13" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent12" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent14" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent13" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent15" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent14" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent16" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent15" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent17" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent16" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent18" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent17" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent19" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent18" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent20" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent19" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent21" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent20" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent22" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent21" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent23" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent22" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent24" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent23" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parent25" inherits="FBMenuItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent24" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnMouseWheel>
+				this.CurrentItem = this.CurrentItem - arg1
+				FB_Menu_Display(this:GetName())
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+
+	<Frame name="FBScriptsFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="640" y="400"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOP">
+ 				<Offset>
+ 					<AbsDimension x="50" y="-200"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="FBScriptsTitleText" inherits="GameFontHighlight" text="FlexBar Script Editor">
+					<Size>
+						<AbsDimension x="200" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="FBScriptsStatusText" inherits="GameFontHighlight" text="">
+					<Size>
+						<AbsDimension x="150" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeto="FBScriptsFrame" relativepoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-20" y="-22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="FBScriptsNameText" inherits="GameFontHighlight" text="Script Name">
+					<Size>
+						<AbsDimension x="80" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeto="FBScriptsFrame" relativepoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="10" y="60"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="FBScriptsTestText" inherits="GameFontHighlight" text="Test Script As:">
+					<Size>
+						<AbsDimension x="120" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeto="FBScriptsFrame" relativepoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="-5" y="35"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="FBScriptsConfigText" inherits="GameFontHighlight" text="Configuration Management">
+					<Size>
+						<AbsDimension x="200" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeto="FBScriptsFrame" relativepoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="150" y="35"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+       	<Frames>
+			<Frame name="FBMenuScript" inherits="FBMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="UIParent" relativepoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Button name="FBScriptsFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBScriptsFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameExitButton" inherits="UIPanelButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="FBScriptsFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="32"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBScriptsFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameDeleteButton" inherits="UIPanelButtonTemplate" text="Delete">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="FBScriptsFrameExitButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_Delete()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameSaveButton" inherits="UIPanelButtonTemplate" text="Save">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="FBScriptsFrameDeleteButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_Save()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameLoadButton" inherits="UIPanelButtonTemplate" text="Load">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsFrameExitButton" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_Load()
+						FBScriptsEditBox:SetFocus()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameNewButton" inherits="UIPanelButtonTemplate" text="New">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="FBScriptsFrameLoadButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBScriptsEditBox:SetText("")
+						FBScriptsEditBox:SetFocus();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameListButton" inherits="UIPanelButtonTemplate" text="List">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="FBScriptsFrameNewButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_List()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameScriptButton" inherits="UIPanelButtonTemplate" text="Script">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="FBScriptsFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						RunScript(FBScriptsEditBox:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameMacroButton" inherits="UIPanelButtonTemplate" text="Macro">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="FBScriptsFrameScriptButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Execute_MultilineMacro(FBScriptsEditBox:GetText(),"editor contents " .. GetTime())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameConfigButton" inherits="UIPanelButtonTemplate" text="Config">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="FBScriptsFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="160" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Execute_ConfigString(FBScriptsEditBox:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameImportButton" inherits="UIPanelButtonTemplate" text="Import">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="FBScriptsFrameConfigButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_Import()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameRestoreButton" inherits="UIPanelButtonTemplate" text="Restore">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="FBScriptsFrameImportButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBcmd:Dispatch("restore confirm='yes'")
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameExportEventsButton" inherits="UIPanelButtonTemplate" text="Events">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="FBScriptsFrameRestoreButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_ExportEvents()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameExportActionsButton" inherits="UIPanelButtonTemplate" text="Actions">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="FBScriptsFrameExportEventsButton" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_ExportActions()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameExportPositionsButton" inherits="UIPanelButtonTemplate" text="Layout">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="FBScriptsFrameExportEventsButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_ExportPositions()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsFrameExportSetupButton" inherits="UIPanelButtonTemplate" text="Setup">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="FBScriptsFrameExportPositionsButton" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_Scripts_ExportSetup()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<EditBox name="ScriptNameEditBox" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="270" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="FBScriptsFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="100" y="60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FBScriptsEditBox:SetFocus();
+					</OnEnterPressed>
+					<OnTabPressed>
+						FBScriptsEditBox:SetFocus();
+					</OnTabPressed>
+					<OnEscapePressed>
+						FBScriptsFrame:Hide()
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<Button name="$parentDropDown">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="ScriptNameEditBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if FBMenuScript:IsVisible() then
+							FBMenuScript:Hide()
+						else
+							FB_Show_Scripts_Dropdown()
+						end
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<ScrollFrame name="FBScriptsScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="600" y="270"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="3" right="5" top="3" bottom="5"/>
+					</BackgroundInsets>
+					<Color r="0" g="0" b="0" a="1"/>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="30" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+									<Offset>
+										<AbsDimension x="0" y="5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="1" right="1" top="1" bottom="1"/>
+						</Texture>
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="106"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="1" right="1" top="1" bottom="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<ScrollChild>
+					<Frame name="FBScriptsScrollChildFrame" enableMouse="true">
+						<Size>
+							<AbsDimension x="600" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<EditBox name="FBScriptsEditBox" letters="10240" multiLine="true" enableMouse="true" autoFocus="false">
+								<Size>
+									<AbsDimension x="550" y="250"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="20" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnTextChanged>
+										FB_Scripts_TextChanged(this)
+									</OnTextChanged>
+									<OnCursorChanged>
+										FB_Scripts_OnCursorChanged(this)
+									</OnCursorChanged>
+									<OnClick>
+										this:SetFocus();
+									</OnClick>
+									<OnTabPressed>
+										ScriptNameEditBox:SetFocus();
+									</OnTabPressed>
+									<OnEscapePressed>
+										FBScriptsFrame:Hide()
+									</OnEscapePressed>
+								</Scripts>
+								<FontString inherits="ChatFontNormal" monochrome="true">
+									<FontHeight>
+										<AbsValue val="16"/>
+									</FontHeight>
+									<Color r="1" g="1" b="1"/>
+								</FontString>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnMouseUp>
+								FBScriptsEditBox:SetFocus();
+							</OnMouseUp>
+						</Scripts>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				FBScriptsEditBox:SetText("")
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="FBScriptsMenu" toplevel="true" enableMouse="true" movable="false" parent="FBScriptsFrame" hidden="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="200" y="400"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPRIGHT" relativeto="FBScriptsFrame" relativepoint="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="-2" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="FBScriptsMenuTitleText" inherits="GameFontHighlight" text="Saved Scripts">
+					<Size>
+						<AbsDimension x="190" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="FBScriptsMenuScrollUp" inherits="UIPanelButtonTemplate" text="Scroll Up">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBScriptCount = FBScriptCount-8
+						FB_DisplayScripts()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu0" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenuScrollUp" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu1" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu0" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu2" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu3" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu2" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu4" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu3" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu5" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu4" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu6" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu5" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu7" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu6" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu8" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu7" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu9" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu8" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu10" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu9" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu11" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu10" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu12" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu11" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu13" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu12" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu14" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu13" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenu15" inherits="UIPanelButtonTemplate" text="">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu14" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ScriptNameEditBox:SetText(this:GetText())
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenuScrollDown" inherits="UIPanelButtonTemplate" text="Scroll Down">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenu15" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBScriptCount = FBScriptCount+8
+						FB_DisplayScripts()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="FBScriptsMenuClose" inherits="UIPanelButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="190" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="FBScriptsMenuScrollDown" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBScriptsMenu:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Button name="FBPerfButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="40" y="15"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="250" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+							<Offset>
+								<AbsDimension x="8" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				FB_Performance_Changed(this)
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name="FBPerfButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="40" y="15"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="250" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+							<Offset>
+								<AbsDimension x="8" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				FB_Performance_Changed(this)
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<Frame name="FBPerformanceFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="640" y="400"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOP">
+ 				<Offset>
+ 					<AbsDimension x="50" y="-200"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="FBPerformanceTitleText" inherits="GameFontHighlight" text="Performance Settings">
+					<Size>
+						<AbsDimension x="200" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="FBPerformanceStatusText" inherits="GameFontHighlight" text="">
+					<Size>
+						<AbsDimension x="150" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeto="FBScriptsFrame" relativepoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-20" y="-22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="FBPerformanceFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn1" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" >
+						<Offset>
+							<AbsDimension x="10" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn2" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn1" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn3" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn2" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn4" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn3" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn5" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn4" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn6" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn5" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn7" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn6" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn8" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn7" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn9" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn8" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn10" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn9" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn11" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn10" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn12" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn11" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn13" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn12" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn14" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn13" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn15" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn14" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn16" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn15" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn17" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn16" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn18" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" >
+						<Offset>
+							<AbsDimension x="305" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn19" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn18" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn20" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn19" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn21" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn20" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn22" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn21" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn23" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn22" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn24" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn23" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn25" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn24" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn26" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn25" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn27" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn26" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn28" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn27" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn29" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn28" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn30" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn29" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn31" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn30" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn32" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn31" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn33" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn32" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBPerfBtn34" inherits="FBPerfButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="FBPerfBtn33" relativepoint="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+		</Scripts>
+	</Frame>
+	<Frame name="FBOptionsFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="240" y="190"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOP">
+ 				<Offset>
+ 					<AbsDimension x="50" y="-200"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="FBOptionsTitleText" inherits="GameFontHighlight" text="FlexBar Global Options">
+					<Size>
+						<AbsDimension x="200" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+       	<Frames>
+			<Button name="FBOptionsFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="FBLoadOptionsButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="40" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Load Options">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="8" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						FB_LoadOptionsClick(this)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="FBTooltipsOption" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Hide FlexBar Tooltips">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="5" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							FBToggles["notooltips"] = true
+						else
+							FBToggles["notooltips"] = false
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="FBVerboseOption" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-70"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Show Detailed feedback">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="5" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							FBToggles["verbose"] = true
+						else
+							FBToggles["verbose"] = false
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="FBShadingOption" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-90"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Force Default Coloring">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="5" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							FBToggles["forceshading"] = true
+						else
+							FBToggles["forceshading"] = false
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="FBAutoPerformanceOption" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-110"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Auto Set Perfomance">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="5" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							FBToggles["autoperf"] = true
+						else
+							FBToggles["autoperf"] = false
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="FBRaidSafeOption" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-130"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Raid Safe">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="5" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if this:GetChecked() then
+							FBToggles["raidsafe"] = true
+						else
+							FBToggles["raidsafe"] = false
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button name="FBDropDownOptionsButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="40" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-155"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Editor Dropdown Items">
+							<Size>
+								<AbsDimension x="200" y="15"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeto="$parent" relativepoint="RIGHT">
+									<Offset>
+										<AbsDimension x="8" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						FB_DropDownOptionsClick(this)
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="FBEventListTemplate" toplevel="true" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="630" y="17"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentNumber" inherits="GameFontHighlight" justifyh="RIGHT">
+					<Size>
+						<AbsDimension x="25" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parent" relativepoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEvent" inherits="GameFontHighlight" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="100" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parentNumber" relativepoint="RIGHT">
+							<Offset>
+								<AbsDimension x="3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+					</Scripts>
+				</FontString>
+				<FontString name="$parentTarget" inherits="GameFontHighlight" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="100" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parentEvent" relativepoint="RIGHT">
+							<Offset>
+								<AbsDimension x="3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCommand" inherits="GameFontHighlight" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="250" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeto="$parentTarget" relativepoint="RIGHT">
+							<Offset>
+								<AbsDimension x="3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentDown">
+				<Size>
+					<AbsDimension x="25" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeto="$parent" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local number = getglobal(this:GetParent():GetName().."Number")
+						FB_MoveEventDown(tonumber(number:GetText()))
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentUp">
+				<Size>
+					<AbsDimension x="25" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeto="$parentDown" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local number = getglobal(this:GetParent():GetName().."Number")
+						FB_MoveEventUp(tonumber(number:GetText()))
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentDelete" inherits="UIPanelButtonTemplate" text="DEL">
+				<Size>
+					<AbsDimension x="30" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeto="$parentUp" relativepoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local number = getglobal(this:GetParent():GetName().."Number")
+						FB_DeleteEvent(tonumber(number:GetText()))
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentInsert" inherits="UIPanelButtonTemplate" text="INS">
+				<Size>
+					<AbsDimension x="30" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeto="$parentDelete" relativepoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local number = getglobal(this:GetParent():GetName().."Number")
+						FB_InsertEvent(tonumber(number:GetText()))
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentEdit" inherits="UIPanelButtonTemplate" text="EDT">
+				<Size>
+					<AbsDimension x="30" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeto="$parentInsert" relativepoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local number = getglobal(this:GetParent():GetName().."Number")
+						FB_EditEvent(tonumber(number:GetText()), this:GetParent():GetName())
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	
+	<Frame name="FBEventEditorFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="640" y="400"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOP">
+ 				<Offset>
+ 					<AbsDimension x="50" y="-200"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="FBEventEditorTitleText" inherits="GameFontHighlight" text="FlexBar Event Editor">
+					<Size>
+						<AbsDimension x="200" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSeperatorLabel" inherits="GameFontHighlight" justifyh="LEFT" text="--------------------------------------------------------------------------------------------------------">
+					<Size>
+						<AbsDimension x="560" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="100" y="-200"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentModeLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Adding: ">
+					<Size>
+						<AbsDimension x="60" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-200"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEventNumberLabel" inherits="GameFontHighlight" justifyh="LEFT" text="###">
+					<Size>
+						<AbsDimension x="30" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="70" y="-200"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEventLabel" inherits="GameFontHighlight" justifyh="LEFT" text="On=">
+					<Size>
+						<AbsDimension x="30" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-215"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTargetLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Target=">
+					<Size>
+						<AbsDimension x="50" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="200" y="-215"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCommandLabel" inherits="GameFontHighlight" justifyh="LEFT" text="Command=">
+					<Size>
+						<AbsDimension x="70" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-247"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentIfLabel" inherits="GameFontHighlight" justifyh="LEFT" text="If=">
+					<Size>
+						<AbsDimension x="30" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-230"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInLabel" inherits="GameFontHighlight" justifyh="LEFT" text="In=">
+					<Size>
+						<AbsDimension x="30" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="270" y="-247"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTToggleLabel" inherits="GameFontHighlight" justifyh="LEFT" text="TToggle=">
+					<Size>
+						<AbsDimension x="65" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="480" y="-247"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTNameLabel" inherits="GameFontHighlight" justifyh="LEFT" text="TName=">
+					<Size>
+						<AbsDimension x="50" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="330" y="-247"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP1Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param1=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-265"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP2Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param2=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="320" y="-265"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP3Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param3=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-280"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP4Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param4=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="320" y="-280"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP5Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param5=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-295"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP6Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param6=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="320" y="-295"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP7Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param7=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-310"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP8Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param8=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="320" y="-310"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP9Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param9=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-325"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentP10Label" inherits="GameFontHighlight" justifyh="LEFT" text="Param10=">
+					<Size>
+						<AbsDimension x="90" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeto="FBEventEditorFrame" relativepoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="320" y="-325"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="FBEEDDMenu" inherits="FBMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="UIParent" relativepoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="FBIfOpsMenu" inherits="FBMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="UIParent" relativepoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<EditBox name="$parentP1Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP1Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP2Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP2Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP3Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP3Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP4Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP4Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP5Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP5Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP6Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP6Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP7Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP7Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP8Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP8Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP9Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP9Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentP10Edit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentP10Label" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentEventEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentEventLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentTargetEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="360" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTargetLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentIfEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="575" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentIfLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentCommandEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="180" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentCommandLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentInEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="40" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentInLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentTNameEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="100" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTNameLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<EditBox name="$parentTToggleEdit" autoFocus="false" inherits="FlexBarInputBoxTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="65" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTToggleLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetFocus();
+					</OnClick>
+					<OnEnterPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnEnterPressed>
+					<OnTabPressed>
+						FB_EventEditor_NextEditBox(this:GetName())
+					</OnTabPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal" bytes="1024"/>
+			</EditBox>
+			<Button name="$parentEventMenu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentEventEdit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentTargetMenu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentTargetEdit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentCommandMenu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentCommandEdit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentTToggleMenu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentTToggleEdit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentIfMenu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentIfEdit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP1Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP1Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP2Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP2Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP3Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP3Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP4Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP4Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP5Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP5Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP6Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP6Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP7Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP7Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP8Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP8Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP9Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP9Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentP10Menu">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentP10Edit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_MenuDropDown(this:GetName())
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="FBEventEditorFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentCancelButton" inherits="UIPanelButtonTemplate" text="Cancel all Changes">
+				<Size>
+					<AbsDimension x="160" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeto="$parent" relativepoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_DisplayNewEvent()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentSaveButton" inherits="UIPanelButtonTemplate" text="Save all Changes">
+				<Size>
+					<AbsDimension x="160" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeto="$parent" relativepoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="5" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FB_EventEditor_SaveEvent()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentScrollUp">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBEventEditorFrame.FirstEvent = FBEventEditorFrame.FirstEvent-10
+						FB_DisplayEventEditor()
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentScrollDown">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentScrollUp" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBEventEditorFrame.FirstEvent = FBEventEditorFrame.FirstEvent+10
+						FB_DisplayEventEditor()
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Frame name="$parent1" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent2" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent1" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent3" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent2" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent4" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent3" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent5" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent4" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent6" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent5" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent7" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent6" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent8" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent7" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent9" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent8" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent10" inherits="FBEventListTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent9" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		
+		<Scripts>
+			<OnLoad>
+				this.FirstEvent = 1
+				this.CurrentEvent = nil
+			</OnLoad>
+			<OnMouseWheel>
+				FBEventEditorFrame.FirstEvent = FBEventEditorFrame.FirstEvent - arg1
+				FB_DisplayEventEditor()
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+
+	<Frame name="FBAutoItemTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="228" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="150" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="30" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentIDLabel" inherits="GameFontHighlight" justifyh="RIGHT">
+					<Size>
+						<AbsDimension x="20" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCountLabel" inherits="GameFontHighlight" justifyh="RIGHT">
+					<Size>
+						<AbsDimension x="20" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeto="$parentIDLabel" relativepoint="LEFT">
+							<Offset>
+								<AbsDimension x="-5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parentOn" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local util = Utility_Class:New()
+						local _,_,number = string.find(this:GetName(),"(%d+)")
+						number = number + 0
+						FB_AutoItemOnClick(number,this,this:GetParent())
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+	</Frame>
+
+	<Frame name="FBAutoItemsFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+	<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="240" y="160"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOP">
+ 				<Offset>
+ 					<AbsDimension x="50" y="-200"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="5" top="3" bottom="5"/>
+			</BackgroundInsets>
+			<Color r="0" g="0" b="0"/>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitleText" inherits="GameFontHighlight" text="FlexBar AutoItems">
+					<Size>
+						<AbsDimension x="200" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCountText" inherits="GameFontHighlight" text="##" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="20" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-30" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentIDText" inherits="GameFontHighlight" text="ID" justifyh="LEFT">
+					<Size>
+						<AbsDimension x="20" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-4" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+       	<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentScrollUp">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeto="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBAutoItemsFrame.FirstItem = FBAutoItemsFrame.FirstItem-1
+						FB_DisplayAutoItems()
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentScrollDown">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeto="$parentScrollUp" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						FBAutoItemsFrame.FirstItem = FBAutoItemsFrame.FirstItem+1
+						FB_DisplayAutoItems()
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"/>
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Frame name="$parent1" inherits="FBAutoItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent2" inherits="FBAutoItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent1" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent3" inherits="FBAutoItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent2" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent4" inherits="FBAutoItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent3" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent5" inherits="FBAutoItemTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeto="$parent4" relativepoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this.FirstItem = 1
+				this.CurrentItem = nil
+			</OnLoad>
+			<OnMouseWheel>
+				FBAutoItemsFrame.FirstItem = FBAutoItemsFrame.FirstItem - arg1
+				FB_DisplayAutoItems()
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+
+	<Frame name="FBMenu1" inherits="FBMenuTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeto="UIParent" relativepoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="50" y="-50"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="FBMenu2" inherits="FBMenuTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeto="UIParent" relativepoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="50" y="-50"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+</UI>

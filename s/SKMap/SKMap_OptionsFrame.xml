@@ -1,0 +1,884 @@
+<!--
+
+	SKMap_OptionsFrame.xml
+
+-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+	..\FrameXML\UI.xsd">
+
+	<Button name="SKMap_OptionsButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="80" y="22"/>
+		</Size>
+	</Button>
+
+	<Button name="SKMap_OptionsLabelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="10"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="LEFT" wraponspaces="false">
+					<Size>
+						<AbsDimension x="200" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
+
+
+	<Button name="SKMap_OptionsGenericTemplate" virtual="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="300" y="30"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+
+				<FontString name="$parentLabel" inherits="GameFontHighlight" justifyH="LEFT" wraponspaces="false">
+					<Size>
+						<AbsDimension x="300" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+
+			<Slider name="$parentSlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnValueChanged>
+						SKMap_OptionSliderChange();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+
+			<CheckButton name="$parentCheck" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SKMap_OptionChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="$parentIcon">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>				
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentTexture"/>												
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SKMap_IconButtonClicked();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+		</Frames>
+	</Button>
+
+
+
+
+	<Frame name="SKMap_OptionsFrame" setAllPoints="true" enableMouse="true" parent="SKMapFrame" hidden="true" id="4">
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+			</Layer>
+		</Layers>
+		<Frames>
+
+
+			<!-- Scrollbar -->
+			<ScrollFrame name="SKMap_OptionsScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="290" y="330" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="SKMap_OptionsFrame">
+						<Offset>
+							<AbsDimension x="-30" y="-100" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="288" />
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+									<Offset>
+										<AbsDimension x="0" y="5" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="1.0" />
+						</Texture>
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="128" />
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+									<Offset>
+										<AbsDimension x="0" y="-2" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625" />
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(32, SKMap_OptionsFrame_ScrollUpdate);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+
+
+
+
+
+			<Frame name="SKMap_OptionsFrameControls">
+				<Size>
+					<AbsDimension x="290" y="107"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-100"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+
+
+<!--
+					<Button name="SKMap_OptionsFrameLabel1" inherits="SKMap_OptionsLabelButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+									<AbsDimension x="10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<CheckButton name="SKMap_OptionsFrameCheckButton1" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameLabel1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton21" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton1" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+
+
+
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton2" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton21" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+
+					<CheckButton name="SKMap_OptionsFrameCheckButton22" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton2" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton14" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton22" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton16" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton14" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton19" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton16" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton18" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton19" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="10" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton13" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton18" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Slider name="SKMap_OptionsFrameSlider2" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton13" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								SKMap_SetSliderTextToValue();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<CheckButton name="SKMap_OptionsFrameCheckButton20" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton13" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="-10" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+
+
+					<Button name="SKMap_OptionsFrameLabel2" inherits="SKMap_OptionsLabelButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+
+									<AbsDimension x="480" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<CheckButton name="SKMap_OptionsFrameCheckButton3" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameLabel2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton15" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton3" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+
+
+					<Button name="SKMap_OptionsFrameLabel3" inherits="SKMap_OptionsLabelButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+									<AbsDimension x="10" y="-250"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<CheckButton name="SKMap_OptionsFrameCheckButton4" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameLabel3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton5" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton4" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton6" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="SKMap_OptionsFrameCheckButton5" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+
+
+					<Button name="SKMap_OptionsFrameLabel4" inherits="SKMap_OptionsLabelButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+									<AbsDimension x="250" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<CheckButton name="SKMap_OptionsFrameCheckButton7" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameLabel4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton8" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton7" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton9" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton8" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-10" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton10" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton9" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="SKMap_OptionsFrameCheckButton11" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-10" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Slider name="SKMap_OptionsFrameSlider1" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								SKMap_SetSliderTextToValue();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<CheckButton name="SKMap_OptionsFrameCheckButton12" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+
+					<Button name="SKMap_OptionsFrameLabel5" inherits="SKMap_OptionsLabelButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+									<AbsDimension x="250" y="-200"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<CheckButton name="SKMap_OptionsFrameCheckButton17" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameLabel5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SKMap_MinimapOption();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<Slider name="SKMap_OptionsFrameSlider3" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameCheckButton17" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								SKMap_SetSliderTextToValue();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+
+					<Slider name="SKMap_OptionsFrameSlider4" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameSlider3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								SKMap_SetSliderTextToValue();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+-->
+
+
+					<Button name="SKMap_Options_Button1" inherits="SKMap_OptionsGenericTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+									<AbsDimension x="10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button2" inherits="SKMap_OptionsGenericTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button3" inherits="SKMap_OptionsGenericTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button4" inherits="SKMap_OptionsGenericTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button5" inherits="SKMap_OptionsGenericTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button6" inherits="SKMap_OptionsGenericTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button7" inherits="SKMap_OptionsGenericTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button6" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button8" inherits="SKMap_OptionsGenericTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button7" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button9" inherits="SKMap_OptionsGenericTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button8" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button10" inherits="SKMap_OptionsGenericTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button9" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button11" inherits="SKMap_OptionsGenericTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Button name="SKMap_Options_Button1R" inherits="SKMap_OptionsGenericTemplate" id="101">
+						<Anchors>
+							<Anchor point="TOPLEFT" >
+								<Offset>
+									<AbsDimension x="360" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button2R" inherits="SKMap_OptionsGenericTemplate" id="102">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button1R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button3R" inherits="SKMap_OptionsGenericTemplate" id="103">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button2R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button4R" inherits="SKMap_OptionsGenericTemplate" id="104">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button3R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button5R" inherits="SKMap_OptionsGenericTemplate" id="105">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button4R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button6R" inherits="SKMap_OptionsGenericTemplate" id="106">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button5R" relativePoint="BOTTOMLEFT">
+								<Offset>
+
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button7R" inherits="SKMap_OptionsGenericTemplate" id="107">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button6R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button8R" inherits="SKMap_OptionsGenericTemplate" id="108">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button7R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button9R" inherits="SKMap_OptionsGenericTemplate" id="109">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button8R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button10R" inherits="SKMap_OptionsGenericTemplate" id="110">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button9R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="SKMap_Options_Button11R" inherits="SKMap_OptionsGenericTemplate" id="111">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SKMap_Options_Button10R" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+
+
+				</Frames>
+			</Frame>
+
+			<Button name="SKMap_OptionsFrameOkay" inherits="SKMap_OptionsButtonTemplate" text="OKAY">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SKMap_OptionsFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-40" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						<!--SKMap_OptionsFrame_Save();-->
+						SKMap_ToggleUI();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="SKMap_OptionsFrameDefaults" inherits="SKMap_OptionsButtonTemplate" text="DEFAULTS">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="SKMap_OptionsFrameOkay" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						SkM_LoadDefaultSettings(true);
+						SKMap_OptionsFrame_Load();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="SKMap_OptionsFrameExpandAll" inherits="SKMap_OptionsButtonTemplate" text="SKM_BTN_EXPAND_ALL">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="100" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						SKMap_OptionExpandAll();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="SKMap_OptionsFrameCollapseAll" inherits="SKMap_OptionsButtonTemplate" text="SKM_BTN_COLLAPSE_ALL">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SKMap_OptionsFrameExpandAll" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						SKMap_OptionCollapseAll();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+		</Frames>
+		<Scripts>
+			<OnShow>
+				SKMap_OptionsFrame_Load();
+			</OnShow>
+			<OnHide>
+				<!--SKMap_OptionsFrame_Save();-->
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+</Ui>
+

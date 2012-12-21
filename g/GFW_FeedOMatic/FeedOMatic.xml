@@ -1,0 +1,520 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:ProjectsWoWBinInterfaceFrameXMLUI.xsd">
+
+	<Frame name="Frame_GFW_FeedOMatic">
+		<Scripts>
+			<OnLoad>
+				FOM_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				FOM_OnEvent(event, arg1);
+			</OnEvent>
+			<OnUpdate>
+				FOM_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<GameTooltip name="FOMTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(UIParent, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+	
+	<CheckButton name="FOM_OptionsButtonTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="26" y="26"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				FOM_OptionsClick();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="FOM_OptionsRadioButtonTemplate" inherits="FOM_OptionsButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0" right="0.25" top="0" bottom="1"/>
+		</NormalTexture>
+		<HighlightTexture file="Interface\Buttons\UI-RadioButton" alphaMode="ADD">
+			<TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
+		</HighlightTexture>
+		<CheckedTexture file="Interface\Buttons\UI-RadioButton">
+			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
+		</CheckedTexture>
+		<Scripts>
+			<OnLoad>
+				local name = this:GetName();
+				local text = getglobal(name.."Text");
+				text:SetPoint("LEFT", this, "RIGHT", 4, 0);
+			</OnLoad>
+		</Scripts>
+	</CheckButton>
+	<Frame name="FOM_OptionsFrame"  toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="695" y="334"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="FOM_OptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="320" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="FOM_OPTIONS_HEADER">
+					<Anchors>
+						<Anchor point="TOP"> 
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="FOM_VersionText" inherits="GameFontDisableSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT"> 
+							<Offset>
+								<AbsDimension x="15" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentCorner" file="Interface\DialogFrame\UI-DialogBox-Corner">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-6" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>		
+		<Frames>
+			
+			<Frame name="FOM_Options_General" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="335" y="190"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="FOM_OptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="13" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="FOM_KeepOpenText1" inherits="GameFontNormalSmall" text="FOM_KEEPOPEN">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT"> 
+									<Offset>
+										<AbsDimension x="10" y="40"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="FOM_KeepOpenText2" inherits="GameFontNormalSmall" text="FOM_KEEPOPEN_SLOTS">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="FOM_KeepOpenText1" relativePoint="RIGHT"> 
+									<Offset>
+										<AbsDimension x="30" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="FOM_KeepOpenText3" justifyH="LEFT" inherits="GameFontDisableSmall" text="FOM_KEEPOPEN_INFO">
+							<Size>
+								<AbsDimension x="300" y="30"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="FOM_KeepOpenText1" relativePoint="BOTTOMLEFT"> 
+									<Offset>
+										<AbsDimension x="20" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>		
+				<Frames>
+					<CheckButton name="FOM_OptionsButton_Tooltip" inherits="FOM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_AvoidQuestFood" inherits="FOM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_Tooltip" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_AvoidBonusFood" inherits="FOM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_AvoidQuestFood" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_Fallback" inherits="FOM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_AvoidBonusFood" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_PreferHigherQuality" inherits="FOM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_Fallback" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<EditBox name="FOM_KeepOpenSlots" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="20" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="FOM_KeepOpenText1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTextChanged>
+								FOM_KeepOpenSlots_TextChanged();
+							</OnTextChanged>
+							<OnTabPressed>
+								this:ClearFocus();
+							</OnTabPressed>
+							<OnEnterPressed>
+								this:ClearFocus();
+							</OnEnterPressed>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+					this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+					this:SetBackdropColor(0.15, 0.15, 0.15);
+					getglobal(this:GetName().."Title"):SetText(FOM_OPTIONS_GENERAL);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="FOM_Options_FeedNotification" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="335" y="78"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="FOM_Options_General" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="FOM_OptionsButton_AlertEmote" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_AlertChat" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_AlertEmote" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_AlertNone" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_AlertChat" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+					this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+					this:SetBackdropColor(0.15, 0.15, 0.15);
+					getglobal(this:GetName().."Title"):SetText(FOM_OPTIONS_FEED_NOTIFY);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="FOM_Options_FeedWarning" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="335" y="148"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="FOM_Options_General" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="FOM_WarnLevelIcon_Content" file="Interface\PetPaperDollFrame\UI-PetHappiness" setAllPoints="true">
+							<Size>
+								<AbsDimension x="24" y="23"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="31" y="-11"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.1875" right="0.375" top="0" bottom="0.359375"/>
+						</Texture>			
+						<Texture name="FOM_WarnLevelIcon_Unhappy" file="Interface\PetPaperDollFrame\UI-PetHappiness" setAllPoints="true">
+							<Size>
+								<AbsDimension x="24" y="23"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="FOM_WarnLevelIcon_Content" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.375" right="0.5625" top="0" bottom="0.359375"/>
+						</Texture>			
+					</Layer>
+				</Layers>		
+				<Frames>
+					<CheckButton name="FOM_OptionsButton_LevelContent" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="15" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								local name = this:GetName();
+								local text = getglobal(name.."Text");
+								text:SetPoint("LEFT", this, "RIGHT", 26, 0);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_LevelUnhappy" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_LevelContent" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								local name = this:GetName();
+								local text = getglobal(name.."Text");
+								text:SetPoint("LEFT", this, "RIGHT", 26, 0);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_LevelOff" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_LevelUnhappy" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_AudioWarning" inherits="FOM_OptionsButtonTemplate" frameLevel="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_LevelOff" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-5" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_TextWarning" inherits="FOM_OptionsButtonTemplate" frameLevel="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_AudioWarning" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="80" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_IconWarning" inherits="FOM_OptionsButtonTemplate" frameLevel="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_TextWarning" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="80" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_AudioWarningBell" inherits="FOM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_AudioWarning" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+					this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+					this:SetBackdropColor(0.15, 0.15, 0.15);
+					getglobal(this:GetName().."Title"):SetText(FOM_OPTIONS_WARNING);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="FOM_Options_FoodChoice" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="335" y="120"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="FOM_Options_FeedWarning" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="FOM_OptionsButton_SaveForCook_Orange" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_SaveForCook_Yellow" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_SaveForCook_Orange" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_SaveForCook_Green" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_SaveForCook_Yellow" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_SaveForCook_All" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_SaveForCook_Green" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="FOM_OptionsButton_SaveForCook_None" inherits="FOM_OptionsRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="FOM_OptionsButton_SaveForCook_All" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+					this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+					this:SetBackdropColor(0.15, 0.15, 0.15);
+					getglobal(this:GetName().."Title"):SetText(FOM_OPTIONS_FOOD_CHOICE);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Button inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentCorner" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+		</Frames>
+
+		<Scripts>
+			<OnShow>
+				PlaySound("igMainMenuOpen");
+				FOM_OptionsShow();
+			</OnShow>
+			<OnHide>
+				PlaySound("igMainMenuClose");
+			</OnHide>
+		</Scripts>
+
+	</Frame>
+	
+
+</Ui>

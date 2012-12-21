@@ -1,0 +1,323 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<Script file="AutoCraft.lua"/>
+
+	<Frame name="AutoCraftFrame" frameStrata="LOW" enableMouse="false" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				AutoCraft.OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				AutoCraft.OnUpdate(arg1);
+			</OnUpdate>
+			<OnEvent>
+				AutoCraft.OnEvent(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Button name="AutoCraftQueue" inherits="UIPanelButtonTemplate" text="FAC_QUEUE_BUTTON"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="80" y="22"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				AutoCraft.Queue(TradeSkillInputBox:GetNumber());
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+				GameTooltip:SetText(string.format(QUEUE_BUTTON_TOOLTIP, TradeSkillInputBox:GetNumber()));
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Button name="AutoCraftQueueAll" inherits="UIPanelButtonTemplate" text="FAC_QUEUE_ALL_BUTTON"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="80" y="22"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				local _, _, numAvailable = AutoCraft.GetTradeSkillInfo(GetTradeSkillSelectionIndex());
+				TradeSkillInputBox:SetNumber(numAvailable);
+				AutoCraft.Queue(TradeSkillInputBox:GetNumber());
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+				local _, _, numAvailable = AutoCraft.GetTradeSkillInfo(GetTradeSkillSelectionIndex());
+				GameTooltip:SetText(string.format(QUEUE_BUTTON_TOOLTIP, numAvailable));
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Button name="AutoCraftBuy" inherits="UIPanelButtonTemplate" text="FAC_BUY_BUTTON"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="80" y="22"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				AutoCraft.BuyReagents(TradeSkillInputBox:GetNumber());
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+				GameTooltip:AppendText(string.format(BUY_BUTTON_TOOLTIP, TradeSkillInputBox:GetNumber()));
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Button name="AutoCraftQueueEverything" inherits="UIPanelButtonTemplate" text="FAC_QUEUE_EVERYTHING_BUTTON"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="144" y="22"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="AutoCraftQueueAll" relativePoint="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension x="-3" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				AutoCraft.QueueEverything();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="AutoCraftRunQueue" inherits="UIPanelButtonTemplate" text="FAC_RUN_QUEUE_BUTTON"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="92" y="22"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="AutoCraftQueueEverything" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="-2" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				AutoCraft.StartStop();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="AutoCraftClear" inherits="UIPanelButtonTemplate" text="FAC_CLEAR_QUEUE_BUTTON"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="96" y="22"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="AutoCraftRunQueue" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				AutoCraft.Clear();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<CheckButton name="AutoCraftRunAutomatically" inherits="OptionsCheckButtonTemplate"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="AutoCraftQueueEverything" relativePoint="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension x="1" y="-1"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+				GameTooltip:SetText(string.format(RUN_AUTOMATICALLY_TOOLTIP, TradeSkillInputBox:GetNumber()));
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnClick>
+				if ( this:GetChecked() ) then
+					FAC_Config.AutoIterate = true;
+					PlaySound("igMainMenuOptionCheckBoxOff");
+				else
+					FAC_Config.AutoIterate = false;
+					PlaySound("igMainMenuOptionCheckBoxOn");
+				end
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<Frame name="AutoCraftBackground" hidden="true"> <!-- parent="TradeSkillFrame"> -->
+		<Size>
+			<AbsDimension x="354" y="560"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\PaperDollInfoFrame\SkillFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0.5" bottom="1.0"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\SkillFrame-BotLeft">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT"/>
+							<Offset>
+								<AbsDimension x="-32" y="0"/>
+							</Offset>
+					</Anchors>
+					<TexCoords left="1.0" right="0" top="0.5" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<Button name="QueuedSkillIconTemplate" inherits="ItemButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				AutoCraft.Queue_OnClick();
+			</OnClick>
+			<OnEnter>
+				AutoCraft.Queue_OnEvent();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	
+	<Frame name="QueueIconsFrame" toplevel="true" parent="UIParent" hidden="false">
+		<Size>
+			<AbsDimension x="505" y="43"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="CastingBarFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="2" y="10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="QueueMessageText" parent="QueueIconsFrame" inherits="GameFontHighlight">
+					<Size>
+						<AbsDimension x="185" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="-2" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="QueuedSkillIcon1" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="1">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon2" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon3" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon4" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon5" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon6" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="6">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="QueuedSkillIcon1" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon7" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon8" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon9" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="QueuedSkillIcon10" inherits="QueuedSkillIconTemplate" parent="QueueIconsFrame" hidden="true" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="QueuedSkillIcon9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

@@ -1,0 +1,201 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+   <Script file="localization.lua"/>
+   <Script file="Confab.lua"/>
+
+	<EditBox name="ConfabEditBoxTemplate" ignoreArrows="true" frameStrata="DIALOG" toplevel="true" historyLines="32" letters="255" hidden="true" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\AddOns\Confab\Textures\default.tga">
+					<Size>
+						<AbsDimension x="16" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+                    <TexCoords left="0" right="0.0625" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\AddOns\Confab\Textures\default.tga">
+					<Size>
+						<AbsDimension x="16" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\AddOns\Confab\Textures\default.tga">
+					<Size>
+						<AbsDimension x="1" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentHeader" inherits="ChatFontNormal">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="13" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentLanguage" hidden="true">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():ToggleInputLanguage();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<NormalText inherits="DialogButtonNormalText"/>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				ChatEdit_OnLoad();
+			</OnLoad>
+			<OnShow>
+				ChatEdit_OnShow();
+			</OnShow>
+			<OnUpdate>
+				ChatEdit_OnUpdate(arg1);
+			</OnUpdate>
+			<OnEnterPressed>
+				ChatEdit_OnEnterPressed();
+			</OnEnterPressed>
+			<OnEscapePressed>
+				ChatEdit_OnEscapePressed(this);
+			</OnEscapePressed>
+			<OnSpacePressed>
+				ChatEdit_OnSpacePressed();
+			</OnSpacePressed>
+			<OnTabPressed>
+				ChatEdit_OnTabPressed();
+			</OnTabPressed>
+			<OnTextChanged>
+				ChatEdit_OnTextChanged();
+			</OnTextChanged>
+			<OnTextSet>
+				ChatEdit_OnTextSet();
+			</OnTextSet>
+			<OnInputLanguageChanged>
+				ChatEdit_OnInputLanguageChanged();
+			</OnInputLanguageChanged>
+		</Scripts>
+		<FontString inherits="ChatFontNormal" bytes="256"/>
+	</EditBox>
+
+   <Frame name="Confab" parent="UIParent" hidden="false">
+	   <Scripts>
+			<OnLoad>
+			    Confab_OnLoad();
+			</OnLoad> 
+            <OnEvent>
+				Confab_OnEvent(event);
+			</OnEvent>
+			<OnUpdate>
+              Confab_OnUpdate(arg1);
+			</OnUpdate>
+	   </Scripts>
+   </Frame>
+
+ 	<EditBox name="ConfabEditBoxArrowsEnabled" inherits="ConfabEditBoxTemplate" ignoreArrows="false" parent="UIParent">
+		<Size>
+			<AbsDimension x="300" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ChatFrame1" relativePoint="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension x="-5" y="-2"/>
+				</Offset>
+			</Anchor>
+			<Anchor point="TOPRIGHT" relativeTo="ChatFrame1" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+                this.chatFrame = DEFAULT_CHAT_FRAME;
+                this:SetMinResize(256,32);
+                this:SetMaxResize(1024,32);
+                ChatEdit_OnLoad();
+                this:RegisterForDrag("LeftButton"); 
+			</OnLoad> 
+			<OnShow>
+				Confab_OnShow();
+			</OnShow>
+            <OnMouseDown>
+			    ConfabMoveOrResize();
+			</OnMouseDown>
+			<OnMouseUp>
+		        this:StopMovingOrSizing();
+                ConfabSavePosition();
+			</OnMouseUp>
+		</Scripts>
+       </EditBox>
+
+ 	<EditBox name="ConfabEditBoxArrowsDisabled" inherits="ConfabEditBoxTemplate" ignoreArrows="true" parent="UIParent"> 
+		<Size>
+			<AbsDimension x="300" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ChatFrame1" relativePoint="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension x="-5" y="-2"/>
+				</Offset>
+			</Anchor>
+			<Anchor point="TOPRIGHT" relativeTo="ChatFrame1" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+                this.chatFrame = DEFAULT_CHAT_FRAME;
+                this:SetMinResize(256,32);
+                this:SetMaxResize(1024,32);
+                ChatEdit_OnLoad();
+                this:RegisterForDrag("LeftButton"); 
+			</OnLoad> 
+			<OnShow>
+				Confab_OnShow();
+			</OnShow>
+            <OnMouseDown>
+			    ConfabMoveOrResize();
+			</OnMouseDown>
+			<OnMouseUp>
+		        this:StopMovingOrSizing();
+                ConfabSavePosition();
+			</OnMouseUp>
+		</Scripts>
+       </EditBox> 
+</Ui>

@@ -1,0 +1,458 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML/UI.xsd">
+	
+	<Script file="EventEditor.lua"/>
+
+	<Button name="CalendarEventEditorTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOpen");
+				PanelTemplates_Tab_OnClick(CalendarEventEditorFrame);
+				CalendarEventEditor_ShowPanel(CalendarEventEditorFrame.selectedTab);
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<Frame name="CalendarEventEditorFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="318" y="344"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GroupCalendarFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="1" y="-21"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture name="EventEditorFrameTopLeftTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EventEditorFrameTopRightTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="EventEditorFrameTopLeftTexture" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EventEditorFrameBottomLeftTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="EventEditorFrameTopLeftTexture" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EventEditorFrameBottomRightTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="EventEditorFrameTopRightTexture" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" text="CalendarEventEditorFrame_cTitle" inherits="GameFontHighlight">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-10" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="CalendarEventEditorCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="CalendarEventEditorFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEventEditorDoneButton" inherits="UIPanelButtonTemplate" text="CalendarEventEditor_cDone">
+				<Size>
+					<AbsDimension x="102" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						CalendarEventEditor_DoneEditing();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Frame name="CalendarEventEditorEventFrame" hidden="true" setAllPoints="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="CalendarEventEditorEventBackground" file="">
+							<Size>
+								<AbsDimension x="306" y="254"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="-4" y="-18"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0.140625" bottom="0.859375"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<FontString name="CalendarEventEditorFrameSubTitle" inherits="GameFontNormalLarge">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="-10" y="-36"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="CalendarEventEditorDeleteButton" inherits="UIPanelButtonTemplate" text="CalendarEventEditor_cDelete">
+						<Size>
+							<AbsDimension x="102" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="CalendarEventEditorDoneButton">
+								<Offset>
+									<AbsDimension x="-15" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								
+								CalendarEventEditor_AskDeleteEvent();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Frame name="CalendarEventType" inherits="CalendarEventTypeTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-70"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<EditBox name="CalendarEventTitle" letters="50" historyLines="0" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="172" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventType" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="62" y="-30"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString inherits="GameFontNormalSmall" text="GroupCalendar_cTitleLabel" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+							<OnEnterPressed>
+								CalendarEventEditor_DoneEditing();
+							</OnEnterPressed>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+					<Frame name="CalendarEventEditorTime" inherits="CalendarTimeTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventType" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-60"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="CalendarEventEditorDuration" inherits="CalendarDurationTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventEditorTime" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-30"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<EditBox name="CalendarEventMinLevel" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="40" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventEditorDuration" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="62" y="-30"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString inherits="GameFontNormalSmall" text="GroupCalendar_cLevelsLabel" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+					
+					<EditBox name="CalendarEventMaxLevel" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="40" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="CalendarEventMinLevel" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="20" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString inherits="GameFontNormalSmall" text="GroupCalendar_cLevelRangeSeparator" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+					
+					<Frame name="CalendarEventDescriptionFrame" inherits="CalendarInputFrameTemplate">
+						<Size>
+							<AbsDimension x="220" y="60"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventMinLevel" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-5" y="-30"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<ScrollFrame name="CalendarEventDescriptionScrollFrame" inherits="UIPanelScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="195" y="54"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<FontString inherits="GameFontNormalSmall" text="GroupCalendar_cDescriptionLabel" justifyH="RIGHT">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="TOPLEFT">
+													<Offset>
+														<AbsDimension x="-6" y="-4"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ScrollChild>
+									<Frame name="CalendarEventDescriptionScrollChildFrame" enableMouse="true">
+										<Size>
+											<AbsDimension x="190" y="54"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="0" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Frames>
+											<EditBox name="CalendarEventDescription" letters="300" multiLine="true" enableMouse="true" autoFocus="false">
+												<Size>
+													<AbsDimension x="190" y="34"/>
+												</Size>
+												<Anchors>
+													<Anchor point="TOPLEFT">
+														<Offset>
+															<AbsDimension x="6" y="-3"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnLoad>
+														CalendarInputBox_OnLoad(3);
+													</OnLoad>
+													<OnTabPressed>
+														CalendarInputBox_TabPressed();
+													</OnTabPressed>
+													<OnEscapePressed>
+														this:ClearFocus();
+													</OnEscapePressed>
+													<OnEnterPressed>
+														CalendarEventEditor_DoneEditing();
+													</OnEnterPressed>
+													<OnEditFocusGained>
+														this:HighlightText(0, 300);
+													</OnEditFocusGained>
+													<OnEditFocusLost>
+														this:HighlightText(0, 0);
+													</OnEditFocusLost>
+													<OnTextChanged>
+														ScrollingEdit_OnTextChanged(CalendarEventDescriptionScrollFrame);
+													</OnTextChanged>
+													<OnCursorChanged>
+														ScrollingEdit_OnCursorChanged(arg1, arg2-10, arg3, arg4);
+													</OnCursorChanged>
+													<OnUpdate>
+														ScrollingEdit_OnUpdate(CalendarEventDescriptionScrollFrame);
+													</OnUpdate>
+												</Scripts>
+												<FontString inherits="ChatFontNormal"/>
+											</EditBox>
+										</Frames>
+										<Scripts>
+											<OnMouseUp>
+												CalendarEventDescription:SetFocus();
+											</OnMouseUp> 
+										</Scripts>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+						</Frames>
+					</Frame>
+					<CheckButton name="CalendarEventEditorSelfAttend" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventDescriptionFrame" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetWidth(140);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+							</OnLoad>
+							<OnClick>
+								CalendarEventEditor_SetSelfAttend(this:GetChecked());
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Frame name="CalendarEventEditorAttendanceFrame" hidden="true" setAllPoints="true">
+				<Frames>
+					<Frame name="CalendarEventEditorAttendance" inherits="CalendarAttendanceListTemplate" setAllPoints="true" hidden="false">
+						<Scripts>
+							<OnLoad>
+								CalendarAttendanceList_SetCanEdit(this, true);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			
+			<Button name="CalendarEventEditorFrameTab1" inherits="CalendarEventEditorTabTemplate" id="1" text="GroupCalendar_cEvent">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEventEditorFrameTab2" inherits="CalendarEventEditorTabTemplate" id="2" text="GroupCalendar_cAttendance">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="CalendarEventEditorFrameTab1" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<Frame name="CalendarAddPlayerFrame" hidden="true" frameStrata="DIALOG" inherits="CalendarAddPlayerTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Frame>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				CalendarEventEditor_OnLoad();
+			</OnLoad>
+			<OnShow>
+				CalendarEventEditor_OnShow();
+			</OnShow>
+			<OnHide>
+				CalendarEventEditor_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="CalendarClassLimitsFrame" parent="GroupCalendarFrame" hidden="true" frameStrata="DIALOG" inherits="CalendarClassLimitsTemplate">
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="200" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+</UI>

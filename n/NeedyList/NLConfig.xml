@@ -1,0 +1,2255 @@
+<!-- Ralak's Needy List -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+	<Script file="NeedyList.lua"/>
+	<Script file="NLConfig.lua"/>
+
+	<CheckButton name="NLCheckTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				if ( this:GetChecked() ) then
+					PlaySound("igMainMenuOptionCheckBoxOff");
+				else
+					PlaySound("igMainMenuOptionCheckBoxOn");
+				end
+			</OnClick>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<Button name="NLButtonTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="28" y="28"/>
+		</Size>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnShow>
+				this:SetBackdropColor(0, 0, 0.5, 1);
+			</OnShow>
+		</Scripts>
+	</Button>
+
+	<Button name="NLNeedTemplate" virtual="true" hidden="true" inherits="NLButtonTemplate">
+		<Size>
+			<AbsDimension x="300" y="30"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent_CheckButton" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Button name="$parent_ColorSwatch">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_CheckButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="175" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="14" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						NL_OpenColorPicker(this:GetParent());
+					</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			<Button name="$parentFilters" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="68" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_ColorSwatch">
+						<Offset>
+							<AbsDimension x="5" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_FILTERS);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						if( NLFilterListFrame.NeedFrame == this:GetParent():GetName() and NLFilterListFrame:IsVisible() ) then
+							NLFilterListFrame:Hide();
+						else
+							NLFilterListFrame:Hide();
+							if( this:GetParent().Filter == nil ) then
+								this:GetParent().Filter = {Type="Everyone"};
+							end
+							NLFilterListFrame.NeedFrame = this:GetParent():GetName();
+							NLFilterListFrame:SetPoint("TOPLEFT", this:GetName(), "TOPRIGHT");
+							NLFilterListFrame:Show();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				this:SetBackdropColor(0, 0, 0.5, 1);
+			</OnShow>
+			<OnMouseDown>
+				if( NLConfigNeedsFrameNeedSticky ~= this and NLConfigNeedsFrameNeedNeverShow ~= this ) then
+					NLMovingFrame = this;
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				NLMovingFrame = nil;
+			</OnMouseUp> 
+			<OnEnter>
+				if( this ~= NLMovingFrame and NLMovingFrame ~= nil ) then
+					if( NLConfigNeedsFrameNeedSticky ~= this and NLConfigNeedsFrameNeedNeverShow ~= this ) then
+						NL_SwapNeedFrames( this, NLMovingFrame );
+					end
+				else
+					NL_SetTooltipOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(NL_CLICKANDDRAG);
+					this:SetBackdropColor(0, 0.5, 0.5, 1);
+				end
+			</OnEnter>
+			<OnLeave>
+				if( NLMovingFrame == nil ) then
+					this:SetBackdropColor(0, 0, 0.5, 1);
+					GameTooltip:Hide();
+				end
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Frame name="NLConfigFrameTemplate" virtual="true" toplevel="true" frameStrata="LOW" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="340" y="430" />
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />	
+				<Size>
+					<AbsDimension x="128" y="17" />
+				</Size>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Scripts>
+			<OnMouseDown>
+				this:StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<Frame name="NLConfigFrame" inherits="NLConfigFrameTemplate" parent="UIParent">
+		<Size>
+			<AbsDimension x="450" y="510" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="350" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitleText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="NLConfigFrame">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parent_CheckButtonUseWhenSolo" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonUseWhenSoloText:SetText(NL_USEWHENSOLO);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonUseInParty" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonUseWhenSolo" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="85" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonUseInPartyText:SetText(NL_USEINPARTY);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonUseInRaid" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonUseInParty" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="85" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonUseInRaidText:SetText(NL_USEINRAID);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowHealth" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonUseWhenSolo" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowHealthText:SetText(NL_SHOWHEALTHBAR);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowMana" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowHealth" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowManaText:SetText(NL_SHOWRAGEMANAENERGY);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonUseCastParty" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowMana" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonUseCastPartyText:SetText(NL_USECASTPARTYCLICKS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonLargeNeedIcons" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonUseCastParty" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonLargeNeedIconsText:SetText(NL_LARGENEEDICONS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonInvertList" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonLargeNeedIcons" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonInvertListText:SetText(NL_GROWLISTUPWARD);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonColorByClass" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonInvertList" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonColorByClassText:SetText(NL_COLORFRAMESBYCLASS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowTargetFrame" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonColorByClass" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowTargetFrameText:SetText(ML_SHOWTARGETMONITOR);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowHealthNum" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowTargetFrame" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowHealthNumText:SetText(NL_SHOWHEALTHASNUMBER);
+					</OnLoad>
+					<OnShow>
+						if( NLConfig.ShowHealthNum == 1 ) then
+							NLConfigFrame_CheckButtonShowHealthLost:Show();
+						else
+							NLConfigFrame_CheckButtonShowHealthLost:Hide();
+						end
+					</OnShow>
+					<OnClick>
+						if( this:GetChecked() == nil ) then
+							NLConfigFrame_CheckButtonShowHealthLost:Hide();
+						else
+							NLConfigFrame_CheckButtonShowHealthLost:Show();
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowHealthLost" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowHealthNum" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowHealthLostText:SetText(NL_SHOWHEALTHLOST);
+						if( NLConfigFrame_CheckButtonShowHealthNum:GetChecked() == nil ) then
+							NLConfigFrame_CheckButtonShowHealthLost:Hide();
+						end
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowNeeds" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-210" y="-63" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowNeedsText:SetText(NL_SHOWNEEDICONS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowBuffs" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowNeeds" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowBuffsText:SetText(NL_SHOWBUFFS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowHealBuffs" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowBuffs" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowHealBuffsText:SetText(NL_SHOWHEALBUFFS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowDebuffs" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowHealBuffs" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowDebuffsText:SetText(NL_SHOWDEBUFFS);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonSwapNeedsAndDetails" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowDebuffs" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonSwapNeedsAndDetailsText:SetText(NL_SHOWNEEDONLEFT);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonAutoSort" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonSwapNeedsAndDetails" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonAutoSortText:SetText(NL_AUTOSORT);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonShowTooltips" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonAutoSort" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonShowTooltipsText:SetText(NL_SHOWTOOLTIP);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonSpellNotify" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonShowTooltips" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonSpellNotifyText:SetText(NL_WISPERCASTNOTIFY);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parent_CheckButtonHideHeader" inherits="NLCheckTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CheckButtonSpellNotify" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_CheckButtonHideHeaderText:SetText(NL_HIDELISTWHENEMTPY);
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<Button name="$parentDefaults" inherits="GameMenuButtonTemplate">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="60" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_LOAD_DEFAULTS);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NLConfig = NL_GetConfigForCurrentPlayer( true );
+						NL_InitializeConfigFrame();
+						NL_SaveConfig();
+						NLHeader:ClearAllPoints();
+						NLHeader:SetPoint("TOPRIGHT", "UIParent", "TOPRIGHT", -150, -150);
+						NLMembertarget:ClearAllPoints();
+						NLMembertarget:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 150, -150);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<EditBox name="$parent_MaxUnits" letters="50" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="50" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="NLConfigFrame">
+						<Offset>
+							<AbsDimension x="-30" y="100"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentDescription" inherits="GameFontNormalSmall" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-15" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="50" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_MaxUnitsDescription:SetText(NL_STR_MAX_UNITS);
+					</OnLoad>
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						this:HighlightText();
+					</OnEditFocusGained>
+					<OnEscapePressed>
+						if( NLConfig.BlackListDelay ) then
+							this:SetNumber(NLConfig.MaxUnits);
+						end
+						this:ClearFocus();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<EditBox name="$parent_BlackListDelay" letters="50" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="50" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="NLConfigFrame">
+						<Offset>
+							<AbsDimension x="-30" y="80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentDescription" inherits="GameFontNormalSmall" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-15" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="50" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						NLConfigFrame_BlackListDelayDescription:SetText(NL_STR_BLACKLIST_TIMER);
+					</OnLoad>
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						this:HighlightText();
+					</OnEditFocusGained>
+					<OnEscapePressed>
+						if( NLConfig.BlackListDelay ) then
+							this:SetNumber(NLConfig.BlackListDelay);
+						end
+						this:ClearFocus();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Slider name="$parent_SliderFrameWidth" orientation="HORIZONTAL" minValue="60" maxValue="200" valueStep="5" defaultValue="80">
+				<Size>
+					<AbsDimension x="128" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentDefaults">
+						<Offset>
+							<AbsDimension x="0" y="80" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="8"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="6" bottom="6"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="BOTTOM" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="60">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontHighlightSmall" text="200">
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnValueChanged>
+						getglobal( this:GetName() .. "Text" ):SetText(string.format( NL_STR_FRAME_WIDTH.." %d", this:GetValue()));
+					</OnValueChanged>
+				</Scripts>
+				<ThumbTexture file="Interface\Buttons\UI-SliderBar-Button-Vertical">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+				</ThumbTexture>
+			</Slider>
+			<Button name="$parentConfigureSpells" inherits="GameMenuButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentDefaults">
+						<Offset>
+							<AbsDimension x="5" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_CONFIG_SPELLS);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NLConfigFrame:Hide();
+						NLFilterListFrame:Hide();
+						NLConfigSpellsFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentConfigureNeeds" inherits="GameMenuButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentDefaults">
+						<Offset>
+							<AbsDimension x="-5" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_CONFIG_NEEDS);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NLConfigFrame:Hide();
+						NLFilterListFrame:Hide();
+						NLConfigNeedsFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentSave" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="64" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-5" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_SAVE);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						if ( ColorPickerFrame:IsVisible() ) then
+							ColorPickerFrame:Hide();
+						end
+						NL_SaveConfig();
+						NLConfigFrame:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="64" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="5" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_CANCEL);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NLConfigFrame:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				NLConfigFrameTitleText:SetText(NL_NEEDY_CONFIG);
+				tinsert(UISpecialFrames,"NLConfigFrame");
+				NL_InitializeConfigFrame();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="NLConfigNeedsFrame" movable="true" inherits="NLConfigFrameTemplate" parent="UIParent">
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="-150" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="250" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitleText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="$parentNeedSticky" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						getglobal("NLConfigNeedsFrameNeedSticky_CheckButtonText"):SetText(NL_STICKYUNITS);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedNeverShow" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						getglobal("NLConfigNeedsFrameNeedNeverShow_CheckButtonText"):SetText(NL_NEVERSHOW);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedHealth" inherits="NLNeedTemplate">
+				<Frames>
+					<EditBox name="$parent_EditBox" letters="3" historyLines="0" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="38" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="80" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-5" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset>
+												<AbsDimension x="-10" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnTextChanged>
+								if( NLConfigNeedsFrameNeedHealth_EditBox:GetNumber() > 100 ) then
+									NLConfigNeedsFrameNeedHealth_EditBox:SetNumber(100);
+								end
+							</OnTextChanged> 
+							<OnEditFocusLost>
+								this:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								this:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+							getglobal("NLConfigNeedsFrameNeedHealth_CheckButtonText"):SetText("Health              %");
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedMana" inherits="NLNeedTemplate">
+				<Frames>
+					<EditBox name="$parent_EditBox" letters="3" historyLines="0" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="38" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="80" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-5" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset>
+												<AbsDimension x="-10" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnTextChanged>
+								if( NLConfigNeedsFrameNeedMana_EditBox:GetNumber() > 100 ) then
+								NLConfigNeedsFrameNeedMana_EditBox:SetNumber(100);
+								end
+							</OnTextChanged>
+							<OnEditFocusLost>
+								this:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								this:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal("NLConfigNeedsFrameNeedMana_CheckButtonText"):SetText("Mana                %");
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFortitude" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFortitude_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["Fortitude"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button> 
+
+			<Button name="$parentNeedMark" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedMark_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_DRUID_NAME]["Mark"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedThorns" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedThorns_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_DRUID_NAME]["Thorns"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedClarity" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedClarity_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_DRUID_NAME]["Clarity"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedIntellect" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedIntellect_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["Intellect"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFrostArmor" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFrostArmor_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["FrostArmor"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedIceArmor" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedIceArmor_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["IceArmor"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedAmplifyMagic" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedAmplifyMagic_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["AmplifyMagic"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDampenMagic" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDampenMagic_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["DampenMagic"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedManaShield" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedManaShield_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["ManaShield"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedMageArmor" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedMageArmor_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_MAGE_NAME]["MageArmor"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedShadowProt" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedShadowProt_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["ShadowProt"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDivineSpirit" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDivineSpirit_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["DivineSpirit"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFearWard" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFearWard_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["FearWard"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedShadowguard" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedShadowguard_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["Shadowguard"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedTouchOfWeakness" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedTouchOfWeakness_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["TouchOfWeakness"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedInnerFire" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedInnerFire_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["InnerFire"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedPWShield" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedPWShield_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["PWShield"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFeedback" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFeedback_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PRIEST_NAME]["Feedback"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedBlessMight" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBlessMight_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PALADIN_NAME]["BlessMight"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedBlessWisdom" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBlessWisdom_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PALADIN_NAME]["BlessWisdom"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedBlessKings" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBlessKings_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PALADIN_NAME]["BlessKings"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedBlessSalvation" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBlessSalvation_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PALADIN_NAME]["BlessSalvation"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedBlessLight" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBlessLight_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PALADIN_NAME]["BlessLight"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedBlessSanctuary" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBlessSanctuary_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_PALADIN_NAME]["BlessSanctuary"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedSoulstone" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedSoulstone_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["Soulstone"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFireShield" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFireShield_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["FireShield"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDemonSkin" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDemonSkin_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["DemonSkin"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDemonArmor" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDemonArmor_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["DemonArmor"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedUnendingBreath" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedUnendingBreath_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["UnendingBreath"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDetectLesserInvis" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDetectLesserInvis_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["DetectLesserInvis"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDetectInvis" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDetectInvis_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["DetectInvis"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDetectGreaterInvis" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDetectGreaterInvis_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARLOCK_NAME]["DetectGreaterInvis"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDetectTraps" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDetectTraps_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_ROGUE_NAME]["DetectTraps"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedLightningShield" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedLightningShield_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_SHAMAN_NAME]["LightningShield"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedRockbiter" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedRockbiter_CheckButtonText:SetText(NL_ENCHANT_SPELLS[NL_SHAMAN_NAME]["Rockbiter"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFlametongue" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFlametongue_CheckButtonText:SetText(NL_ENCHANT_SPELLS[NL_SHAMAN_NAME]["Flametongue"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedFrostbrand" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedFrostbrand_CheckButtonText:SetText(NL_ENCHANT_SPELLS[NL_SHAMAN_NAME]["Frostbrand"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedWindfury" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedWindfury_CheckButtonText:SetText(NL_ENCHANT_SPELLS[NL_SHAMAN_NAME]["Windfury"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentNeedBattleShout" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedBattleShout_CheckButtonText:SetText(NL_BUFF_SPELLS[NL_WARRIOR_NAME]["BattleShout"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedMainhandPoison" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedMainhandPoison_CheckButtonText:SetText(NL_ENCHANT_SPELLS[NL_ROGUE_NAME]["MainhandPoison"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedOffhandPoison" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedOffhandPoison_CheckButtonText:SetText(NL_ENCHANT_SPELLS[NL_ROGUE_NAME]["OffhandPoison"][1]);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedMagic" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedMagic_CheckButtonText:SetText(NL_MAGIC_DEBUFF);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedDisease" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedDisease_CheckButtonText:SetText(NL_DISEASE);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedPoison" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedPoison_CheckButtonText:SetText(NL_POISON);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedCurse" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedCurse_CheckButtonText:SetText(NL_CURSE);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedResurrection" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedResurrection_CheckButtonText:SetText(NL_RESURRECT);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNeedWellFed" inherits="NLNeedTemplate">
+				<Scripts>
+					<OnLoad>
+						NLConfigNeedsFrameNeedWellFed_CheckButtonText:SetText(NL_WELLFED);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentSave" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="60" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-5" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_SAVE);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						if ( ColorPickerFrame:IsVisible() ) then
+							ColorPickerFrame:Hide();
+						end
+						NL_SaveNeedsConfig();
+						NLFilterListFrame:Hide();
+						NLConfigNeedsFrame:Hide();
+						NLConfigFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="60" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="5" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_CANCEL);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NLFilterListFrame:Hide();
+						NLConfigNeedsFrame:Hide();
+						NLConfigFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				NLConfigNeedsFrameTitleText:SetText(NL_CONFIG_NEEDS);
+			</OnLoad>
+			<OnShow>
+				NL_InitializeConfigNeedsFrame();
+				tinsert(UISpecialFrames,"NLConfigNeedsFrame");
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Button name="NLFilterTargetTemplate" virtual="true" hidden="true" inherits="NLButtonTemplate">
+		<Size>
+			<AbsDimension x="85" y="28"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>
+				if( this.Flagged ) then
+					this:SetBackdropColor(0.5, 0.5, 1, 1);
+				else
+					this:SetBackdropColor(0, 0, 0.5, 1);
+				end
+			</OnShow>
+			<OnClick>
+				if( getglobal(NLFilterListFrame.NeedFrame).Filter.Names == nil ) then
+					getglobal(NLFilterListFrame.NeedFrame).Filter.Names = {};
+				end
+
+				if( this.Flagged ) then
+					getglobal(NLFilterListFrame.NeedFrame).Filter.Names[ getglobal( this:GetName() .. "Text" ):GetText() ] = nil;
+					this.Flagged = false;
+				else
+					getglobal(NLFilterListFrame.NeedFrame).Filter.Names[ getglobal( this:GetName() .. "Text" ):GetText() ] = true;
+					this.Flagged = true;
+				end
+			</OnClick>
+			<OnEnter>
+				this:SetBackdropColor(0, 0.5, 0, 1);
+			</OnEnter>
+			<OnLeave>
+				if( this.Flagged ) then
+					this:SetBackdropColor(0.5, 0.5, 1, 1);
+				else
+					this:SetBackdropColor(0, 0, 0.5, 1);
+				end
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Button name="NLFilterTemplate" virtual="true" inherits="NLButtonTemplate">
+		<Size>
+			<AbsDimension x="75" y="28"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				getglobal(this:GetName() .. "Text"):SetText(NL_FILTER_TYPE_NAMES[this.Type]);
+				if( getglobal(NLFilterListFrame.NeedFrame) ~= nil ) then
+					if( getglobal(NLFilterListFrame.NeedFrame).Filter.Type == this.Type ) then
+						-- this is where we show the appropriate subframe based on which filter to show
+						this:SetBackdropColor(0.5, 0.5, 1, 1);
+						if( getglobal(this:GetName() .. "Subframe") ~= nil ) then
+							getglobal(this:GetName() .. "Subframe"):Show();
+						end
+					else
+						-- hide the subframe
+						this:SetBackdropColor(0, 0, 0.5, 1);
+						if( getglobal(this:GetName() .. "Subframe") ~= nil ) then
+							getglobal(this:GetName() .. "Subframe"):Hide();
+						end
+					end
+				else
+					this:SetBackdropColor(0, 0, 0.5, 1);
+				end
+			</OnShow>
+			<OnClick>
+				if( getglobal(NLFilterListFrame.NeedFrame) ~= nil ) then
+					if( getglobal(NLFilterListFrame.NeedFrame).Filter.Type ~= this.Type ) then
+						-- hide the subframe of the previously selected filter and clear the filter
+						if( getglobal("NLFilterListFrame" .. getglobal(NLFilterListFrame.NeedFrame).Filter.Type .. "Subframe") ~= nil ) then
+							getglobal("NLFilterListFrame" .. getglobal(NLFilterListFrame.NeedFrame).Filter.Type .. "Subframe"):Hide();
+						end
+
+						getglobal("NLFilterListFrame" .. getglobal(NLFilterListFrame.NeedFrame).Filter.Type):SetBackdropColor(0, 0, 0.5, 1);
+						getglobal(NLFilterListFrame.NeedFrame).Filter = {};
+						getglobal(NLFilterListFrame.NeedFrame).Filter.Type = this.Type;
+						getglobal(NLFilterListFrame.NeedFrame).Filter.Names = nil;
+						if( getglobal("NLFilterListFrame" .. this.Type .. "Subframe") ~= nil ) then
+							getglobal("NLFilterListFrame" .. this.Type .. "Subframe"):Show();
+						end
+					end
+				end
+			</OnClick>
+			<OnEnter>
+				this:SetBackdropColor(0, 0.5, 0, 1);
+			</OnEnter>
+			<OnLeave>
+				if( getglobal(NLFilterListFrame.NeedFrame) ~= nil ) then
+					if( getglobal(NLFilterListFrame.NeedFrame).Filter.Type == this.Type ) then
+						this:SetBackdropColor(0.5, 0.5, 1, 1);
+					else
+						this:SetBackdropColor(0, 0, 0.5, 1);
+					end
+				else
+					this:SetBackdropColor(0, 0, 0.5, 1);
+				end
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Frame name="NLFilterListFrame" toplevel="true" frameStrata="LOW" movable="false" enableMouse="true" hidden="true" parent="NLConfigNeedsFrame">
+		<Size>
+			<AbsDimension x="150" y="200" />
+		</Size>
+		<Frames>
+			<Button name="$parentSpacer" inherits="NLButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="4" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEveryone" inherits="NLFilterTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSpacer">
+						<Offset>
+							<AbsDimension x="-4" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.Type = "Everyone";
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentUnits" inherits="NLFilterTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEveryone" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentSubframe" inherits="NLConfigFrameTemplate">
+						<Size>
+							<AbsDimension x="300" y="72" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT"/>
+						</Anchors>
+						<Frames>
+							<EditBox name="$parentNames" letters="50" historyLines="0" autoFocus="false">
+								<Size>
+									<AbsDimension x="250" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="25" y="-35" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<FontString name="$parentDescription" inherits="GameFontNormal" justifyH="RIGHT">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP">
+													<Offset>
+														<AbsDimension x="0" y="5" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+											<Size>
+												<AbsDimension x="8" y="20"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT">
+													<Offset>
+														<AbsDimension x="-8" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+										</Texture>
+										<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+											<Size>
+												<AbsDimension x="250" y="20"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+											</Anchors>
+											<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+										</Texture>
+										<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+											<Size>
+												<AbsDimension x="8" y="20"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+											</Anchors>
+											<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Description"):SetText(NL_FILTER_NAMES_DESC);
+									</OnLoad>
+									<OnEditFocusLost>
+										getglobal(NLFilterListFrame.NeedFrame).Filter.Names = string.gsub( this:GetText(), " ", "" );
+										this:HighlightText(0, 0);
+									</OnEditFocusLost>
+									<OnEditFocusGained>
+										this:HighlightText();
+									</OnEditFocusGained>
+									<OnEnterPressed>
+										getglobal(NLFilterListFrame.NeedFrame).Filter.Names = string.gsub( this:GetText(), " ", "" );
+									</OnEnterPressed>
+									<OnEscapePressed>
+										if( getglobal(NLFilterListFrame.NeedFrame).Filter.Names ) then
+											this:SetText(getglobal(NLFilterListFrame.NeedFrame).Filter.Names);
+										end
+										this:ClearFocus();
+									</OnEscapePressed>
+								</Scripts>
+								<FontString inherits="ChatFontNormal"/>
+							</EditBox>
+						</Frames>
+						<Scripts>
+							<OnShow>
+								if( getglobal(NLFilterListFrame.NeedFrame) ~= nil ) then
+									NL_PopulateUnitFilterFrame(getglobal(NLFilterListFrame.NeedFrame).Filter);
+								end
+							</OnShow>
+						</Scripts>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this.Type = "Units";
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentMulti" inherits="NLFilterTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentUnits" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentSubframe" inherits="NLConfigFrameTemplate">
+						<Size>
+							<AbsDimension x="384" y="190" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT"/>
+						</Anchors>
+						<Frames>
+							<Button name="$parentSelectAllParty" inherits="GameMenuButtonTemplate">
+								<Size>
+									<AbsDimension x="90" y="21" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="12" y="-13" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText(NL_FILTER_PARTIES_ALL);
+									</OnLoad>
+									<OnClick>
+										NL_SelectAllPartyFilterFrame();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentSelectNoneParty" inherits="GameMenuButtonTemplate">
+								<Size>
+									<AbsDimension x="90" y="21" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSelectAllParty"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText(NL_FILTER_PARTIES_NONE);
+									</OnLoad>
+									<OnClick>
+										NL_SelectNonePartyFilterFrame();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty1" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parentSelectAllParty"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY1);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty3" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty1"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY3);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty5" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty3"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY5);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty7" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty5"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY7);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty2" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentParty1"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY2);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty4" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty2"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY4);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty6" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty4"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY6);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty8" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty6"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_PARTY8);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentParty9" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentParty7"/></Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName() .. "Text"):SetText(NL_MYPARTY);
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentSelectNoneClass" inherits="GameMenuButtonTemplate">
+								<Size>
+									<AbsDimension x="90" y="21" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-12" y="-13" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText(NL_FILTER_CLASSES_NONE);
+									</OnLoad>
+									<OnClick>
+										NL_SelectNoneClassFilterFrame();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentSelectAllClass" inherits="GameMenuButtonTemplate">
+								<Size>
+									<AbsDimension x="90" y="21" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parentSelectNoneClass"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:SetText(NL_FILTER_CLASSES_ALL);
+									</OnLoad>
+									<OnClick>
+										NL_SelectAllClassFilterFrame();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass1" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parentSelectAllClass"/>
+								</Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[1][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass2" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass1"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[2][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass3" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass2"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[3][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass4" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass3"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[4][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass5" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass4"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[5][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass6" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass1"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[6][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass7" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass6"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[7][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass8" inherits="NLFilterTargetTemplate" hidden="true">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass7"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[8][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass9" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass8"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[9][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+							<Button name="$parentClass10" inherits="NLFilterTargetTemplate" hidden="false">
+								<Anchors><Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentClass9"/></Anchors>
+								<Scripts>
+									<OnShow>
+										getglobal(this:GetName() .. "Text"):SetText(NLClassLists[10][UnitFactionGroup("player")]);
+									</OnShow>
+								</Scripts>
+							</Button>
+						</Frames>
+						<Scripts>
+							<OnShow>
+								if( getglobal(NLFilterListFrame.NeedFrame) ~= nil ) then
+									NL_PopulatePartyFilterFrame(getglobal(NLFilterListFrame.NeedFrame).Filter);
+									NL_PopulateClassFilterFrame(getglobal(NLFilterListFrame.NeedFrame).Filter);
+								end
+							</OnShow>
+						</Scripts>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this.Type = "Multi";
+					</OnLoad>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<EditBox name="NLSpellEditTemplate" letters="30" historyLines="0" numeric="false" autoFocus="false" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="10" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEditFocusLost>
+				this:HighlightText(0, 0);
+			</OnEditFocusLost>
+			<OnEditFocusGained>
+				this:HighlightText();
+			</OnEditFocusGained>
+		</Scripts>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+
+	<Frame name="NLConfigSpellsFrame" movable="true" inherits="NLConfigFrameTemplate" parent="UIParent">
+		<Size>
+			<AbsDimension x="365" y="220" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="250" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitleText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDescription" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<EditBox name="$parentHeal1" inherits="NLSpellEditTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="150" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentDescription" inherits="GameFontNormal" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-130" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</EditBox>
+			<EditBox name="$parentHeal2" inherits="NLSpellEditTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHeal1">
+						<Offset>
+							<AbsDimension x="0" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentDescription" inherits="GameFontNormal" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-130" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</EditBox>
+			<EditBox name="$parentHeal3" inherits="NLSpellEditTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHeal2">
+						<Offset>
+							<AbsDimension x="0" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentDescription" inherits="GameFontNormal" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-130" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</EditBox>
+			<EditBox name="$parentHeal4" inherits="NLSpellEditTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHeal3">
+						<Offset>
+							<AbsDimension x="0" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentDescription" inherits="GameFontNormal" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-130" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</EditBox>
+			<EditBox name="$parentHeal5" inherits="NLSpellEditTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHeal4">
+						<Offset>
+							<AbsDimension x="0" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentDescription" inherits="GameFontNormal" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-130" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</EditBox>
+
+			<Button name="$parentSave" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="60" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-5" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_SAVE);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NL_SaveSpellsConfig();
+						NLFilterListFrame:Hide();
+						NLConfigSpellsFrame:Hide();
+						NLConfigFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="60" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="5" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(NL_CANCEL);
+					</OnLoad>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						NLFilterListFrame:Hide();
+						NLConfigSpellsFrame:Hide();
+						NLConfigFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				NLConfigSpellsFrameTitleText:SetText(NL_CONFIG_SPELLS);
+				NLConfigSpellsFrameDescription:SetText(NL_CONFIG_SPELL_DESC);
+				NLConfigSpellsFrameHeal1Description:SetText(NL_CONFIG_SPELL_HEAL1);
+				NLConfigSpellsFrameHeal2Description:SetText(NL_CONFIG_SPELL_HEAL2);
+				NLConfigSpellsFrameHeal3Description:SetText(NL_CONFIG_SPELL_HEAL3);
+				NLConfigSpellsFrameHeal4Description:SetText(NL_CONFIG_SPELL_HEAL4);
+				NLConfigSpellsFrameHeal5Description:SetText(NL_CONFIG_SPELL_HEAL5);
+			</OnLoad>
+			<OnShow>
+				NL_InitializeConfigSpellsFrame();
+				tinsert(UISpecialFrames,"NLConfigSpellsFrame");
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

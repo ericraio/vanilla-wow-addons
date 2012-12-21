@@ -1,0 +1,1925 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+
+	<Script file="localization.lua"/>
+	<Script file="SimpleActionSets.lua"/>
+	<Script file="SimpleActionSets_Hooks.lua"/>
+	
+	<Button name="SASMenuButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="21"/>
+		</Size>
+	</Button>
+	<Button name="SASActionButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIcon"/>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentFlash" file="Interface\Buttons\UI-QuickslotRed" hidden="true"/>
+				<FontString name="$parentHotKey" inherits="NumberFontNormalSmallGray" justifyH="RIGHT">
+					<Size>
+						<AbsDimension x="32" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentName" inherits="GameFontHighlightSmallOutline">
+					<Size>
+						<AbsDimension x="36" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentBorder" file="Interface\Buttons\UI-ActionButton-Border" hidden="true" alphaMode="ADD">
+					<Size>
+						<AbsDimension x="62" y="62"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentDelete" file="Interface\Buttons\UI-GroupLoot-Pass-Up" hidden="true">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentCopy" file="Interface\Buttons\UI-AutoCastableOverlay" hidden="true">
+					<Size>
+						<AbsDimension x="62" y="62"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
+			<Size>
+				<AbsDimension x="66" y="66"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				this:RegisterForDrag("LeftButton");
+				this.IsSASAction = true;
+				getglobal( this:GetName().."HotKey" ):SetText(this:GetID());
+			</OnLoad>
+			<OnClick>
+				SASActionButton_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				SASActionButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				SASActionButton_OnLeave();
+			</OnLeave>
+			<OnDragStart>
+				SASActionButton_OnDragStart();
+			</OnDragStart>
+			<OnDragStop>
+				SASActionButton_OnDragStop();
+			</OnDragStop>
+			<OnReceiveDrag>
+				SASActionButton_OnReceiveDrag();
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+	<Button name="SASActionBarButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="29" y="44"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">				
+				<FontString name="$parentNumber" inherits="GameFontNormalLarge">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-2" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="22"/>
+		</HitRectInsets>
+		<NormalTexture file="Interface\Buttons\UI-MicroButtonCharacter-Up">
+			<TexCoords left="0.2" right="1.0" top="0.359375" bottom="1.0"/>
+		</NormalTexture>
+		<PushedTexture file="Interface\Buttons\UI-MicroButtonCharacter-Down">
+			<TexCoords left="0.2" right="1.0" top="0.359375" bottom="1.0"/>
+		</PushedTexture>
+		<HighlightTexture file="Interface\Buttons\UI-MicroButton-Hilight">
+			<TexCoords left="0.2" right="1.0" top="0.359375" bottom="1.0"/>
+		</HighlightTexture>
+		<Scripts>
+			<OnLoad>
+				--this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				--this:RegisterForDrag("LeftButton", "RightButton");
+				this:RegisterForClicks("LeftButtonUp");
+				this:RegisterForDrag("LeftButton");
+				this.IsSASBar = true;
+				getglobal( this:GetName().."Number" ):SetText(this:GetParent():GetID()+1);
+			</OnLoad>
+			<OnClick>
+				SASActionBarButton_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				SASActionBarButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				SASActionBarButton_OnLeave();
+			</OnLeave>
+			<OnDragStart>
+				SASActionBarButton_OnDragStart();
+			</OnDragStart>
+			<OnDragStop>
+				SASActionBarButton_OnDragStop();
+			</OnDragStop>
+			<OnReceiveDrag>
+				SASActionBarButton_OnReceiveDrag();
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+	<Frame name="SASActionBarTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="498" y="36"/>
+		</Size>
+		<Frames>
+			<Button name="$parentButton" inherits="SASActionBarButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<CheckButton name="$parentEnable" checked="true" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parentButton" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASActions_BarEnable_OnClick(this:GetParent():GetID(), this:GetChecked());
+					</OnClick>
+					<OnReceiveDrag>
+						SASActionBarButton_OnReceiveDrag();
+					</OnReceiveDrag>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentAction1" inherits="SASActionButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction2" inherits="SASActionButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction3" inherits="SASActionButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction4" inherits="SASActionButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction5" inherits="SASActionButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction6" inherits="SASActionButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction7" inherits="SASActionButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction8" inherits="SASActionButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction9" inherits="SASActionButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction10" inherits="SASActionButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction11" inherits="SASActionButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction10" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentAction12" inherits="SASActionButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentAction11" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+		</Frames>
+	</Frame>
+	<Button name="SASTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PanelTemplates_Tab_OnClick(this:GetParent());
+				SASMain_UpdateDisplay();
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="SASFrame"/>	
+	<GameTooltip name="SASToolTip" inherits="GameTooltipTemplate" hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+			</OnLoad>
+			<OnEvent>
+				this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnEvent>
+		</Scripts>
+	</GameTooltip>
+
+	<Frame name="SASMain" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="640" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="44" top="0" bottom="13"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\HelpFrame\HelpFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-Top">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-Bottom">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-BotRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="SASMainHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="346" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-12" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="SAS_TITLE">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SASMainHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>
+				SASActions_OnShow();
+				SASActions_Display();
+			</OnShow>
+			<OnHide>
+				SASActions_OnHide();
+			</OnHide>
+		</Scripts>
+		<Frames>
+			<Frame name="$parentTabDivider" inherits="HelpFrameDividerTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Button name="SASActionsDelete" inherits="SASMenuButtonTemplate" text="SAS_TEXT_DELETE">
+				<Size>
+					<AbsDimension x="100" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-53" y="-56"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASActions_Delete();
+					</OnClick>
+				</Scripts>
+			</Button>		
+			<Button name="SASActionsSaveNew" inherits="SASMenuButtonTemplate" text="SAS_TEXT_SAVEAS">
+				<Size>
+					<AbsDimension x="100" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="SASActionsDelete">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASActions_SaveNew();
+					</OnClick>
+				</Scripts>
+			</Button>			
+			<Frame name="SASActionSetsDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="160" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="SASActionsSaveNew">
+						<Offset>
+							<AbsDimension x="16" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						SASActions_DropDown_OnLoad();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Button name="$parentTab1" inherits="SASTabButtonTemplate" id="1" text="SAS_TEXT_TAB_SETS">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTab2" inherits="SASTabButtonTemplate" id="2" text="SAS_TEXT_TAB_OPTIONS">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentTab3" inherits="SASTabButtonTemplate" id="3" text="SAS_TEXT_TAB_HELP">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SASMainCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-42" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<CheckButton name="SASActionsCheckAll" checked="true">
+				<Size>
+					<AbsDimension x="28" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-52"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="GameFontNormal" text="Check All Bars">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = SAS_TEXT_CB_ALLBARS;
+					</OnLoad>
+					<OnClick>
+						SASActions_Bar_CheckAll();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Frame name="$parentTopDivider" inherits="HelpFrameDividerTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-72"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentBottomDivider" inherits="HelpFrameDividerTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTopDivider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-270"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<ScrollFrame name="SASActions" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="540" y="280"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTopDivider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="8" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="SASActionsScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="128"/>
+							</Size>
+							<Anchors>
+								<!--<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">-->
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="0.5"/>
+						</Texture>
+						<Texture name="SASActionsScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="108"/>
+							</Size>
+							<Anchors>
+								<!--<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">-->
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="-4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.421875"/>
+						</Texture>
+						<Texture name="SASActionsScrollBarMiddle" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="60"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="SASActionsScrollBarTop" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOM" relativeTo="SASActionsScrollBarBottom" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top=".75" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<ScrollChild>
+					<Frame name="$parentScrollChild">
+						<Size>
+							<AbsDimension x="526" y="465"/>
+						</Size>
+						<Frames>
+							<Frame name="SASActionBar0" inherits="SASActionBarTemplate" id="0">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="0" y="-5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar1" inherits="SASActionBarTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar0" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar2" inherits="SASActionBarTemplate" id="2">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar1" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar3" inherits="SASActionBarTemplate" id="3">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar2" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar4" inherits="SASActionBarTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar3" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar5" inherits="SASActionBarTemplate" id="5">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar4" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar6" inherits="SASActionBarTemplate" id="6">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar5" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-20"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar7" inherits="SASActionBarTemplate" id="7">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar6" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar8" inherits="SASActionBarTemplate" id="8">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar7" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="SASActionBar9" inherits="SASActionBarTemplate" id="9">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="SASActionBar8" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+				<Scripts>
+					<OnShow>
+						SASActions_OnShow();
+					</OnShow>
+				</Scripts>
+			</ScrollFrame>
+			<Frame name="SASSets" hidden="true">
+				<Size>
+					<AbsDimension x="568" y="90"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="18" y="48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="SASActionsSave" inherits="UIPanelButtonTemplate2" text="SAS_TEXT_SAVE">
+						<Size>
+							<AbsDimension x="152" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="5" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.oldEnable = this.Enable;
+								this.oldDisable = this.Disable;
+								this.Enable = SASActionsSave_Enable;
+								this.Disable = SASActionsSave_Disable;
+							</OnLoad>
+							<OnClick>
+								SASActions_Save();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentLoadCurrent" inherits="UIPanelButtonTemplate2" text="SAS_TEXT_LOADCURRENT">
+						<Size>
+							<AbsDimension x="152" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SASActions_LoadCurrent();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentClearSet" inherits="UIPanelButtonTemplate2" text="SAS_TEXT_CLEARSET">
+						<Size>
+							<AbsDimension x="152" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SASActions_ClearTemp();
+							</OnClick>
+						</Scripts>
+					</Button>			
+					<!--<Frame name="SASSets_Character_DropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+						<Size>
+							<AbsDimension x="160" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								SASSets_Character_DropDown_OnLoad();
+							</OnShow>
+						</Scripts>
+					</Frame>		
+					<Frame name="SASSets_CharacterSets_DropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+						<Size>
+							<AbsDimension x="160" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SASSets_Character_DropDown" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-30" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								SASSets_CharacterSets_DropDown_OnLoad();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Button name="$parentOtherSet" inherits="UIPanelButtonTemplate2" text="SAS_TEXT_LOADSET">
+						<Size>
+							<AbsDimension x="174" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="SASSets_CharacterSets_DropDown" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-14" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SASActions_LoadOtherSet();
+							</OnClick>
+						</Scripts>
+					</Button>-->
+				</Frames>
+			</Frame>
+			<Frame name="SASOptions" hidden="true">
+				<Size>
+					<AbsDimension x="568" y="180"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="18" y="50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentMinimap">
+						<Size>
+							<AbsDimension x="300" y="60"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontHighlight" text="Minimap Button">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="9" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentShow" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="5" y="-5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_Minimap_Show();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentDrag" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentShow" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_Minimap_Drag();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+						</Frames>
+					</Frame>
+					<Frame name="$parentMinimapPosition">
+						<Size>
+							<AbsDimension x="300" y="110"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimap" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Frames>
+							<Slider name="SASButtonPos" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="280" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-20" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName().."Text"):SetText(SAS_OPTIONS_BUTPOS.." "..SAS_POS);
+										getglobal(this:GetName().."High"):SetText(360);
+										getglobal(this:GetName().."Low"):SetText(0);
+										SASButtonPos:SetMinMaxValues(0,360);
+										SASButtonPos:SetValueStep(1);
+									</OnLoad>
+									<OnValueChanged>
+										SAS_POS = SASButtonPos:GetValue();
+										getglobal(this:GetName().."Text"):SetText(SAS_OPTIONS_BUTPOS.." "..SASButtonPos:GetValue());
+										SASMinimap_PosUpdate();
+										SASOptionsMinimapPositionUndo:Enable();
+									</OnValueChanged>
+								</Scripts>
+							</Slider>
+							<Slider name="SASButtonOffset" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="280" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-50" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										getglobal(this:GetName().."Text"):SetText(SAS_OPTIONS_OFFSET.." "..SAS_OFFSET);
+										getglobal(this:GetName().."High"):SetText(30);
+										getglobal(this:GetName().."Low"):SetText(0);
+										SASButtonOffset:SetMinMaxValues(0,30);
+										SASButtonOffset:SetValueStep(1);
+									</OnLoad>
+									<OnValueChanged>
+										SAS_OFFSET = SASButtonOffset:GetValue();
+										getglobal(this:GetName().."Text"):SetText(SAS_OPTIONS_OFFSET.." "..SASButtonOffset:GetValue());
+										SASMinimap_PosUpdate();
+										SASOptionsMinimapPositionUndo:Enable();
+									</OnValueChanged>
+								</Scripts>
+							</Slider>
+							<Button name="$parentDefault" inherits="OptionsButtonTemplate" text="Default">
+								<Anchors>
+									<Anchor point="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="5" y="5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_Minimap_Defaults();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentUndo" inherits="OptionsButtonTemplate" text="Undo">
+								<Anchors>
+									<Anchor point="BOTTOMRIGHT">
+										<Offset>
+											<AbsDimension x="-5" y="5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_Minimap_Undo();
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+					<Frame name="$parentGeneral">
+						<Size>
+							<AbsDimension x="268" y="170"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontHighlight" text="General Options">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="9" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentWarnings" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="5" y="-5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_General_Warnings();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentEmptyBars" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentWarnings" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_General_EmptyBars();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentEmptyButtons" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentEmptyBars" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="10" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_General_EmptyButtons();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentFakeItemTooltips" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentEmptyButtons" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="-10" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_General_FakeItemTooltips();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentAutoRestore" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentFakeItemTooltips" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_General_AutoRestore();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentAutoRestoreWarning" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentAutoRestore" relativePoint="BOTTOM">
+										<Offset>
+											<AbsDimension x="10" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										SASOptions_General_AutoRestoreWarnings();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+						</Frames>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						SASOptions_OnShow();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<ScrollFrame name="SASHelp" inherits="UIPanelScrollFrameTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="540" y="183"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentBottomDivider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="8" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="SASHelpScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="128"/>
+							</Size>
+							<Anchors>
+								<!--<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">-->
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="0.5"/>
+						</Texture>
+						<Texture name="SASHelpScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="108"/>
+							</Size>
+							<Anchors>
+								<!--<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">-->
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="-4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.421875"/>
+						</Texture>
+						<Texture name="SASHelpScrollBarMiddle" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="60"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="SASHelpScrollBarTop" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOM" relativeTo="SASHelpScrollBarBottom" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top=".75" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<ScrollChild>
+					<Frame name="$parentScrollChild">
+						<Size>
+							<AbsDimension x="526" y="50"/>
+						</Size>
+						<Layers>
+							<Layer lever="BACKGROUND">
+								<FontString name="SASHelpTitle" inherits="GameFontNormalLarge" text="SAS_TEXT_HELP_HEADER">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="5" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="SASHelpDescript" inherits="GameFontHighlight" text="SAS_TEXT_HELP_INTRO" justifyH="LEFT" justifyV="TOP">
+									<Size>
+										<AbsDimension x="526" y="65"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-25"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="SASHelpTempText" inherits="GameFontHighlight" text="SAS_TEXT_HELP_TEXT" justifyH="LEFT" justifyV="TOP">
+									<Size>
+										<AbsDimension x="526" y="600"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-45"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+			<Button name="$parentCancel" inherits="SASMenuButtonTemplate" text="SAS_OPTIONS_CLOSE">
+				<Size>
+					<AbsDimension x="100" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-53" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASActions_Cancel();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentSwapSet" inherits="SASMenuButtonTemplate" text="SAS_TEXT_SWAPSET">
+				<Size>
+					<AbsDimension x="100" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASActions_SwapSet();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				PanelTemplates_SetNumTabs(this, 3);
+				this.selectedTab = 1;
+				PanelTemplates_UpdateTabs(this);
+			</OnLoad>
+			<OnShow>
+				SASMain_UpdateDisplay();
+			</OnShow>
+			<OnHide>
+				SAS_Temp = nil;
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="SASSaveMenu" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="350" y="135"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Save New Set As">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEditing" inherits="GameFontNormal" text="Type in the name of the new set:">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHelp" inherits="GameFontNormal" text="This name is already used by another set." hidden="true">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-75"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentNameEB" historyLines="0" letters="250">
+				<Size>
+					<AbsDimension x="250" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension x="65" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="-10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension x="25" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension x="5" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						this:SetFocus();
+					</OnShow>
+					<OnEnterPressed>
+						SASSaveMenu_Save(SASSaveMenuNameEB:GetText());
+					</OnEnterPressed>
+					<OnTextChanged>
+						if ( this:GetText() == "" ) then
+							getglobal(this:GetParent():GetName() .. "OkayButton"):Disable();
+							SASSaveMenuHelp:SetText("|cffff0000You must enter a name for the new set.");
+							SASSaveMenuHelp:Show();
+						elseif ( SAS_SetExists(this:GetText()) ) then
+							getglobal(this:GetParent():GetName() .. "OkayButton"):Enable();
+							SASSaveMenuHelp:SetText("|cffff0000This set already exists, save over it?");
+							SASSaveMenuHelp:Show();
+						else
+							getglobal(this:GetParent():GetName() .. "OkayButton"):Enable();
+							SASSaveMenuHelp:Hide();
+						end
+					</OnTextChanged>
+					<OnEscapePressed>
+						HideUIPanel(this:GetParent());
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="$parentOkayButton" hidden="false" inherits="GameMenuButtonTemplate" text="SAS_TEXT_WARNING_OKAY">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASSaveMenu_Save(SASSaveMenuNameEB:GetText());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelButton" hidden="false" inherits="GameMenuButtonTemplate" text="SAS_TEXT_WARNING_CANCEL">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="SASWarningFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="350" y="135"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Warning">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontNormal" text="" justifyH="CENTER" justifyV="CENTER">
+					<Size>
+						<AbsDimension x="300" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentOkayButton" hidden="false" inherits="GameMenuButtonTemplate" text="Okay">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SASWarning_Okay();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelButton" hidden="false" inherits="GameMenuButtonTemplate" text="Cancel">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Frame name="SASFakeDragFrame" frameStrata="DIALOG" toplevel="true" parent="UIParent" movable="true" enableMouse="false" hidden="true">
+		<Size>
+			<AbsDimension x="34" y="34"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon">
+					<Size>
+						<AbsDimension x="34" y="34"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon1">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="40" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon2">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon1" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon3">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon2" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon4">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon3" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon5">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon4" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon6">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon5" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon7">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon6" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon8">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon7" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon9">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon8" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon10">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon9" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon11">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon10" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon12">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon11" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="SASMinimapFrame" parent="Minimap" enableMouse="true" hidden="false" frameStrata="MEDIUM">
+		<Size>
+			<AbsDimension x="30" y="30"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Minimap" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="SASMinimapButton">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\SimpleActionSets\sas"/>
+				<PushedTexture file="Interface\AddOns\SimpleActionSets\sas">
+					<Size>
+						<AbsDimension x="29" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0.5" y="-0.5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</PushedTexture>
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+				<Scripts>
+					<OnClick>
+						SASMinimap_OnClick(arg1);
+					</OnClick>
+					<OnEnter>
+						SASMinimap_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnLoad>
+						SASMinimap_OnLoad();
+					</OnLoad>
+					<OnEvent>
+						SASMinimap_OnEvent();
+					</OnEvent>
+					<OnDragStart>
+						SASMinimap_DragStart()
+					</OnDragStart>
+					<OnDragStop>
+						SASMinimap_DragStop();
+					</OnDragStop>
+					<OnMouseUp>
+						SASMinimap_DragStop();
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+			<Frame name="SAS_SetsDropDown" inherits="UIDropDownMenuTemplate" hidden="true">
+				<Scripts>
+					<OnLoad>
+						SASMinimap_SetsDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

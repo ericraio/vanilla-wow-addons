@@ -1,0 +1,612 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="AIOB_localization.lua"/> 
+	<Script file="AllInOneBank_Config.lua"/>
+	<Script file="AllInOneBank.lua"/> 
+	<Script file="AllInOneBank_TextFns.lua"/>
+	<!-- BEGIN TEMPLATES -->
+	<Button name="AIOBButtonTemplate" inherits="ItemButtonTemplate" hidden="true" virtual="true">
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				AIOBFrame_Button_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				AIOBFrame_Button_OnLeave();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Button name="AIOBFrameItemButtonTemplate" inherits="AIOBButtonTemplate" hidden="true" virtual="true">
+		<Frames>
+			<Model name="$parentCooldown" inherits="CooldownFrameTemplate"/>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				AIOBFrameItemButton_OnLoad();
+			</OnLoad>
+			<OnHide>
+				if ( this.hasStackSplit and (this.hasStackSplit == 1) ) then
+					StackSplitFrame:Hide();
+				end
+			</OnHide>
+			<OnClick>
+				AIOBFrameItemButton_OnClick(arg1);
+			</OnClick>
+			<OnDragStart>
+				AIOBFrameItemButton_OnClick("LeftButton",1);
+			</OnDragStart>
+			<OnReceiveDrag>
+				AIOBFrameItemButton_OnClick("LeftButton",1);
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+	<Button name="AIOBBagButtonTemplate" inherits="AIOBButtonTemplate" hidden="false" virtual="true">
+		<Scripts>
+			<OnLoad>
+				this.isBag = 1;
+				AIOBFrameItemButton_OnLoad();
+			</OnLoad>
+			<OnClick>
+				if ( IsShiftKeyDown() ) then
+					AIOBFrameItemButtonBag_OnShiftClick();
+				else
+					AIOBFrameItemButtonBag_OnClick(arg1);
+				end
+			</OnClick>
+			<OnDragStart>
+				AIOBFrameItemButtonBag_OnShiftClick("LeftButton",1);
+			</OnDragStart>
+			<OnReceiveDrag>
+				AIOBFrameItemButtonBag_OnClick("LeftButton", 1);
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+	<!-- BEGIN REAL FRAMES -->
+	<Frame name="AIOBFrame" frameStrata="MEDIUM" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size><AbsDimension x="350" y="500"/></Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" >
+				<Offset><AbsDimension x="-200" y="50"/></Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop name="AIOBFrameBackdrop" bgFile="Interface\AddOns\AllInOneInventory\Skin\AllBlack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets><AbsInset left="5" right="5" top="5" bottom="5"/></BackgroundInsets>
+			<TileSize><AbsValue val="16"/></TileSize>
+			<EdgeSize><AbsValue val="16"/></EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentPortrait" hidden="true" file="Interface\AddOns\AllInOneInventory\Skin\AIOBPortait" > <!--   -->
+					<Size><AbsDimension x="58" y="58"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="-7" y="2"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+							
+				<Texture name="$parentTextureTopLeft" file="Interface\AddOns\AllInOneInventory\Skin\AIOBTopLeft" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="-67" y="60"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTextureTopRight" file="Interface\AddOns\AllInOneInventory\Skin\AIOBTopRight" hidden="true">
+					<Size>
+						<AbsDimension x="64" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"> 
+							<Offset><AbsDimension x="36" y="60"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTextureTopCenter" file="Interface\AddOns\AllInOneInventory\Skin\AIOBTopCenter" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentTextureTopLeft" relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentTextureTopRight" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentTextureBottomLeft" file="Interface\AddOns\AllInOneInventory\Skin\AIOBBottomLeft" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset><AbsDimension x="-67" y="-60"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTextureBottomRight" file="Interface\AddOns\AllInOneInventory\Skin\AIOBBottomRight" hidden="true">
+					<Size>
+						<AbsDimension x="64" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"> 
+							<Offset><AbsDimension x="36" y="-60"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTextureBottomCenter" file="Interface\AddOns\AllInOneInventory\Skin\AIOBBottomCenter" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextureBottomLeft" relativePoint="TOPRIGHT"/>
+						<Anchor point="TOPRIGHT" relativeTo="$parentTextureBottomRight" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentTextureLeft" file="Interface\AddOns\AllInOneInventory\Skin\AIOBLeft" hidden="true">
+					<Size>
+						<AbsDimension x="64" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parentTextureTopLeft" relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentTextureBottomLeft" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTextureRight" file="Interface\AddOns\AllInOneInventory\Skin\AIOBRight" hidden="true">
+					<Size>
+						<AbsDimension x="64" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextureTopRight" relativePoint="BOTTOMLEFT"/>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentTextureBottomRight" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTextureCenter" file="Interface\AddOns\AllInOneInventory\Skin\AIOBCenter" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextureTopCenter" relativePoint="BOTTOMLEFT"/>
+						<Anchor point="TOPRIGHT" relativeTo="$parentTextureTopCenter" relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentTextureBottomCenter" relativePoint="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentTextureBottomCenter" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="7" y="-6"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AIOBFrameAtBankText" inherits="GameFontNormal" justifyH="LEFT" text="AIOB_ATBANK" hidden="true">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+							<Offset><AbsDimension x="7" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSlots" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset><AbsDimension x="7" y="15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+		<Frame name="AIOBFramePurchaseInfo" hidden="false">
+			<Size>
+				<AbsDimension x="200" y="23" />
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-15" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Frames>
+				<Button name="AIOBFramePurchaseButton" inherits="UIPanelButtonTemplate" disabled="true" virtual="true" text="AIOB_FRAME_BUY">
+					<Size>
+						<AbsDimension x="64" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							PlaySound("igMainMenuOption");
+							PurchaseSlot();
+						</OnClick>
+					</Scripts>
+				</Button>
+				<Frame name="AIOBFrameDetailMoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="AIOBFramePurchaseButton" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="-5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							SmallMoneyFrame_OnLoad();
+							MoneyFrame_SetType("STATIC");
+						</OnLoad>
+					</Scripts>
+				</Frame>
+			</Frames>
+		</Frame>	 
+	
+      <Button name="$parentItem1" inherits="AIOBFrameItemButtonTemplate" id="1"/>
+      <Button name="$parentItem2" inherits="AIOBFrameItemButtonTemplate" id="2"/>
+      <Button name="$parentItem3" inherits="AIOBFrameItemButtonTemplate" id="3"/>
+      <Button name="$parentItem4" inherits="AIOBFrameItemButtonTemplate" id="4"/>
+      <Button name="$parentItem5" inherits="AIOBFrameItemButtonTemplate" id="5"/>
+      <Button name="$parentItem6" inherits="AIOBFrameItemButtonTemplate" id="6"/>
+      <Button name="$parentItem7" inherits="AIOBFrameItemButtonTemplate" id="7"/>
+      <Button name="$parentItem8" inherits="AIOBFrameItemButtonTemplate" id="8"/>
+      <Button name="$parentItem9" inherits="AIOBFrameItemButtonTemplate" id="9"/>
+      <Button name="$parentItem10" inherits="AIOBFrameItemButtonTemplate" id="10"/>
+      <Button name="$parentItem11" inherits="AIOBFrameItemButtonTemplate" id="11"/>
+      <Button name="$parentItem12" inherits="AIOBFrameItemButtonTemplate" id="12"/>
+      <Button name="$parentItem13" inherits="AIOBFrameItemButtonTemplate" id="13"/>
+      <Button name="$parentItem14" inherits="AIOBFrameItemButtonTemplate" id="14"/>
+      <Button name="$parentItem15" inherits="AIOBFrameItemButtonTemplate" id="15"/>
+      <Button name="$parentItem16" inherits="AIOBFrameItemButtonTemplate" id="16"/>
+      <Button name="$parentItem17" inherits="AIOBFrameItemButtonTemplate" id="17"/>
+      <Button name="$parentItem18" inherits="AIOBFrameItemButtonTemplate" id="18"/>
+      <Button name="$parentItem19" inherits="AIOBFrameItemButtonTemplate" id="19"/>
+      <Button name="$parentItem20" inherits="AIOBFrameItemButtonTemplate" id="20"/>
+      <Button name="$parentItem21" inherits="AIOBFrameItemButtonTemplate" id="21"/>
+      <Button name="$parentItem22" inherits="AIOBFrameItemButtonTemplate" id="22"/>
+      <Button name="$parentItem23" inherits="AIOBFrameItemButtonTemplate" id="23"/>
+      <Button name="$parentItem24" inherits="AIOBFrameItemButtonTemplate" id="24"/>
+      <Button name="$parentItem25" inherits="AIOBFrameItemButtonTemplate" id="25"/>
+      <Button name="$parentItem26" inherits="AIOBFrameItemButtonTemplate" id="26"/>
+      <Button name="$parentItem27" inherits="AIOBFrameItemButtonTemplate" id="27"/>
+      <Button name="$parentItem28" inherits="AIOBFrameItemButtonTemplate" id="28"/>
+      <Button name="$parentItem29" inherits="AIOBFrameItemButtonTemplate" id="29"/>
+      <Button name="$parentItem30" inherits="AIOBFrameItemButtonTemplate" id="30"/>
+      <Button name="$parentItem31" inherits="AIOBFrameItemButtonTemplate" id="31"/>
+      <Button name="$parentItem32" inherits="AIOBFrameItemButtonTemplate" id="32"/>
+      <Button name="$parentItem33" inherits="AIOBFrameItemButtonTemplate" id="33"/>
+      <Button name="$parentItem34" inherits="AIOBFrameItemButtonTemplate" id="34"/>
+      <Button name="$parentItem35" inherits="AIOBFrameItemButtonTemplate" id="35"/>
+      <Button name="$parentItem36" inherits="AIOBFrameItemButtonTemplate" id="36"/>
+      <Button name="$parentItem37" inherits="AIOBFrameItemButtonTemplate" id="37"/>
+      <Button name="$parentItem38" inherits="AIOBFrameItemButtonTemplate" id="38"/>
+      <Button name="$parentItem39" inherits="AIOBFrameItemButtonTemplate" id="39"/>
+      <Button name="$parentItem40" inherits="AIOBFrameItemButtonTemplate" id="40"/>
+      <Button name="$parentItem41" inherits="AIOBFrameItemButtonTemplate" id="41"/>
+      <Button name="$parentItem42" inherits="AIOBFrameItemButtonTemplate" id="42"/>
+      <Button name="$parentItem43" inherits="AIOBFrameItemButtonTemplate" id="43"/>
+      <Button name="$parentItem44" inherits="AIOBFrameItemButtonTemplate" id="44"/>
+      <Button name="$parentItem45" inherits="AIOBFrameItemButtonTemplate" id="45"/>
+      <Button name="$parentItem46" inherits="AIOBFrameItemButtonTemplate" id="46"/>
+      <Button name="$parentItem47" inherits="AIOBFrameItemButtonTemplate" id="47"/>
+      <Button name="$parentItem48" inherits="AIOBFrameItemButtonTemplate" id="48"/>
+      <Button name="$parentItem49" inherits="AIOBFrameItemButtonTemplate" id="49"/>
+      <Button name="$parentItem50" inherits="AIOBFrameItemButtonTemplate" id="50"/>
+      <Button name="$parentItem51" inherits="AIOBFrameItemButtonTemplate" id="51"/>
+      <Button name="$parentItem52" inherits="AIOBFrameItemButtonTemplate" id="52"/>
+      <Button name="$parentItem53" inherits="AIOBFrameItemButtonTemplate" id="53"/>
+      <Button name="$parentItem54" inherits="AIOBFrameItemButtonTemplate" id="54"/>
+      <Button name="$parentItem55" inherits="AIOBFrameItemButtonTemplate" id="55"/>
+      <Button name="$parentItem56" inherits="AIOBFrameItemButtonTemplate" id="56"/>
+      <Button name="$parentItem57" inherits="AIOBFrameItemButtonTemplate" id="57"/>
+      <Button name="$parentItem58" inherits="AIOBFrameItemButtonTemplate" id="58"/>
+      <Button name="$parentItem59" inherits="AIOBFrameItemButtonTemplate" id="59"/>
+      <Button name="$parentItem60" inherits="AIOBFrameItemButtonTemplate" id="60"/>
+      <Button name="$parentItem61" inherits="AIOBFrameItemButtonTemplate" id="61"/>
+      <Button name="$parentItem62" inherits="AIOBFrameItemButtonTemplate" id="62"/>
+      <Button name="$parentItem63" inherits="AIOBFrameItemButtonTemplate" id="63"/>
+      <Button name="$parentItem64" inherits="AIOBFrameItemButtonTemplate" id="64"/>
+      <Button name="$parentItem65" inherits="AIOBFrameItemButtonTemplate" id="65"/>
+      <Button name="$parentItem66" inherits="AIOBFrameItemButtonTemplate" id="66"/>
+      <Button name="$parentItem67" inherits="AIOBFrameItemButtonTemplate" id="67"/>
+      <Button name="$parentItem68" inherits="AIOBFrameItemButtonTemplate" id="68"/>
+      <Button name="$parentItem69" inherits="AIOBFrameItemButtonTemplate" id="69"/>
+      <Button name="$parentItem70" inherits="AIOBFrameItemButtonTemplate" id="70"/>
+      <Button name="$parentItem71" inherits="AIOBFrameItemButtonTemplate" id="71"/>
+      <Button name="$parentItem72" inherits="AIOBFrameItemButtonTemplate" id="72"/>
+      <Button name="$parentItem73" inherits="AIOBFrameItemButtonTemplate" id="73"/>
+      <Button name="$parentItem74" inherits="AIOBFrameItemButtonTemplate" id="74"/>
+      <Button name="$parentItem75" inherits="AIOBFrameItemButtonTemplate" id="75"/>
+      <Button name="$parentItem76" inherits="AIOBFrameItemButtonTemplate" id="76"/>
+      <Button name="$parentItem77" inherits="AIOBFrameItemButtonTemplate" id="77"/>
+      <Button name="$parentItem78" inherits="AIOBFrameItemButtonTemplate" id="78"/>
+      <Button name="$parentItem79" inherits="AIOBFrameItemButtonTemplate" id="79"/>
+      <Button name="$parentItem80" inherits="AIOBFrameItemButtonTemplate" id="80"/>
+      <Button name="$parentItem81" inherits="AIOBFrameItemButtonTemplate" id="81"/>
+      <Button name="$parentItem82" inherits="AIOBFrameItemButtonTemplate" id="82"/>
+      <Button name="$parentItem83" inherits="AIOBFrameItemButtonTemplate" id="83"/>
+      <Button name="$parentItem84" inherits="AIOBFrameItemButtonTemplate" id="84"/>
+      <Button name="$parentItem85" inherits="AIOBFrameItemButtonTemplate" id="85"/>
+      <Button name="$parentItem86" inherits="AIOBFrameItemButtonTemplate" id="86"/>
+      <Button name="$parentItem87" inherits="AIOBFrameItemButtonTemplate" id="87"/>
+      <Button name="$parentItem88" inherits="AIOBFrameItemButtonTemplate" id="88"/>
+      <Button name="$parentItem89" inherits="AIOBFrameItemButtonTemplate" id="89"/>
+      <Button name="$parentItem90" inherits="AIOBFrameItemButtonTemplate" id="90"/>
+      <Button name="$parentItem91" inherits="AIOBFrameItemButtonTemplate" id="91"/>
+      <Button name="$parentItem92" inherits="AIOBFrameItemButtonTemplate" id="92"/>
+      <Button name="$parentItem93" inherits="AIOBFrameItemButtonTemplate" id="93"/>
+      <Button name="$parentItem94" inherits="AIOBFrameItemButtonTemplate" id="94"/>
+      <Button name="$parentItem95" inherits="AIOBFrameItemButtonTemplate" id="95"/>
+      <Button name="$parentItem96" inherits="AIOBFrameItemButtonTemplate" id="96"/>
+      <Button name="$parentItem97" inherits="AIOBFrameItemButtonTemplate" id="97"/>
+      <Button name="$parentItem98" inherits="AIOBFrameItemButtonTemplate" id="98"/>
+      <Button name="$parentItem99" inherits="AIOBFrameItemButtonTemplate" id="99"/>
+      <Button name="$parentItem100" inherits="AIOBFrameItemButtonTemplate" id="100"/>
+      <Button name="$parentItem101" inherits="AIOBFrameItemButtonTemplate" id="101"/>
+      <Button name="$parentItem102" inherits="AIOBFrameItemButtonTemplate" id="102"/>
+      <Button name="$parentItem103" inherits="AIOBFrameItemButtonTemplate" id="103"/>
+      <Button name="$parentItem104" inherits="AIOBFrameItemButtonTemplate" id="104"/>
+      <Button name="$parentItem105" inherits="AIOBFrameItemButtonTemplate" id="105"/>
+      <Button name="$parentItem106" inherits="AIOBFrameItemButtonTemplate" id="106"/>
+      <Button name="$parentItem107" inherits="AIOBFrameItemButtonTemplate" id="107"/>
+      <Button name="$parentItem108" inherits="AIOBFrameItemButtonTemplate" id="108"/>
+      <Button name="$parentItem109" inherits="AIOBFrameItemButtonTemplate" id="109"/>
+      <Button name="$parentItem110" inherits="AIOBFrameItemButtonTemplate" id="110"/>
+      <Button name="$parentItem111" inherits="AIOBFrameItemButtonTemplate" id="111"/>
+      <Button name="$parentItem112" inherits="AIOBFrameItemButtonTemplate" id="112"/>
+      <Button name="$parentItem113" inherits="AIOBFrameItemButtonTemplate" id="113"/>
+      <Button name="$parentItem114" inherits="AIOBFrameItemButtonTemplate" id="114"/>
+      <Button name="$parentItem115" inherits="AIOBFrameItemButtonTemplate" id="115"/>
+      <Button name="$parentItem116" inherits="AIOBFrameItemButtonTemplate" id="116"/>
+      <Button name="$parentItem117" inherits="AIOBFrameItemButtonTemplate" id="117"/>
+      <Button name="$parentItem118" inherits="AIOBFrameItemButtonTemplate" id="118"/>
+      <Button name="$parentItem119" inherits="AIOBFrameItemButtonTemplate" id="119"/>
+      <Button name="$parentItem120" inherits="AIOBFrameItemButtonTemplate" id="120"/>
+      <Button name="$parentItem121" inherits="AIOBFrameItemButtonTemplate" id="121"/>
+      <Button name="$parentItem122" inherits="AIOBFrameItemButtonTemplate" id="122"/>
+      <Button name="$parentItem123" inherits="AIOBFrameItemButtonTemplate" id="123"/>
+      <Button name="$parentItem124" inherits="AIOBFrameItemButtonTemplate" id="124"/>
+      <Button name="$parentItem125" inherits="AIOBFrameItemButtonTemplate" id="125"/>
+      <Button name="$parentItem126" inherits="AIOBFrameItemButtonTemplate" id="126"/>
+      <Button name="$parentItem127" inherits="AIOBFrameItemButtonTemplate" id="127"/>
+      <Button name="$parentItem128" inherits="AIOBFrameItemButtonTemplate" id="128"/>
+      <Button name="$parentItem129" inherits="AIOBFrameItemButtonTemplate" id="129"/>
+      <Button name="$parentItem130" inherits="AIOBFrameItemButtonTemplate" id="130"/>
+      <Button name="$parentItem131" inherits="AIOBFrameItemButtonTemplate" id="131"/>
+      <Button name="$parentItem132" inherits="AIOBFrameItemButtonTemplate" id="132"/>
+		<Frame name="AIOBBagButtonsBar">
+			<Size>
+			   <AbsDimension x="232" y="37"/>
+			</Size>
+			<Anchors>
+			   <Anchor point="TOP" relativePoint="TOP" relativeto="$parent">
+   			   <Offset>
+   			      <AbsDimension x="0" y="-67" />
+   			   </Offset>
+			   </Anchor>
+			</Anchors>
+			<Frames>
+				<Button name="AIOBFrameBag5" inherits="AIOBBagButtonTemplate" id="5"/>
+				<Button name="AIOBFrameBag6" inherits="AIOBBagButtonTemplate" id="6"/>
+				<Button name="AIOBFrameBag7" inherits="AIOBBagButtonTemplate" id="7"/>
+				<Button name="AIOBFrameBag8" inherits="AIOBBagButtonTemplate" id="8"/>
+				<Button name="AIOBFrameBag9" inherits="AIOBBagButtonTemplate" id="9"/>
+				<Button name="AIOBFrameBag10" inherits="AIOBBagButtonTemplate" id="10"/>
+			</Frames>
+		</Frame>
+		<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="2" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					CloseAIOBFrame();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parentFreezeButton" inherits="UIPanelCloseButton">
+			<NormalTexture name="AIOBFreezeNormalTexture" file="Interface\AddOns\AllInOneInventory\Skin\LockButton-Unlocked-Up"/>
+			<PushedTexture name="AIOBFreezePushedTexture" file="Interface\AddOns\AllInOneInventory\Skin\LockButton-Locked-Down"/>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentCloseButton" relativePoint="LEFT">
+					<Offset><Absdimension x="10" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					AIOB_Toggle_Option("Freeze");
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parentHideBagsButton" inherits="UIPanelCloseButton">
+			<NormalTexture name="AIOBHideBagsNormalTexture" file="Interface\AddOns\AllInOneInventory\Skin\MinimizeButton-Up"/>
+			<PushedTexture name="AIOBHideBagsPushedTexture" file="Interface\AddOns\AllInOneInventory\Skin\MinimizeButton-Down"/>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentFreezeButton" relativePoint="LEFT">
+					<Offset><Absdimension x="15" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					AIOB_Toggle_Option("BagView");
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="AIOBDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="AIOBFrame" relativePoint="TOP">
+					<Offset>
+						<AbsDimension x="30" y="-38"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="AIOB_FRAME_SELECTPLAYER">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			<Scripts>
+				<OnShow>
+					AIOB_UserDropDown_OnLoad();
+				</OnShow>
+				<OnEnter>
+					GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+					GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+			</Scripts>
+		</Frame>
+		<CheckButton name="AIOB_AllRealms_Check" inherits="UICheckButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPRIGHT" RelativeTo="AIOBDropDown" RelativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="15" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<HitRectInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</HitRectInsets>
+			<Scripts>
+				<OnShow>
+					AIOB_ShowAllRealms_Check_OnShow();
+				</OnShow>
+				<OnClick>
+					if ( this:GetChecked() ) then
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					else
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					end
+					AIOB_ShowAllRealms_Check_OnClick();
+				</OnClick>
+				<OnEnter>
+					if ( this.tooltipText ) then
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+					end
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+			</Scripts>
+		</CheckButton>
+			<Frame name="AIOB_MoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					--	this.small = 1;
+					--	this.moneyType = "PLAYER";
+					--	this.info = {
+					--		collapse = 1,
+					--		showSmallerCoins = "Backpack"};
+					</OnLoad>
+					<OnShow>
+						-- Do nothing override
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="AIOB_MoneyFrameTotal" inherits="SmallMoneyFrameTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="AIOBFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="AIOB_TotalMoneyText" inherits="GameFontHighlightSmall" text="AIOB_FRAME_TOTAL" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-14" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+						--this.small = 1;
+						--this.moneyType = "PLAYER";
+						--this.info = {
+						--	collapse = 1,
+						--	showSmallerCoins = "Backpack"};
+					</OnLoad>
+					<OnShow>
+						--do nothing
+					</OnShow>
+				</Scripts>
+			</Frame>
+	</Frames>
+	<Scripts>
+      <OnEvent>
+        AIOBFrame_OnEvent(event);
+        AIOBTitle_Update();
+      </OnEvent>
+      <OnLoad>
+        AIOBFrame_OnLoad();
+        --this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        AIOBTitle_Update();
+      </OnLoad>
+      <OnHide>
+        AIOBFrame_OnHide();
+      </OnHide>
+      <OnShow>
+        AIOBFrame_OnShow();
+      </OnShow>
+      <OnMouseDown>
+        if ( arg1 == "LeftButton" ) then
+          if ( AIOBFreeze == 0 ) then
+            this:StartMoving();
+          else
+            AIOB_Print(AIOB_FROZEN_ERROR);
+          end
+        end
+      </OnMouseDown>
+      <OnMouseUp>
+        if ( arg1 == "LeftButton" ) then
+          this:StopMovingOrSizing();
+        end
+      </OnMouseUp>
+  </Scripts>
+  </Frame>
+
+	<GameTooltip name="AIOBHiddenTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true" />
+</Ui>

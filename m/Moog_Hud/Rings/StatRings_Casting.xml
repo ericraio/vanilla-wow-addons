@@ -1,0 +1,105 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Frame name="StatRingsCasting" parent="UIParent" inherits="StatRingsRingTemplate">
+		<Anchors>
+			<Anchor point="RIGHT" relativeTo="StatRingsMana">
+				<Offset>
+					<AbsDimension x="15" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				StatRings_RegisterRing(this, "Casting");
+      			StatRingsRingTemplate_OnLoad();
+				this:SetReversed(true);
+      			
+				this:SetAlpha(0.1);
+        		
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+				this:RegisterEvent("SPELLCAST_START");
+				this:RegisterEvent("SPELLCAST_STOP");
+				this:RegisterEvent("SPELLCAST_FAILED");
+				this:RegisterEvent("SPELLCAST_INTERRUPTED");
+				this:RegisterEvent("SPELLCAST_DELAYED");
+				this:RegisterEvent("SPELLCAST_CHANNEL_START");
+				this:RegisterEvent("SPELLCAST_CHANNEL_UPDATE");
+				this:RegisterEvent("SPELLCAST_CHANNEL_STOP");
+    			
+				this:SetMax(1);
+				this:SetValue(0);
+
+				function this:UpdateAlpha()
+					if this.startValue &lt; this.maxValue then
+						StatRingsTest_SetAlpha(self, 0.4);
+					elseif this.startValue == this.maxValue then
+						StatRingsTest_SetAlpha(self, 0);
+					end
+				end
+				this:AddUpdateFunction(this.UpdateAlpha);
+				this.dirty = true;
+			</OnLoad>
+			<OnEvent>
+				if (event == "PLAYER_ENTERING_WORLD") then
+					this:UpdateColor({["r"] = 1, ["g"] = 1, ["b"] = 0});
+					this:SetMax(1);
+					this:SetValue(0);
+					this.spellstart = GetTime();
+					this.channeling = 0;
+					this.casting = 0;
+					return;
+				elseif event == "SPELLCAST_START" then
+					this:UpdateColor({["r"] = 1, ["g"] = 1, ["b"] = 0});
+					Moog_HudCastTime:SetTextColor(1, 1, 0 );
+					this:SetMax(arg2);
+					-- sr_pr("Spell " .. arg1 .. " : " .. (arg2 / 1000));
+					this:SetValue(0);
+					this.casting = 1;
+					this.channeling = 0;
+					this.spellstart = GetTime();
+				elseif event == "SPELLCAST_CHANNEL_START" then
+					this:UpdateColor({["r"] = 0, ["g"] = 1, ["b"] = 0});
+					Moog_HudCastTime:SetTextColor(0, 1, 0 );
+					this:SetMax(arg1);
+					-- sr_pr("Channelled Spell " .. arg2 .. " : " .. (arg1 / 1000));
+					this:SetValue(arg1);
+					this.channeling = 1;
+					this.casting = 1;
+					this.spellstart = GetTime();
+				elseif event == "SPELLCAST_CHANNEL_UPDATE" then
+					if arg1 == 0 then
+						this:SetValue(0);
+						this.casting = 0;
+						this.channeling = 0;
+						Moog_HudCastTime:SetText("");
+						if (MoogHUDInfo.BlinkLongCast) then
+							Moog_SpellBlinkTime = GetTime(); end
+						-- sr_pr("Channelled Spell Aborted");
+					else
+						this:SetValue(this.maxValue-arg1);
+						this.spellstart = GetTime() - (this.endValue/1000);
+						-- sr_pr("Channelled Spell remaining : " .. (arg1 / 1000));
+					end
+				elseif event == "SPELLCAST_DELAYED" then
+					this:SetValue(this.startValue - arg1);
+					this.spellstart = this.spellstart + (arg1/1000);
+					-- sr_pr("Spell Delayed");
+				elseif event == "SPELLCAST_STOP" or event == "SPELLCAST_CHANNEL_STOP" or event == "SPELLCAST_FAILED" or event == "SPELLCAST_INTERRUPTED" then
+					if this.channeling == nil then
+						this.channeling = 0; end
+					if ((this.channeling == 0) or (event == "SPELLCAST_CHANNEL_STOP")) then
+						if ((this.casting == 1) and (MoogHUDInfo.BlinkLongCast)) then
+							Moog_SpellBlinkTime = GetTime(); end
+						if ((this.casting == 0) and (MoogHUDInfo.BlinkInstaCast)) then
+							Moog_SpellBlinkTime = GetTime(); end
+						this:SetValue(0);
+						this.casting = 0;
+						Moog_HudCastTime:SetText("");
+					end
+					-- sr_pr("Spell Aborted");
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

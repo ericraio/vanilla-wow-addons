@@ -1,0 +1,73 @@
+ItemRack - Events
+
+Version 1.7 of ItemRack introduces event-driven scripts to swap gear.
+
+__ Using Events __
+
+In the options window when you right-click the minimap button are three tabs.  All event setup is done in the Events tab.
+
+Events are disabled initially.  To begin using events you need to enable it with the "Enable Events" checkbox at the top of the Events tab.  This is the "master switch".  You can set up a key binding to toggle all events on or off as well.
+
+In that tab you'll see a list of events with a red question mark beside it.  Click the question mark to choose what set to equip for the event.  When you've chosen a set it will be enabled.  You won't be able to enable an event until you've associated a set for it. (even if the event script doesn't rely on a defined script)
+
+To disable/enable a set with an associated event, uncheck the event.  Alternately, you can click Delete to remove the set association and have it drop down to the bottom of the list.
+
+Deleting an event not associated with a set will completely remove it if no other characters use that event.
+
+__ Editing or Creating Events __
+
+If you hit Edit or New at the bottom of the events tab you'll be brought to the event script editor.  Here you define when the event runs and what it does.  You can copy-paste into/out of these boxes.  The four boxes are:
+
+Name: This is the name you'll see in the event list, ie Mount, Warrior:Berserker, Swimming, etc.
+Trigger: This is the WoW-generated event you want the event to trigger from. ie PLAYER_AURAS_CHANGED, CHAT_MSG_COMBAT_SELF_HITS, etc
+Delay: This is the time, in seconds, after the last occurance of the Trigger before the script runs.
+Script: This is the actual script that runs.  You can use any lua construct or make it as complicated as you want.  The code is directly run without any parsing.
+
+Some knowledge of WoW Lua and scripting will help a great deal in editing and creating events.  An excellent resource is the wiki: http://www.wowwiki.com/Interface_Customization
+
+In the lower left is a Test button.  You can use this to run the script once to make sure there are no syntax or other obvious errors.  But it can't test if the trigger works or anything beyond stuff that would prompt a red error box.
+
+If at any time you've messed up your default events and want them back: /itemrack reset events.  This will not touch your custom events.  It will just recreate the default events.
+
+__ Event Name __
+
+- If you format a name like Class:Event, then you can restrict the list to the class unless "Show All" is checked in the Events tab.  For instance "Mage:Evocation" will make the event only list on mages.
+- The class is the localized name of the class.  Other clients will probably want to keep "Show All" checked.
+- If you change the name of an existing event and save it, a COPY is made.  This is to make it easy to set up multi-event scripts that can fire on many different triggers. (crits for spells, melee, vs hostile players, creatures, etc)
+
+__ Event Trigger __
+
+- The list of all usable events are listed here: http://www.wowwiki.com/Events
+- You can use ITEMRACK_NOTIFY as a trigger for the mod's notify.  arg1 will be the name of item you received notification for.
+- You can use ITEMRACK_ITEMUSED as a trigger for an item being used.  arg1 will be the name of the item and arg2 will be the slot the item was used in.
+- Events enabled on a character are registered after the first PLAYER_ENTERING_WORLD when you log in/reload, not including that PLAYER_ENTERING_WORLD.
+
+__ Event Delay __
+
+- If the delay is 0, then the script will immediately run on every occurance of the event.
+- If the delay is greater than 0, then the script will be run only *once* after the last occurange of the event.
+- Many events are fired in game hundreds of times in a flurry. BAG_UPDATE for instance can fire 300 times when you zone.  In those cases, putting a small delay here will ensure your script only runs once instead of 300 times. 0.5 seconds is sufficient in most cases.  For events that are frequent but not spastic (like UNIT_AURA or PLAYER_AURAS_CHANGED), I prefer 1 to defer processing while heavy stuff is going on (combat, loading, etc) but you can usually choose 0.
+- You can use the delay to wait before running a script also.  For instance the "Overpower Begin" has a delay of 0 when an opponent dodges melee, and "Overpower End" has a delay of 5 when an opponent dodges melee.  With this pair it can swap in gear at the dodge and swap gear out 5 seconds later.  If the opponent dodges again in that 5 seconds, "Overpower Begin" will immediately run again and the "Overpower End" will wait until 5 seconds after tht second dodge.
+- arg1 and arg2 will be saved in delayed events, but arg3+ will not
+
+__ Event Script __
+
+- You can use the entire Lua environment.  In the default events I make heavy use of globals to carry a state over from one event to the next.  You could check the gear currently equipped to determine its new state instead if you want.
+- Scripts can be up to 4096 characters long.
+- You can add bracketed comments and they will appear in an event's tooltip: --[[Add notes anywhere in your script]]
+- Scripts are run with RunScript().  This is not as fast as pre-compiled Lua.  If you have some massive function you want to do many times, it's always better to embed it into an existing .lua that loads with the game.
+- There are some helper functions to help simplify scripts:
+EquipSet() : Equips the set associated with the event
+SaveSet() : Remembers the gear currently in the slots of the associated set
+LoadSet() : Equips the gear saved with SaveSet() in the slots of associated set
+ToggleSet() : Toggles between "SaveSet() EquipSet()" and "LoadSet()".
+- You can pass names of sets in the above functions also:
+EquipSet("setname") : Equips a set named "setname"
+SaveSet("setname") : Remembers the gear currently in the slots of "setname"
+LoadSet("setname") : Equips the gear saved with SaveSet() in the slots of "setname"
+ToggleSet("setname") : Toggles between "SaveSet("setname") EquipSet("setname")" and "LoadSet("setname")"
+- If either EquipSet, SaveSet, LoadSet or ToggleSet is used by another part of the UI, then use ItemRack_EquipSet, ItemRack_SaveSet, ItemRack_LoadSet, ItemRack_ToggleSet instead.
+- Two other helper functions:
+ItemRack_PlayerMounted() : Returns true if the player is mounted.  This method is made for speed primarily.  If you have problems with this method, I highly recommend the IsMounted mod.  ItemRack will defer to IsMounted to be sure if you're mounted or not.
+ItemRack_GetForm() : Returns the name of the form you are in.  ie "Battle Stance" "Moonkin Form" etc
+- Finally, remember the script is run without parsing.  You don't need to equip a set in reaction to an event.  You can make an event to watch chat and flash the chat window if someone says your name.  Mostly, remember that ItemRack makes no effort to make sure the script will do what it's supposed to do.

@@ -1,0 +1,1089 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<!--
+		Version: <%version%>
+		Revision: $Id: GathererInfo.xml,v 1.2 2005/09/06 11:15:20 islorgris Exp $
+	-->
+
+	<!-- Load scripts -->
+ 	<Script file="GathererInfo.lua"/>	
+
+	<!-- Templates -->
+	<Button name="GathererInfo_FrameColumnHeaderTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="10" y="24"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+					<Size>
+						<AbsDimension x="5" y="24"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+					<Size>
+						<AbsDimension x="53" y="24"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+					<Size>
+						<AbsDimension x="4" y="24"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				if ( this.sortType ) then
+					SortGathererInfo(this.sortType, (GathererInfo_LastSortType == this.sortType or GathererInfo_LastSearchSortType == this.sortType), this.search);
+--					GathererInfo_LastSortType=this.sortType;
+				end
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+		</Scripts>
+		<NormalText inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="8" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+	</Button>
+	
+	<Button name="GathererInfo_FrameEntryStatusButtonTemplate" virtual="true" id="0">
+		<Size>
+			<AbsDimension x="298" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentType" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="112" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="14" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentIcon">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentType" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentGatherable" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="230" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIcon" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNumber" inherits="GameFontHighlightSmall" justifyH="CENTER">
+					<Size>
+						<AbsDimension x="50" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentGatherable" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTypePercent" inherits="GameFontHighlightSmall" justifyH="CENTER">
+					<Size>
+						<AbsDimension x="70" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNumber" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDensityPercent" inherits="GameFontHighlightSmall" justifyH="CENTER">
+					<Size>
+						<AbsDimension x="70" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTypePercent" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<Button name="GathererInfo_FrameTabButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="115" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeftDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+					<Size>
+						<AbsDimension x="20" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="5"/>
+        						</Offset>
+        					</Anchor>
+        				</Anchors>
+					<TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
+        			</Texture>
+				<Texture name="$parentMiddleDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+        				<Size>
+        					<AbsDimension x="88" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
+        			</Texture>
+				<Texture name="$parentRightDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+        				<Size>
+        					<AbsDimension x="20" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentMiddleDisabled" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
+        			</Texture>
+				<Texture name="$parentLeft" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+        				<Size>
+        					<AbsDimension x="20" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="TOPLEFT"/>
+        				</Anchors>
+					<TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
+        		</Texture>
+				<Texture name="$parentMiddle" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+        				<Size>
+        				<AbsDimension x="88" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
+        		</Texture>
+				<Texture name="$parentRight" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+        				<Size>
+        					<AbsDimension x="20" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
+        		</Texture>
+        		</Layer>
+        	</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() + 4);
+			</OnLoad>
+			<OnClick>
+				PanelTemplates_Tab_OnClick(GathererInfo_DialogFrame);
+				GathererInfoFrameTab_OnClick();
+			</OnClick>
+			<OnShow>
+				PanelTemplates_TabResize(0);
+				getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 30);
+			</OnShow>
+		</Scripts>
+		<NormalText name="$parentText" inherits="GameFontNormalSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText name="$parentHighlightText" inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText name="$parentDisabledText" inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+		<HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="10" y="2"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="RIGHT">
+					<Offset>
+						<AbsDimension x="-10" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<!-- Main Frame -->
+	<Frame name="GathererInfo_DialogFrame" toplevel="true" parent="UIParent" movable="true" frameStrata="DIALOG" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="640" y="390"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="5" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="12" right="12" top="12" bottom="12"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>		
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="GathererInfo_FrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="336" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-12" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="Gatherer Info">
+					<Size>
+						<AbsDimension x="360" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="GathererInfo_FrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- Tab code -->
+			<Button name="GathererInfo_DialogFrameTab1" inherits="GathererInfo_FrameTabButtonTemplate" id="1" text="GATHERER_TEXT_TOGGLE_REPORT">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(GATHERER_TAB_REPORT_TIP);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GathererInfo_DialogFrameTab2" inherits="GathererInfo_FrameTabButtonTemplate" id="2" text="GATHERER_TEXT_TOGGLE_SEARCH">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererInfo_DialogFrameTab1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(GATHERER_TAB_SEARCH_TIP);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GathererInfo_FrameHomeCancel" inherits="GameMenuButtonTemplate" text="CLOSE">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="GathererInfo_DialogFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GathererInfo_DialogFrame:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	  <Scripts> 
+	  	<OnLoad>
+	  		GathererInfo_LoadContinents( GetMapContinents() );
+			-- Tab Handling code
+			PanelTemplates_SetNumTabs(this, 2);
+			PanelTemplates_SetTab(this, 1);
+	  	</OnLoad>
+		<OnShow>
+			GathererInfo_SetDefaultLocation();
+		</OnShow>
+      </Scripts> 
+	</Frame>
+
+
+	<Frame name="GathererInfo_ReportFrame" enableMouse="true" parent="GathererInfo_DialogFrame" hidden="true" id="1">
+		<Size>
+			<AbsDimension x="640" y="370"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="GathererInfo_DialogFrame" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<!-- Target Information -->
+		<Frames>
+			<!-- Controls and Informational -->
+			<Frame name="GathererInfo_LocContinentDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererInfo_ReportFrame">
+						<Offset>
+							<AbsDimension x="15" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(80);
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_Initialize(this, GathererInfo_LocContinentDropDown_Initialize);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="GathererInfo_LocZoneDropDown" inherits="UIDropDownMenuTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GathererInfo_LocContinentDropDown">
+						<Offset>
+							<AbsDimension x="100" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(260);
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_Initialize(this, GathererInfo_LocZoneDropDown_Initialize);
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			-- Display area
+			<Frame name="GathererInfo_Main" setAllPoints="true" hidden="false">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="GathererInfo_FrameHomeTitle" inherits="GameFontNormalSmall" justifyH="LEFT" text="GATHERER_REPORT_LOCATION">
+							<Size>
+								<AbsDimension x="550" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GathererInfo_totalcount" inherits="GameFontNormalSmall" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="200" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="GathererInfo_Main" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-15" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<!-- headers -->
+						<Button name="GathererInfo_FrameColumnHeader3" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_REPORT_COL_TYPE" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="17" y="-70"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnLoad>
+									WhoFrameColumn_SetWidth(130);
+									this.sortType = "gtype";
+								</OnLoad>
+							</Scripts>
+						</Button>
+						<Button name="GathererInfo_FrameColumnHeader1" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_REPORT_COL_NAME" justifyH="LEFT">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_FrameColumnHeader3" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+						<Scripts>
+							<OnLoad>
+								WhoFrameColumn_SetWidth(244);
+								this.sortType = "name";
+							</OnLoad>
+						</Scripts>
+						</Button>
+						<Button name="GathererInfo_FrameColumnHeader2" inherits="GathererInfo_FrameColumnHeaderTemplate" text="  #" justifyH="CENTER">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_FrameColumnHeader1" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(54);
+										this.sortType = "amount";
+									</OnLoad>
+								</Scripts>
+						</Button>
+					<Button name="GathererInfo_FrameColumnHeader4" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_REPORT_COL_PTYPE" justifyH="CENTER">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_FrameColumnHeader2" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(74);
+										this.sortType = "percent";
+									</OnLoad>
+								</Scripts>
+						</Button>
+						<Button name="GathererInfo_FrameColumnHeader5" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_REPORT_COL_PDENSITY" justifyH="CENTER">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_FrameColumnHeader4" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(74);
+										this.sortType = "density";
+									</OnLoad>
+								</Scripts>
+						</Button>
+
+						<!-- Display Buttons -->
+						<Button name="GathererInfo_FrameButton1" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="1">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="GathererInfo_FrameColumnHeader3">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton2" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="2">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton1" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton3" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="3">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton2" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton4" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="4">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton3" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton5" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="5">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton4" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton6" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="6">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton5" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton7" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="7">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton6" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton8" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="8">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton7" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton9" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="9">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton8" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton10" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="10">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton9" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton11" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="11">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton10" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton12" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="12">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton11" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton13" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="13">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton12" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton14" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="14">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton13" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_FrameButton15" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="15">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_FrameButton14" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+					<!-- Scrollbar -->
+					<ScrollFrame name="GathererInfo_ListScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="296" y="240"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="GathererInfo_ReportFrame" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-56" y="-96"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(GATHERERINFO_FRAME_HEIGHT, GathererInfo_Update);
+							</OnVerticalScroll>
+						</Scripts>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="GathererInfo_ListScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size>
+										<AbsDimension x="31" y="246"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+											<Offset>
+												<AbsDimension x="0" y="5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+								</Texture>
+								<Texture name="GathererInfo_ListScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size>
+										<AbsDimension x="31" y="106"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+					</ScrollFrame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="GathererInfo_SearchFrame" enableMouse="true" parent="GathererInfo_DialogFrame" hidden="true" id="2">
+		<Size>
+			<AbsDimension x="640" y="370"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="GathererInfo_DialogFrame" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<!-- Target Information -->
+		<Frames>
+			<!-- Informational -->
+			<Frame name="GathererInfo_GatherTypeDropDown" inherits="UIDropDownMenuTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrame">
+						<Offset>
+							<AbsDimension x="15" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(80);
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_Initialize(this, GathererInfo_GatherTypeDropDown_Initialize);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="GathererInfo_GatherItemDropDown" inherits="UIDropDownMenuTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GathererInfo_GatherTypeDropDown">
+						<Offset>
+							<AbsDimension x="100" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(260);
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_Initialize(this, GathererInfo_GatherItemDropDown_Initialize);
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			-- Display area
+			<Frame name="GathererInfo_MainSearch" setAllPoints="true" hidden="false">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="GathererInfo_SearchFrameHomeTitle" inherits="GameFontNormalSmall" justifyH="LEFT" text="GATHERER_SEARCH_LOCATION">
+							<Size>
+								<AbsDimension x="550" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GathererInfo_Searchtotalcount" inherits="GameFontNormalSmall" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="200" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="GathererInfo_Main" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-15" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<!-- headers -->
+						<Button name="GathererInfo_SearchFrameColumnHeader3" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_SEARCH_COL_CONTINENT" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="17" y="-70"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnLoad>
+									WhoFrameColumn_SetWidth(130);
+									this.sortType = "Cname";
+									this.search="Search";
+								</OnLoad>
+							</Scripts>
+						</Button>
+						<Button name="GathererInfo_SearchFrameColumnHeader1" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_SEARCH_COL_ZONE" justifyH="LEFT">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_SearchFrameColumnHeader3" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							<Scripts>
+								<OnLoad>
+									WhoFrameColumn_SetWidth(244);
+									this.sortType = "Zname";
+									this.search="Search";
+								</OnLoad>
+							</Scripts>
+						</Button>
+						<Button name="GathererInfo_SearchFrameColumnHeader2" inherits="GathererInfo_FrameColumnHeaderTemplate" text="  #" justifyH="CENTER">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_SearchFrameColumnHeader1" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(54);
+										this.search="Search";
+										this.sortType = "Namount";
+									</OnLoad>
+								</Scripts>
+						</Button>
+					<Button name="GathererInfo_SearchFrameColumnHeader4" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_SEARCH_COL_PNODE" justifyH="CENTER">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_SearchFrameColumnHeader2" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(74);
+										this.sortType = "Npercent";
+										this.search="Search";
+									</OnLoad>
+								</Scripts>
+						</Button>
+						<Button name="GathererInfo_SearchFrameColumnHeader5" inherits="GathererInfo_FrameColumnHeaderTemplate" text="GATHERER_SEARCH_COL_PDENSITY" justifyH="CENTER">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="GathererInfo_SearchFrameColumnHeader4" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="-2" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(74);
+										this.sortType = "Ndensity";
+										this.search="Search";
+									</OnLoad>
+								</Scripts>
+						</Button>
+
+						<!-- Display Buttons -->
+						<Button name="GathererInfo_SearchFrameButton1" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="1">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="GathererInfo_SearchFrameColumnHeader3">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton2" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="2">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton1" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton3" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="3">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton2" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton4" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="4">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton3" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton5" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="5">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton4" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton6" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="6">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton5" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton7" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="7">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton6" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton8" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="8">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton7" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton9" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="9">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton8" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton10" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="10">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton9" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton11" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="11">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton10" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton12" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="12">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton11" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton13" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="13">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton12" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton14" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="14">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton13" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+						<Button name="GathererInfo_SearchFrameButton15" inherits="GathererInfo_FrameEntryStatusButtonTemplate" id="15">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GathererInfo_SearchFrameButton14" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Button>
+					<!-- Scrollbar -->
+					<ScrollFrame name="GathererInfo_SearchListScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="296" y="240"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="GathererInfo_SearchFrame" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-56" y="-96"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(GATHERERINFO_FRAME_HEIGHT, GathererInfo_SearchUpdate);
+							</OnVerticalScroll>
+						</Scripts>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="GathererInfo_SearchListScrollBarTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size>
+										<AbsDimension x="31" y="246"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+											<Offset>
+												<AbsDimension x="0" y="5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+								</Texture>
+								<Texture name="GathererInfo_SearchListScrollBarBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size>
+										<AbsDimension x="31" y="106"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+					</ScrollFrame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+
+</Ui>
+
+

@@ -1,0 +1,766 @@
+AutoShoutOut by Cosmic Cleric (a.k.a. Effren)
+
+Version 1.15.5 - Automatically notifies others when player/pet stats drop below a certain percentage.
+
+Any comments, send to autoshoutout@cosmiccleric.com.
+
+
+Credits
+-------
+
+Thanks to Hopman's AutoShout for one hell of a foundation to add on to/build from!
+http://www.hopman.plus.com/Autoshout/
+
+I took the AutoShout v1.1 code base, and branced off of it, adding enhancements and fixes to allow 
+for changes in the WoW client (see below for details).
+
+
+Introduction
+------------
+
+Does automated notifications, based on user-defined settings.  Can be used by any player who 
+wishes to notify others as to the status of their character.  For example, I use AutoShoutOut 
+when playing my priest character, in instances, so that other people in the group know when I'm 
+about to die or running out of mana.  Will also notify others of the player's pet health status,
+as well as if the player loses a "Soulstone Resurrection" buff.
+
+
+Tutorial
+--------
+
+AutoShoutOut does 'notifications'.  There are five TYPES of notifications, 'health', 'life', 'mana',
+'pet health', and 'soulstone'.  For 'health', 'life', and 'mana' types of notification, there are 
+two WAYS to do the actual notification, 'shouts' and 'messaging'.  For 'pet health' and 'soulstone', 
+there is only 'messaging'.  
+
+Each notification type has a trigger that tells AutoShoutOut that it needs do something.  For the 
+'health' and 'life' notification types, the trigger is the player's health amount remaining.  For 
+the 'mana' notification type, its the player's mana amount remaining.  For 'pet health' notification 
+type, the trigger is the pet's health amount.  The triggers are defined in percentage of health/mana 
+remaining (ex.: 75% health left).  For 'soulstone', the trigger is the expiration of the "Soulstone
+Resurrection" buff that was on the player.
+
+There are two ways that AutoShoutOut can do a notification, by 'shouting', which uses WoW's vocal 
+emotes, and/or by 'messaging', which uses WoW's chat messages.  The player can setup AutoShoutOut to 
+use neither/either/both notification types, and can change them from within WoW via the chat prompt.
+
+The vocal emotes that AutoShoutOut uses when it shouts are "/healme" for 'health' notifications, 
+"/helpme" for 'life' notifications, and '/oom' for 'mana' notifications.  These cannot be changed 
+(currently).  There are no vocal emote for 'pet health' and 'soulstone' notifications.
+
+The chat messages that AutoShoutOut uses when it messages can be defined by the user, with a seperate 
+definition for each of the notification types (health, life, mana, pet health, and soulstone).  Besides 
+defining the chat message to send, the target can also be defined.  The possible target choices are 
+another player (via whispering), locally to your chat window with the 'LOCAL' channel, 'BANNER' to see 
+the message displayed at the top center of the screen, the 'SAY' channel, the 'PARTY' channel, and the 
+'RAID' channel.  Channel names must be in all upper caps, otherwise they are presumed to be player 
+character names.  For example, there is a player character named 'Party', then typing in the word 'party' 
+or 'Party' or 'PaRtY' will send a whisper to the player, and typing in 'PARTY' will send the messages to 
+the Party (/P) channel.  When in doubt, use the 'Channels' button to select a channel, and type the name
+in manually when you want to whisper to another player.
+
+When defining a message to send, you can use special keywords that get converted at message 
+sending time into values, like hit points remaining, mana percentage remaining, etc.  The keywords are:
+
+	$HEALTH			-	The current health points remaining
+	$HEALTHMAX		-	The maximum number of health points available
+	$HEALTHPERCENT	-	The current health points remaining, in a percentage notation (23%)
+	$MANA			-	The current mana points remaining
+	$MANAMAX		-	The maximum number of mana points available
+	$MANAPERCENT	-	The current mana points remaining, in a percentage notation (54%)
+	$NAME			-	The name of the unit doing the notifying (see below for "unit" information)
+
+Please note that, depending on which event type is being done (ex.: 'health' vs. 'pet health'), the 
+"unit" doing the notifying can be different, and the keywords listed above relate to a unit, not always 
+from a player's perspective.  For the event type 'pet health', the "unit" is your pet.  For all other 
+event types, the "unit" is the player.  So the same keyword $NAME (for example) can return a different 
+value, based on which "unit" (player vs. pet) is doing the notifying.
+
+Also, the player can define the frequency (how often) AutoShoutOut does its notifications, for each 
+notification type.  The default is usually ten seconds (since most battles last about thirty seconds), 
+but can be changed to any value that the user desires, up to a maximum of 999 seconds (and a minimum 
+of one second).  Also, this frequency value is the minimum amount of time to go by before getting a 
+notification.  You need to be in combat, or have a buff get applied/wear off, or a system message
+be received, or your Health and/or Mana values change, or change targets, before AutoShoutOut will even 
+bother to check and see if it needs to do any notifications.  Basically a WoW event needs to come in for 
+AutoShoutOut to do its thing.  If, for a particular event notification, a frequency duration has elapsed, 
+but no new WoW events come in, the notification will not happen until the next WoW event comes in, then 
+AutoShoutOut will see that the amount of time that has elapsed is greater than the frequency duration, 
+and will do its notification.  Checking is done this way for performance reasons.
+
+Also, the player can choose if AutoShoutOut does its notifications only while the player/pet is
+in battle, or at any time that a notification should be done, because a percentage trigger has been 
+reached.  Each notification type can have its own 'combat only' vs. 'always' notification setup.  The 
+determination is based on the unit.  In other words, for a player the check is done to see if the 
+PLAYER is in combat, and for a pet, the check is done to see if the PET is in combat.
+
+Also, the player can choose if AutoShoutOut does its notifications while they are dueling or not.  Each
+notification type can have its own 'notify during duels' notification setup.
+
+Finally, for each event type, there will be three different ways to configure an event type.  These ways 
+are called 'configurations'.  The three 'configurations' are  'solo', 'party', and 'raid'.  The user can 
+choose which configuration is active when they are using AutoShoutOut, via a dropdown control at the top 
+of the UI.  For example, the user can choose the 'solo' configuration, then change the 'health' / 'life' 
+/ 'mana' / 'pet health' / 'soulstone' event types as they want.  Then the user can choose the 'party' 
+configuration, and then change the 'health' / 'life' / 'mana' / 'pet health' / 'soulstone' event types for 
+that configuration differently (for example, different notify frequency or message, etc.).  The user then 
+can choose which configuration is active by bringing up the UI again (if its not already up) and selecting 
+the configuration they want to be active on the dropdown control, at the top of the window.
+
+This below chart lays out what was just stated above...
+
+ CONFIG      NOTIFY       HOW OFTEN       WHEN TO            NOTIFICATION
+  TYPE        TYPE        TO NOTIFY       NOTIFY                METHOD
+======== =============== =========== ================ =========================
+                                                      -- Shout   (Vocal Emote)
+                                     -- Combat Only --|
+                                     |                -- Message (Chat Message)
+         -- Health ----- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+         |                                            -- Message (Chat Message)
+         |   
+         |   
+         |                                            -- Shout   (Vocal Emote)
+         |                           -- Combat Only --|
+         |                           |                -- Message (Chat Message)
+         -- Life ------- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+ Solo ---|                                            -- Message (Chat Message)
+         |   
+         |   
+         |                                            -- Shout   (Vocal Emote)
+         |                           -- Combat Only --|
+         |                           |                -- Message (Chat Message)
+         -- Mana ------- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+         |                                            -- Message (Chat Message)
+         | 
+         |                           -- Combat Only ---- Message (Chat Message)
+         -- Pet Health - Frequency --|
+         |                           -- Always --------- Message (Chat Message)
+         | 
+         |                           -- Combat Only ---- Message (Chat Message)
+         -- Soulstone  - Frequency --|
+                                     -- Always --------- Message (Chat Message)
+                                            
+                                                      -- Shout   (Vocal Emote)
+                                     -- Combat Only --|
+                                     |                -- Message (Chat Message)
+         -- Health ----- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+         |                                            -- Message (Chat Message)
+         |   
+         |   
+         |                                            -- Shout   (Vocal Emote)
+         |                           -- Combat Only --|
+         |                           |                -- Message (Chat Message)
+         -- Life ------- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+ Party --|                                            -- Message (Chat Message)
+         |   
+         |   
+         |                                            -- Shout   (Vocal Emote)
+         |                           -- Combat Only --|
+         |                           |                -- Message (Chat Message)
+         -- Mana ------- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+         |                                            -- Message (Chat Message)
+         | 
+         |                           -- Combat Only ---- Message (Chat Message)
+         -- Pet Health - Frequency --|
+         |                           -- Always --------- Message (Chat Message)
+         | 
+         |                           -- Combat Only ---- Message (Chat Message)
+         -- Soulstone  - Frequency --|
+                                     -- Always --------- Message (Chat Message)
+                                           
+                                                      -- Shout   (Vocal Emote)
+                                     -- Combat Only --|
+                                     |                -- Message (Chat Message)
+         -- Health ----- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+         |                                            -- Message (Chat Message)
+         |   
+         |   
+         |                                            -- Shout   (Vocal Emote)
+         |                           -- Combat Only --|
+         |                           |                -- Message (Chat Message)
+         -- Life ------- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+ Raid ---|                                            -- Message (Chat Message)
+         |   
+         |   
+         |                                            -- Shout   (Vocal Emote)
+         |                           -- Combat Only --|
+         |                           |                -- Message (Chat Message)
+         -- Mana ------- Frequency --|
+         |                           |                -- Shout   (Vocal Emote)
+         |                           -- Always -------|
+         |                                            -- Message (Chat Message)
+         | 
+         |                           -- Combat Only ---- Message (Chat Message)
+         -- Pet Health - Frequency --|
+         |                           -- Always --------- Message (Chat Message)
+         | 
+         |                           -- Combat Only ---- Message (Chat Message)
+         -- Soulstone  - Frequency --|
+                                     -- Always --------- Message (Chat Message)
+
+To sum up, for a particular configuration (solo, party, raid), there are multiple notification types.  
+For a particular notification type (health, life, mana, pet health, or soulstone) you can set up how 
+often AutoShoutOut does a notification, whether to do notifications only when you are in battle, or 
+always, and whether it should use shouts (vocal emotes) and/or messages (WoW chat messages) to notify 
+others.  
+
+
+Commands
+--------
+
+For English clients:
+
+	/aso (or /autoshoutout) - Displays the settings window
+	
+	/aso [on|off] - Turns on/off ALL notifications of any kind.
+
+	/aso status - Toggles on/off the output of status information to the Combat channel.
+
+	/aso reset - Resets all notification settings back to their default values.
+	
+	/aso warnings - Toggles on/off warning messages (ex.: "No 'Soulstone Resurrection' buff!").
+
+
+Pour les clients français:
+
+	Voyez le document d'AutoShoutOut_FR.txt pour l'information de futher.
+
+
+Für französische Klienten:
+
+	/aso [an|aus] - schaltet jegliche Hinweise an oder aus.
+
+	/aso status - Schält AN/CAus den Ausgang von Statusangaben zur Kampfführung um.
+
+	/aso zurückstellen - Stellt alle Mitteilungseinstellungen zurück zu ihren Default-Werten zurück.
+
+	/aso warnungen - Toggles on/off warning messages (ex.: "No 'Soulstone Resurrection' buff!").
+
+
+To-Do
+-----
+
+Add notifications for the health of other group/raid members.
+
+
+Changes in 1.15.5
+-----------------
+
+Bug fix so that AutoShoutOut will write out its settings information.
+
+Updated interface number for v1.7 of WoW.
+
+
+Changes in 1.15.4
+-----------------
+
+Fix for bug introduced in v1.14.1, where if you are in a raid, and you try and notify via messaging 
+to the 'PARTY' channel, you will not get the "ASO: Notify via Messaging-Target: Character is NOT in a 
+party/raid" message.
+
+
+Changes in 1.15.3
+-----------------
+
+Fixed ctrl-left-click on chat name link functionality, which was broke with v1.6 of WoW client.  Note
+that, as of WoW v1.6, the selecting of a pet (by clicking on the player's name link twice) will no 
+longer work (because of a deprecated function call).  Will try to make this work again in a future
+release of ASO.
+
+Updated interface number for v1.6 of WoW.
+
+AutoShoutOut will not check for the loss of a 'Soulstone Resurrection' buff (the 'soulstone' event)
+until the buff has been applied.  This should stop the 'false positive' notifications players get 
+when forgetting to turn off notification after a buff has worn off from their previous WoW session.
+
+Made window width a little wider, so that no text runs off the right side of the window.
+
+Added a comment in the combat channel status output text that reminds people that they 
+can use the '/aso status' command if they do not want to see any ASO status messages.
+
+
+Changes in 1.15.2
+-----------------
+
+Added a settings that determines if AutoShoutOut should display warning messages when certain 
+conditions occur.  For example, if a 'Soulstone Resurrection' buff is put on the player, but the
+'Soulstone' notification is not active, a warning message is displayed.  The default is set to on
+(true).  Use the "/aso warnings" command to switch back and forth between on and off (true/false).
+
+Updated French translations.  Thank you Methos (http://forums.curse-gaming.com/member.php?u=11256)!
+
+
+Changes in 1.15.1
+-----------------
+
+Updated German translations.  Thank you Drazul (http://forums.curse-gaming.com/member.php?u=6717)!
+
+Resized width of settings window because of updatiang of German translations.
+
+Moved the anchor point for the close button tooltip to right, from left.
+
+
+Changes in 1.15.0
+-----------------
+
+Added "Soulstone" event type.  ASO will look to see if the player has a 'Soulstone Resurrection' 
+buff on them (a.k.a. a 'Res Stone').  If they do NOT, then ASO will do its notification.  If the 
+'Soulstone Resurrection' buff is applied to a player who does not have the "Soulstone" event
+notification turned on, ASO will warn the player of that fact.
+
+AutoShoutOut settings window is now dragable.
+
+Changed maximum notify frequency value from 60 to 999 seconds (little over 15 minutes).
+
+Added tooltips to the vast majority of the UI controls.
+
+Fixed bug when registering for event "PLAYER_AURAS_CHANGED" (typo in event name being registered).
+
+Modified assignment of default values (first time person runs ASO or after a "/aso reset" command)
+so that the default message targets make sense, for the configuration (Solo/Party/Raid).  Solo
+configuration gets LOCAL as target, party configuration gets PARTY as a target, and raid
+configuration gets RAID as a target.
+
+Added unregistering for events notification, when the user does a "/aso off" command.
+
+Cosmetic UI change for German localization.
+
+Updated README with additional information concerning 'Notification Frequency'.
+
+NOTE!  French/German translations are needed.  Any French/German users who wish to help,
+please contact me.  Your help will be appreciated by all other AutoShoutOut users in
+your community.
+
+
+Changes in 1.14.1
+-----------------
+
+Code change for "C Stack Overflow" error, which is caused when a user is NOT in a party/raid, but
+they have the notification via messaging target set to PARTY/RAID.  WoW/LUA doesn't like it when ASO
+would keep doing '/party' and/or '/raid' messaging every time a notification would happen.  The fix is to 
+have ASO make a check to verify that the user is in a group/raid before sending a message to PARTY/RAID.  
+If the user is not in a group/raid, a warning message will be done by ASO and the message target will
+be changed to SAY, for that message.  Once the user joins a group/raid, the message target will return
+back to what the user had set previously.  This check is done for all configurations.
+
+Updated German command notes in the README (thank you jfk21 (http://forums.curse-gaming.com/member.php?u=12139)).  
+Tweaked French localized text (thanks Methos (http://forums.curse-gaming.com/member.php?u=11256)).
+
+
+Changes in 1.14.0
+-----------------
+
+Added a settings that determines if AutoShoutOut should do ANY notifications (or not); a global on/off switch.  
+The default is set to 'on'.  Use the "/aso on" or "/aso off" commands to turn notifications 'on' or 'off'.
+
+When clicking on the 'Channels' button, and if a player is targeted, after cycling through the other channel
+choices, the targeted player name will be entered as a whisper target.  In other words, each click of the 
+'Channels' button will give you "LOCAL / BANNER / SAY / PARTY / RAID / <Targeted Player Name>", if a player 
+is targeted.  Otherwise the button clicking will cycle through "LOCAL / BANNER / SAY / PARTY / RAID".
+
+Added checking for spell channeling, and if a 'Mana' event shout needs to be done (OOM), but a spell is being
+channeled, the shout will not be done.  This may help those who feel that doing a OOM emote during spell
+channeling interrupts the spell and prevents it from completing.  This check is only done for the 'Mana' 
+event type, and only for shouting, not messaging.  What is checked is the CastingBarFrame.channeling value.
+
+Fixed a bug where the 'status output' on/off setting was not being saved when the character logs out.
+
+Tweaked localization stuff to use native language add-on name/title, instead of 'AutoShoutOut'.
+
+
+Changes in 1.13.4
+-----------------
+
+Fixed a bug that prevented the targeting of a target's pet (when ctrl-left-clicking on a chat window player name
+link twice), because a check was made to see if the player had a pet UI, but this check should not be done when 
+other players are targeted, as they don't have a pet UI on the checking/clicking players WoW client.
+
+
+Changes in 1.13.3
+-----------------
+
+Redid how AutoShoutOut gets the player's name, to try and help out those who are getting 'nil' errors when 
+changing zones.  The change is to combat a situation where a UnitName("player") could (once again after the 
+initializing phase) be returning a UNKNOWNOBJECT (or nil) value, instead of the players name, which would 
+cause errors when AutoShoutOut tries to read/update its settings.  Now AutoShoutOut calls UnitName("player")
+just once (after player has been loaded into the world and initialized), and saves the player's name to a
+variable.  Then any time after that that the player name is needed, its grabbed from the variable instead of
+making another UnitName("player") call.
+
+AutoShoutOut now remembers the last setting of the 'debug' switch, the next time it starts.
+
+Added output of the character's name to the chat window when the user does a "/aso" command, if the debug mode
+had been previously set on/true.
+
+
+Changes in 1.13.2
+-----------------
+
+Fixed a bug with how the LUA string.find function was used.  Instead of using "(%a+)" as the find pattern,
+had to use "(%S+)" instead, as special characters like "ü" (for example) were just being dropped when using
+the "(%a+)" pattern to determine where one word ended and the next started.  This bug made it so that the user 
+could not type in the foreign equivalent of the "/aso reset" command.  "(%a+)" meant any alphanumeric character, 
+and "(%S+)" mean any non-space value, which is actually more accurate in the long run, as spaces seperate the 
+command from the arguments typed in.  This fix also would help if the "Starting duel" system message had any 
+special characters in it as well for foreign languages.
+
+Moved the 'changed configuration' status message output, when the automatic configuration option changes the 
+user's configuration from one mode to another, to the combat channel, and hooked it up so that it can be 
+shown/not shown via the "/aso status" command.
+
+
+Changes in 1.13.1
+-----------------
+
+Updated French localization (thank you Methos).
+
+
+Changes in 1.13.0
+-----------------
+
+Currently in WoW, when a user sends out a chat message, his name is a link, and you can left-click on it 
+to send him a whisper, or shift-left-click to do a /who, or right-click to show a popup menu for the player.
+AutoShoutOut adds a Ctrl-left-click, which will select the user as a target, 'if' the user is nearby (a 
+limitation of the WoW function that AutoShoutOut uses).  If the user is not targetable, a message will
+appear and targeting will be cleared.  If the player is targeted, either manually or because you've clicked
+on their chat name link once already, and if they have a pet, a second click on the link will select their
+pet.  A third click on the link will reselect the player, fourth the pet, etc. etc.
+
+Updated German translations (thank you jth).
+
+
+Changes in 1.12.0 ßeta!
+-----------------
+
+=====
+NOTE: THIS VERSION IS MARKED AS BETA BECAUSE ONE OF THE NEW FEATURES DEPENDS ON SYSTEM MESSAGES GENERATED 
+BY THE WOW SERVERS.  BECAUSE OF THIS, TESTING OF THE NEW FEATURES USING THE FRENCH/GERMAN LOCALIZATIONS 
+COULD NOT BE DONE.  FRENCH/GERMAN USERS, IF YOU DECIDE TO USE THIS VERSION, PLEASE CONFIRM THAT THE NEW
+'NOTIFY DURING A DUEL' SWITCH IS WORKING PROPERLY, SPECIFICALLY IF AUTOSHOUTOUT CAN PROPERLY DETERMINE 
+THAT YOU HAVE STARTED A DUEL.  IF I DON'T HEAR BACK FROM ANYONE IN A FEW DAYS, I'LL PRESUME THAT IT IS
+WORKING PROPERLY ON FRENCH/GERMAN CLIENTS AND RELEASE THE FINAL 1.12.0 VERSION OF AUTOSHOUTOUT.  Also,
+hoping that French/German users will help out with polishing up the UI with the new features that have
+been added (currently using Google translations).
+=====
+
+Automatic switching between configurations has been implemented.  If you join a party, the configuration
+will be automatically switched to the 'Party' configuration.  If you join a raid, the configuration will 
+be automatically switched to the 'Raid' configuration.  If you leave either, the configuration will be 
+automatically switched to the 'Solo' configuration.  The default is to not do the automatic switching.  
+Can be turned on or off via the UI.
+
+Added a new setting so that the user can choose whether notifications are done during duels or not.  
+Each configuration type has its own version of this switch.  The default is off, which means that 
+notifications will not be done during duels.  Can be turned on or off via the UI.
+
+Changed how the "reset" command works, so that now it only resets the current character's settings, not 
+ALL of the character's settings.
+
+Added localization coding to the arguments for the DoEmote(String) function, so that in the future if
+the arguments change from "HEALME"/"HELPME"/"OOM" to something else, its a five second change to the
+localization file to fix (ASO_LOCSTR_DOEMOTE_HEALME/ASO_LOCSTR_DOEMOTE_HEPEME/ASO_LOCSTR_DOEMOTE_OOM).
+
+Reworded how AutoShoutOut tells the user if the status output has been turned on/off.
+
+Updated localization with new translations (thank you Methos!).  French users will have to redo their
+settings again, apologies for that.
+
+Methos has created a French version of the README (AutoShoutOut_FR.txt), and it has been added to the 
+distribution package.  Added German translated information on the commands in the README file.  Should 
+really have fully translated versions of the whole README file for French/German speakers.  Any volunteers?
+
+Tweaked UI display by associating some objects (main window, message text edit box, etc.) to the 
+localization settings, to support localization text changes.
+
+Fixed typos in README tutorial.
+
+
+Changes in 1.11.0
+-----------------
+
+Added "Configurations" enhancement.  There are three types of configurations, "Solo", "Party", 
+and "Raid", and they allow for multiple event types settings.  See above for further information.
+
+Added a new command, "reset", which will reset all of the notificaiton options back to their
+default values.
+
+Modified UI so that changes are saved as soon as something is modified, instead of when just 
+closing the window or switching between event types.
+
+Modified UI so that a user can TAB/ENTER from edit field to edit field (not to checkboxes or
+lists though).
+
+Modified UI so that a user can hit the ESCAPE key to close the window.  Their changes will be saved.
+
+Modified UI so that a tooltip is shown with all the available keywords that can be typed into
+the notification message editbox.
+
+Updated README tutorial section to reflect "Configurations" enhancement.
+
+
+Changes in 1.10.2
+-----------------
+
+Added a settings that determines if AutoShoutOut should output status information to the Combat 
+channel.  The default is set to on (true).  Use the "/aso status" command to switch back and forth 
+between on and off (true/false).
+
+
+Changes in 1.10.1
+-----------------
+
+Updated French localization (thank you Methos!).
+
+Changed the localization so that if its not French/German, it will automatically default to
+English, instead of generating an error.  That way Korean players will at least see English,
+instead of a bunch of question marks.
+
+Tweaked UI display by associating some objects (Window Title, etc.) to the localization settings.
+
+
+Changes in 1.10.0
+-----------------
+
+Added a 'BANNER' channel output, which just sends messages to the top center of 
+the screen, which can only be seen by the player.  Also, starting with this version,
+channel names must be in all upper caps, otherwise they are presumed to be player 
+character names.  If you use the 'Channel' button you have nothing to worry about,
+but if you type in a channel name manually, make sure its in all upper caps, or 
+else AutoShoutOut will think it is a player name and try to whisper instead.  When
+coding this latest feature I accidentally (because of a bug) started whispering
+messages to 'Banner', a player, and he replied, to use his his words, "WTF?" :)  So
+I figured the code needed to distinguish between a player name, and a channel name, 
+and decided to use case sensitivity as a way to do the distinguishing between the two.
+
+
+Changes in 1.9.0
+----------------
+
+Added a 'LOCAL' channel output, which just sends messages to the chat window that
+can only be seen locally by the player.  It is NOT a /say that others can see.
+
+Added the $NAME keyword.  It will output the unit's name when a message is sent.
+
+French translations were redone by a human being.  Thanks to Methos 
+(http://forums.curse-gaming.com/member.php?u=11256) for the French translations.
+
+Updated some of the German translations.  My thanks go out to Drazul 
+(http://forums.curse-gaming.com/member.php?u=6717) for the translation help.
+
+Updated README with a better description of the keywords, and what it means
+by "unit", vs. player or pet, when using keywords.
+
+
+Changes in 1.8.0
+----------------
+
+Added the ability to send, as part of any message, health and/or mana information, for 
+the unit that is doing the notifying.  Keywords are $HEALTH, $HEALTHMAX, $HEALTHPERCENT, 
+$MANA, $MANAMAX, and $MANAPERCENT.  If you wanted, for example, to send out this message: 
+"I have X out of Y (Z%) left!", where X is how many hit points you have left, Y is the 
+maximum hit points that you have, and Z is the percentage of hit points left, you would 
+type your message like this: "I have $HEALTH out of $HEALTHMAX ($HEALTHPERCENT%) left!".  
+For mana, instead of hit points, you would type this: "I have $MANA out of $MANAMAX 
+($MANAPERCENT%) left!".
+
+Bug fix.  Health event notifications were not being done if the life event notification percentage
+threshold was being met, but all life event notifications were turned off by the user in the UI.
+Normally, if both a health and life event notification needs to be done, only the life event 
+notification would be done; the health event notification would be ignored.  A bug existed where 
+the health event notification would be ignored when it should not be, because the code thought a 
+life event notification was already done, but it was not done, because the user had manually turned 
+off all life event notifications from the UI (both shout and messaging).  The code now ignores the 
+status of life event notifications when determining if a health event notification should be done 
+or not, if all life event notifications have been turned off by the user.
+
+(Invisible) bug fix.  When checking a pet's mana for low condition, the player's mana value was 
+used instead.  This check is currently not being done, as there is just one single event type that 
+involves pets, and its health points based ('Pet Health'), but the check can be done in the future 
+if (Warlock) pet mana events are supported, so it seemed like a good idea to fix for future's sake.
+
+Cosmetic UI enhancement.  If player does not have a mana pool, they cannot choose the 'Mana' event 
+type from the UI.  The code already will prevent notifications from being sent out internally, 
+but the UI was allowing the user to make changes to the 'Mana' event type, as if those kind of 
+notifications would be sent out.  Now the 'Mana' event type gets disabled for Warriors, Rogues, 
+and Druids in shapeshifted forms.
+
+Cosmetic UI enhancement.  If player does not have a pet, they cannot choose the 'Pet Health' event 
+type from the UI.  The code already will prevent notifications from being sent out internally, but 
+the UI was allowing the user to make changes to the 'Pet Health' event type, as if those kind of 
+notifications would be sent out.  Now the 'Pet Health' event type gets disabled if the player does
+not have a pet UI (function HasPetUI()), which presumably means they do not have a pet available.
+
+
+Changes in 1.7.0
+----------------
+
+New event type, "Pet Health" added.  Will only do messaging (couldn't think
+of a proper vocal emote to assign).  FYI, The "In Combat" switch is for the 
+pet, not the player.  Didn't add a "Life" event type for pets, if many others
+need/want this event type let me know and I'll add it.
+
+More localization bug fixes (SAY/PARTY/RAID checks) and new items.
+
+UI location/size tweaks for new event type and its localization text.
+
+Updated README to add the new notification type.
+
+
+Changes in 1.6.1
+----------------
+
+Bug fix: UNKNOWNOBJECT instead of "Unknown Entity" when verifying that player
+has been loaded into the world completely, so that his/her character's name
+can be determined.  This bug affects the non-English client using players.
+
+German translations were redone by a human being.  Thanks to jth 
+(http://forums.curse-gaming.com/member.php?u=5486) for the German translations
+
+Tweaked UI controls locations based on redone German translations.
+
+
+Changes in 1.6.0
+----------------
+
+AutoShoutOut now has a user interface (removed the command line interface, with the
+exception of the "/aso" command, which displays the UI).
+
+Refactored "Druid in shapeshifted form" checking, when deciding to notify for low mana
+(with thanks to Iriel for informing me about the GetShapeshiftFormInfo function!).
+
+Cleaned up French and German localization text, by using UTF-8 decimal representations
+for certain letters, so that they'll display properly in WoW.
+
+NOTE! Korean localization text is still not working correctly.  For now, I'll have to
+remove support for this language from AutoShoutOut, until I can figure out how to do
+it properly.  I'll leave the "koKR" localization logic in the localization lua file,
+but it currently contains a bunch of question marks.  My apologies to the Korean player 
+base for this.  French/German localization versions should be fine; please let me know 
+of any typos or syntactical changes that are needed.
+
+
+Changes in 1.5.2
+----------------
+Bug fixes for localizations support.
+
+
+Changes in 1.5.1
+----------------
+Fixed bug where setting on/off the shouting for 'Life' was not working correctly.
+
+
+Changes in 1.5.0
+----------------
+
+Added support for myAddOns (ok, isn't it supposed to be spelled 'Add-Ons' instead of 'AddOns'? :) ).
+
+Added localization support.  Used http://www.google.com/translate_t for translations.  Let me apologize
+up front for any comedic/insulting comments that the non-English version of this add-on may have starting
+with this version.  I only speak English and Spanish, so I needed to rely on web based translations.  :)
+Please, I would be grateful for any non-English speaking users to let me know when any of the translated
+words are wrong, so that I may correct them for the next version of the add-on.  ISSUE:  Some English words 
+(for example, 'on') translate into two words in a different language, but the command line parser is only 
+expecting one word.  So I've had to merge the two words as one (ex.: 'outrede' instead of 'outre de').  My 
+apologies for this.  Not sure if I'll ever get around to fixing this one, but I'll keep it on the radar.
+
+Refactored code to remove duplication of methods.  For each kind of processing, now there's one global 
+method instead of three individual methods (one for health, one for life, and one for mana).
+
+
+Changes in 1.4.0
+----------------
+
+Settings are now saved for each individual character, instead of just one global setting.
+Please note that you'll have to reassign your settings for each character, but you'll only 
+have to do it once.  All previous settings are lost and default values are used initially.
+
+
+Changes in 1.3.0
+----------------
+
+Modified 'frequency', so that there is a seperate setting/timer for each of the notification
+types (Health/Life/Mana).  This means that you can now do notifications for Health/Life AND
+Mana at the same time, since they are on seperate timers now (though only Health OR Life will
+be done, not both).
+
+Moved the local chat messages for when AutoShoutOut wants to do a notification to the
+combat chat frame, from the general chat frame.
+
+
+Changes in 1.2.1
+----------------
+
+Wasn't checking the notification message flags before sending out a message, so that
+messages were being sent out always, even if the user had turned it off.
+
+
+Changes in 1.2.0
+----------------
+
+Added settings so that shout/message notifications can only be done while in combat,
+or always.  There are three switches, one for each notification type (Health/Life/Mana).
+
+Commands interface was redone to optimize and better fit the actions that they were used for.
+
+Redid the README, including a tutorial of sorts.
+
+
+Changes in 1.1.0
+----------------
+
+Added message sending (user request), so that when a shout event occurs, a message 
+can also be sent to either an individual player, or the say, party, or raid channels.
+Each type of shout can have its own message sent.  This will help out those players 
+who use the WhisperCast add-on, or who just want to send a notice (besides the emote 
+shout that happens) to another player/group/raid participants.  With this change 
+AutoShoutOut is now PvP friendly, in that you can turn off the shouting portion, but
+still send notifications via messaging to other persons.  That way the enemy won't
+hear any emotes from you, but your team mates know that you are in need of aid.
+
+Enhanced help info to just display a section of help for a particular command, when 
+an invalid command is done.  Also made cosmetic changes to the help information.
+
+Added a "debug" command.
+
+
+Changes in 1.0.1
+----------------
+
+Modified the way AutoShoutOut sends messages to the chat window.  More specifically,
+instead of sending a message to the 'ChatFrame1' chat window, it sends it to the 
+'DEFAULT_CHAT_FRAME' chat window instead.  This was done to assist a user who was 
+getting an unusual crash situation when a message was sent to 'ChatFrame1'.
+
+
+Changes in 1.0.0
+----------------
+
+First version, based on AutoShout code.  The following changes were made since 
+branching from AutoShout's v1.1 code base:
+
+Updated .toc for WoW client version 1300 (v1.3.0)
+
+Modified to use the DoEmote(String) function, instead of the PlayVocalCategory(String) 
+function which was removed in version 1.3.0 of the WoW client.
+
+Added shout 'frequency' settings.  Also enhancements to what order shouts are done.
+
+Added 'About to die' (a.k.a. Life) shout category.  Uses the 'HELPME' vocal emote.
+
+Minor bug fixes.

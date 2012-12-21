@@ -1,0 +1,325 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="Options.lua"/>
+	
+	<CheckButton name="LSChat_CheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset left="0" right="-20" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				if ( this:GetChecked() ) then
+					PlaySound("igMainMenuOptionCheckBoxOff");
+				else
+					PlaySound("igMainMenuOptionCheckBoxOn");
+				end
+				MGOptionsFrame_OnClick();
+			</OnClick>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+				if ( this.tooltipRequirement ) then
+					GameTooltip:AddLine(this.tooltipRequirement, "", 1.0, 1.0, 1.0);
+					GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+		
+	<Frame name="LSChat_Options" toplevel="true" frameStrata="MEDIUM" enableMouse="false" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="280" y="220" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" >
+				<Offset>
+					<AbsDimension x="0" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED");
+				
+				LSChat_Options:SetBackdropColor(0, 0, 0, 1);
+				LSChat_Options:SetBackdropBorderColor(100, 0, 0);
+				
+				
+				LSChat_Text_Hide:SetText('Hide Chat Buttons');
+				LSChat_Text_DisableButtons:SetText('Disable Chat Buttons');
+				
+				LSChat_Text_HideEmote:SetText('Hide Emote Button');
+				LSChat_Text_Mousewheel:SetText('Enable Mousewheel to scroll chat');
+				
+				LSChat_Text_Enabled:SetText('Enable Chat Timestamps');
+				LSChat_Text_Seconds:SetText('Add Seconds to stamps');
+				LSChat_Text_Style:SetText('use 24 hours format');
+				
+							
+			</OnLoad>
+			<OnShow>
+				LSChat_UpdateOptions()
+			</OnShow>
+			<OnEvent>
+				if (event == "VARIABLES_LOADED") then
+					LSChat_UpdateOptions()
+				end;
+			</OnEvent>
+			 <OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+				    this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+				    this:StopMovingOrSizing();
+				end
+		    </OnMouseUp>
+		</Scripts>
+		<Backdrop name="LSChat_OptionsBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+					
+			<Layer level="BACKGROUND">
+								
+				<FontString name="LSChat_Text_Hide" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="50" y="-25" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+				
+				<FontString name="LSChat_Text_DisableButtons" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativeTo="LSChat_Text_Hide" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-15" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+				
+				<FontString name="LSChat_Text_HideEmote" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativeTo="LSChat_Text_DisableButtons" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-15" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+				
+				<FontString name="LSChat_Text_Mousewheel" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativeTo="LSChat_Text_HideEmote" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-15" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+							
+				<FontString name="LSChat_Text_Enabled" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativeTo="LSChat_Text_Mousewheel" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-15" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+				
+				<FontString name="LSChat_Text_Seconds" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativeTo="LSChat_Text_Enabled" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-15" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+				
+				<FontString name="LSChat_Text_Style" inherits="GameFontNormal">
+					<Anchors><Anchor point="TOPLEFT" relativeTo="LSChat_Text_Seconds" relativePoint="BOTTOMLEFT">
+							<Offset><AbsDimension x="0" y="-15" /></Offset>
+						</Anchor></Anchors>
+				</FontString>
+				
+			</Layer>
+			
+		</Layers>
+		<Frames>
+					
+			
+			<CheckButton name="LSChat_checkbox_Hide" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_Hide" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleButtons()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="LSChat_checkbox_DisableButtons" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_DisableButtons" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleEnabled()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="LSChat_checkbox_HideEmote" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_HideEmote" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleEmote()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="LSChat_checkbox_Mousewheel" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_Mousewheel" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleMousewheel()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			
+			<CheckButton name="LSChat_checkbox_Enabled" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_Enabled" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleStamp()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="LSChat_checkbox_Seconds" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_Seconds" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleStampSeconds()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="LSChat_checkbox_Style" inherits="LSChat_CheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LSChat_Text_Style" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-35" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LSChat.ToggleStampStyle()
+					</OnClick>	
+				</Scripts>
+			</CheckButton>
+			
+			<!--=======================================-->
+			<!--Exit Button-->
+			<!--=======================================-->
+			<Button name="LSChat_Button_Exit" inherits="GameMenuButtonTemplate" virtual="true" text="X">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+					</OnLoad>
+					<OnClick>
+						LSChat_Options:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		
+			<Frame  toplevel="true" name="LSChat_Header" hidden="false">
+				<Size><AbsDimension x="130" y="25" /></Size>
+				<Anchors>
+					<Anchor point="TOP" >
+						<Offset>
+							<AbsDimension x="0" y="22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="LSChat_HeaderArt" file="Interface\ChatFrame\ChatFrameTab">
+							<Size><AbsDimension x="140" y="30" /></Size>
+							<Anchors><Anchor point="TOP"  relativePoint="TOP">
+							<Offset><AbsDimension x="0" y="5" /></Offset>
+							</Anchor></Anchors>
+						</Texture>
+						
+						<FontString name="LSChat_HeaderText" inherits="GameFontNormal">
+							<Anchors><Anchor point="CENTER" relativeTo="LSChat_HeaderArt" relativePoint="CENTER">
+									<Offset><AbsDimension x="0" y="-5" /></Offset>
+								</Anchor></Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				
+				
+				<Scripts>
+					<OnLoad>
+						LSChat_HeaderText:SetText("LS Chat");
+					</OnLoad>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+						    LSChat_Options:StartMoving();
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						if ( arg1 == "LeftButton" ) then
+						    LSChat_Options:StopMovingOrSizing();
+						end
+				    </OnMouseUp>
+				</Scripts>
+			</Frame>
+	
+		</Frames>
+	</Frame>
+	
+	
+</Ui>

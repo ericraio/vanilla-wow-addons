@@ -1,0 +1,183 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    
+    <!-- <Script file="LootTrackerSettingsUI.lua"/> -->
+
+    <!-- OptionsButtonTemplate, UIPanelButtonTemplate2, UIPanelButtonGrayTemplate, -->
+    
+    <Button name="LT_SessionButtonTemplate" inherits="UIPanelButtonTemplate2" virtual="true">
+        <Size x="170" y="20"/>
+        <Scripts>
+            <OnClick>
+                LT_SessionButtonClicked(this);
+            </OnClick>
+        </Scripts>
+    </Button>
+
+            
+    <Frame name="LT_SessionChangeTemplate" virtual="true" inherits="OptionFrameBoxTemplate">
+        <Size x="210" y="235"/>
+        <Frames>
+                                                    
+            <!-- Change Session EditBox -->
+            <EditBox name="LT_ChangeSessionEditBox" letters="40" autoFocus="false" inherits="InputBoxTemplate">
+                <Size x="190" y="20"/>
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="TopLEFT" relativeTo="$parent">
+                        <Offset x="15" y="-10"/>
+                    </Anchor>
+                </Anchors>
+                <FontString inherits="ChatFontHighlight" font="Fonts\ARIALN.TTF">
+                    <Color r="1" g="1" b="0"/>
+                    <FontHeight>
+                        <AbsValue val="12"/>
+                    </FontHeight>
+                </FontString>
+                <Scripts>
+                    <OnShow>
+                        -- Initialize
+                        local settings = LT_GetSettings();
+                        this:SetText(settings.CurrentSession);
+                        LT_OnSessionEditValueChanged(this:GetText());
+                    </OnShow>
+                    <OnTextChanged>
+                        LT_OnSessionEditValueChanged(this:GetText());
+                    </OnTextChanged>
+                </Scripts>
+            </EditBox>
+            
+            <!-- Set Session Button -->
+            <Button name="LT_SetSessionButton" inherits="OptionsButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_ChangeSessionEditBox">
+                        <Offset x="-5" y="-4"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        local value = LT_ChangeSessionEditBox:GetText();
+                        LT_SetSession(value);
+                        LT_UpdateCurrentSessionText();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            
+            <!-- Export Session Button -->
+            <Button name="LT_ExportSessionButton" inherits="OptionsButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="TopRIGHT" relativeTo="LT_SetSessionButton">
+                        <Offset x="5" y="0"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        local value = LT_ChangeSessionEditBox:GetText();
+                        LT_ExportSession(value);
+                        LT_UpdateCurrentSessionText();
+                        LT_UpdateSessionScroll();
+                    </OnClick>
+                    <OnShow>
+                        this:SetText(LT_BUTTON_EXPORT);
+                    </OnShow>
+                </Scripts>
+            </Button>
+            
+            <!-- Reset Button -->
+            <Button name="LT_ResetButton" inherits="OptionsButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLeft" relativeTo="LT_SetSessionButton">
+                        <Offset x="0" y="-4"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        LT_ResetSession(LT_ChangeSessionEditBox:GetText());
+                    </OnClick>
+                </Scripts>
+            </Button>
+            
+            
+            <!-- Existing sessions -->
+            
+            <Frame name="LT_SessionButtonsLabel" inherits="LT_SubLabelTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_ResetButton">
+                        <Offset x="0" y="-5"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        LT_SessionButtonsLabelText:SetText(LT_LABEL_SESSIONS);
+                    </OnShow>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="LT_SessionButtonsFrame" inherits="OptionFrameBoxTemplate">
+                <Size x="190" y="100"/>
+                <Anchors>
+                    <Anchor point="TopLEFT" relativeTo="LT_SessionButtonsLabel" relativePoint="BottomLEFT">
+                        <Offset x="0" y="-2"/>
+                    </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <EdgeSize>
+                        <AbsValue val="8"/>
+                    </EdgeSize>
+                    <TileSize>
+                        <AbsValue val="8"/>
+                    </TileSize>
+                    <BackgroundInsets>
+                        <AbsInset left="2" right="2" top="2" bottom="2"/>
+                    </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                    <OnLoad>
+                        this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+                        this:SetBackdropColor(0.15, 0.15, 0.15);
+                    </OnLoad>
+                </Scripts>
+                <Frames>
+                
+                    <ScrollFrame name="LT_SessionScrollFrame" inherits="FauxScrollFrameTemplate">
+                        <Size x="165" y="100"/>
+                        <Anchors>
+                            <Anchor point="TopLEFT" relativePoint="TopLEFT" relativeTo="LT_SessionButtonsFrame">
+                                <Offset x="0" y="0"/>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnVerticalScroll>
+                                FauxScrollFrame_OnVerticalScroll(LT_SCROLL_SESSIONITEMHEIGHT, LT_UpdateSessionScroll);
+                            </OnVerticalScroll>
+                            <OnShow>
+                                LT_AddListener(LT_UpdateSessionScroll);
+                                LT_UpdateSessionScroll();
+                            </OnShow>
+                            <OnHide>
+                                LT_RemoveListener(LT_UpdateSessionScroll);
+                            </OnHide>
+                        </Scripts>
+                    </ScrollFrame>
+                    
+                    <Button name="LT_SessionButton1" inherits="LT_SessionButtonTemplate"><Anchors><Anchor point="TopLEFT" relativeTo="LT_SessionScrollFrame" relativePoint="TopLEFT"/></Anchors></Button>
+                    <Button name="LT_SessionButton2" inherits="LT_SessionButtonTemplate"><Anchors><Anchor point="TopLEFT" relativeTo="LT_SessionButton1" relativePoint="BottomLEFT"/></Anchors></Button>
+                    <Button name="LT_SessionButton3" inherits="LT_SessionButtonTemplate"><Anchors><Anchor point="TopLEFT" relativeTo="LT_SessionButton2" relativePoint="BottomLEFT"/></Anchors></Button>
+                    <Button name="LT_SessionButton4" inherits="LT_SessionButtonTemplate"><Anchors><Anchor point="TopLEFT" relativeTo="LT_SessionButton3" relativePoint="BottomLEFT"/></Anchors></Button>
+                    <Button name="LT_SessionButton5" inherits="LT_SessionButtonTemplate"><Anchors><Anchor point="TopLEFT" relativeTo="LT_SessionButton4" relativePoint="BottomLEFT"/></Anchors></Button>
+            
+                </Frames>
+            </Frame>
+            
+        </Frames>
+        <Scripts>
+            <OnShow>
+                --LT_AddListener(LT_UpdateUI);
+                --LT_UpdateUI();
+            </OnShow>
+            <OnHide>
+                --LT_RemoveListener(LT_UpdateUI);
+            </OnHide>
+        </Scripts>
+    </Frame>
+</Ui>

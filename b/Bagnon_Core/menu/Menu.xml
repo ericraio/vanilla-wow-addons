@@ -1,0 +1,316 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="Menu.lua"/>
+	
+	<!-- General Slider -->
+	<Slider name="BagnonSlider" inherits="OptionsSliderTemplate" virtual="true">
+		<Size x="216" y="18"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentValText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset x="0" y="-6"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Slider>
+	
+	<CheckButton name="BagnonCheckButton" virtual="true">
+		<Size x="32" y="32"/>
+		
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+				<Offset x="18" y="-36"/>
+			</Anchor>
+		</Anchors>
+		
+		<ButtonText name="$parentText" inherits="GameFontNormalSmall">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT">
+					<Offset x="-2" y="0"/>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont font="GameFontNormalSmall"/>
+	
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+	</CheckButton>
+	
+	<!-- 
+		The right click menu
+	-->
+	
+	<Button name="BagnonMenu" clampedToScreen="true" enableMouse="true" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Size x="254" y="390"/>
+		
+		<Backdrop bgFile="Interface\CharacterFrame\UI-Party-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontHighlightLarge">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset x="0" y="-16"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset x="-8" y="-8"/>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- checkbox -->
+			<CheckButton name="$parentLocked" inherits="BagnonCheckButton" text="BAGNON_OPTIONS_LOCK">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset x="18" y="-36"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonMenu_ToggleLock(this:GetParent().frame, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			
+			<!-- texture -->
+			<CheckButton name="$parentReverse" inherits="BagnonCheckButton" text="BAGNON_OPTIONS_REVERSE">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentLocked" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonMenu_ToggleOrder(this:GetParent().frame, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentStayOnScreen" inherits="BagnonCheckButton" text="BAGNON_OPTIONS_STAY_ON_SCREEN">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentReverse" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+						BagnonMenu_ToggleStayOnScreen(this:GetParent().frame, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<!-- texture -->
+			<Button name="$parentBGSettings" text="BAGNON_OPTIONS_BACKGROUND">
+				<Size x="32" y="32"/>
+
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentStayOnScreen" relativePoint="BOTTOMLEFT">
+						<Offset x="4" y="2"/>
+					</Anchor>
+				</Anchors>
+				
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBackground">
+							<Size x="24" y="24"/>
+							
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+							
+							<Color r="0.5" g="0.5" b="0.5"/>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch">
+					<Size x="30" y="30"/>
+					
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset x="-3" y="0"/>
+						</Anchor>
+					</Anchors>
+				</NormalTexture>
+				
+				<ButtonText>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNormalTexture" relativePoint="RIGHT">
+							<Offset x="-2" y="0"/>
+						</Anchor>
+					</Anchors>
+				</ButtonText>
+				
+				<NormalFont font="GameFontNormalSmall" justifyH="RIGHT"/>
+				<HighlightFont font="GameFontHighlightSmall" justifyH="RIGHT"/>
+				
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						BagnonMenuBG_OnClick(this:GetParent().frame);
+					</OnClick>
+					<OnHide>
+						this:UnlockHighlight();
+					</OnHide>
+				</Scripts>
+			</Button>
+			
+			<!-- Columns -->
+			<Slider name="$parentColumns" inherits="BagnonSlider" minValue="1" maxValue="32" valuestep="1">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentBGSettings" relativePoint="BOTTOMLEFT">
+						<Offset x="-4" y="-12"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText(BAGNON_OPTIONS_COLUMNS);
+						getglobal(this:GetName() .. "Low"):SetText("1");
+						getglobal(this:GetName() .. "High"):SetText("32");
+					</OnLoad>
+					<OnValueChanged>
+						if(not this:GetParent().onShow) then
+							local frame = this:GetParent().frame;
+							BagnonFrame_Layout(frame, this:GetValue(), frame.space);
+						end
+						getglobal(this:GetName() .. "ValText"):SetText( this:GetValue() );
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<!-- Spacing -->
+			<Slider name="$parentSpacing" inherits="BagnonSlider" minValue="0" maxValue="32" valuestep="1">
+			
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentColumns" relativePoint="BOTTOM">
+						<Offset x="0" y="-24"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText(BAGNON_OPTIONS_SPACING);
+						getglobal(this:GetName() .. "Low"):SetText("0");
+						getglobal(this:GetName() .. "High"):SetText("32");
+					</OnLoad>
+					<OnValueChanged>
+						if(not this:GetParent().onShow) then
+							local frame = this:GetParent().frame;
+							BagnonFrame_Layout(frame, frame.cols, this:GetValue() );
+						end
+						getglobal(this:GetName() .. "ValText"):SetText( this:GetValue() );
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<!-- Scaler -->
+			<Slider name="$parentScale" inherits="BagnonSlider" minValue="50" maxValue="150" valuestep="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSpacing" relativePoint="BOTTOM">
+						<Offset x="0" y="-24"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText(BAGNON_OPTIONS_SCALE);
+						getglobal(this:GetName() .. "Low"):SetText("50%");
+						getglobal(this:GetName() .. "High"):SetText("150%");
+					</OnLoad>
+					<OnValueChanged>
+						if(not this:GetParent().onShow) then
+							BagnonMenu_SetScale(this:GetParent().frame, this:GetValue() / 100 );
+						end
+						getglobal(this:GetName() .. "ValText"):SetText( this:GetValue() );
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<!-- Opacity -->
+			<Slider name="$parentOpacity" inherits="BagnonSlider" minValue="0" maxValue="100" valuestep="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentScale" relativePoint="BOTTOM">
+						<Offset x="0" y="-24"/>
+					</Anchor>
+				</Anchors>
+				
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText(BAGNON_OPTIONS_OPACITY);
+						getglobal(this:GetName() .. "Low"):SetText("0%");
+						getglobal(this:GetName() .. "High"):SetText("100%");
+					</OnLoad>
+					<OnValueChanged>
+						if(not this:GetParent().onShow) then
+							BagnonMenu_SetAlpha(this:GetParent().frame, this:GetValue() / 100 );
+						end
+						getglobal(this:GetName() .. "ValText"):SetText( this:GetValue() );
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<!-- Opacity -->
+			<Slider name="$parentStrata" inherits="BagnonSlider" minValue="1" maxValue="3" valuestep="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOpacity" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="-24"/>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText(BAGNON_OPTIONS_STRATA);
+						getglobal(this:GetName() .. "Low"):SetText("Low");
+						getglobal(this:GetName() .. "High"):SetText("High");
+					</OnLoad>
+					<OnValueChanged>
+						if(not this:GetParent().onShow) then
+							BagnonFrame_SetStrata(this:GetParent().frame, this:GetValue() );
+						end
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+
+		<!-- Setup all buttons to whatever the bar had the settings to -->
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonDown", "LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				this:Hide();
+			</OnClick>
+			<OnHide>
+				this:SetParent(UIParent);
+			</OnHide>
+		</Scripts>
+	</Button>
+</Ui>

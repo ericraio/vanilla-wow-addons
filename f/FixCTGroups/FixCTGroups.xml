@@ -1,0 +1,211 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd"> 
+   <Script file="FixCTGroups.lua"/>
+
+   <!-- Frame to handle all core events --> 
+   <Frame name="FixCTGroupsCore"> 
+      <Scripts> 
+		<OnLoad>
+			this:RegisterEvent("VARIABLES_LOADED");
+		</OnLoad>
+		<OnEvent>
+			if (event == "VARIABLES_LOADED") then
+				FixCTGroupsInit();
+			end
+		</OnEvent>
+	  </Scripts> 
+   </Frame> 
+
+	<Frame name="FixCTGroupsConfigFrame"
+		toplevel="true" parent="UIParent" frameStrata="DIALOG" 
+		hidden="true" enableMouse="true">
+    <Size>
+      <AbsDimension x="260" y="280"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+
+    <Scripts>
+      <OnLoad>
+        <!-- allow pressing escape to close frame -->
+        tinsert(UISpecialFrames, this:GetName());
+      </OnLoad>
+      <OnShow> FixCTGroupsConfigFrameOnShow(); </OnShow>
+    </Scripts>
+    
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" 
+      edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+
+    <!-- title header -->
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+          <Size>
+            <AbsDimension x="256" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="12"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString inherits="GameFontNormal" text="Fix CT Groups Config">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="$parent"></Anchor>
+          </Anchors>
+        </FontString>      
+      </Layer>
+	</Layers>
+
+    <Frames>
+      <!-- close button -->
+      <Button name="$parentClose" inherits="OptionsButtonTemplate" text="Close">
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+            <Offset>
+              <AbsDimension x="4" y="16"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick> this:GetParent():Hide(); </OnClick>
+        </Scripts>
+      </Button>
+
+      <!-- groups button -->
+      <Button name="$parentGroups" inherits="OptionsButtonTemplate" text="Groups">
+        <Anchors>
+          <Anchor relativeTo="$parentClose" point="BOTTOM" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="8"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick> FixCTGroupsCellsFrame:Show(); </OnClick>
+        </Scripts>
+      </Button>
+
+	  <!-- default button -->
+      <Button name="$parentDefault" inherits="OptionsButtonTemplate" text="Defaults">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+            <Offset>
+              <AbsDimension x="-4" y="16"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick> FixCTGroupsSetDefaultConfig(); </OnClick>
+        </Scripts>
+      </Button>
+
+	  <!-- checkbox options -->
+      <CheckButton name="$parentCTRADefault" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parent">
+            <Offset>
+              <AbsDimension x="20" y="-32"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad> getglobal(this:GetName().."Text"):SetText("Default CTRA Style"); </OnLoad>
+          <OnClick>  FixCTGroupsConfigFrameOptionOnClick(); </OnClick>
+        </Scripts>
+      </CheckButton>
+
+      <!--CheckButton name="$parentLinkAllGroups" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentCTRADefault" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="0" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad> getglobal(this:GetName().."Text"):SetText("Link All Groups"); </OnLoad>
+          <OnClick> FixCTGroupsConfigFrameOptionOnClick(); </OnClick>
+        </Scripts>
+      </CheckButton-->
+
+      <CheckButton name="$parentShowGroups" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentCTRADefault" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="0" y="0"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad> getglobal(this:GetName().."Text"):SetText("Show Groups"); </OnLoad>
+          <OnClick> FixCTGroupsConfigFrameOptionOnClick(); </OnClick>
+        </Scripts>
+      </CheckButton>
+
+	<!-- spacing sliders -->
+      <Slider name="$parentSpacingX" inherits="OptionsSliderTemplate">
+        <Size>
+          <AbsDimension x="220" y="16"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentShowGroups" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-24"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            getglobal(this:GetName().."Text"):SetText("Horizontal Spacing");
+            getglobal(this:GetName().."High"):SetText("");
+            getglobal(this:GetName().."Low"):SetText("");
+            this:SetMinMaxValues(-15,15);
+            this:SetValueStep(1);
+          </OnLoad>
+          <OnValueChanged> FixCTGroupsConfigFrameOptionOnClick(); </OnValueChanged>
+        </Scripts>
+      </Slider>	
+
+      <Slider name="$parentSpacingY" inherits="OptionsSliderTemplate">
+        <Size>
+          <AbsDimension x="220" y="16"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentSpacingX" relativePoint="BOTTOMLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-24"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnLoad>
+            getglobal(this:GetName().."Text"):SetText("Vertical Spacing");
+            getglobal(this:GetName().."High"):SetText("");
+            getglobal(this:GetName().."Low"):SetText("");
+            this:SetMinMaxValues(-100,0);
+            this:SetValueStep(1);
+          </OnLoad>
+          <OnValueChanged> FixCTGroupsConfigFrameOptionOnClick(); </OnValueChanged>
+        </Scripts>
+      </Slider>	
+
+	</Frames>
+
+	</Frame>
+</Ui>
+

@@ -1,0 +1,314 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+        <Script file="localization.enUS.lua"/>
+        <Script file="localization.deDE.lua"/>
+        <Script file="localization.frFR.lua"/>
+        <Script file="localization.zhCN.lua"/>
+        <Script file="localization.lua"/>
+        <Script file="XPerl_Raid.lua"/>
+
+        <Frame name="XPerl_Raid_Frame" parent="UIParent" hidden="true">
+		<Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+                                XPerl_Raid_OnLoad()
+                                -- Saves 1 level of function calling by calling our update function directly
+                                this:SetScript("OnEvent", XPerl_Raid_OnEvent)
+                                this:SetScript("OnUpdate", XPerl_Raid_OnUpdate)
+			</OnLoad>
+		</Scripts>
+
+                <Frames>
+                        <Frame name="XPerl_Raid_Mover" hidden="true">
+                                <Layers>
+                                        <Layer level="OVERLAY">
+                                                <Texture file="Interface\Addons\XPerl_RaidFrames\Images\XPerl_MovingHighlight" alphaMode="ADD" setAllPoints="true"/>
+                                        </Layer>
+                                </Layers>
+                        </Frame>
+                </Frames>
+	</Frame>
+
+        <StatusBar name="XPerlRaidStatusBar" virtual="true">
+                <BarTexture name="$parentTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+                <Layers>
+                        <Layer level="OVERLAY">
+                                <FontString name="$parentText" inherits="GameFontNormalSmall" text="Error!">
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT"/>
+                                                <Anchor point="BOTTOMRIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="0" y="1"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                        <Color r="1.0" g="1.0" b="1.0"/>
+                                </FontString>
+                        </Layer>
+                        <Layer level="BACKGROUND">
+                                <Texture name="$parentBG" file="Interface\TargetingFrame\UI-TargetingFrame-BarFill" setAllPoints="true"/>
+                        </Layer>
+                </Layers>
+                <Scripts>
+                        <OnLoad>
+                                XPerl_RegisterBar(this)
+                                this:SetScript("OnLoad", nil)
+                        </OnLoad>
+                </Scripts>
+        </StatusBar>
+
+        <Frame name="XPerl_Raid_FrameTemplate" frameStrata="LOW" movable="true" virtual="true" hidden="true">
+		<Size>
+			<!-- The size of this frame determines what can be clicked for the menu and moving, hence it is the same size as the name frame. -->
+                        <AbsDimension x="80" y="46"/>
+		</Size>
+
+		<!-- Script Events -->
+		<Scripts>
+                        <OnLoad>
+                                XPerl_Raid_Single_OnLoad()
+                        </OnLoad>
+		</Scripts>
+
+		<Frames>
+			<!-- Raid Name -->
+			<Frame name="$parent_NameFrame">
+				<Size>
+					<AbsDimension x="80" y="20"/>
+				</Size>
+				<Anchors>
+                                        <Anchor point="TOPLEFT"/>
+				</Anchors>
+                                <Backdrop bgFile="Interface\AddOns\XPerl\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="OVERLAY">
+                                                <!-- Combat Icon -->
+                                                <Texture name="$parent_ActivityStatus" file="Interface\CharacterFrame\UI-StateIcon">
+							<Size>
+                                                                <AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="RIGHT">
+									<Offset>
+                                                                                <AbsDimension x="2" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+                                                        <TexCoords left="0.5" right = "1.0" top="0.0" bottom="0.5"/>
+						</Texture>
+
+                                                <!-- Warning Icon -->
+                                                <Texture name="$parent_Warning" file="Interface\Minimap\Ping\ping6" alphaMode="ADD" hidden="true">
+							<Size>
+                                                                <AbsDimension x="24" y="24"/>
+							</Size>
+							<Anchors>
+                                                                <Anchor point="TOP" relativePoint="TOP">
+									<Offset>
+                                                                                <AbsDimension x="0" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+
+                                                <FontString name="$parent_NameBarText" inherits="GameFontNormalSmall" text="Error!">
+							<Anchors>
+                                                                <Anchor point="TOPLEFT"/>
+                                                                <Anchor point="BOTTOMRIGHT">
+									<Offset>
+                                                                                <AbsDimension x="0" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+                                                </FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame name="$parent_StatsFrame">
+				<Size>
+					<AbsDimension x="80" y="30"/>
+				</Size>
+				<Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_NameFrame">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                                <Backdrop bgFile="Interface\AddOns\XPerl\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+                                        <!-- Health Bar -->
+                                        <StatusBar name="$parent_HealthBar" inherits="XPerlRaidStatusBar">
+                                                <Size>
+                                                        <AbsDimension x="70" y="15"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="TOPLEFT">
+                                                                <Offset>
+                                                                        <AbsDimension x="5" y="-5"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+                                                                <Offset>
+                                                                        <AbsDimension x="-5" y="-20"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <BarColor r="0" g="0.8" b="0"/>
+                                        </StatusBar>
+
+                                        <!-- Mana Bar -->
+
+                                        <StatusBar name="$parent_ManaBar" inherits="XPerlRaidStatusBar">
+                                                <Size>
+                                                        <AbsDimension x="70" y="5"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="BOTTOMLEFT" >
+                                                                <Offset>
+                                                                        <AbsDimension x="5" y="5"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                        <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent_HealthBar"/>
+                                                </Anchors>
+                                                <BarColor r="0" g="0" b="1"/>
+                                        </StatusBar>
+				</Frames>
+			</Frame>
+
+                        <Button name="$parent_CastClickOverlay" topLevel="true">
+                                -- frameStrata="MEDIUM">
+                                <Anchors>
+                                        <Anchor point="BOTTOMLEFT" relativeTo="$parent_StatsFrame"/>
+                                        <Anchor point="TOPRIGHT" relativeTo="$parent_NameFrame"/>
+                                </Anchors>
+                                <HighlightTexture file="Interface\Addons\XPerl\images\XPerl_Highlight" alphaMode="ADD">
+                                        <TexCoords left="0.25" right="0.75" top="0" bottom="0.5"/>
+                                </HighlightTexture>
+                                <Scripts>
+                                        <OnLoad>
+                                                this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up')
+                                                this:RegisterForDrag("RightButton")
+                                                this:SetScript("OnClick", XPerl_Raid_OnClick)
+                                                this:SetScript("OnLeave", XPerl_PlayerTipHide)
+                                        </OnLoad>
+                                        <OnEnter>
+                                                XPerl_PlayerTip(this:GetParent().partyid)
+                                        </OnEnter>
+                                        <OnDragStart>
+                                                if (IsRaidLeader()) then
+                                                        XPerl_Raid_StartMovingMember()
+                                                end
+                                        </OnDragStart>
+                                        <OnDragStop>
+                                                XPerl_Raid_StopMovingMember(true)
+                                        </OnDragStop>
+                                </Scripts>
+                        </Button>
+
+                        <Frame name="$parent_BuffFrame" frameStrata="MEDIUM" hidden="true">
+                                <Size>
+                                        <AbsDimension x="10" y="10"/>
+                                </Size>
+				<Anchors>
+                                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="$parent_StatsFrame">
+						<Offset>
+                                                        <AbsDimension x="-2" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+                        </Frame>
+		</Frames>
+	</Frame>
+
+        <Frame name="XPerl_Raid_TitleFrameTemplate" clampedToScreen="true" frameStrata="LOW" movable="true" virtual="true">
+		<Size>
+			<!-- The size of this frame determines what can be clicked for the menu and moving, hence it is the same size as the name frame. -->
+                        <AbsDimension x="80" y="10"/>
+		</Size>
+		<HitRectInsets>
+                        <AbsInset left="0" right="-30" top="-5" bottom="-5"/>
+		</HitRectInsets>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="500" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<!-- Script Events -->
+		<Scripts>
+                        <OnLoad>
+                                XPerl_Raid_Group_OnLoad()
+                                this:RegisterForDrag("LeftButton")
+                        </OnLoad>
+                        <OnDragStart>
+                                if (XPerlLocked == 0) then
+                                        this:StartMoving()
+                                end
+                        </OnDragStart>
+                        <OnDragStop>
+                                this:StopMovingOrSizing()
+                                this:SavePosition()
+                        </OnDragStop>
+		</Scripts>
+
+		<Frames>
+			<Frame name="$parent_NameFrame">
+				<Size>
+                                        <AbsDimension x="70" y="10"/>
+				</Size>
+				<Anchors>
+                                        <Anchor point="BOTTOM">
+                                                <Offset>
+                                                        <AbsDimension x="0" y="5"/>
+                                                </Offset>
+                                        </Anchor>
+				</Anchors>
+                                <Scripts>
+                                        <OnShow>
+                                                this:SetScale(0.75)
+                                        </OnShow>
+                                </Scripts>
+				<Layers>
+					<Layer level="OVERLAY">
+                                                <FontString name="$parent_NameBarText" inherits="GameFontNormal" text="Error!">
+                                                        <Anchors>
+                                                                <Anchor point="TOPLEFT"/>
+                                                                <Anchor point="BOTTOMRIGHT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="0" y="2"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                </FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

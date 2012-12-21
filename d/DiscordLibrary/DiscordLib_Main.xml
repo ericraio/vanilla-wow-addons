@@ -1,0 +1,201 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Frame name="DiscordLib_MainFrame" hidden="false" parent="UIParent">
+	<Scripts>
+		<OnLoad>
+			DiscordLib_Main_OnLoad();
+		</OnLoad>
+		<OnEvent>
+			DiscordLib_Main_OnEvent(event);
+		</OnEvent>
+		<OnUpdate>
+			DiscordLib_Main_OnUpdate(arg1);
+			DL_Update_Timers(arg1);
+		</OnUpdate>
+	</Scripts>
+</Frame>
+
+<GameTooltip name="DiscordLib_Tooltip" frameStrata="TOOLTIP" hidden="false" inherits="GameTooltipTemplate">
+	<Anchors>
+		<Anchor point="BOTTOM" relativePoint="TOP">
+			<Offset><AbsDimension x="0" y="100"/></Offset>
+		</Anchor>
+	</Anchors>
+</GameTooltip>
+
+<GameTooltip name="DiscordLib_AuraTooltip" frameStrata="TOOLTIP" hidden="false" inherits="GameTooltipTemplate">
+	<Anchors>
+		<Anchor point="BOTTOM" relativePoint="TOP">
+			<Offset><AbsDimension x="0" y="100"/></Offset>
+		</Anchor>
+	</Anchors>
+</GameTooltip>
+
+<EditBox name="DiscordLib_MacroBox" inherits="ChatFrameEditBoxTemplate" parent="UIParent" letters="2048" hidden="true">
+	<Scripts>
+		<OnLoad>
+			-- Preventing an error message at log-in
+		</OnLoad>
+	</Scripts>
+</EditBox>
+
+<Button name="DL_ColorCopy" inherits="UIPanelButtonTemplate" hidden="false" parent="ColorPickerFrame" text="DL_COPYTEXT">
+			<Size><AbsDimension x="75" y="22"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="ColorPickerFrame" relativePoint="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					local r, g, b = ColorPickerFrame:GetColorRGB();
+					if ColorPickerFrame.hasOpacity then
+						local a = OpacitySliderFrame:GetValue();
+						DL_SAVED_COLOR = {r=r, g=g, b=b, a=a};
+					else
+						DL_SAVED_COLOR = {r=r, g=g, b=b};
+					end 
+				</OnClick>
+			</Scripts>
+		</Button>
+
+<Button name="DL_ColorPaste" inherits="UIPanelButtonTemplate" hidden="false" parent="ColorPickerFrame" text="DL_PASTETEXT">
+			<Size><AbsDimension x="75" y="22"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="ColorPickerFrame" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="0" y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					if (DL_SAVED_COLOR) then
+						ColorPickerFrame:SetColorRGB(DL_SAVED_COLOR.r, DL_SAVED_COLOR.g, DL_SAVED_COLOR.b);
+						if DL_SAVED_COLOR.a and ColorPickerFrame.hasOpacity then
+							OpacitySliderFrame:SetValue(DL_SAVED_COLOR.a);
+						end
+					end 
+				</OnClick>
+			</Scripts>
+		</Button>
+
+<Frame name="DL_ScriptErrors" inherits="DiscordLib_DialogueBackdropTemplate" frameStrata="DIALOG" hidden="true">
+		<Size><AbsDimension x="384" y="256"/></Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Frames>
+			<Button inherits="UIPanelButtonTemplate" text="OK">
+				<Size><AbsDimension x="75" y="24"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="15"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						DL_ScriptErrors_OK_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="DL_ScriptErrors_Message" inherits="GameFontRedLarge" justifyH="CENTER" justifyV="TOP">
+					<Size>
+						<AbsDimension x="360" y="232"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0, 0, 0);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+<EditBox name="DL_ColorBoxTemplate" letters="5" autoFocus="false" inherits="InputBoxTemplate" frameStrata="DIALOG" parent="ColorPickerFrame" virtual="true">
+	<Size><AbsDimension x="60" y="25"/></Size>
+	<Scripts>
+		<OnEscapePressed>
+			this:ClearFocus();
+			DL_ColorBox_UpdateDisplay();
+		</OnEscapePressed>
+		<OnEnterPressed>
+			this:ClearFocus();
+			DL_ColorBox_UpdateDisplay();
+		</OnEnterPressed>
+		<OnTextChanged>
+			DL_ColorBox_UpdateColor();
+		</OnTextChanged>
+		<OnEditFocusGained>
+			DL_COLORBOX_FOCUS = 1;
+		</OnEditFocusGained>
+		<OnEditFocusLost>
+			DL_COLORBOX_FOCUS = nil;
+		</OnEditFocusLost>
+	</Scripts>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</EditBox>
+
+<EditBox name="DL_RedBox" inherits="DL_ColorBoxTemplate" id="1">
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset><AbsDimension x="235" y="-70"/></Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			DL_RedBox_Label:SetText("R:");
+		</OnLoad>
+		<OnTabPressed>
+			DL_GreenBox:SetFocus();
+		</OnTabPressed>
+	</Scripts>
+</EditBox>
+<EditBox name="DL_GreenBox" inherits="DL_ColorBoxTemplate" id="2">
+	<Anchors>
+		<Anchor point="TOP" relativeTo="DL_RedBox" relativePoint="BOTTOM"/>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			DL_GreenBox_Label:SetText("G:");
+		</OnLoad>
+		<OnTabPressed>
+			DL_BlueBox:SetFocus();
+		</OnTabPressed>
+	</Scripts>
+</EditBox>
+<EditBox name="DL_BlueBox" inherits="DL_ColorBoxTemplate" id="3">
+	<Anchors>
+		<Anchor point="TOP" relativeTo="DL_GreenBox" relativePoint="BOTTOM"/>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			DL_BlueBox_Label:SetText("B:");
+		</OnLoad>
+		<OnTabPressed>
+			DL_RedBox:SetFocus();
+		</OnTabPressed>
+	</Scripts>
+</EditBox>
+
+</Ui>

@@ -1,0 +1,92 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+  <Script file="localization.lua" />
+  <Script file="TNEUtils.lua" />
+  <Script file="FiveSec.lua" />
+
+  <GameTooltip name="FiveSecTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate" />
+
+  <StatusBar name="FiveSecBarFrame" drawLayer="BORDER" toplevel="true" parent="UIParent" movable="true">
+    <Size>
+      <AbsDimension x="195" y="13" />
+    </Size>
+    <Anchors>
+      <Anchor point="BOTTOM">
+        <Offset>
+          <AbsDimension x="0" y="120" />
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <Texture setAllPoints="true">
+          <Color r="0" g="0" b="0" a="0.5" />
+        </Texture>    
+      </Layer>
+      <Layer level="ARTWORK">
+        <FontString name="$parentDelay" inherits="GameFontHighlight" justifyh="CENTER" hidden="true" setAllPoints="true" text="TNE_FiveSec_DELAYED_BY_CHANNELING" />
+        <FontString name="$parentLabel" inherits="GameFontHighlight" justifyh="RIGHT" text="TNE_FiveSec_NEXT_TICK_IN">
+          <Size>
+            <AbsDimension x="115" y="12" />
+          </Size>
+          <Anchors>
+            <Anchor point="LEFT" />
+          </Anchors>
+        </FontString>
+        <FontString name="$parentText" inherits="GameFontHighlight" justifyh="LEFT">
+          <Anchors>
+            <Anchor point="LEFT" relativeTo="$parentLabel" relativePoint="RIGHT" />
+          </Anchors>
+        </FontString>
+        <Texture name="$parentBorder" file="Interface\Tooltips\UI-StatusBar-Border">
+          <Size>
+            <AbsDimension x="205" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="3" />
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <Texture name="$parentSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
+          <Size>
+            <AbsDimension x="32" y="32" />
+          </Size>
+          <Anchors>
+            <Anchor point="CENTER" />
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Scripts>
+      <OnLoad>
+        this:RegisterEvent("VARIABLES_LOADED")
+        this:RegisterEvent("UNIT_DISPLAYPOWER") -- we need this to detect mana users and shifty druids
+        this:RegisterForDrag("LeftButton")
+        FiveSec:Initalize()
+      </OnLoad>
+      <OnEvent>
+        FiveSecBarFrame_OnEvent(event, arg1)
+      </OnEvent>
+      <OnUpdate>
+        FiveSecBarFrame_OnUpdate(arg1)
+      </OnUpdate>
+      <OnDragStart>
+        if (TNE_FiveSec_Movable) then
+          this:StartMoving()
+        end
+      </OnDragStart>
+      <OnDragStop>
+        this:StopMovingOrSizing()
+      </OnDragStop>
+    </Scripts>
+    <BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+    <BarColor r="0.0" g="0.7" b="1.0" />
+  </StatusBar>
+
+</Ui>

@@ -1,0 +1,149 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<Script file="SmartHeal_OptionFrame.lua"/>
+    <!-- tab button template -->
+	<Button	name="SH_TabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>SmartHeal:OptionTabClick(this:GetName())</OnClick>
+			<OnLoad>  
+				this:SetText( SmartHeal.OptionTab[ this:GetName()] ); 
+				PanelTemplates_TabResize(0);
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+    <!-- options frame -->
+    <Frame name="SH_OptionsFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent" enableKeyboard="true">
+		<Size>
+			<AbsDimension x="450" y="500"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+        <!-- header -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="SH_OptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size><AbsDimension x="350" y="64"/></Size>
+					<Anchors><Anchor point="TOP"><Offset><AbsDimension x="0" y="12"/></Offset></Anchor></Anchors>
+				</Texture>
+				<FontString name="SH_TitleText" inherits="GameFontNormal" text="SH_SMARTHEAL_OPTION">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SH_OptionsFrameHeader">
+							<Offset><AbsDimension x="0" y="-14"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>			  				
+			</Layer>
+		</Layers>
+
+        <Frames>
+		<Frame name="SH_OptionsFrameCanvas">
+			<Size>
+				<AbsDimension x="390" y="400"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					 <Offset> <AbsDimension x="30" y="-45"/> </Offset>
+					 </Anchor>
+			</Anchors>
+		</Frame>
+		
+            <!-- tab buttons -->
+            <Button	name="$parentTab1" inherits="SH_TabButtonTemplate" id="1">
+                <Anchors>
+                    <Anchor	point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+                        <Offset> <AbsDimension x="8" y="-24"/> </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button	name="$parentTab2" inherits="SH_TabButtonTemplate" id="2">
+                <Anchors>
+                    <Anchor	point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+                        <Offset> <AbsDimension x="-15" y="0"/> </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+          <Button name="$parentTab3" inherits="SH_TabButtonTemplate" id="3">
+                <Anchors>
+                    <Anchor	point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+                        <Offset> <AbsDimension x="-15" y="0"/> </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+					
+            											    	    	    	    	    	    	    	    
+            <!-- Default Button -->
+		<Button name="SH_ButtonDefault" inherits="OptionsButtonTemplate" text="SH_DEFAULT">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="SH_OptionsFrameCanvas" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					SmartHeal:setDefault(SmartHeal.TabDefault[SmartHeal.CurrentTab])
+					this:GetParent():Hide()
+					this:GetParent():Show()
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<!-- Close Button -->
+		<Button name="SH_ButtonClose" inherits="OptionsButtonTemplate" text="SH_CLOSE">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="SH_OptionsFrameCanvas" relativePoint="BOTTOMRIGHT">
+					<Offset><AbsDimension x="0" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick> 
+				    SH_OptionsFrame:Hide()
+				    SmartHeal.CurrentTab=nil
+				</OnClick>
+			</Scripts>
+		</Button>
+			
+ 
+        </Frames>
+		<Scripts>
+			<OnShow>
+				if(not SmartHeal.CurrentTab) then 
+					SmartHeal.CurrentTab="SH_OptionsFrameTab1" 
+				end
+				SmartHeal:OptionTabClick(SmartHeal.CurrentTab)
+			</OnShow>
+			<OnHide>	
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnMouseDown>
+				if (arg1 == "LeftButton") then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "LeftButton") then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnKeyDown>
+				if (arg1 == "ESCAPE") then
+					this:Hide();
+				end
+			</OnKeyDown>			
+		</Scripts>
+	</Frame>
+</UI>

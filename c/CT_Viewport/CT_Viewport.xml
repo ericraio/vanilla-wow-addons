@@ -1,0 +1,590 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_Viewport.lua"/>
+	<EditBox name="CT_Viewport_EditBoxTemplate" autoFocus="false" historyLines="0" letters="4" virtual="true">
+		<Size>
+			<AbsDimension x="60" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+					<Size>
+						<AbsDimension x="65" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+					<Size>
+						<AbsDimension x="25" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+					<Size>
+						<AbsDimension x="5" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<FontString inherits="ChatFontNormal"/>
+		<Scripts>
+			<OnEscapePressed>
+				this:ClearFocus();
+			</OnEscapePressed>
+			<OnEnterPressed>
+				CT_Viewport_ChangeViewportSide();
+			</OnEnterPressed>
+			<OnTextChanged>
+				if ( ( not tonumber(this:GetText()) or ( this.limitation and tonumber(this:GetText()) > this.limitation ) ) and strlen(this:GetText()) > 0 ) then
+					if ( tonumber(this:GetText()) and this.limitation and tonumber(this:GetText()) >  this.limitation ) then
+						this:SetText(this.limitation);
+					else
+						this:SetText(strsub(this:GetText(), 1, strlen(this:GetText())-1));
+					end
+				end
+			</OnTextChanged>
+			<OnEditFocusGained>
+				this:HighlightText();
+			</OnEditFocusGained>
+			<OnEditFocusLost>
+				this:HighlightText(0, 0);
+			</OnEditFocusLost>
+		</Scripts>
+	</EditBox>
+	<Frame name="CT_ViewportFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="Viewport">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfoText" inherits="GameFontNormal" text="CT_VIEWPORT_INFO">
+					<Size>
+						<AbsDimension x="450" y="40"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAspectRatioDefaultText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="-5" y="100"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAspectRatioNewText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="5" y="100"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentBorderFrame">
+				<Size>
+					<AbsDimension x="382" y="289"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop edgeFile="Interface\ChatFrame\ChatFrameBackground" tile="true">
+					<EdgeSize>
+						<AbsValue val="4"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="4"/>
+					</TileSize>
+				</Backdrop>
+			</Frame>
+			<Frame name="$parentInnerFrame" resizable="true">
+				<Size>
+					<AbsDimension x="375" y="281"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentBorderFrame">
+						<Offset>
+							<AbsDimension x="4" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ResizeBounds>
+					<minResize>
+						<AbsDimension x="188" y="140"/>
+					</minResize>
+					<maxResize>
+						<AbsDimension x="375" y="281"/>
+					</maxResize>
+				</ResizeBounds>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground" hidden="false" file="Interface\ChatFrame\ChatFrameBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-2" y="3"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="2" y="3"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="-2" y="-6"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="3" y="-6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<FontString name="$parentInfo" inherits="GameFontNormal" text="Rendered Area">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Backdrop edgeFile="Interface\ChatFrame\ChatFrameBackground" tile="true">
+					<EdgeSize>
+						<AbsValue val="4"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="4"/>
+					</TileSize>
+				</Backdrop>
+				<Frames>
+					<Button name="$parentResizeTopLeft">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentBackground">
+								<Offset>
+									<AbsDimension x="-2" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("TOPLEFT");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeTopRight">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentBackground">
+								<Offset>
+									<AbsDimension x="2" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("TOPRIGHT");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeBottomLeft">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativeTo="$parentBackground">
+								<Offset>
+									<AbsDimension x="-2" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("BOTTOMLEFT");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeBottomRight">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parentBackground">
+								<Offset>
+									<AbsDimension x="2" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("BOTTOMRIGHT");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeTop">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentResizeTopLeft" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT" relativeTo="$parentResizeTopRight" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("TOP");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeBottom">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentResizeBottomLeft" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT" relativeTo="$parentResizeBottomRight" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("BOTTOM");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeLeft">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentResizeTopLeft" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOM" relativeTo="$parentResizeBottomLeft" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("LEFT");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+					<Button name="$parentResizeRight">
+						<Size>
+							<AbsDimension x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentResizeTopRight" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOM" relativeTo="$parentResizeBottomRight" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel()-1);
+							</OnLoad>
+							<OnMouseDown>
+								CT_Viewport_Resize("RIGHT");
+							</OnMouseDown>
+							<OnMouseUp>
+								CT_Viewport_StopResize();
+							</OnMouseUp> 
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<EditBox name="$parentLeftEB" id="1" inherits="CT_Viewport_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBorderFrame">
+						<Offset>
+							<AbsDimension x="-7" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						if ( IsShiftKeyDown() ) then
+							getglobal(this:GetParent():GetName() .. "BottomEB"):SetFocus();
+						else
+							getglobal(this:GetParent():GetName() .. "TopEB"):SetFocus();
+						end
+					</OnTabPressed>
+				</Scripts>
+			</EditBox>
+			<EditBox name="$parentRightEB" id="2" inherits="CT_Viewport_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBorderFrame">
+						<Offset>
+							<AbsDimension x="7" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						if ( IsShiftKeyDown() ) then
+							getglobal(this:GetParent():GetName() .. "TopEB"):SetFocus();
+						else
+							getglobal(this:GetParent():GetName() .. "BottomEB"):SetFocus();
+						end
+					</OnTabPressed>
+				</Scripts>
+			</EditBox>
+			<EditBox name="$parentTopEB" id="3" inherits="CT_Viewport_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBorderFrame">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						if ( IsShiftKeyDown() ) then
+							getglobal(this:GetParent():GetName() .. "LeftEB"):SetFocus();
+						else
+							getglobal(this:GetParent():GetName() .. "RightEB"):SetFocus();
+						end
+					</OnTabPressed>
+				</Scripts>
+			</EditBox>
+			<EditBox name="$parentBottomEB" id="4" inherits="CT_Viewport_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentBorderFrame">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						if ( IsShiftKeyDown() ) then
+							getglobal(this:GetParent():GetName() .. "RightEB"):SetFocus();
+						else
+							getglobal(this:GetParent():GetName() .. "LeftEB"):SetFocus();
+						end
+					</OnTabPressed>
+				</Scripts>
+			</EditBox>
+			<Button name="$parentOkay" inherits="GameMenuButtonTemplate" text="Okay">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-73" y="65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_Viewport_ApplyViewport();
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Cancel">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentApply" inherits="GameMenuButtonTemplate" text="Apply">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="73" y="65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_Viewport_ApplyViewport();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnHide>
+				this.isResizing = nil;
+				getglobal(this:GetName() .. "InnerFrame"):StopMovingOrSizing();
+				PlaySound("UChatScrollButton");
+			</OnHide>
+			<OnLoad>
+				CT_ViewportFrame_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				CT_ViewportFrame_OnUpdate(arg1);
+			</OnUpdate>
+			<OnShow>
+				CT_ViewportFrame_OnShow();
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnEvent>
+				CT_ViewportFrame_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

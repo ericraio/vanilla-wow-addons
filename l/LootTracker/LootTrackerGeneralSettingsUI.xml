@@ -1,0 +1,56 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    
+    <Script file="LootTrackerGeneralSettingsUI.lua"/>
+    
+    <Frame name="LT_GeneralSettingsTemplate" virtual="true" inherits="OptionFrameBoxTemplate">
+        <Size x="210" y="70"/>
+        <Frames>
+
+            <!-- Color Picker Button -->
+            <Button name="ColorPickerButton" inherits="OptionsButtonTemplate">
+                <Size x="190" y="20"/>
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="TopLEFT" relativeTo="$parent">
+                        <Offset x="10" y="-10"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        LT_ShowChatColorPicker();
+                    </OnClick>
+                    <OnShow>
+                        this:SetText(LT_BUTTON_CHATCOLOR);
+                    </OnShow>
+                </Scripts>
+            </Button>
+
+            <!-- Just my loot CheckBox -->
+            <CheckButton name="JustMyLootCheckBox" inherits="OptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="ColorPickerButton">
+                        <Offset x="0" y="-5"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        local settings = LT_GetSettings();
+                        this:SetChecked(settings.JustMyLoot);
+                        
+                        local text = getglobal(this:GetName() .. "Text");
+                        text:SetText(LT_LABEL_JUSTMYLOOT);
+                    </OnShow>
+                    <OnClick>
+                        local settings = LT_GetSettings();
+                        settings.JustMyLoot = this:GetChecked();
+                        LT_DebugMessage(1, string.format(LT_SLASHCOMMAND_JUSTMYLOOT_QUERY, tostring(settings.JustMyLoot)));
+                        LT_FireChange();
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+
+        </Frames>
+    </Frame>
+
+</Ui>

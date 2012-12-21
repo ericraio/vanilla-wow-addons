@@ -1,0 +1,75 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="paging.lua"/>
+	
+	<CheckButton name="BOptionsPagingButton" inherits="BongosCheckButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				BActionBar.SetPaging(tonumber(this:GetText()), this:GetChecked());
+			</OnClick>
+			<OnMouseWheel>
+				BOptionsPaging_OnMousewheel(BOptionsPanelPagingScrollFrame, arg1);
+			</OnMouseWheel>
+		</Scripts>
+	</CheckButton>
+	
+	<Frame name="BongosOptionsPaging" inherits="BongosOptionsPanel" virtual="true">
+		<Frames>	
+			<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset x="-48" y="-32"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset x="-24" y="48"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(18, BOptionsPagingScrollBar_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			
+			<Slider name="$parentSkip" inherits="BongosOptionsSlider" minValue="0" maxValue="9" valuestep="1">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="8" y="18"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Text"):SetText("Page Skip");
+						getglobal(this:GetName() .. "Low"):SetText(0);
+						getglobal(this:GetName() .. "High"):SetText(9);
+					</OnLoad>
+					<OnValueChanged>
+						if not this.onShow then
+							if this:GetValue() == 0 then
+								BActionSets.g.skip = nil
+							else
+								BActionSets.g.skip = this:GetValue();
+							end
+							BActionMain_UpdatePage();
+						end
+						getglobal(this:GetName() .. "ValText"):SetText(this:GetValue());
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+		
+		<Scripts>
+			<OnLoad>
+				BOptionsPaging_OnLoad();
+			</OnLoad>
+			<OnShow>
+				BOptionsPaging_OnShow();
+			</OnShow>
+			<OnMouseWheel>
+				BOptionsPaging_OnMousewheel(BOptionsPanelPagingScrollFrame, arg1);
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+</Ui>

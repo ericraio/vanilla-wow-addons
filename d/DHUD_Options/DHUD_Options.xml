@@ -1,0 +1,2041 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<Script file="DHUD_Options.lua"/>
+
+    <!-- tab button template -->
+	<Button	name="DHUD_TabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick> DHUD_TabButton_OnClick( this:GetName() ); </OnClick>
+			<OnLoad>  
+                local DHUD_TabText = {
+                    ["DHUDOptionsFrameTab1"] = "Main",    
+                    ["DHUDOptionsFrameTab2"] = "Offsets",
+                    ["DHUDOptionsFrameTab3"] = "Text",
+                }
+			
+				getglobal(this:GetName()):SetText( DHUD_TabText[ this:GetName()] ); 
+				PanelTemplates_TabResize(0);
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<Button name="DHUD_ColorTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="25" y="25"/>
+		</Size>
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Text"):SetWidth(105);
+			</OnLoad>
+			<OnClick>
+                DHUD_ColorPicker_OnClick();
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"></HighlightTexture>
+	</Button>
+	
+    <!-- options frame -->
+    <Frame name="DHUDOptionsFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent" enableKeyboard="true">
+		<Size>
+			<AbsDimension x="450" y="500"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+        <!-- header -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="DHUDOptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size><AbsDimension x="350" y="64"/></Size>
+					<Anchors><Anchor point="TOP"><Offset><AbsDimension x="0" y="12"/></Offset></Anchor></Anchors>
+				</Texture>
+				<FontString name="DHUD_TitleText" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="DHUDOptionsFrameHeader">
+							<Offset><AbsDimension x="0" y="-14"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>			  				
+			</Layer>
+		</Layers>
+
+        <Frames>
+
+            <!-- tab buttons -->
+            <Button	name="$parentTab1" inherits="DHUD_TabButtonTemplate" id="1">
+                <Anchors>
+                    <Anchor	point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+                        <Offset> <AbsDimension x="8" y="-24"/> </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button	name="$parentTab2" inherits="DHUD_TabButtonTemplate" id="2">
+                <Anchors>
+                    <Anchor	point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+                        <Offset> <AbsDimension x="-15" y="0"/> </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button	name="$parentTab3" inherits="DHUD_TabButtonTemplate" id="3">
+                <Anchors>
+                    <Anchor	point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+                        <Offset> <AbsDimension x="-15" y="0"/> </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+					
+            <!-- tab1 frame -->
+            <Frame name="DHUD_Tab1" hidden="false" >	
+                <Frames>
+                    
+                    <!-- Alpha Settings Text -->
+                    <Frame name="DHUD_TEXT1" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Alpha Settings:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="20" y="-30"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame>  
+                                                
+                    <!-- Hud Scaling Text -->
+                    <Frame name="DHUD_TEXT5" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Hud Scaling:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="20" y="-220"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame>
+                        
+                    <!-- Display Text -->
+                    <Frame name="DHUD_TEXT6" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Display:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="160" y="-30"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame>
+                        
+                    <!-- Minimap Text -->
+                    <Frame name="DHUD_TEXT_MM" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Minimap:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="20" y="-375"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame>  
+                                        
+                    <!-- OOC Alpha -->
+                    <Slider name="DHUD_Slider_oocalpha" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-60"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 1, 0.1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("oocAlpha","No Combat");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("oocAlpha","No Combat",1)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("No Combat.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>				
+                
+                    <!-- Combat Alpha -->
+                    <Slider name="DHUD_Slider_combatAlpha" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-100"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 1, 0.1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("combatAlpha","In Combat");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("combatAlpha","In Combat",1)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("In Combat.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>		
+        
+                    <!-- Select Alpha -->
+                    <Slider name="DHUD_Slider_selAlpha" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-140"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 1, 0.1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("selAlpha","Selected");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("selAlpha","Selected",1)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Selected.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                
+                    <!-- Regen Alpha -->
+                    <Slider name="DHUD_Slider_regAlpha" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-180"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 1, 0.1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("regAlpha","Regenerate");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("regAlpha","Regenerate",1)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Regenerate.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                                
+                    <!-- Scale -->
+                    <Slider name="DHUD_Slider_scale" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-250"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0.1, 2, 0.1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("scale","Scale");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("scale","Scale",1)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Scale.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                
+                    <!-- showclass -->
+                    <CheckButton name="DHUD_OptionsFrame_showclass" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-50"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Class");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showclass");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showclass"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Class", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                    <!-- showlevel -->
+                    <CheckButton name="DHUD_OptionsFrame_showlevel" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-80"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Level");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showlevel");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showlevel"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Level", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                    <!-- showname -->
+                    <CheckButton name="DHUD_OptionsFrame_showname" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-110"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Name");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showname");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showname"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Name", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                    <!-- showelite -->
+                    <CheckButton name="DHUD_OptionsFrame_showelite" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-140"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Elite");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showelite");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showelite"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Elite", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+        
+                    <!-- animatebars -->
+                    <CheckButton name="DHUD_OptionsFrame_animatebars" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-170"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Animate Bars");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("animatebars");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["animatebars"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Animate Bars", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+        
+                    <!-- barborders -->
+                    <CheckButton name="DHUD_OptionsFrame_barborders" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-200"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Borders");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("barborders");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["barborders"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Borders", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+        
+                    <!-- showauras -->
+                    <CheckButton name="DHUD_OptionsFrame_showauras" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-230"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Auras");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showauras");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showauras"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Auras", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>			
+        
+                    <!-- Hide Blizzard Targetframe -->
+                    <CheckButton name="DHUD_OptionsFrame_btarget" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-260"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Bliz. Target");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("btarget");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["btarget"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Blizzard Targetframe", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+        
+                    <!-- Hide Blizzard Playerframe -->
+                    <CheckButton name="DHUD_OptionsFrame_bplayer" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-290"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Bliz. Player");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("bplayer");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["bplayer"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show Blizzard Playerframe", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                    <!-- Hide NPC in HUD -->
+                    <CheckButton name="DHUD_OptionsFrame_shownpc" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="170" y="-320"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show NPC");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("shownpc");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["shownpc"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show / Hide NPC Infos in HUD", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>	
+                    
+                    <!-- Show Castingbar -->
+                    <CheckButton name="DHUD_OptionsFrame_castingbar" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-50"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Castingbar");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("castingbar");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["castingbar"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show / Hide Castingbar", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                    <!-- Show Castingtime -->
+                    <CheckButton name="DHUD_OptionsFrame_castingtime" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-80"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Castingtime");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("castingbartimer");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["castingbartimer"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show / Hide Castingtime", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+ 
+                     <!-- Show target -->
+                    <CheckButton name="DHUD_OptionsFrame_showtarget" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-110"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Target");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showtarget");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showtarget"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show / Hide Target Bars / Text", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                     <!-- Show pet -->
+                    <CheckButton name="DHUD_OptionsFrame_showpet" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-140"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Pet");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showpet");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showpet"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show / Hide Pet Bars", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                                                       
+                    <!-- Hide minimap button -->
+                    <CheckButton name="DHUD_OptionsFrame_showmmb" inherits="OptionsCheckButtonTemplate" hidden="false">
+                        <HitRectInsets><AbsInset left="0" right="0" top="0" bottom="0"/></HitRectInsets>
+                        <Size><AbsDimension x="20" y="20"/>
+                        </Size>			
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-390"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                getglobal(this:GetName().."Text"):SetText(" Show Minimap Button");
+                            </OnLoad>				
+                            <OnClick>
+                                DHUD_ToggleConfig("showmmb");
+                            </OnClick>
+                            <OnShow>
+                                getglobal(this:GetName()):SetChecked(DHUD_Config["showmmb"]);
+                            </OnShow>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Show / Hide Show Minimap Button", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>					
+                        </Scripts>
+                    </CheckButton>
+                    
+                    <!-- mnimap angle-->
+                    <Slider name="DHUD_Slider_minimapw" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-420"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 360, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("minimapw","Minimap Button Angle");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("minimapw","Minimap Button Angle",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Minimap Button Angle", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>  
+                    
+                </Frames>      
+            </Frame>		
+			
+            <!-- tab2 -->	
+            <Frame name="DHUD_Tab2" hidden="true" >	
+                <Frames>
+                
+                    <!-- position text -->
+                    <Frame name="DHUD_TEXT3" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Position:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="20" y="-30"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame>
+                    
+                    <!-- x offset -->
+                    <Slider name="DHUD_Slider_xoffset" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-40"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-300, 300, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("xoffset","X Offset");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("xoffset","X Offset",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("X Offset.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+            
+                    <!-- y offset -->
+                    <Slider name="DHUD_Slider_yoffset" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-70"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-300, 300, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("yoffset","Y Offset");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("yoffset","Y Offset",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Y Offset.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+            
+                    <!-- hudspacing -->
+                    <Slider name="DHUD_Slider_hudspacing" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-100"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-500, 500, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("hudspacing","HUD Spacing");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("hudspacing","HUD Spacing",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("HUD Spacing", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>     
+            
+                    <!-- targettexty -->
+                    <Slider name="DHUD_Slider_targettexty" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-130"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-500, 500, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targettexty","Targettext Y");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targettexty","Targettext Y",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Targettext Y", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>       
+            
+                    <!-- playerhptextx playerhptexty-->
+                    <Slider name="DHUD_Slider_playerhptextx" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-160"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playerhptextx","PlayerHP X");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("playerhptextx","PlayerHP X",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("PlayerHP X", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+            
+                    <Slider name="DHUD_Slider_playerhptexty" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-190"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playerhptexty","PlayerHP Y");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("playerhptexty","PlayerHP Y",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("PlayerHP Y", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+                       
+                    <!-- playermanatextx playermanatexty-->
+                    <Slider name="DHUD_Slider_playermanatextx" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-220"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playermanatextx","PlayerMana X");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("playermanatextx","PlayerMana X",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("PlayerMana X", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+            
+                    <Slider name="DHUD_Slider_playermanatexty" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-250"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playermanatexty","PlayerMana Y");
+                            </OnShow>
+                            <OnValueChanged>
+                                 DHUD_FrameSlider_OnValueChanged("playermanatexty","PlayerMana Y",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("PlayerMana Y", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- targethptextx targethptexty-->
+                    <Slider name="DHUD_Slider_targethptextx" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-280"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 600, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targethptextx","TargetHP X");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targethptextx","TargetHP X",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("TargetHP X", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+
+                    <Slider name="DHUD_Slider_targethptexty" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-310"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targethptexty","TargetHP Y");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targethptexty","TargetHP Y",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("TargetHP Y", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+
+                    <!-- targetmanatextx targetmanatexty-->
+                    <Slider name="DHUD_Slider_targetmanatextx" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-340"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 600, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targetmanatextx","TargetMana X");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targetmanatextx","TargetMana X",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("TargetMana X", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <Slider name="DHUD_Slider_targetmanatexty" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-370"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targetmanatexty","TargetMana Y");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targetmanatexty","TargetMana Y",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("TargetMana Y", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                        
+                    <!-- pethptexty petmanatexty-->
+                    <Slider name="DHUD_Slider_pethptexty" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-400"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("pethptexty","PetHP and PetMana Y");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("pethptexty","PetHP and PetMana Y",0);
+                                DHUD_FrameSlider_OnValueChanged("petmanatexty","PetHP and PetMana Y",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("PetHP and PetMana Y", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+                        
+                    <!-- pethptextx petmanatextx-->
+                    <Slider name="DHUD_Slider_pethptextx" inherits="OptionsSliderTemplate" hidden="false">
+                       <Size><AbsDimension x="390" y="16"/></Size>	
+                        <Anchors>
+                           <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-430"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(-200, 400, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("pethptextx","PetHP and PetMana X");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("pethptextx","PetHP and PetMana X",0);
+                                DHUD_FrameSlider_OnValueChanged("petmanatextx","PetHP and PetMana X",0);
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("PetHP and PetMana X", 1, 1, 1, 1);
+                            </OnEnter>
+                           <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                      </Scripts>
+                    </Slider>             
+            
+                </Frames>      
+            </Frame>
+	            
+            <!-- tab3 -->	
+            <Frame name="DHUD_Tab3" hidden="true" >	
+                <Frames>		
+                        
+                    <!-- Fontsize Text -->
+                    <Frame name="DHUD_TEXT4" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Fontsize:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="20" y="-30"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame> 
+                    
+                    <!-- Fontcolors -->
+                    <Frame name="DHUD_TEXT_Fontcolors" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Fontcolors:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="150" y="-30"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame> 
+                    
+                    <!-- Fontsize Pet -->
+                    <Slider name="DHUD_Slider_fontsizepet" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-60"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 30, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("fontsizepet","Pet");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("fontsizepet","Pet",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Pet.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                
+                    <!-- Fontsize Player -->
+                    <Slider name="DHUD_Slider_fontsizeplayer" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-100"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 30, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("fontsizeplayer","Player");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("fontsizeplayer","Player",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Player.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+        
+                    <!-- Fontsize Target -->
+                    <Slider name="DHUD_Slider_fontsizetarget" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-140"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 30, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("fontsizetarget","Target");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("fontsizetarget","Target",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Target.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+        
+                    <!-- Fontsize Targetname -->
+                    <Slider name="DHUD_Slider_fontsizetargetname" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-260"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 30, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("fontsizetargetname","Text");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("fontsizetargetname","Text",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Text.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontsize Casttime -->
+                    <Slider name="DHUD_Slider_fontsizecasttime" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-180"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 30, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("fontsizecasttime","Casttime");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("fontsizecasttime","Casttime",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Casttime.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontsize Castdelay -->
+                    <Slider name="DHUD_Slider_fontsizecastdelay" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-220"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 30, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("fontsizecastdelay","Castdelay");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("fontsizecastdelay","Castdelay",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Castdelay.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- colorpicker pet health -->
+					<Button name="DHUD_pethptextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="160" y="-55"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "pethptextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("HP");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+
+                    <!-- colorpicker pet mana -->
+					<Button name="DHUD_petmanatextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="220" y="-55"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "petmanatextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("Mana");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+					
+                    <!-- colorpicker player health -->
+					<Button name="DHUD_playerhptextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="160" y="-95"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "playerhptextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("HP");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+
+                    <!-- colorpicker player mana -->
+					<Button name="DHUD_playermanatextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="220" y="-95"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "playermanatextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("Mana");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+
+                    <!-- colorpicker target health -->
+					<Button name="DHUD_targethptextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="160" y="-135"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "targethptextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("HP");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+
+                    <!-- colorpicker target mana -->
+					<Button name="DHUD_targetmanatextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="220" y="-135"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "targetmanatextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("Mana");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+					
+                    <!-- colorpicker casttime -->
+					<Button name="DHUD_casttimetextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="160" y="-175"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "casttimetextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("Casttime");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+					
+                    <!-- colorpicker castdelay -->
+					<Button name="DHUD_castdelaytextcolor" inherits="DHUD_ColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+								<Offset><AbsDimension x="160" y="-215"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture">
+									<Size><AbsDimension y="16" x="16"/></Size>
+									<Anchors><Anchor point="CENTER"></Anchor></Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+							    this.objindex = "castdelaytextcolor";
+							    this.tohue = this:GetName().."Texture";
+								getglobal(this:GetName().."Text"):SetText("Castdelay");
+								getglobal(this:GetName().."Texture"):SetTexture(DHUD_hextodec(DHUD_Config[this.objindex]));
+							</OnShow>
+						</Scripts>
+					</Button>
+
+                    <!-- Displaymodes Text -->
+                    <Frame name="DHUD_TEXT2" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Displaymodes:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="20" y="-300"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame>
+                    
+                    <!-- playerdisplaymode -->
+                    <Slider name="DHUD_Slider_playerdisplaymode" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-330"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 4, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playerdisplaymode","Player");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("playerdisplaymode","Player",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Player.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                
+                    <!-- targetdisplaymode -->
+                    <Slider name="DHUD_Slider_targetdisplaymode" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-370"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 4, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targetdisplaymode","Target");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targetdisplaymode","Target",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Target.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                            
+                    <!-- petdisplaymode -->
+                    <Slider name="DHUD_Slider_petdisplaymode" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="96" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="30" y="-410"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(1, 4, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("petdisplaymode","Pet");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("petdisplaymode","Pet",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Pet.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontoutlines -->
+                    <Frame name="DHUD_TEXT_Fontoutline" hidden="false" >
+                      <Layers>
+                         <Layer level="ARTWORK">
+                            <FontString inherits="GameFontNormal" text="Fontoutline:">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                        <Offset><AbsDimension x="300" y="-30"/></Offset>
+                                    </Anchor>
+                                </Anchors>
+                             </FontString>	
+                           </Layer>
+                        </Layers>
+                    </Frame> 
+                    
+                    <!-- Fontoutline Pet HP -->
+                    <Slider name="DHUD_Slider_pethpoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-60"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("pethpoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("pethpoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Pet Hp.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontoutline Pet Mana -->
+                    <Slider name="DHUD_Slider_petmanaoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-100"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("petmanaoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("petmanaoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Pet Mana.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                   
+                    <!-- Fontoutline Player HP -->
+                    <Slider name="DHUD_Slider_playerhpoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-140"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playerhpoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("playerhpoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Player Hp.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontoutline Player Mana -->
+                    <Slider name="DHUD_Slider_playermanaoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-180"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("playermanaoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("playermanaoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Player Mana.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontoutline Target HP -->
+                    <Slider name="DHUD_Slider_targethpoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-220"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targethpoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targethpoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Target Hp.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+
+                    <!-- Fontoutline Target Mana -->
+                    <Slider name="DHUD_Slider_targetmanaoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-260"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targetmanaoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targetmanaoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Target Mana.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                      
+                    <!-- Fontoutline casttime -->
+                    <Slider name="DHUD_Slider_casttimeoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-300"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("casttimeoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("casttimeoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Casttime.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>                      
+                      
+                    <!-- Fontoutline castdelay -->
+                    <Slider name="DHUD_Slider_castdelayoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-340"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("castdelayoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("castdelayoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Castdelay.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider> 
+ 
+                     <!-- Fontoutline target -->
+                    <Slider name="DHUD_Slider_targetoutline" inherits="OptionsSliderTemplate" hidden="false">
+                        <Size><AbsDimension x="100" y="16"/></Size>	
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DHUDOptionsFrame">
+                                <Offset><AbsDimension x="310" y="-380"/></Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                DHUD_FrameSlider_OnLoad(0, 2, 1);
+                            </OnLoad>
+                            <OnShow>
+                                DHUD_Options_OnShow("targetoutline","");
+                            </OnShow>
+                            <OnValueChanged>
+                                DHUD_FrameSlider_OnValueChanged("targetoutline","",0)
+                            </OnValueChanged>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                GameTooltip:SetText("Target Text.", 1, 1, 1, 1);
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide();
+                            </OnLeave>			    
+                        </Scripts>
+                    </Slider>
+                                                                           	
+                </Frames>      
+            </Frame>	
+            											    	    	    	    	    	    	    	    
+            <!-- Close Button -->
+			<Button name="DHUDFrameApply" inherits="OptionsButtonTemplate" text="OK">
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="20"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						DHUD_OptionsFrame_Toggle();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+            <!-- Reset Button -->
+			<Button name="DHUDFrameReset" inherits="OptionsButtonTemplate" text="Reset">
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="100" y="20"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+					    DHUD_reset(); 
+				        DHUDOptionsFrame:Hide();
+                		DHUDOptionsFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+ 
+        </Frames>
+		<Scripts>
+			<OnLoad>  
+                DHUD_TitleText:SetText("Phaytal's DHUD v1.1");
+			</OnLoad>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnMouseDown>
+				if (arg1 == "LeftButton") then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "LeftButton") then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnKeyDown>
+				if (arg1 == "ESCAPE") then
+				  this:StopMovingOrSizing();
+				  this:Hide();
+				end
+			</OnKeyDown>			
+		</Scripts>
+	</Frame>
+</UI>

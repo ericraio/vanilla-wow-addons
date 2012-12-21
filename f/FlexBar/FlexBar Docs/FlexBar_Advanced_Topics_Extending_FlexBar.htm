@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<meta name="GENERATOR" content="PageBreeze Free HTML Editor (http://www.pagebreeze.com)">
+<title>FlexBar_Advanced_Topics_Extending FlexBar</title>
+</head>
+<body bgcolor="#ffffff">
+<p align="center"><strong><em><font size="5">Advanced Topics - 
+Extending FlexBar</font></em></strong></p>
+<p align="center"><strong><em>PLEASE NOTE - THERE ARE CHANGES FROM 
+1.36</em></strong></p>
+<p align="left"><strong>Introduction:</strong>&nbsp; The creation of variants of 
+FlexBar (FlexBarEx, the original Matrix Flexbar and adding the detection of fear 
+to FlexBar) got me to thinking.&nbsp; The problem with these is that they fork 
+the FlexBar Code, making it hard for their creators to keep up with changes I 
+make in the original FlexBar.&nbsp; To help these folks out I've added in a few 
+arctitectural features to ensure that they can add code in that will survive new 
+versions (hopefully unchanged).</p>
+<p align="left">The addition of the Scripts Editor and the ability to run scripts 
+on ProfileLoaded has paved the way to allowing these extension to be done within 
+the FlexBar environment instead of through outside code modules.</p>
+<p align="left"><strong>Handling WoW Events:</strong>&nbsp; (NOTE - This is 
+changed since 1.36 PLEASE READ)</p>
+<p align="left">In order to effectively code in the WoW environment, you must be 
+able to register for its events and respond to them.&nbsp; In 1.32-1.36 this was 
+done by making an entry in the FBEventHandlers table.&nbsp; This is problematic 
+in that, if I am already listening for that event you could overwrite my 
+code.</p>
+<p align="left">In 1.37 I addressed this with 2 new functions:</p>
+<p align="left">function FB_RegisterEvent(event, name, callback, 
+wowevent)<br>function FB_UnregisterEvent(event, name)<br></p>
+<p align="left">The call to RegisterEvent requrest the event name (either a WoW 
+event like UNIT_HEALTH, or a FlexBar event like "mouseentergroup", a name for 
+your handler for this event, a callback function to handle the event, and a flag 
+to let FlexBar know if it is a WoW event or not.</p>
+<p align="left">Unregister simply takes the event and name and deletes it from the 
+table.</p>
+<p align="left">Note:&nbsp; For WoW events, FlexBar Code will execute first 
+followed by other functions for that event in the order they were 
+registered.&nbsp; For FB events, the event will be raised and acted on before 
+the registered code is run.</p>
+<p align="left">Example:</p>
+<p align="left">function SDK_TargetChanged()</p>
+<p align="left">&nbsp;&nbsp;&nbsp; FB_RaiseEvent("TargetChanged")</p>
+<p align="left">end</p>
+<p 
+align="left">FB_RegisterEvent("PLAYER_TARGET_CHANGED","SDK_tgtchange",SDK_TargetChanged,true)</p>
+<p align="left">Save this as "SDK Target Change Event Addition"</p>
+<p align="left">then</p>
+<p align="left">/flexbar runscript script='SDK Target Change Event Addition' 
+on='ProfileLoaded'</p>
+<p align="left">and you will now get a Target Changed event in FlexBar.</p>
+<p align="left"><strong>Conditionals:</strong></p>
+<p align="left">Conditionals are also handled by a table (FBConditions).&nbsp; 
+They are indexed by a lower case condition name (EG: FBConditions["hasbuff"]) 
+and return either true or false - NOT NIL.&nbsp; Please see 
+FlexBar_Conditionals.lua for examples.&nbsp; </p>
+<p align="left">Two conventions:&nbsp; If a condition has a target (argument) and 
+it is not provided, return false.&nbsp; If several targets are passed, and ANY 
+of them are true, return true.</p>
+<p align="left"><strong>Slash Commands:</strong></p>
+<p align="left">Slash commands are easy to add with WoW_UtilityClasses.lua 
+loaded:</p>
+<p align="left">MyCmd = Command_Class:New("MyCmd","/mycmd")</p>
+<p align="left">After this you can either add sub-commands with:</p>
+<p align="left">MyCmd:AddCommand("command",callback,"group","usage")</p>
+<p align="left">and parameters to that command with</p>
+<p align="left">MyCmd:AddParam("command","param",Required,Strict,{ types },{ 
+bounds }, default)</p>
+<p align="left">Or, if you just require a simple command, override 
+MyCmd:Dispatch(msg) to deal with it:</p>
+<p align="left">function MyCmd:Dispatch(msg)</p>
+<p align="left">local util = Utility_Class:New()</p>
+<p align="left">util:Echo(msg)</p>
+<p align="left">end</p>
+<p align="left">&nbsp;</p>
+<p align="left">These abilities will make FlexBar extensible for other people, 
+without requiring that they remake all their changes each version.</p>
+<p align="left">&nbsp;</p>
+</body>
+</html>

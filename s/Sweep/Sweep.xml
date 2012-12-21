@@ -1,0 +1,560 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="Sweep.lua"/>
+
+	<Button name="Sweep_CellTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+	
+	<!-- bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" -->
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlightLarge">
+					<Anchors>
+						<Anchor point="CENTER">
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks('LeftButtonDown', 'RightButtonDown');
+			</OnLoad>
+			<OnClick>
+				Sweep_CellOnClick(arg1);
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<!-- the main frame -->
+	<Frame name="Sweep_Frame"  toplevel="true" hidden="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="285" y="320"/>
+		</Size>
+		
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+ 					<AbsDimension x="0" y="-104"/>
+ 				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />	
+				<Size>
+					<AbsDimension x="128" y="17" />
+				</Size>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Frame header background texture -->
+				<Texture name="Sweep_FrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="250" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				
+				<!-- Frame header label -->
+				<FontString inherits="GameFontNormal" text="Val's Sweep 1.0">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="Sweep_ResetButton" inherits="GameMenuButtonTemplate" text="Reset">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="Sweep_Frame" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Sweep_NewGame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="Sweep_HideButton" inherits="GameMenuButtonTemplate" text="Hide">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="Sweep_Frame" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Sweep_Toggle();
+					</OnClick>
+				</Scripts>
+			</Button>
+		
+			<!-- row 1 -->
+			<Button name="Sweep_Cell1" inherits="Sweep_CellTemplate" hidden="false" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Frame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-28"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell2" inherits="Sweep_CellTemplate" hidden="false" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell1" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell3" inherits="Sweep_CellTemplate" hidden="false" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell2" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell4" inherits="Sweep_CellTemplate" hidden="false" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell3" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell5" inherits="Sweep_CellTemplate" hidden="false" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell4" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell6" inherits="Sweep_CellTemplate" hidden="false" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell5" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell7" inherits="Sweep_CellTemplate" hidden="false" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell6" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell8" inherits="Sweep_CellTemplate" hidden="false" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell7" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 2 -->
+			<Button name="Sweep_Cell9" inherits="Sweep_CellTemplate" hidden="false" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell1" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell10" inherits="Sweep_CellTemplate" hidden="false" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell9" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell11" inherits="Sweep_CellTemplate" hidden="false" id="11">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell10" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell12" inherits="Sweep_CellTemplate" hidden="false" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell11" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell13" inherits="Sweep_CellTemplate" hidden="false" id="13">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell12" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell14" inherits="Sweep_CellTemplate" hidden="false" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell13" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell15" inherits="Sweep_CellTemplate" hidden="false" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell14" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell16" inherits="Sweep_CellTemplate" hidden="false" id="16">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell15" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 3 -->
+			<Button name="Sweep_Cell17" inherits="Sweep_CellTemplate" hidden="false" id="17">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell9" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell18" inherits="Sweep_CellTemplate" hidden="false" id="18">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell17" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell19" inherits="Sweep_CellTemplate" hidden="false" id="19">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell18" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell20" inherits="Sweep_CellTemplate" hidden="false" id="20">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell19" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell21" inherits="Sweep_CellTemplate" hidden="false" id="21">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell20" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell22" inherits="Sweep_CellTemplate" hidden="false" id="22">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell21" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell23" inherits="Sweep_CellTemplate" hidden="false" id="23">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell22" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell24" inherits="Sweep_CellTemplate" hidden="false" id="24">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell23" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 4 -->
+			<Button name="Sweep_Cell25" inherits="Sweep_CellTemplate" hidden="false" id="25">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell17" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell26" inherits="Sweep_CellTemplate" hidden="false" id="26">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell25" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell27" inherits="Sweep_CellTemplate" hidden="false" id="27">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell26" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell28" inherits="Sweep_CellTemplate" hidden="false" id="28">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell27" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell29" inherits="Sweep_CellTemplate" hidden="false" id="29">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell28" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell30" inherits="Sweep_CellTemplate" hidden="false" id="30">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell29" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell31" inherits="Sweep_CellTemplate" hidden="false" id="31">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell30" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell32" inherits="Sweep_CellTemplate" hidden="false" id="32">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell31" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 5 -->
+			<Button name="Sweep_Cell33" inherits="Sweep_CellTemplate" hidden="false" id="33">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell25" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell34" inherits="Sweep_CellTemplate" hidden="false" id="34">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell33" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell35" inherits="Sweep_CellTemplate" hidden="false" id="35">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell34" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell36" inherits="Sweep_CellTemplate" hidden="false" id="36">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell35" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell37" inherits="Sweep_CellTemplate" hidden="false" id="37">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell36" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell38" inherits="Sweep_CellTemplate" hidden="false" id="38">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell37" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell39" inherits="Sweep_CellTemplate" hidden="false" id="39">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell38" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell40" inherits="Sweep_CellTemplate" hidden="false" id="40">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell39" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 6 -->
+			<Button name="Sweep_Cell41" inherits="Sweep_CellTemplate" hidden="false" id="41">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell33" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell42" inherits="Sweep_CellTemplate" hidden="false" id="42">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell41" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell43" inherits="Sweep_CellTemplate" hidden="false" id="43">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell42" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell44" inherits="Sweep_CellTemplate" hidden="false" id="44">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell43" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell45" inherits="Sweep_CellTemplate" hidden="false" id="45">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell44" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell46" inherits="Sweep_CellTemplate" hidden="false" id="46">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell45" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell47" inherits="Sweep_CellTemplate" hidden="false" id="47">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell46" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell48" inherits="Sweep_CellTemplate" hidden="false" id="48">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell47" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 7 -->
+			<Button name="Sweep_Cell49" inherits="Sweep_CellTemplate" hidden="false" id="49">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell41" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell50" inherits="Sweep_CellTemplate" hidden="false" id="50">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell49" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell51" inherits="Sweep_CellTemplate" hidden="false" id="51">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell50" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell52" inherits="Sweep_CellTemplate" hidden="false" id="52">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell51" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell53" inherits="Sweep_CellTemplate" hidden="false" id="53">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell52" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell54" inherits="Sweep_CellTemplate" hidden="false" id="54">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell53" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell55" inherits="Sweep_CellTemplate" hidden="false" id="55">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell54" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell56" inherits="Sweep_CellTemplate" hidden="false" id="56">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell55" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- row 8 -->
+			<Button name="Sweep_Cell57" inherits="Sweep_CellTemplate" hidden="false" id="57">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Sweep_Cell49" relativePoint="BOTTOMLEFT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell58" inherits="Sweep_CellTemplate" hidden="false" id="58">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell57" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell59" inherits="Sweep_CellTemplate" hidden="false" id="59">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell58" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell60" inherits="Sweep_CellTemplate" hidden="false" id="60">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell59" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell61" inherits="Sweep_CellTemplate" hidden="false" id="61">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell60" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell62" inherits="Sweep_CellTemplate" hidden="false" id="62">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell61" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell63" inherits="Sweep_CellTemplate" hidden="false" id="63">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell62" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Sweep_Cell64" inherits="Sweep_CellTemplate" hidden="false" id="64">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Sweep_Cell63" relativePoint="RIGHT">
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		
+		<Scripts>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnLoad>
+				Sweep_OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+</Ui>

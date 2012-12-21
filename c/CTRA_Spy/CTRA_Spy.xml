@@ -1,0 +1,325 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+	<Script file="CTRA_Spy.lua"/>
+	<Frame name="CTRA_Spy">
+		<Scripts>
+			<OnLoad>
+				ctraSpy_onLoad();
+			</OnLoad>
+			<OnEvent>
+				ctraSpy_onEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="CTRA_SpyOptionsFrame" movable="true" frameStrata="DIALOG" toplevel="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="220" y="240"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="CTRA Spy Options">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEnable" inherits="GameFontNormal" text="Enable CTRA Spy">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-50"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPlaySounds" inherits="GameFontNormal" text="Play Sounds">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-70"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentShowChat" inherits="GameFontNormal" text="Show Chat Messages">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-90"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentResistances" inherits="GameFontNormal" text="Resistance Checks">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-110"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentReagents" inherits="GameFontNormal" text="Reagents Checks">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-130"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDurability" inherits="GameFontNormal" text="Durability Checks">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-150"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentItems" inherits="GameFontNormal" text="Item Checks">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-170"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDrag">
+				<Size>
+					<AbsDimension x="150" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-12" y="12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StartMoving();
+						elseif ( arg1 == "RightButton" ) then
+							this:GetParent():ClearAllPoints();
+							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+					</OnMouseUp>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Left-click to drag\nRight-click to reset");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Button name="$parentCloseButton" hidden="false" inherits="GameMenuButtonTemplate" text="Okay">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="$parentEnableCB" id="1" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentEnable">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(1, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentPlaySoundsCB" id="2" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentPlaySounds">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(2, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentShowChatCB" id="3" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowChat">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(3, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentResistancesCB" id="4" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentResistances">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(4, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentReagentsCB" id="5" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentReagents">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(5, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentDurabilityCB" id="6" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentDurability">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(6, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentItemsCB" id="7" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentItems">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						ctraSpyOptions_onClick(7, this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+			</OnLoad>
+			<OnEvent>
+				ctraSpyOptions_initialize();
+			</OnEvent>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

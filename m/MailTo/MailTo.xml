@@ -1,0 +1,315 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <!-- Frame to handle all core events -->
+    <Frame name="MailTo_Frame" frameStrata="LOW" toplevel="true" parent="UIParent" hidden="True">
+        <Scripts>
+            <OnLoad>
+            	this:RegisterEvent("VARIABLES_LOADED")
+            	this:RegisterEvent("MAIL_SHOW")
+            	this:RegisterEvent("MAIL_INBOX_UPDATE")
+            	this:RegisterEvent("MAIL_CLOSED")
+            	this:RegisterEvent("BAG_UPDATE")
+            </OnLoad>
+            <OnEvent>
+                if(event=="VARIABLES_LOADED") then MailTo_Init()
+                else MailTo_Event(event); end
+            </OnEvent>
+            <OnUpdate>
+			    MailTo_OnUpdate(arg1)
+            </OnUpdate>
+        </Scripts>
+    </Frame>
+
+    <Frame name="MailToDropDownMenu" parent="SendMailFrame" id="1">
+        <Size> <AbsDimension x="24" y="24"/> </Size>
+        <Anchors>
+            <Anchor point="RIGHT" relativeTo="SendMailNameEditBox" relativePoint="RIGHT">
+                <Offset> <AbsDimension x="6" y="0"/> </Offset>
+            </Anchor>
+        </Anchors>
+        <Frames>
+            <Button name="$parentButton">
+                <Size> <AbsDimension x="24" y="24"/> </Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="MailToDropDownMenu"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick> ToggleDropDownMenu() </OnClick>
+                </Scripts>
+                <NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up">
+                    <Size> <AbsDimension x="24" y="24"/> </Size>
+                    <Anchors> <Anchor point="RIGHT"/> </Anchors>
+                </NormalTexture>
+
+                <HighlightTexture alphaMode="ADD" name="$parentHighlightTexture" file="Interface\Buttons\UI-Common-MouseHilight">
+                    <Size> <AbsDimension x="24" y="24"/> </Size>
+                    <Anchors> <Anchor point="RIGHT"/> </Anchors>
+                </HighlightTexture>
+
+                <PushedTexture name="$parentPushedTexture" file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down">
+                    <Size> <AbsDimension x="24" y="24"/> </Size>
+                    <Anchors> <Anchor point="RIGHT"/> </Anchors>
+                </PushedTexture>
+                <Scripts>
+                    <OnShow> MailTo_DropDown_OnLoad() </OnShow>
+                    <OnEnter>
+                        GameTooltip:SetOwner(this,"ANCHOR_TOPRIGHT")
+                        GameTooltip:SetText(this.tooltip)
+                    </OnEnter>
+                    <OnLeave> GameTooltip:Hide() </OnLeave>
+                </Scripts>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnHide> CloseDropDownMenus() </OnHide>
+        </Scripts>
+    </Frame>
+
+    <!-- Inbox Multi-Frame -->
+	<Button name="MailTo_ButtonTemplate" virtual="true">
+	  <Size> <AbsDimension x="37" y="37"/> </Size>
+	  <Anchors> <Anchor point="TOPLEFT"/> </Anchors>
+	  <Layers>
+		<Layer level="BACKGROUND">
+		  <Texture name="$parentSlot" file="Interface\MailFrame\MailItemBorder">
+			<Size> <AbsDimension x="42" y="48"/> </Size>
+			<Anchors>
+			  <Anchor point="TOPLEFT">
+			    <Offset> <AbsDimension x="-3" y="3"/> </Offset>
+			  </Anchor>
+			</Anchors>
+			<TexCoords left="0" right="0.1640625" top="0" bottom="0.75"/>
+		  </Texture>
+		</Layer>
+		<Layer level="ARTWORK">
+		  <Texture name="$parentIconTexture">
+			<Size> <AbsDimension x="38" y="38"/> </Size>
+			<Anchors> <Anchor point="CENTER"/> </Anchors>
+		  </Texture>
+		</Layer>
+	  </Layers>
+	  <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+	  <Scripts>
+		<OnEnter> MailTo_InFrame_OnEnter() </OnEnter>
+		<OnLeave> GameTooltip:Hide() </OnLeave>
+	  </Scripts>
+	</Button>
+	<Frame name="MailTo_ColumnTemplate" virtual="true">
+	  <Size> <AbsDimension x="70" y="450"/> </Size>
+	  <Frames>
+	    <Button name="$parentItem1" inherits="MailTo_ButtonTemplate">
+	      <Anchors> <Anchor point="TOPLEFT"/> </Anchors>
+	    </Button>
+	    <Button name="$parentItem2" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem1" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	    <Button name="$parentItem3" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem2" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	    <Button name="$parentItem4" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem3" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	    <Button name="$parentItem5" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem4" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	    <Button name="$parentItem6" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem5" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	    <Button name="$parentItem7" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem6" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	    <Button name="$parentItem8" inherits="MailTo_ButtonTemplate">
+	      <Anchors>
+	        <Anchor point="TOPLEFT" relativeTo="$parentItem7" relativePoint="BOTTOMLEFT">
+			  <Offset> <AbsDimension x="0" y="-7"/> </Offset>
+			</Anchor>
+	      </Anchors>
+	    </Button>
+	  </Frames>
+    </Frame>
+    <Frame name="MailTo_InFrame" toplevel="true" movable="true" enableMouse="true" parent="UIParent" hidden="True">
+	  <Size> <AbsDimension x="384" y="512"/> </Size>
+	  <Anchors>
+		<Anchor point="TOPLEFT">
+		  <Offset> <AbsDimension x="0" y="-104"/> </Offset>
+		</Anchor>
+	  </Anchors>
+	  <Layers>
+		<Layer level="BACKGROUND">
+		  <Texture file="Interface\MailFrame\Mail-Icon">
+			<Size> <AbsDimension x="58" y="58"/> </Size>
+			<Anchors>
+			  <Anchor point="TOPLEFT">
+				<Offset> <AbsDimension x="10" y="-8"/> </Offset>
+			  </Anchor>
+			</Anchors>
+		  </Texture>
+		</Layer>
+		<Layer level="BORDER">
+		  <Texture name="$parentTopLeft" file="Interface\ItemTextFrame\UI-ItemText-TopLeft">
+			<Size> <AbsDimension x="256" y="256"/> </Size>
+			<Anchors> <Anchor point="TOPLEFT"/> </Anchors>
+		  </Texture>
+		  <Texture name="$parentTopRight" file="Interface\Spellbook\UI-SpellbookPanel-TopRight">
+			<Size> <AbsDimension x="128" y="256"/> </Size>
+			<Anchors>
+			  <Anchor point="TOPLEFT" relativeTo="$parentTopLeft" relativePoint="TOPRIGHT"/>
+			</Anchors>
+		  </Texture>
+		  <Texture name="$parentBotLeft" file="Interface\ItemTextFrame\UI-ItemText-BotLeft">
+			<Size> <AbsDimension x="256" y="256"/> </Size>
+			<Anchors>
+			  <Anchor point="TOPLEFT" relativeTo="$parentTopLeft" relativePoint="BOTTOMLEFT"/>
+			</Anchors>
+		  </Texture>
+		  <Texture name="$parentBotRight" file="Interface\Spellbook\UI-SpellbookPanel-BotRight">
+			<Size> <AbsDimension x="128" y="256"/> </Size>
+			<Anchors>
+			  <Anchor point="TOPLEFT" relativeTo="$parentTopLeft" relativePoint="BOTTOMRIGHT"/>
+			</Anchors>
+		  </Texture>
+		</Layer>
+		<Layer level="ARTWORK">
+		  <FontString name="$parentTitleText" inherits="GameFontNormal" text="MAILTO_TITLE">
+			<Size> <AbsDimension x="224" y="14"/> </Size>
+			<Anchors>
+			  <Anchor point="CENTER">
+				<Offset> <AbsDimension x="6" y="230"/> </Offset>
+			  </Anchor>
+			</Anchors>
+		  </FontString>
+		</Layer>
+	  </Layers>
+	  <Frames>
+		<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+		  <Anchors>
+			<Anchor point="CENTER" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-45" y="-25"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Button>
+		<Frame name="$parent_DropDown" inherits="UIDropDownMenuTemplate" id="2">
+		  <Anchors>
+			<Anchor point="CENTER" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-188" y="-58"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		  <Layers>
+			<Layer level="OVERLAY">
+			  <FontString inherits="GameFontHighlight" text="MAILTO_SELECT">
+				<Anchors>
+				  <Anchor point="RIGHT" relativePoint="LEFT">
+					<Offset> <AbsDimension x="13" y="2"/> </Offset>
+				  </Anchor>
+				</Anchors>
+			  </FontString>
+			</Layer>
+		  </Layers>
+		</Frame>
+		<CheckButton name="$parentServerButton" inherits="OptionsCheckButtonTemplate" hidden="True">
+		  <Anchors>
+			<Anchor point="CENTER" relativeTo="$parent_DropDown" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="6" y="-14"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		  <Layers>
+			<Layer level="OVERLAY">
+			  <FontString inherits="GameFontHighlight" text="MAILTO_SERVER">
+				<Anchors>
+				  <Anchor point="LEFT" relativePoint="RIGHT">
+					<Offset> <AbsDimension x="0" y="2"/> </Offset>
+				  </Anchor>
+				</Anchors>
+			  </FontString>
+			</Layer>
+		  </Layers>
+			<Scripts>
+			  <OnEnter>
+				  GameTooltip:SetOwner(this,"ANCHOR_RIGHT")
+				  GameTooltip:SetText(MAILTO_SERVERTIP)
+			  </OnEnter>
+			  <OnLeave> GameTooltip:Hide() </OnLeave>
+			  <OnClick> AC_Server_OnClick() </OnClick>
+			</Scripts>
+		</CheckButton>
+		<Frame name="$parentCol1" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT">
+			  <Offset> <AbsDimension x="28" y="-80"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+		<Frame name="$parentCol2" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parentCol1" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-25" y="0"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+		<Frame name="$parentCol3" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parentCol2" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-25" y="0"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+		<Frame name="$parentCol4" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parentCol3" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-25" y="0"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+		<Frame name="$parentCol5" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parentCol4" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-25" y="0"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+		<Frame name="$parentCol6" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parentCol5" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-25" y="0"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+		<Frame name="$parentCol7" inherits="MailTo_ColumnTemplate">
+		  <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parentCol6" relativePoint="TOPRIGHT">
+			  <Offset> <AbsDimension x="-25" y="0"/> </Offset>
+			</Anchor>
+		  </Anchors>
+		</Frame>
+	  </Frames>
+      <Scripts>
+		<OnMouseDown> this:StartMoving() </OnMouseDown>
+		<OnMouseUp> this:StopMovingOrSizing() </OnMouseUp>
+      </Scripts>
+    </Frame>
+</Ui>

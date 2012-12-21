@@ -1,0 +1,571 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="Chatr.lua" />
+	
+	<EditBox name="ChatrEditTemplate" virtual="true" autoFocus="false" multiLine="false">
+		<FontString inherits="ChatFontNormal"/>
+		<Size><AbsDimension x="250" y="24" /></Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="12"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="12"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="2" right="2" top="2" bottom="2"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<TextInsets>
+			<AbsInset left="2" right="2" top="0" bottom="0"/>
+		</TextInsets>		
+		<Scripts>
+			<OnLoad>this:SetBackdropColor(0,0,0);</OnLoad>
+		</Scripts>
+	</EditBox>
+	
+	<Button name="ChatrDockBtn" virtual="true">
+		<Size><AbsDimension x="60" y="20" /></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ChatFrame\ChatFrameTab">
+					<Size>
+						<AbsDimension x="12" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0.0" right="0.25" top="0.0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\ChatFrame\ChatFrameTab">
+					<Size>
+						<AbsDimension x="36" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.25" right="0.75" top="0.0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ChatFrame\ChatFrameTab">
+					<Size>
+						<AbsDimension x="12" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.75" right="1.0" top="0.0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalText name="$parentText" inherits="GameFontNormalSmall">
+			<Size>
+				<AbsDimension x="60" y="8"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="-5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightTexture file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="60" y="20"/>
+			</Size>		
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentLeft">
+					<Offset>
+						<AbsDimension x="0" y="-7"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="RIGHT" relativeTo="$parentRight">
+					<Offset>
+						<AbsDimension x="0" y="-7"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>		
+		<Scripts>
+			<OnClick>Chatr_DockClick(this:GetID());</OnClick>
+		</Scripts>
+	</Button>	
+	
+	
+	<Frame name="ChatrTemplate" virtual="true" enableMouse="true" movable="true" resizable="true">
+		<Size><AbsDimension x="350" y="150" /></Size>	
+		<TitleRegion setAllPoints="true" />
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">		
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Chatr" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="6" y="-4" /></Offset>
+						</Anchor>
+						<Anchor point="TOPRIGHT">
+							<Offset><AbsDimension x="-12" y="-4" /></Offset>
+						</Anchor>
+						
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="$parentTitleBtn">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="6" y="-4" /></Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="-36" y="-16" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnDoubleClick>Chatr_Minimize(this:GetParent());</OnDoubleClick>
+					<OnLoad>this:RegisterForDrag("LeftButton");</OnLoad>
+					<OnDragStart>if this:GetParent():IsMovable() then this:GetParent():StartMoving(); end</OnDragStart>
+					<OnDragStop>this:GetParent():StopMovingOrSizing()</OnDragStop>
+					<OnEnter>this:GetParent():SetAlpha(1)</OnEnter>
+				</Scripts>
+			</Button>		
+			<Button name="$parentClose" inherits="UIPanelCloseButton">
+				<Size><AbsDimension x="24" y="24" /></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>Chatr_CloseOrMinimize(this:GetParent());</OnClick>
+					<OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp")</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentMenuButton" inherits="GameMenuButtonTemplate" text="M">
+				<Size><AbsDimension x="16" y="16" /></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="-18" y="-3"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>Chatr_Menu(this:GetParent());</OnClick>
+				</Scripts>
+			</Button>			
+			<Button name="$parentSizer" inherits="GameMenuButtonTemplate">
+				<Size><AbsDimension x="8" y="8" /></Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT"></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>this:GetParent():StartSizing("BOTTOMRIGHT")</OnMouseDown>
+					<OnMouseUp>this:GetParent():StopMovingOrSizing();Chatr_UpdateWin(this:GetParent());</OnMouseUp>
+				</Scripts>
+			</Button>			
+			<ScrollingMessageFrame name="$parentChatBox" displayDuration="604800.0" maxLines="500" enableMouse="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="5" y="-17"/></Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset><AbsDimension x="-5" y="7"/></Offset>
+					</Anchor>
+				</Anchors>
+				<FontString inherits="ChatFontNormal" justifyH="LEFT"/>
+				<Scripts>
+					<OnMouseWheel>Chatr_ChatWheel(this, arg1);</OnMouseWheel>
+					<OnHyperlinkClick>Chatr_Hyperlink(arg1,arg2,arg3);</OnHyperlinkClick>
+					<OnEnter>Chatr_Enter(this:GetParent());</OnEnter>
+				</Scripts>
+			</ScrollingMessageFrame>
+			<EditBox name="$parentEditBox" letters="1600" autoFocus="false" historyLines="10">
+				<Scripts>
+					<OnEscapePressed>Chatr_AbandonEntry(this:GetParent());</OnEscapePressed>
+					<OnEnterPressed>Chatr_Send(this:GetParent());</OnEnterPressed>
+					<OnEditFocusGained>Chatr_LastFocused=this:GetParent().id;this.hasFocus=1;this:SetAlpha(1);Chatr_EditFocus=this;</OnEditFocusGained>
+					<OnEditFocusLost>this.hasFocus=0;if Chatr_EditFocus==this then Chatr_EditFocus=nil; end</OnEditFocusLost>
+					<OnLeave>if this:GetText()=="" then this:ClearFocus() end</OnLeave>
+					<OnChar>Chatr_EntryChar();</OnChar>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="2" y="4"/></Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset><AbsDimension x="-2" y="-16"/></Offset>
+					</Anchor>
+					
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="8"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>this:SetBackdropColor(0,0,0);</OnLoad>
+					<OnEnter>Chatr_EBEnter(this);Chatr_Enter(this:GetParent());</OnEnter>
+					<OnLeave>Chatr_EBLeave(this);</OnLeave>
+				</Scripts>				
+			</EditBox> 
+			
+		</Frames>
+		
+		<Scripts>
+			<OnEnter>Chatr_Enter(this);</OnEnter>
+			<OnLeave>Chatr_Leave(this);</OnLeave>
+		</Scripts>		
+	</Frame>
+
+	<Frame name="Chatr1" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr2" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr3" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr4" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr5" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr6" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr7" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr8" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr9" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr10" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr11" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr12" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr13" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr14" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="Chatr15" inherits="ChatrTemplate" parent="UIParent"></Frame>
+	<Frame name="ChatrOptions" toplevel="true" hidden="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size><AbsDimension x="280" y="450"/></Size>
+		<Anchors>
+			<Anchor point="LEFT" relativePoint="LEFT" relativeTo="UIParent">
+				<Offset><AbsDimension x="40" y="0" /></Offset>
+			</Anchor>
+		</Anchors>		
+		<TitleRegion setAllPoints="true"/>
+		<Scripts>
+		</Scripts>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize><AbsValue val="32"/></EdgeSize>
+			<TileSize><AbsValue val="32"/></TileSize>
+			<BackgroundInsets><AbsInset left="11" right="12" top="12" bottom="11"/></BackgroundInsets>
+		</Backdrop>		
+		<Layers>
+			<Layer level="OVERLAY">		
+				<FontString name="ChatrOptionsTitle" inherits="GameFontNormal" text="Chatr Options" justifyH="CENTER">
+					<Anchors><Anchor point="TOP"><AbsDimension x="0" y="-15" /></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsFmtT" inherits="GameFontNormal" text="Text Format" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-20" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsFmt2T" inherits="GameFontNormal" text="Note Format" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-60" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsColorT" inherits="GameFontNormal" text="Colors" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-100" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsFontSizeT" inherits="GameFontNormal" text="Font Size" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-157" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsFontSizeLabel" inherits="GameFontNormal" text="" justifyH="RIGHT">
+					<Anchors><Anchor point="TOPRIGHT"><Offset><AbsDimension x="-15" y="-157" /></Offset></Anchor></Anchors>
+				</FontString>
+
+				<FontString name="ChatrOptionsAutoDockT" inherits="GameFontNormal" text="Dock By Default" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-207" /></Offset></Anchor></Anchors>
+				</FontString>
+				
+				<FontString name="ChatrOptionsAutoWhoT" inherits="GameFontNormal" text="Automatic /who" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-227" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsAllowFadeT" inherits="GameFontNormal" text="Automatic Fading" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-247" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsVertDockT" inherits="GameFontNormal" text="Vertical Dock" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-267" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsMinInCombatT" inherits="GameFontNormal" text="Minimize In Combat" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-287" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsEntryInsideT" inherits="GameFontNormal" text="Entry Box Inside Frame" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-307" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsPlaySoundT" inherits="GameFontNormal" text="Play Incoming Sound" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-327" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsExecSlashT" inherits="GameFontNormal" text="Execute Slash Commands" justifyH="LEFT">
+					<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="40" y="-347" /></Offset></Anchor></Anchors>
+				</FontString>
+				
+				
+				<FontString name="ChatrOptionsSavePerT" inherits="GameFontNormal" text="Save Per Character" justifyH="LEFT">
+					<Anchors><Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="40" y="18" /></Offset></Anchor></Anchors>
+				</FontString>
+				<FontString name="ChatrOptionsQuote" inherits="GameFontNormal" text="" justifyH="CENTER">
+					<Anchors><Anchor point="TOP" relativePoint="BOTTOM"><Offset><AbsDimension x="0" y="7" /></Offset></Anchor></Anchors>
+				</FontString>
+				
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="ChatrOptionsClose" inherits="UIPanelCloseButton">
+				<Size><AbsDimension x="32" y="32" /></Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPRIGHT"><Offset><AbsDimension x="-8" y="-8" /></Offset></Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if IsShiftKeyDown() then
+							Chatr_LoadSettings("_backup");
+							Chatr_Print("Settings reverted.");
+						else
+							Chatr_SaveSettings();
+						end
+						this:GetParent():Hide();
+						Chatr_Options["_backup"]=nil;
+					</OnClick>
+					<OnEnter>Chatr_Tip("Shift-click this button to cancel changes");</OnEnter>
+					<OnLeave>Chatr_Tip();</OnLeave>
+					
+				</Scripts>
+			</Button>		
+			<EditBox name="ChatrOptionsFmt" inherits="ChatrEditTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-35" /></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnTextChanged>Chatr_TextFormat=this:GetText();</OnTextChanged></Scripts>
+			</EditBox>
+			<EditBox name="ChatrOptionsFmt2" inherits="ChatrEditTemplate">
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-75" /></Offset></Anchor></Anchors>
+				<Scripts><OnTextChanged>Chatr_NoteFormat=this:GetText();</OnTextChanged></Scripts>
+			</EditBox>
+			<Button name="ChatrOptionsTextColor" inherits="GameMenuButtonTemplate" text="Normal">
+				<Size><AbsDimension x="60" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-115" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_OptSetColor("Chatr_NormalTextColor");</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrOptionsAFKColor" inherits="GameMenuButtonTemplate" text="AFK/DND">
+				<Size><AbsDimension x="60" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="75" y="-115" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_OptSetColor("Chatr_AFKTextColor");</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrOptionsSelfColor" inherits="GameMenuButtonTemplate" text="Self">
+				<Size><AbsDimension x="60" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="135" y="-115" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_OptSetColor("Chatr_SelfTextColor");</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrOptionsNoteColor" inherits="GameMenuButtonTemplate" text="Note">
+				<Size><AbsDimension x="60" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="195" y="-115" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_OptSetColor("Chatr_SelfTextColor");</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrOptionsBgColor" inherits="GameMenuButtonTemplate" text="BG">
+				<Size><AbsDimension x="60" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-135" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_OptSetColor("Chatr_BGColor");</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrOptionsBorderColor" inherits="GameMenuButtonTemplate" text="Border">
+				<Size><AbsDimension x="60" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="75" y="-135" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_OptSetColor("Chatr_BorderColor");</OnClick></Scripts>
+			</Button>
+
+			
+			<Slider name="ChatrOptionsFontSize" minValue="8" maxValue="20" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="250" y="17" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-170" /></Offset></Anchor></Anchors>
+				<Scripts><OnValueChanged>Chatr_FontSize=floor(this:GetValue()); ChatrOptionsFontSizeLabel:SetText(tostring(Chatr_FontSize));</OnValueChanged></Scripts>
+			</Slider>
+
+			
+			<CheckButton name="ChatrOptionsAutoDock" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-205" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_AutoDock=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsAutoWho" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-225" /></Offset></Anchor></Anchors>
+				<Scripts>
+					<OnClick>Chatr_AutoWho=this:GetChecked()</OnClick>
+					<OnEnter>Chatr_Tip("If you have Who boxes popping up when you get whispered, turn this off.")</OnEnter>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsAllowFade" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-245" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_AllowFade=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsVertDock" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-265" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_DockMode=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsMinInCombat" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-285" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_MinInCombat=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsEntryInside" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-305" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_EntryInside=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsPlaySound" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-325" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_PlaySound=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+			<CheckButton name="ChatrOptionsExecSlash" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="15" y="-345" /></Offset></Anchor></Anchors>
+				<Scripts><OnClick>Chatr_ExecSlash=this:GetChecked()</OnClick></Scripts>
+			</CheckButton>
+
+			
+			<CheckButton name="ChatrOptionsSavePer" inherits="OptionsCheckButtonTemplate">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors><Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="15" y="13" /></Offset></Anchor></Anchors>
+				<Scripts><OnEnter>Chatr_Tip("Unchecking this and closing the window will overwrite the global settings.")</OnEnter></Scripts>
+			</CheckButton>
+			
+		</Frames>		
+	</Frame>
+	<Frame name="ChatrDock" toplevel="true" hidden="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size><AbsDimension x="30" y="20"/></Size>
+		<Anchors>
+			<Anchor point="LEFT" relativePoint="LEFT" relativeTo="UIParent">
+				<Offset><AbsDimension x="40" y="0" /></Offset>
+			</Anchor>
+		</Anchors>		
+		<TitleRegion setAllPoints="true"/>
+		<Scripts>
+			<OnLoad>
+				Chatr_Init();
+				this:RegisterEvent("CHAT_MSG_WHISPER");
+				this:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
+				this:RegisterEvent("CHAT_MSG_AFK");
+				this:RegisterEvent("CHAT_MSG_DND");
+				this:RegisterEvent("WHO_LIST_UPDATE");
+				this:RegisterEvent("VARIABLES_LOADED");
+				this:RegisterEvent("PLAYER_REGEN_DISABLED");
+				this:RegisterEvent("PLAYER_REGEN_ENABLED");
+			</OnLoad>
+			<OnEvent>
+				Chatr_Event();
+			</OnEvent>
+			<OnEnter>Chatr_Tip("Drag this tiny part to move the dock.");</OnEnter>
+			<OnLeave>Chatr_Tip();</OnLeave>
+			
+		</Scripts>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="ChatrDockText" inherits="GameFontNormal" text="" justifyH="LEFT">
+					<Anchors><Anchor point="LEFT"></Anchor></Anchors>
+				</FontString>			
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="ChatrDockClose" inherits="GameMenuButtonTemplate">
+				<Size><AbsDimension x="10" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>Chatr_DockClose();</OnClick>
+					<OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");this:SetAlpha(0.33);</OnLoad>
+					<OnEnter>Chatr_Tip("Click this to hide and show the dock.");</OnEnter>
+					<OnLeave>Chatr_Tip();</OnLeave>					
+				</Scripts>
+			</Button>		
+			<Button name="ChatrDockBtn1" inherits="ChatrDockBtn" id="1"></Button>
+			<Button name="ChatrDockBtn2" inherits="ChatrDockBtn" id="2"></Button>
+			<Button name="ChatrDockBtn3" inherits="ChatrDockBtn" id="3"></Button>
+			<Button name="ChatrDockBtn4" inherits="ChatrDockBtn" id="4"></Button>
+			<Button name="ChatrDockBtn5" inherits="ChatrDockBtn" id="5"></Button>
+			<Button name="ChatrDockBtn6" inherits="ChatrDockBtn" id="6"></Button>
+			<Button name="ChatrDockBtn7" inherits="ChatrDockBtn" id="7"></Button>
+			<Button name="ChatrDockBtn8" inherits="ChatrDockBtn" id="8"></Button>
+			<Button name="ChatrDockBtn9" inherits="ChatrDockBtn" id="9"></Button>
+			<Button name="ChatrDockBtn10" inherits="ChatrDockBtn" id="10"></Button>
+			<Button name="ChatrDockBtn11" inherits="ChatrDockBtn" id="11"></Button>
+			<Button name="ChatrDockBtn12" inherits="ChatrDockBtn" id="12"></Button>
+			<Button name="ChatrDockBtn13" inherits="ChatrDockBtn" id="13"></Button>
+			<Button name="ChatrDockBtn14" inherits="ChatrDockBtn" id="14"></Button>
+			<Button name="ChatrDockBtn15" inherits="ChatrDockBtn" id="15"></Button>
+		</Frames>		
+	</Frame>
+	<Frame name="ChatrMenu" enableMouse="true" hidden="true" parent="UIParent">
+		<Size><AbsDimension x="120" y="130" /></Size>	
+		<Scripts>
+			<OnLoad>this:SetBackdropColor(0,0,0);this:SetScale(0.85);</OnLoad>
+		</Scripts>
+		<Frames>
+			<Button name="ChatrMenuInvite" inherits="GameMenuButtonTemplate" text="Invite">
+				<Size><AbsDimension x="120" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="-10"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>InviteByName(ChatrMenu.chatr.target);</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrMenuTarget" inherits="GameMenuButtonTemplate" text="Target/Inspect">
+				<Size><AbsDimension x="120" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="-30"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>if UnitName("target")==ChatrMenu.chatr.target then InspectUnit("target"); ChatrMenu:Hide(); else TargetByName(ChatrMenu.chatr.target); end </OnClick></Scripts>
+			</Button>
+			<Button name="ChatrMenuWho" inherits="GameMenuButtonTemplate" text="Who">
+				<Size><AbsDimension x="120" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="-50"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>Chatr_Who(ChatrMenu.chatr.target);</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrMenuFollow" inherits="GameMenuButtonTemplate" text="Follow">
+				<Size><AbsDimension x="120" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="-70"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>FollowByName(ChatrMenu.chatr.target,true);</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrMenuTrade" inherits="GameMenuButtonTemplate" text="Trade">
+				<Size><AbsDimension x="120" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="-90"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>TargetByName(ChatrMenu.chatr.target);if UnitName("target")==ChatrMenu.chatr.target then InitiateTrade("target"); end</OnClick></Scripts>
+			</Button>
+			<Button name="ChatrMenuDuel" inherits="GameMenuButtonTemplate" text="Duel">
+				<Size><AbsDimension x="120" y="20" /></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="-110"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>StartDuel(ChatrMenu.chatr.target);</OnClick></Scripts>
+			</Button>
+			
+			<Button name="ChatrMenuClose" inherits="UIPanelCloseButton">
+				<Size><AbsDimension x="20" y="20" /></Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="TOP"><Offset><AbsDimension x="0" y="-10"/></Offset></Anchor>
+				</Anchors>
+				<Scripts><OnClick>ChatrMenu:Hide();</OnClick></Scripts>
+			</Button>			
+		</Frames>	
+	</Frame>
+</Ui>

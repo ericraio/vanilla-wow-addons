@@ -1,0 +1,33 @@
+local L = AceLibrary("AceLocale-2.0"):new("FuBar_PerformanceFu")
+
+L:RegisterTranslations("zhCN", function() return {
+	["Show framerate"] = "显示帧速",
+	["Toggle whether to framerate"] = "开关显示帧速",
+	["Show latency"] = "显示延迟",
+	["Toggle whether to latency (lag)"] = "开关显示延迟",
+	["Show memory usage"] = "显示内存使用",
+	["Toggle whether to show current memory usage"] = "开关显示内存使用",
+	["Show rate of increasing memory usage"] = "显示内存使用增长",
+	["Toggle whether to show increasing rate of memory"] = "开关显示内存使用增长",
+	["Warn on garbage collection"] = "内存回收提示",
+	["Toggle whether to warn on an upcoming garbage collection"] = "开关内存回收提示",
+	["Force garbage collection"] = "强制内存回收",
+	["Force a garbage collection to happen"] = "强制内存回收",
+	["Garbage collection occurred"] = "开始内存回收",
+	["Garbage collection in %s"] = "内存回收在 %s",
+	["Framerate:"] = "帧速:",
+	["Network status"] = "网络状态",
+	["Latency:"] = "延迟:",
+	["Bandwidth in:"] = "接收:",
+	["Bandwidth out:"] = "发送:",
+	["Memory usage"] = "内存使用",
+	["Current memory:"] = "当前内存使用:",
+	["Initial memory:"] = "初始内存使用:",
+	["Increasing rate:"] = "增长率:",
+	["Average increasing rate:"] = "平均增长率",
+	["Garbage collection"] = "内存回收",
+	["Threshold:"] = "界限:",
+	["Time to next:"] = "下次回收时间:",
+	
+	["AceConsole-options"] = {"/perffu", "/performancefu"},
+} end)

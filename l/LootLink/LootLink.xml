@@ -1,0 +1,2244 @@
+<!--
+
+	LootLink 3.15: An in-game item database
+		copyright 2004 by Telo
+	
+	- Watches all chat links you see to cache link color and link data
+	- Automatically extracts data from items already in or added to your inventory
+	- Automatically caches link data from items already in or added to your bank
+	- Automatically inspects your target and extracts data for each of their equipped items
+	- Automatically gets link data from your auction queries
+	- Can perform a fully automatic scan of the entire auction house inventory
+	- Stores sell prices for items that you've moused over while a merchant window was open
+	  and displays them in the tooltips for stacks of items that you are looting, stacks of items
+	  in your inventory and entries in the LootLink browse window
+	- Converts green loot messages into correctly colored item messages if the item is cached
+	- Provides a browsable, searchable window that allows you to find any item in the cache
+	- Allows you to shift-click items in the browse window to insert links in the chat edit box
+
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="LootLink.lua"/>
+	<GameTooltip name="LootLinkTooltip" inherits="GameTooltipTemplate" frameStrata="TOOLTIP" parent="UIParent" hidden="true"/>
+	<GameTooltip name="LLHiddenTooltip" inherits="GameTooltipTemplate" frameStrata="TOOLTIP" hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+	<Frame name="LootLinkUpdateFrame" parent="UIParent">
+		<Scripts>
+			<OnUpdate>
+				LootLink_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Button name="LootLinkItemButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="16"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				LootLinkItemButton_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				LootLinkItemButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				LootLinkItemButton_OnLeave();
+			</OnLeave>
+		</Scripts>
+		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="275" y="12"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors> 
+		</NormalText>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentType" file="Interface\GossipFrame\AvailableQuestIcon">
+					<Size>
+						<AbsDimension x="12" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentIndexed" file="Interface\MoneyFrame\Arrow-Right-Down">
+					<Size>
+						<AbsDimension x="12" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="20" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+	<Frame name="LootLinkOptionFrameBoxTemplate" inherits="OptionFrameBoxTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="180" y="44"/>
+		</Size>
+		<Frames>
+			<Frame name="$parentRedBox" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="180" y="44"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.5, 0.0, 0.0);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="LootLinkFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="-104"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+                <Texture name="LootLinkFramePortrait" file="Interface\PetitionFrame\GuildCharter-Icon">
+			<Size>
+				<AbsDimension x="58" y="58"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="8" y="-9"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+                </Texture>
+		</Layer>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\TalentFrame\UI-TalentFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-256"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\TalentFrame\UI-TalentFrame-BotRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="-256"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="LootLinkTitleText" inherits="GameFontHighlight" text="LOOTLINK_TITLE">
+					<Size>
+						<AbsDimension x="300" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="LootLinkFrame" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="LootLinkHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="293" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="LootLinkHighlight" file="Interface\QuestFrame\UI-QuestLogTitleHighlight" alphaMode="ADD"/>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="LootLinkFrameQuickSearch" autoFocus="false" letters="34" historyLines="0">
+				<Size>
+					<AbsDimension x="240" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="27" y="-420"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="12" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-11" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="225" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="12" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+						<FontString inherits="GameFontNormal" text="LOOTLINK_QUICK_LABEL">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Color r="0.3" g="0.3" b="0.3"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTextChanged>
+						LootLinkQuickSearch_Search();
+					</OnTextChanged>
+					<OnEscapePressed>
+						this:ClearFocus()
+					</OnEscapePressed>
+					<OnTabPressed>
+						LootLinkQuickSearch_Search(1);
+					</OnTabPressed>
+					<OnEnterPressed>
+						LootLinkQuickSearch_FullSearch();
+					</OnEnterPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="LootLinkFrameQuickClearButton" toplevel="true">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<HitRectInsets>
+					<AbsInset left="9" right="7" top="-7" bottom="10"/>
+				</HitRectInsets>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="LootLinkFrameQuickSearch" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LootLinkQuickSearch_Clear();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<!--<Button name="LootLinkFrameOptionsButton" inherits="UIPanelButtonTemplate" text="LOOTLINK_OPTIONS_LABEL">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="305" y="-420"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LootLinkSearchFrame:Hide();
+						LootLinkOptionsFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>-->
+			<Button name="LootLinkFrameSearchButton" inherits="UIPanelButtonTemplate" text="LOOTLINK_SEARCH_LABEL">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="305" y="-420"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LootLink_Search();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="LootLinkFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="LootLinkFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-29" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkFrameDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="59" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						LootLinkFrameDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="LootLinkFrameOptionsButton" inherits="UIPanelButtonTemplate" text="LOOTLINK_OPTIONS_LABEL">
+				<Size>
+					<AbsDimension x="75" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="177" y="-43"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LootLinkSearchFrame:Hide();
+						LootLinkOptionsFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<!--<Button name="LootLinkFrameSearchButton" inherits="UIPanelButtonTemplate" text="LOOTLINK_SEARCH_LABEL">
+				<Size>
+					<AbsDimension x="75" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="177" y="-43"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LootLink_Search();
+					</OnClick>
+				</Scripts>
+			</Button>-->
+			<Button name="LootLinkFrameRefreshButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="75" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="257" y="-43"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(LOOTLINK_REFRESH_LABEL);
+					</OnLoad>
+					<OnClick>
+						LootLink_Refresh();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="LootLinkItem1" inherits="LootLinkItemButtonTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkFrame">
+						<Offset>
+							<AbsDimension x="19" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem2" inherits="LootLinkItemButtonTemplate" id="2" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem3" inherits="LootLinkItemButtonTemplate" id="3" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem4" inherits="LootLinkItemButtonTemplate" id="4" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem5" inherits="LootLinkItemButtonTemplate" id="5" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem6" inherits="LootLinkItemButtonTemplate" id="6" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem7" inherits="LootLinkItemButtonTemplate" id="7" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem8" inherits="LootLinkItemButtonTemplate" id="8" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem9" inherits="LootLinkItemButtonTemplate" id="9" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem10" inherits="LootLinkItemButtonTemplate" id="10" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem11" inherits="LootLinkItemButtonTemplate" id="11" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem12" inherits="LootLinkItemButtonTemplate" id="12" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem13" inherits="LootLinkItemButtonTemplate" id="13" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem14" inherits="LootLinkItemButtonTemplate" id="14" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem15" inherits="LootLinkItemButtonTemplate" id="15" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem16" inherits="LootLinkItemButtonTemplate" id="16" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem17" inherits="LootLinkItemButtonTemplate" id="17" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem18" inherits="LootLinkItemButtonTemplate" id="18" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem19" inherits="LootLinkItemButtonTemplate" id="19" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem18" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem20" inherits="LootLinkItemButtonTemplate" id="20" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem21" inherits="LootLinkItemButtonTemplate" id="21" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="LootLinkItem22" inherits="LootLinkItemButtonTemplate" id="22" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem21" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<!--<Button name="LootLinkItem23" inherits="LootLinkItemButtonTemplate" id="23" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkItem22" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>-->
+			<ScrollFrame name="LootLinkListScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="296" y="332"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LootLinkFrame">
+						<Offset>
+							<AbsDimension x="19" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="31" y="106"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(LOOTLINK_ITEM_HEIGHT, LootLink_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				LootLink_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				LootLink_OnEvent();
+			</OnEvent>
+			<OnShow>
+				LootLink_OnShow();
+			</OnShow>
+			<OnHide>
+				LootLink_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Button name="LootLinkSearchButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="104" y="21"/>
+		</Size>
+		<NormalText inherits="GameFontHighlight"/>
+		<DisabledText inherits="GameFontDisable"/>
+		<HighlightText inherits="GameFontHighlight"/>
+	</Button>
+	<EditBox name="LLS_EditBoxTemplate" letters="256" historyLines="0" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="12" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-11" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="195" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="12" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEscapePressed>
+				LootLinkSearchFrame_Cancel();
+			</OnEscapePressed>
+			<OnEnterPressed>
+				LootLinkSearchFrame_Okay();
+			</OnEnterPressed>
+			<OnTabPressed>
+				LootLinkSearchFrame_ChangeFocus();
+			</OnTabPressed>
+		</Scripts>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+	<Frame name="LootLinkSearchFrame" toplevel="true" frameStrata="DIALOG" enableMouse="true" enableKeyboard="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="CENTER">
+ 				<Offset>
+ 					<AbsDimension x="0" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="LootLinkSearchFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="LOOTLINK_SEARCH_TITLE">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="LootLinkSearchFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_TextLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_TEXT">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-35"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_TextDisabled" inherits="GameFontNormal" justifyH="LEFT" justifyV="BOTTOM" text="LLS_TEXT_DISABLED" hidden="true">
+					<Size>
+						<AbsDimension x="200" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_TextLabel" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="8" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_NameLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_NAME">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_TextLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_RarityLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_RARITY">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_NameLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_BindsLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_BINDS">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_RarityLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_LocationLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_LOCATION">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_BindsLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MinimumLevelLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_MINIMUM_LEVEL">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_LocationLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MaximumLevelLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_MAXIMUM_LEVEL">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MinimumLevelLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_TypeLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" text="LLS_TYPE">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MaximumLevelLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_SubtypeLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_TypeLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-- container items -->
+				<FontString name="LLS_MinimumSlotsLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MINIMUM_SLOTS">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_SubtypeLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-- weapon items -->
+				<FontString name="LLS_MinimumDamageLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MINIMUM_DAMAGE">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_SubtypeLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MaximumDamageLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MAXIMUM_DAMAGE">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MinimumDamageLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MaximumSpeedLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MAXIMUM_SPEED">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MaximumDamageLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MinimumDPSLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MINIMUM_DPS">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MaximumSpeedLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-- armor and shield items -->
+				<FontString name="LLS_MinimumArmorLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MINIMUM_ARMOR">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_SubtypeLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MinimumBlockLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MINIMUM_BLOCK">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MinimumArmorLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-- recipe items -->
+				<FontString name="LLS_MinimumSkillLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MINIMUM_SKILL">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_SubtypeLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LLS_MaximumSkillLabel" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM" hidden="true" text="LLS_MAXIMUM_SKILL">
+					<Size>
+						<AbsDimension x="134" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="LLS_MinimumSkillLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="LootLinkSearchFrameReset" inherits="LootLinkSearchButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="16" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(LOOTLINK_RESET_LABEL);
+					</OnLoad>
+					<OnClick>
+						LootLinkFrame.SearchParams = nil;
+						LootLinkSearch_LoadValues();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="LootLinkSearchFrameCancel" inherits="LootLinkSearchButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-16" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(CANCEL);
+					</OnLoad>
+					<OnClick>
+						LootLinkSearchFrame_Cancel();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="LootLinkSearchFrameOkay" inherits="LootLinkSearchButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="LootLinkSearchFrameCancel" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(OKAY);
+					</OnLoad>
+					<OnClick>
+						LootLinkSearchFrame_Okay();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<EditBox name="LLS_TextEditBox" inherits="LLS_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_TextLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.next = "LLS_NameEditBox";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<EditBox name="LLS_NameEditBox" inherits="LLS_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_NameLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.previous = "LLS_TextEditBox";
+						this.next = "LLS_MinimumLevelEditBox";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="LLS_RarityDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_RarityLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						LLS_RarityDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<CheckButton name="LLS_ServerCheckButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_RarityDropDown" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" text="LLS_SERVER">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<Button name="LLS_BindsDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_BindsLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						LLS_BindsDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<CheckButton name="LLS_UniqueCheckButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_BindsDropDown" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" text="LLS_UNIQUE">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<Button name="LLS_LocationDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_LocationLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						LLS_LocationDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<CheckButton name="LLS_UsableCheckButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_LocationDropDown" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" text="LLS_USABLE">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<EditBox name="LLS_MinimumLevelEditBox" inherits="LLS_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumLevelLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="LLS_MaximumLevelEditBox" inherits="LLS_EditBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MaximumLevelLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<Button name="LLS_TypeDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_TypeLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						LLS_TypeDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="LLS_SubtypeDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_SubtypeLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						LLS_SubtypeDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<CheckButton name="LLS_SetCheckButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_TypeDropDown" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" text="LLS_SET">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="LLS_SpoofCheckButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_TypeDropDown" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-29"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" text="LLS_SPOOF">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<!-- container items -->
+			<EditBox name="LLS_MinimumSlotsEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumSlotsLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<!-- weapon items -->
+			<EditBox name="LLS_MinimumDamageEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumDamageLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="LLS_MaximumDamageEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MaximumDamageLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="LLS_MaximumSpeedEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MaximumSpeedLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="LLS_MinimumDPSEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumDPSLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<!-- armor and shield items -->
+			<EditBox name="LLS_MinimumArmorEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumArmorLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="LLS_MinimumBlockEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumBlockLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<!-- recipe items -->
+			<EditBox name="LLS_MinimumSkillEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MinimumSkillLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+			<EditBox name="LLS_MaximumSkillEditBox" inherits="LLS_EditBoxTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="LLS_MaximumSkillLabel" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</EditBox>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				LootLinkSearch_LoadValues();
+				LootLinkSearchFrame_SaveSearchParams();
+				LootLinkOptionsFrame_Cancel();
+			</OnShow>
+			<!--<OnKeyDown>
+				if( arg1 == "ESCAPE" ) then
+					LootLinkSearchFrame_Cancel();
+				end
+			</OnKeyDown>-->
+		</Scripts>
+	</Frame>
+	<Frame name="LootLinkTooltipIcon" toplevel="true" frameStrata="DIALOG" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture" file="Interface\Icons\INV_Misc_QuestionMark">
+					<Size>
+						<AbsDimension x="36" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="LootLinkOptionsFrame" frameStrata="DIALOG" enableMouse="true" enableKeyboard="false" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="CENTER">
+ 				<Offset>
+ 					<AbsDimension x="0" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="LOOTLINK_OPTIONS_TITLE">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentDefaults" inherits="LootLinkSearchButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="16" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(DEFAULTS);
+					</OnLoad>
+					<OnClick>
+						LootLinkOptionsFrame_Defaults();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancel" inherits="LootLinkSearchButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-16" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(CANCEL);
+					</OnLoad>
+					<OnClick>
+						LootLinkOptionsFrame_Cancel();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentOkay" inherits="LootLinkSearchButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentCancel" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(OKAY);
+					</OnLoad>
+					<OnClick>
+						LootLinkOptionsFrame_Okay();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parentGeneralFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="360" y="88"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentFixFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="LLO_MouseoverCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_MOUSEOVER);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_IconCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="188" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_ICON);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_ExtraInfoCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-32"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_EXTRA_INFO);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_TypeLinksCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="188" y="-32"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									LLO_AutoTypeLinksCheckButton:Enable();
+									LLO_AutoTypeLinksCheckButtonText:SetTextColor(1, 0.82, 0);
+								else
+									LLO_AutoTypeLinksCheckButton:Disable();
+									LLO_AutoTypeLinksCheckButtonText:SetTextColor(0.3, 0.3, 0.3);
+								end
+							</OnClick>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_TYPE_LINKS);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_AutoTypeLinksCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="198" y="-56"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_AUTO_TYPE_LINKS);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(LLO_GENERAL_LABEL);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMinimapFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="360" y="100"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentGeneralFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="LLO_HideMinimap" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-48"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_MINIMAP_HIDE);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_LockMinimap" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-68"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_MINIMAP_LOCK);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<Slider name="LLO_MinimapPos" inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension x="340" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-23" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_MINIMAP_POS.." "..0);
+								getglobal(this:GetName().."High"):SetText(360);
+								getglobal(this:GetName().."Low"):SetText(0);
+								this:SetMinMaxValues(0,360);
+								this:SetValueStep(1);
+							</OnLoad>
+							<OnValueChanged>
+								getglobal(this:GetName().."Text"):SetText(LLO_MINIMAP_POS.." "..this:GetValue());
+								LootLink_Minimap_Position(this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Slider name="LLO_MinimapOffset" inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension x="170" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="85" y="-63" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_MINIMAP_OFFSET.." "..0);
+								getglobal(this:GetName().."High"):SetText(30);
+								getglobal(this:GetName().."Low"):SetText(-30);
+								this:SetMinMaxValues(-30,30);
+								this:SetValueStep(1);
+							</OnLoad>
+							<OnValueChanged>
+								getglobal(this:GetName().."Text"):SetText(LLO_MINIMAP_OFFSET.." "..this:GetValue());
+								LootLink_Minimap_Position(nil,this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(LLO_MINIMAP_LABEL);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentCacheFrame" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="360" y="110"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentMinimapFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="LLO_ServerCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_SERVER);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_SpoofCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-32"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_SPOOF);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_SameNameCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="188" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									LLO_VariantCheckButton:Enable();
+									LLO_VariantCheckButtonText:SetTextColor(1, 0.82, 0);
+									LLO_EnchantsCheckButton:Enable();
+									LLO_EnchantsCheckButtonText:SetTextColor(1, 0.82, 0);
+								else
+									LLO_VariantCheckButton:Disable();
+									LLO_VariantCheckButtonText:SetTextColor(0.3, 0.3, 0.3);
+									LLO_EnchantsCheckButton:Disable();
+									LLO_EnchantsCheckButtonText:SetTextColor(0.3, 0.3, 0.3);
+								end
+							</OnClick>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_SAME_NAME);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_VariantCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="198" y="-32"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_VARIANT);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_EnchantsCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="198" y="-56"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_ENCHANTS);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="LLO_LiteModeCheckButton" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="188" y="-80"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() and not LootLinkState.LightMode ) then
+									StaticPopup_Show("LOOTLINK_LITEMODE_CONFIRM");
+								else
+									StaticPopup_Hide("LOOTLINK_LITEMODE_CONFIRM");
+								end
+							</OnClick>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(LLO_LITE_MODE);
+								this:Disable();
+								getglobal(this:GetName().."Text"):SetTextColor(0.3, 0.3, 0.3);
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<Button name="LLO_RarityDropDown" inherits="UIDropDownMenuTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-8" y="-72"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="LLO_RARITY_THRESHOLD">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="21" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								LLO_RarityDropDown_OnLoad();
+							</OnLoad>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						getglobal(this:GetName().."Title"):SetText(LLO_FIX_LABEL);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentFixFrame" inherits="LootLinkOptionFrameBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentCacheFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="LLO_Fix" inherits="LootLinkSearchButtonTemplate" text="LLO_FIX">
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								LootLinkProcess_Process("FIXCACHE");
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="LLO_Purge" inherits="LootLinkSearchButtonTemplate" text="LLO_PURGE">
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="$parentRedBox">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								LootLinkOptions_SaveValues();
+								LootLinkProcess_Process("PURGE");
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.15, 0.15, 0.15);
+						--getglobal(this:GetName().."Title"):SetText(LLO_FIX_LABEL);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				LootLinkOptions_LoadValues();
+			</OnShow>
+			<OnHide>
+				LootLinkOptionsFrame_Cancel();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Button name="LootLinkMinimapButton" parent="Minimap" enableMouse="true" hidden="true" frameStrata="MEDIUM">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="Minimap" relativePoint="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<NormalTexture file="Interface\PetitionFrame\GuildCharter-Icon">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="-1" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<PushedTexture file="Interface\PetitionFrame\GuildCharter-Icon">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</PushedTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parentFrame" file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size>
+						<AbsDimension x="52" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				if ( arg1 == "RightButton" and ( LootLinkFrame.process or LootLink_Process:IsVisible() ) ) then
+					if ( LootLink_Process:IsVisible() ) then
+						LootLink_Process:Hide();
+					else
+						LootLink_Process:Show();
+					end
+					return;
+				end
+				if ( LootLinkFrame:IsVisible() ) then
+					HideUIPanel(LootLinkFrame);
+				else
+					ShowUIPanel(LootLinkFrame);
+				end
+			</OnClick>
+			<OnEnter>
+				LootLink_Minimap_OnEnter();
+			</OnEnter>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				this:RegisterForDrag("LeftButton", "RightButton");
+			</OnLoad>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnDragStart>
+				LootLink_Minimap_DragStart();
+			</OnDragStart>
+			<OnDragStop>
+				LootLink_Minimap_DragStop();
+			</OnDragStop>
+			<OnMouseUp>
+				LootLink_Minimap_DragStop();
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+	<Frame name="LootLink_Process" parent="UIParent" hidden="true" movable="true">
+		<Size>
+			<AbsDimension x="206" y="26"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-120"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Size>
+						<AbsDimension x="195" y="13"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Texture>		
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Num" inherits="GameFontHighlight">
+					<Size>
+						<AbsDimension x="185" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_Header" inherits="GameFontHighlight">
+					<Size>
+						<AbsDimension x="185" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent_Time" inherits="GameFontHighlight">
+					<Size>
+						<AbsDimension x="185" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture file="Interface\Tooltips\UI-StatusBar-Border">
+					<Size>
+						<AbsDimension x="205" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="LootLink_Process" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LootLink_Process_Cancel();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentMinimizeButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentCloseButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-24" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Minimize");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();						
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-MinusButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-MinusButton-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-MinusButton-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD"/>
+			</Button>
+			<StatusBar name="$parent_Bar">
+				<Size>
+					<AbsDimension x="195" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1)
+					</OnLoad>
+				</Scripts>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="1.0" g="1.0" b="0.0"/>
+			</StatusBar>
+		</Frames>	
+		<Scripts>
+			<OnMouseDown>
+				this:StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing();
+			</OnMouseUp>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+</Ui>

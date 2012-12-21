@@ -1,0 +1,1762 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MegaMacroFrame.lua"/>
+	<CheckButton name="MegaMacroFrameButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentName" inherits="GameFontHighlightSmallOutline">
+					<Size>
+						<AbsDimension x="36" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Buttons\UI-EmptySlot-Disabled">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentIcon">
+			<Size>
+				<AbsDimension x="36" y="36"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+	</CheckButton>
+	<CheckButton name="MegaMacroButtonTemplate" inherits="MegaMacroFrameButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnClick>
+				MegaMacroButton_OnClick();
+			</OnClick>
+			<OnDragStart>
+				PickupMacro(this:GetID());
+			</OnDragStart>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="MegaMacroPopupButtonTemplate" inherits="MegaMacroFrameButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				MegaMacroPopupButton_OnClick();	
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	
+	<Frame name="MegaMacroFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="684" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="34" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="MegaMacroFramePortrait" file="Interface\MacroFrame\MacroFrame-Icon">
+					<Size>
+						<AbsDimension x="60" y="60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture file="Interface\Addons\MegaMacro\Images\Macro-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\MegaMacro\Images\Macro-Top">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\MegaMacro\Images\Macro-TopRight">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\MegaMacro\Images\MacroFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\MegaMacro\Images\MacroFrame-Bot">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\MegaMacro\Images\MacroFrame-BotRight">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="CREATE_MACROS">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="MegaMacroFrame">
+							<Offset>
+								<AbsDimension x="0" y="-17"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="MegaMacroFrameSelectedMacroBackground" file="Interface\Buttons\UI-EmptySlot">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="16" y="-228"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="MegaMacroFrameSelectedMacroName" inherits="GameFontNormalLarge">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameSelectedMacroBackground" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-4" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="MegaMacroFrameEnterMacroText" inherits="GameFontHighlightSmall" text="ENTER_MACRO_LABEL">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameSelectedMacroBackground" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="8" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="MegaMacroFrameCharLimitText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="-15" y="105"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="MegaMacroFrameSelectedMacroButton" inherits="MegaMacroButtonTemplate" id="0">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameSelectedMacroBackground">
+						<Offset>
+							<AbsDimension x="14" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:SetChecked(nil);
+						PickupMacro(MegaMacroFrame.selectedMacro);
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<ScrollFrame name="MegaMacroButtonFrameScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="624" y="150"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MegaMacroFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-67" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+				<Frame name="MegaMacroButtonFrameScrollChildFrame">
+						<Size>
+							<AbsDimension x="624" y="150"/>
+						</Size>
+				<Frames>
+			<CheckButton name="MegaMacroButton1" inherits="MegaMacroButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="35" y="-13"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton2" inherits="MegaMacroButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton3" inherits="MegaMacroButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton4" inherits="MegaMacroButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton5" inherits="MegaMacroButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton6" inherits="MegaMacroButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton7" inherits="MegaMacroButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton8" inherits="MegaMacroButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton9" inherits="MegaMacroButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton10" inherits="MegaMacroButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton11" inherits="MegaMacroButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton10" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton12" inherits="MegaMacroButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton11" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton13" inherits="MegaMacroButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MegaMacroButton1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton14" inherits="MegaMacroButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton13" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton15" inherits="MegaMacroButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton14" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton16" inherits="MegaMacroButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton15" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton17" inherits="MegaMacroButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton16" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton18" inherits="MegaMacroButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton17" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton19" inherits="MegaMacroButtonTemplate" id="19">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton18" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton20" inherits="MegaMacroButtonTemplate" id="20">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton19" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton21" inherits="MegaMacroButtonTemplate" id="21">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton20" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton22" inherits="MegaMacroButtonTemplate" id="22">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton21" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton23" inherits="MegaMacroButtonTemplate" id="23">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton22" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton24" inherits="MegaMacroButtonTemplate" id="24">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton23" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton25" inherits="MegaMacroButtonTemplate" id="25">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MegaMacroButton13" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton26" inherits="MegaMacroButtonTemplate" id="26">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton25" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton27" inherits="MegaMacroButtonTemplate" id="27">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton26" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton28" inherits="MegaMacroButtonTemplate" id="28">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton27" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton29" inherits="MegaMacroButtonTemplate" id="29">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton28" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="MegaMacroButton30" inherits="MegaMacroButtonTemplate" id="30">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton29" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton31" inherits="MegaMacroButtonTemplate" id="31">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton30" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="MegaMacroButton32" inherits="MegaMacroButtonTemplate" id="32">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton31" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton33" inherits="MegaMacroButtonTemplate" id="33">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton32" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton34" inherits="MegaMacroButtonTemplate" id="34">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton33" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton35" inherits="MegaMacroButtonTemplate" id="35">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton34" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton36" inherits="MegaMacroButtonTemplate" id="36">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton35" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton37" inherits="MegaMacroButtonTemplate" id="37">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MegaMacroButton25" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton38" inherits="MegaMacroButtonTemplate" id="38">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton37" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton39" inherits="MegaMacroButtonTemplate" id="39">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton38" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton40" inherits="MegaMacroButtonTemplate" id="40">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton39" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton41" inherits="MegaMacroButtonTemplate" id="41">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton40" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton42" inherits="MegaMacroButtonTemplate" id="42">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton41" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton43" inherits="MegaMacroButtonTemplate" id="43">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton42" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton44" inherits="MegaMacroButtonTemplate" id="44">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton43" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton45" inherits="MegaMacroButtonTemplate" id="45">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton44" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton46" inherits="MegaMacroButtonTemplate" id="46">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton45" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton47" inherits="MegaMacroButtonTemplate" id="47">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton46" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton48" inherits="MegaMacroButtonTemplate" id="48">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton47" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton49" inherits="MegaMacroButtonTemplate" id="49">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MegaMacroButton37" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton50" inherits="MegaMacroButtonTemplate" id="50">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton49" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton51" inherits="MegaMacroButtonTemplate" id="51">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton50" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton52" inherits="MegaMacroButtonTemplate" id="52">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton51" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton53" inherits="MegaMacroButtonTemplate" id="53">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton52" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton54" inherits="MegaMacroButtonTemplate" id="54">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton53" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton55" inherits="MegaMacroButtonTemplate" id="55">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton54" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton56" inherits="MegaMacroButtonTemplate" id="56">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton55" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton57" inherits="MegaMacroButtonTemplate" id="57">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton56" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton58" inherits="MegaMacroButtonTemplate" id="58">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton57" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton59" inherits="MegaMacroButtonTemplate" id="59">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton58" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton60" inherits="MegaMacroButtonTemplate" id="60">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton59" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton61" inherits="MegaMacroButtonTemplate" id="61">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MegaMacroButton49" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton62" inherits="MegaMacroButtonTemplate" id="62">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton61" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton63" inherits="MegaMacroButtonTemplate" id="63">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton62" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton64" inherits="MegaMacroButtonTemplate" id="64">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton63" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton65" inherits="MegaMacroButtonTemplate" id="65">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton64" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton66" inherits="MegaMacroButtonTemplate" id="66">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton65" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton67" inherits="MegaMacroButtonTemplate" id="67">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton66" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton68" inherits="MegaMacroButtonTemplate" id="68">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton67" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton69" inherits="MegaMacroButtonTemplate" id="69">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton68" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton70" inherits="MegaMacroButtonTemplate" id="70">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton69" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton71" inherits="MegaMacroButtonTemplate" id="71">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton70" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton72" inherits="MegaMacroButtonTemplate" id="72">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton71" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton73" inherits="MegaMacroButtonTemplate" id="73">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MegaMacroButton61" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton74" inherits="MegaMacroButtonTemplate" id="74">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton73" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton75" inherits="MegaMacroButtonTemplate" id="75">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton74" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton76" inherits="MegaMacroButtonTemplate" id="76">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton75" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton77" inherits="MegaMacroButtonTemplate" id="77">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton76" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton78" inherits="MegaMacroButtonTemplate" id="78">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton77" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton79" inherits="MegaMacroButtonTemplate" id="79">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton78" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton80" inherits="MegaMacroButtonTemplate" id="80">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton79" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton81" inherits="MegaMacroButtonTemplate" id="81">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton80" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton82" inherits="MegaMacroButtonTemplate" id="82">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton81" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton83" inherits="MegaMacroButtonTemplate" id="83">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton82" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroButton84" inherits="MegaMacroButtonTemplate" id="84">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroButton83" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+
+			</Frames>
+			</Frame>
+			</ScrollChild>
+			</ScrollFrame>
+			
+			
+		
+			
+			<ScrollFrame name="MegaMacroFrameScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="293" y="85"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameSelectedMacroBackground" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="11" y="-18"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<EditBox name="MegaMacroFrameText" multiLine="true" letters="1000" autoFocus="false">
+						<Size>
+							<AbsDimension x="293" y="85"/>
+						</Size>
+						<Scripts>
+							<OnTextChanged>
+								MegaMacroFrame.textChanged = 1;
+								if ( MegaMacroPopupFrame.mode == "new" ) then
+									MegaMacroPopupFrame:Hide();
+								end
+								MegaMacroFrameCharLimitText:SetText(format(TEXT(MACROFRAME_CHAR_LIMIT), MegaMacroFrameText:GetNumLetters()));
+
+								local scrollBar = getglobal(this:GetParent():GetName().."ScrollBar")
+								this:GetParent():UpdateScrollChildRect();
+								local min;
+								local max;
+								min, max = scrollBar:GetMinMaxValues();
+								if ( max > 0 and (this.max ~= max) ) then
+									this.max = max;
+									scrollBar:SetValue(max);
+								end
+							</OnTextChanged>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+							<OnEditFocusGained>
+								MegaMacroNewButton:SetText(COMPLETE);
+							</OnEditFocusGained>
+							<OnEditFocusLost>
+								MegaMacroNewButton:SetText(NEW);
+							</OnEditFocusLost>							
+						</Scripts>
+						<FontString inherits="GameFontHighlightSmall"/>
+					</EditBox>
+				</ScrollChild>
+			</ScrollFrame>
+			<ScrollFrame name="MegaMacroScrollFrame" inherits="UIPanelScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="265" y="155"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameSelectedMacroBackground" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="335" y="50"/>
+						</Offset>
+					</Anchor>
+			</Anchors>
+			<ScrollChild>
+				<Frame name="MegaMacroScrollChildFrame" enableMouse="true">
+					<Size>
+						<AbsDimension x="265" y="155"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Frames>
+						<EditBox name="MegaMacroEditBox" letters="7500" multiLine="true" enableMouse="true" autoFocus="false">
+							<Size>
+								<AbsDimension x="265" y="155"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnTextChanged>
+									local scrollBar = getglobal(this:GetParent():GetParent():GetName().."ScrollBar")
+									this:GetParent():GetParent():UpdateScrollChildRect();
+									local min;
+									local max;
+									min, max = scrollBar:GetMinMaxValues();
+									if ( max > 0 and (this.max ~= max) ) then
+										this.max = max;
+										scrollBar:SetValue(max);
+									end
+									MegaMacroID = MegaMacroFrame.selectedMacro;
+									MegaMacroNewButton:Enable();
+									if ( not MegaMacroID ) then
+										-- Hmm
+									else
+										macroName = GetMacroInfo(MegaMacroID);
+										MegaMacro_UpdateText(macroName);
+									end
+								</OnTextChanged>
+								<OnClick>
+									this:SetFocus();
+								</OnClick>
+								<OnEditFocusGained>
+									MegaMegaMacroNewButton:SetText("Save Extended");
+									MegaMegaMacroNewButton:Enable();
+								</OnEditFocusGained>
+								<OnEditFocusLost>
+									MegaMegaMacroNewButton:Disable();
+								</OnEditFocusLost>
+							</Scripts>
+							<FontString inherits="ChatFontNormal"/>
+						</EditBox>
+					</Frames>
+					<Scripts>
+						<OnMouseUp>
+							MegaMacroEditBox:SetFocus();
+						</OnMouseUp>
+					</Scripts>
+				</Frame>
+			</ScrollChild>
+		</ScrollFrame>
+			<Button name="MegaMacroFrameTextButton">
+				<Size>
+					<AbsDimension x="286" y="85"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameText"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MegaMacroFrameText:SetFocus();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="MegaMacroFrameTextBackground">
+				<Size>
+					<AbsDimension x="330" y="95"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroFrame">
+						<Offset>
+							<AbsDimension x="18" y="-305"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
+						this:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="MegaMegaMacroFrameTextBackground">
+				<Size>
+					<AbsDimension x="296" y="165"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroScrollFrame">
+						<Offset>
+							<AbsDimension x="-5" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
+						this:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="MegaMacroFrameTab">
+				<Size>
+					<AbsDimension x="154" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\HelpFrame\HelpFrameTab-Inactive">
+							<Size>
+								<AbsDimension x="16" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT"/>
+							</Anchors>
+							<TexCoords left="0" right="0.25" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\HelpFrame\HelpFrameTab-Inactive">
+							<Size>
+								<AbsDimension x="122" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.25" right="0.75" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\HelpFrame\HelpFrameTab-Inactive">
+							<Size>
+								<AbsDimension x="16" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.75" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+						<FontString name="MegaMacroFrameTabText" inherits="GameFontHighlight" text="CURRENT_MACROS">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentMiddle">
+									<Offset>
+										<AbsDimension x="0" y="-14"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Button name="MegaMacroEditButton" inherits="UIPanelButtonTemplate" text="CHANGE_MACRO_NAME_ICON">
+				<Size>
+					<AbsDimension x="170" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroFrameSelectedMacroBackground">
+						<Offset>
+							<AbsDimension x="51" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MegaMacroEditButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MegaMacroDeleteButton" inherits="UIPanelButtonGrayTemplate" text="DELETE">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="MegaMacroFrame">
+						<Offset>
+							<AbsDimension x="17" y="79"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MegaMacroID = MegaMacroFrame.selectedMacro;
+						if ( not MegaMacroID ) then
+							-- Hmm
+						else
+							macroName = GetMacroInfo(MegaMacroID);
+							MegaMacroText[macroName] = nil;
+						end
+						DeleteMacro(MegaMacroFrame.selectedMacro);
+						DeleteMegaMacroFrame_OnLoad();
+						MegaMacroFrame_Update();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MegaMacroNewButton" inherits="UIPanelButtonTemplate" text="NEW">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="MegaMacroFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="522" y="-422"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MegaMacroNewButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MegaMegaMacroNewButton" inherits="UIPanelButtonTemplate" text="Save Extended">
+				<Size>
+					<AbsDimension x="120" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="MegaMacroFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="422" y="-422"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MegaMacro_Execute();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MegaMacroExitButton" inherits="UIPanelButtonTemplate" text="EXIT">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="MegaMacroFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="603" y="-422"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MegaMacroFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MegaMacroFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-29" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				MegaMacroFrame_OnLoad();
+			</OnLoad>
+			<OnShow>
+				MegaMacroFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				MegaMacroFrame_OnHide();
+			</OnHide>
+			<OnEvent>
+				MegaMacro_OnEvent();
+			</OnEvent>
+			<OnMouseWheel>
+				return;
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+	<Frame name="MegaMacroPopupFrame" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="297" y="298"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MegaMacroFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-40" y="-40"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\MacroFrame\MacroPopup-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\MacroFrame\MacroPopup-TopRight">
+					<Size>
+						<AbsDimension x="64" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\MacroFrame\MacroPopup-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-256"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\MacroFrame\MacroPopup-BotRight">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="-256"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontHighlightSmall" text="MACRO_POPUP_TEXT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="24" y="-21"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontHighlightSmall" text="MACRO_POPUP_CHOOSE_ICON">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="24" y="-69"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="MegaMacroPopupEditBox" letters="16" historyLines="0">
+				<Size>
+					<AbsDimension x="200" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="29" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="MegaMacroPopupNameLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="12" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-11" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="MegaMacroPopupNameMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="175" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="MegaMacroPopupNameLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="MegaMacroPopupNameRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="12" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="MegaMacroPopupNameMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTextChanged>
+						MegaMacroPopupOkayButton_Update();
+						MegaMacroFrameSelectedMacroName:SetText(this:GetText());
+					</OnTextChanged>
+					<OnEscapePressed>
+						MegaMacroPopupFrame:Hide();
+					</OnEscapePressed>
+					<OnEnterPressed>
+						if ( MegaMacroPopupOkayButton:IsEnabled() ~= 0 ) then
+							MegaMacroPopupOkayButton_OnClick();
+						end
+					</OnEnterPressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<ScrollFrame name="MegaMacroPopupScrollFrame" inherits="ClassTrainerListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="296" y="195"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MegaMacroPopupFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-39" y="-67"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(MACRO_ICON_ROW_HEIGHT, MegaMacroPopupFrame_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<CheckButton name="MegaMacroPopupButton1" inherits="MegaMacroPopupButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-85"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton2" inherits="MegaMacroPopupButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton3" inherits="MegaMacroPopupButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton4" inherits="MegaMacroPopupButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton5" inherits="MegaMacroPopupButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton6" inherits="MegaMacroPopupButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroPopupButton1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton7" inherits="MegaMacroPopupButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton8" inherits="MegaMacroPopupButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton9" inherits="MegaMacroPopupButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton10" inherits="MegaMacroPopupButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton11" inherits="MegaMacroPopupButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroPopupButton6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton12" inherits="MegaMacroPopupButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton11" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton13" inherits="MegaMacroPopupButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton12" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton14" inherits="MegaMacroPopupButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton13" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton15" inherits="MegaMacroPopupButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton14" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton16" inherits="MegaMacroPopupButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MegaMacroPopupButton11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton17" inherits="MegaMacroPopupButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton16" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton18" inherits="MegaMacroPopupButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton17" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton19" inherits="MegaMacroPopupButtonTemplate" id="19">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton18" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MegaMacroPopupButton20" inherits="MegaMacroPopupButtonTemplate" id="20">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MegaMacroPopupButton19" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Button name="MegaMacroPopupCancelButton" inherits="UIPanelButtonTemplate" text="CANCEL">
+				<Size>
+					<AbsDimension x="78" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="MegaMacroPopupFrame">
+						<Offset>
+							<AbsDimension x="-11" y="13"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+						MegaMacroFrame_Update();
+						PlaySound("gsTitleOptionOK");
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MegaMacroPopupOkayButton" inherits="UIPanelButtonTemplate" text="OKAY">
+				<Size>
+					<AbsDimension x="78" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="MegaMacroPopupCancelButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MegaMacroPopupOkayButton_OnClick();
+						PlaySound("gsTitleOptionOK");
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				MegaMacroPopupFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				MegaMacroPopupFrame_OnHide();
+			</OnHide>
+			<OnMouseWheel>
+				return;
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+</Ui>

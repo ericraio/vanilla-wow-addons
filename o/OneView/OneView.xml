@@ -1,0 +1,441 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML\UI.xsd">
+<!-- $Id: OneView.xml 8013 2006-08-14 20:35:30Z hk2717 $ -->
+	<Button name="OneViewItemButtonTemplate"  inherits="ItemButtonTemplate" virtual="true">
+    	<Scripts>
+    		<OnLoad>
+				this:SetNormalTexture("Interface\\AddOns\\OneBag\\BagSlot")
+    		</OnLoad>
+			<OnEnter>
+				if this.itemId then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetHyperlink(this.itemId) 
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				if this.itemId and IsShiftKeyDown() then
+					OneView:LinkItem(this.itemId)
+				end
+			</OnClick>
+    	</Scripts>
+    </Button> 
+	
+	<CheckButton name="OneViewBagButtonTemplate"  inherits="ItemButtonTemplate" virtual="true">
+    	<Scripts>
+			<OnEnter>
+				if this.itemId then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetHyperlink(this.itemId) 
+				end
+				
+				OneView:HighlightBagSlots(this:GetID())
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+				
+				if not this:GetChecked() and OneView.frame.bags[this:GetID()] then
+					OneView:UnhighlightBagSlots(this:GetID())
+					OneView.frame.bags[this:GetID()].colorLocked = false
+				elseif OneView.frame.bags[this:GetID()] then
+					OneView.frame.bags[this:GetID()].colorLocked = true
+				end
+			</OnLeave>
+			<OnLoad>
+				this:SetScale(.85)
+			</OnLoad>
+			<OnClick>
+				PlaySound("BAGMENUBUTTONPRESS")
+				
+				if this.itemId and IsShiftKeyDown() then
+					OneView:LinkItem(this.itemId)
+					this:SetChecked(not this:GetChecked())
+				elseif not this:GetChecked() and OneView.frame.bags[this:GetID()] then
+					OneView:UnhighlightBagSlots(this:GetID())
+					OneView.frame.bags[this:GetID()].colorLocked = false
+				elseif OneView.frame.bags[this:GetID()] then
+					OneView.frame.bags[this:GetID()].colorLocked = true
+				end
+			</OnClick>
+		</Scripts>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+    </CheckButton> 
+	
+	<Frame name="OneViewFrame" inherits="OneBagBaseFrameTemplate" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOPLEFT" >
+				<Offset>
+					<AbsDimension x="400" y="-300"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName())
+				this:RegisterForDrag("LeftButton")
+			</OnLoad>
+			<OnShow>
+				this.handler:LoadCharacter()
+				this.handler:OnBaseShow()
+                this.handler:OnCustomShow()
+			</OnShow>
+            <OnDragStart>
+                if not this.handler.db.profile.locked then
+                    this:StartMoving()
+                    this.isMoving = true
+                end
+            </OnDragStart>
+            <OnDragStop>
+                this:StopMovingOrSizing()
+                if this.isMoving then
+                    local point = {}
+                    point.top = this:GetTop()
+                    point.left = this:GetLeft()
+                    point.parent = this:GetParent():GetName()
+                    
+                    this.handler.db.profile.point = point
+                end
+                this.isMoving = false
+            </OnDragStop>
+		</Scripts>
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentConfigButton" inherits="UIPanelButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="130" y="20"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						this:GetParent().handler:OpenMenu()
+					</OnClick>
+					<OnLoad>
+						this:SetText(ONEVIEW_LOCALE_CONFIGMENU)
+						this:SetScale(.85)
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentCharSelectButton" inherits="UIPanelButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentConfigButton" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="130" y="20"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						this:GetParent().handler:CharSelect()
+					</OnClick>
+					<OnLoad>
+						this:SetText(ONEVIEW_LOCALE_CHARSELECT)
+						this:SetScale(.85)
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentInventoryButton">
+				<Size>
+					<AbsDimension x="32" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="3" y="-9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						local handler = this:GetParent().handler
+						if not handler.db.profile.show.inventory then
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
+						else
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
+						end
+					</OnShow>
+					<OnClick>
+						local handler = this:GetParent().handler
+						if handler.db.profile.show.inventory then
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
+							handler.db.profile.show.inventory = false
+						else
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
+							handler.db.profile.show.inventory = true
+						end
+						handler:OrganizeFrame()
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentBankButton">
+				<Size>
+					<AbsDimension x="32" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="3" y="-9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						local handler = this:GetParent().handler
+						if not handler.db.profile.show.bank then
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
+						else
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
+						end
+					</OnShow>
+					<OnClick>
+						local handler = this:GetParent().handler
+						if handler.db.profile.show.bank then
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
+							handler.db.profile.show.bank = false
+						else
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
+							handler.db.profile.show.bank = true
+						end
+						handler:OrganizeFrame()
+					</OnClick>
+					<OnLoad>
+						--getglobal(this:GetParent():GetName() .. "Name"):ClearAllPoints()
+						--getglobal(this:GetParent():GetName() .. "Name"):SetPoint("LEFT", this:GetName(), "RIGHT", 5, 1)
+					</OnLoad>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<CheckButton name="$parentBag1" inherits="OneViewBagButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag0" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag2" inherits="OneViewBagButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag3" inherits="OneViewBagButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag4" inherits="OneViewBagButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag5" inherits="OneViewBagButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag6" inherits="OneViewBagButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag7" inherits="OneViewBagButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag8" inherits="OneViewBagButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag9" inherits="OneViewBagButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentBag10" inherits="OneViewBagButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBag9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Size>
+					<AbsDimension x="206" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentBankName" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="OneViewFrameBankButton" relativePoint="RIGHT">
+							<Offset>     
+								<AbsDimension x="5" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInventoryName" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentInventoryButton" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentBankInfo1" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="8" y="9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentBankInfo2" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentBankInfo1" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentBankInfo3" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentBankInfo2" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentBankInfo4" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentBankInfo3" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInventoryInfo1" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="8" y="9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInventoryInfo2" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInventoryInfo1" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInventoryInfo3" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInventoryInfo2" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInventoryInfo4" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInventoryInfo3" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>

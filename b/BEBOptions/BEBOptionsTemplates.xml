@@ -1,0 +1,300 @@
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+D:\UI.xsd">
+	<Frame name="BEBOptions_MenuEditboxFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension y="24" x="290"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Label" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP">
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentEditBox" inherits="InputBoxTemplate" autoFocus="false" multiLine="false" numeric="false" letters="240">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension y="4" x="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEditFocusGained>
+						this.prevvals = this:GetText()
+					</OnEditFocusGained>
+					<OnEnterPressed>
+						BEBOPTIONS.MenuEditBoxChangeText()
+						this:ClearFocus()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						if (this.prevvals) then
+							this:SetText(this.prevvals)
+						end
+						this:ClearFocus()
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+			<Button name="$parentButton" inherits="UIPanelButtonTemplate" text="v" frameLevel="7">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.controlboxtype = "editbox"
+						this.controlbox = this:GetParent():GetName().."EditBox"
+					</OnLoad>
+					<OnClick>
+						BEBOPTIONS.ShowMenu();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<Button name="BEB_MenuOptionTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="170" y="15"/>
+		</Size>
+		<Scripts>
+			<OnEnter>
+				this:GetParent().timer = nil;
+			</OnEnter>
+			<OnClick>
+				BEBOPTIONS.MenuOptionOnClick()
+			</OnClick>
+		</Scripts>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-Button-Highlight">
+			<TexCoords left="0" right="0.625" top="0.1" bottom="0.6875"/>
+		</HighlightTexture>
+		<NormalText name="$parentText" inherits="GameFontNormalSmall"/>
+	</Button>
+	<Button name="BEBSelectorTemplate" virtual="true" inherits="UIPanelButtonTemplate">
+		<Size>
+			<AbsDimension y="25" x="100"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				BEBOPTIONS.SelectFrame();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="BEBOptionsColorButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="25" y="25"/>
+		</Size>
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Text"):SetWidth(105);
+			</OnLoad>
+			<OnClick>
+				BEBOPTIONS.ColorPicker_OnClick();
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD">
+		</HighlightTexture>
+	</Button>
+	<Button name="BEBNudgeTemplate" virtual="true" inherits="UIPanelButtonTemplate">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+			</OnLoad>
+			<OnMouseDown>
+				if (arg1 == "MiddleButton") then
+					BEBNudging = this:GetName();
+					BEBNudgeTime = 0
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "MiddleButton") then
+					BEBNudging = nil;
+					BEBNudgeTime = nil
+				else
+					BEBOPTIONS.Nudge(arg1);
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+	<Button name="BEBOptions_DMMButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="24"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Label" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP">
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this.controlboxtype = "fontstring"
+			</OnLoad>
+			<OnClick>
+				BEBOPTIONS.ShowMenu();
+			</OnClick>
+		</Scripts>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-Button-Highlight">
+			<TexCoords left="0" right="0.625" top="0.1" bottom="0.6875"/>
+		</HighlightTexture>
+		<NormalText name="$parentText" inherits="GameFontNormal"/>
+	</Button>
+	<Button name="BEBProfileButtonTemplate" virtual="true" inherits="UIPanelButtonTemplate">
+		<Size>
+			<AbsDimension y="24" x="80"/>
+		</Size>
+		<Frames>
+			<Button name="$parentDDMButton" inherits="BEBOptions_DMMButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension y="0" x="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.table = "PROFILETABLE"
+					this.controlboxtype = "fontstring"
+					this.func = "DDM_SetText"
+				</OnLoad>
+			</Scripts>
+			</Button>
+		</Frames>
+	</Button>
+	<CheckButton name="BEBOptionsCheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" maxLines="2" justifyH="LEFT" justifyV="MIDDLE">
+					<Size>
+						<AbsDimension y="28" x="120"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<HitRectInsets>
+			<AbsInset left="0" right="-100" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				BEBOPTIONS.CheckButton_OnClick()
+				if ( this:GetChecked() ) then
+					PlaySound("igMainMenuOptionCheckBoxOn");
+				else
+					PlaySound("igMainMenuOptionCheckBoxOff");
+				end
+			</OnClick>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+	</CheckButton>
+	<Slider name="BEBOptionsSliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="128" y="17"/>
+		</Size>
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="-10" bottom="-10"/>
+		</HitRectInsets>
+		<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="8"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="8"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="3" top="6" bottom="6"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentLow" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="2" y="3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHigh" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+			<Size>
+				<AbsDimension x="32" y="32"/>
+			</Size>
+		</ThumbTexture>
+	</Slider>
+</Ui>

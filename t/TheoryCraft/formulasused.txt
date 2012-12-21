@@ -1,0 +1,74 @@
+Int per Crit @ 60
+	Mages have a 0.2% base spell crit rate, and 1% crit per 59.5 int
+	Priests have a 0.8% base spell crit rate, and 1% crit per 59.5 int
+	Warlocks have a 1.7% base spell crit rate, and 1% crit per 60.6 int
+	Druids have a 1.8% base spell crit rate, and 1% crit per 60 int
+	Shaman have a 2.3% base spell crit rate, and 1% crit per 59.2 int
+	Paladins have 0% base, and 1% crit per 29.5 int
+For levels lower then 60 TC will use your melee crit rate divided by your melee crit rate @ 60, multiplied by your int per crit @ 60.
+This should be very accurate, as I'm sure they follow the same patterns.  If your attack rating is too low to show a melee crit rate
+TC will use a linear relationship.
+
+Agi per Crit			= Calculated from your crit rate (modified by your attack rating), until 60 where
+				  it uses predefined values.
+Crit % for Hunters		= Melee Crit Rate (from attack tooltip, modified by attack rating) + Lethal Shots
+
+Crit Bonus			= (Average Crit Damage / Average Hit (not inc crits)) - 1
+
++Damage Coefficient		= All +Damage Coefficients are hardcoded in to theorycraft.  Reason behind this
+				  is because there is no hard and fast rule for determining the coefficient.
+				  Also if they were not, spells like Presence of Mind would alter the coefficient
+				  when activated (via changing the cast time).
+				  By default, talents that modify your spell damage will be multiplied by the
+				  +Damage Coefficient.  Eg, 5/5 firepower will make fireball get 110% of your +dam.
+				  Some spells are hardcoded to not have talents applied on gear, this is from
+				  testing in game.  Eg curse of agony, drain life, every healing spell :).
+				  If you find any spells which have the wrong coefficient, or have talents applied
+				  when they shouldn't (or vice versa), let me know what the correct relationship is
+				  on the Curse Gaming Theorycraft comments section :) Thanks!
+
+Average Hit (not inc crits) 	= (Max Damage - Min Damage)/2 + Min Damage
+Average Hit (inc crits) 	= Average Hit (not inc crits) + Average Hit (not inc crits) * Crit Chance / 100 * Crit Bonus
+
+Cast Time			= (Base Cast Time - Crit Chance / 100 * Grace) or 1.5 whichever is greater.
+
+ICPercent			= Percent natural regen that continues in 5 second rule. (Mage armor, innervate, darkmoon trinket, meditation, etc)
+Regen from spirit Mages		= (Spirit/8+6.25)*ICPercent
+Regen from spirit Priests	= (Spirit/8+6.25)*ICPercent
+Regen from spirit Warlock	= (Spirit/10+7.5)*ICPercent
+Regen from spirit Druid		= (Spirit/10+7.5)*ICPercent
+Regen from spirit Shaman	= (Spirit/10+8.5)*ICPercent
+Regen from spirit Hunter	= (Spirit/10+7.5)*ICPercent
+Regen from spirit Paladin	= (Spirit/10+7.5)*ICPercent
+Regen Per Second		= Regen from spirit + (Mana per 5)/5
+True Mana Cost			= ((Mana Cost - Regen per second * Cast Time) - Crit Chance / 100 * Illumination * (Mana Cost - Regen per second * Cast Time))*(1-Clearcasting)
+
+Real Mana Pool			= (Total Mana + RotA on use ability)
+
+DPM (inc crits)			= Average Hit (inc crits) / True Mana Cost
+DPM (not inc crits)		= Average Hit (not inc crits) / True Mana Cost
+Total Damage til Oom		= DPM * Real Mana Pool
+
+Cast Procs (Wrath of Cenarius)	= Added Amount * (1 - (1-Proc Chance) ^ (Floor(Proc Duration / Cast Time)))
+Other Procs (Darkmoon)		= Added Amount * (1 - (1-Proc Chance) ^ (Proc Duration / Cast Time))
+
+DPS (inc crits)			= Average Hit (inc crits) / Cast Time
+DPS (not inc crits)		= Average Hit (not inc crits) / Cast Time
+DPS after resists		= ( Average Hit (inc crits) - Average Hit (not inc crits) * Resist Rate ) / Cast Time
+
+Next Crit			= Average Hit (not inc crits) * Crit Bonus / 100
+Next Hit			= Average Hit (not inc crits) / 100
+Next 10 pen			= Average Hit (inc crits) * (10/(5* Level of Player ))*0.75
+
+Rotation Length			= Ceiling(7/speed)*speed+3 or 10, if Rotation Length > 10.7
+if Ranged Attack Speed < 3 then
+	Autoshotcount			= Floor((Rotation Length - 3) / Ranged Attack Speed) + 1
+else
+	Autoshotcount			= Floor(Rotation Length / Ranged Attack Speed)
+end
+10 sec rotation dps		= (Autoshot Average Hit (inc crits) * Autoshotcount + Aimed Shot Average Hit (inc crits) + Multi Shot Average Hit (inc crits))/10
+9 sec rotation dps		= (Autoshot Average Hit (inc crits) * Floor(6/Ranged Attack Speed + 2)*6 + Aimed Shot Average Hit (inc crits) * 6 + Multi Shot Average Hit (inc crits) * 5)/54
+
+Seal unbuffed dps		= Average Melee Hit + Average Melee Hit * Melee crit chance
+Seal of Command dps		= Seal unbuffed dps * (7/(60/ Weapon Speed )*0.7)
+Seal of Crusader dps		= Average Melee Hit + Attack Power Bonus / 14 * Weapon Speed + (Average Melee Hit + Attack Power Bonus / 14 * Weapon Speed)*Melee crit chance

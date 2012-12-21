@@ -1,0 +1,4817 @@
+<Ui	xmlns="http://www.blizzard.com/wow/ui/"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script	file="localisation.lua"/>
+	<Script	file="localisation.fr.lua"/>
+	<Script	file="localisation.de.lua"/>
+	<Script	file="localisation.es.lua"/>
+	<Script	file="MetaMapConstants.lua"/>
+	<Script	file="MetaMap.lua"/>
+
+	<FontString name="MetaMap_FontStringTemplate"	font="Fonts\FRIZQT__.TTF"	virtual="true">
+		<FontHeight>
+			<AbsValue	val="13"/>
+		</FontHeight>
+	</FontString>
+
+	<Button	name="MetaMapMenu_ButtonTemplate"	virtual="true">
+		<Size>
+			<AbsDimension	x="145"	y="METAMAPMENU_BUTTON_HEIGHT"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight"	alphaMode="ADD"	setAllPoints="true"	hidden="true"/>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString	name="$parentText" inherits="GameFontGreen"	text="">
+					<Anchors>
+						<Anchor	point="LEFT">
+							<Offset>
+								<AbsDimension	x="-20"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentCheck" file="Interface\Buttons\UI-CheckBox-Check">
+					<Size>
+						<AbsDimension	x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="LEFT">
+							<Offset><AbsDimension	x="-25"	y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentShade" file="Interface\AddOns\MetaMap\Images\Color1">
+					<Size>
+						<AbsDimension	x="8" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="LEFT">
+							<Offset><AbsDimension	x="-20"	y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="$parentColorSwatch"	hidden="true">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT">
+						<Offset><AbsDimension	x="-6" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentSwatchBg">
+							<Size>
+								<AbsDimension	x="14" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="0"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						getglobal(this:GetName().."SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r,	NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnClick>
+				MetaMapMenu_Select(this:GetID());
+			</OnClick>
+			<OnEnter>
+				getglobal(this:GetName().."Highlight"):Show();
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."Highlight"):Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalFont	name="$parentNormalText" justifyH="LEFT" inherits="GameFontNormalSmall"/>
+		<HighlightFont name="$parentHighlightText" justifyH="LEFT" inherits="GameFontHighlightSmall"/>
+		<DisabledFont	name="$parentDisabledText" justifyH="LEFT" inherits="GameFontDisableSmall"/>
+	</Button>
+
+	<Button	name="MetaMap_FrameTabButtonTemplate"	virtual="true">
+		<Size>
+			<AbsDimension	x="110"	y="22"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeftDisabled"	file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+					<Size>
+						<AbsDimension	x="20" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="TOPLEFT">
+							<Offset>
+								<AbsDimension	x="0"	y="2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+					<TexCoords left="0"	right="0.15625"	top="0"	bottom="1.0"/>
+							</Texture>
+				<Texture name="$parentMiddleDisabled"	file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+								<Size>
+									<AbsDimension	x="88" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="$parentLeftDisabled"	relativePoint="RIGHT"/>
+								</Anchors>
+					<TexCoords left="0.15625"	right="0.84375"	top="0"	bottom="1.0"/>
+							</Texture>
+				<Texture name="$parentRightDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+								<Size>
+									<AbsDimension	x="20" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="$parentMiddleDisabled"	relativePoint="RIGHT"/>
+								</Anchors>
+					<TexCoords left="0.84375"	right="1.0"	top="0"	bottom="1.0"/>
+							</Texture>
+				<Texture name="$parentLeft"	file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+								<Size>
+									<AbsDimension	x="20" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"/>
+								</Anchors>
+					<TexCoords left="0"	right="0.15625"	top="0"	bottom="1.0"/>
+						</Texture>
+				<Texture name="$parentMiddle"	file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+								<Size>
+								<AbsDimension	x="88" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="$parentLeft"	relativePoint="RIGHT"/>
+								</Anchors>
+					<TexCoords left="0.15625"	right="0.84375"	top="0"	bottom="1.0"/>
+						</Texture>
+				<Texture name="$parentRight" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+								<Size>
+									<AbsDimension	x="20" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="$parentMiddle"	relativePoint="RIGHT"/>
+								</Anchors>
+					<TexCoords left="0.84375"	right="1.0"	top="0"	bottom="1.0"/>
+						</Texture>
+						</Layer>
+					</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel()	+	4);
+			</OnLoad>
+			<OnClick>
+				PanelTemplates_Tab_OnClick(MetaMap_DialogFrame);
+				MetaMap_OptionsTab_OnClick();
+			</OnClick>
+			<OnShow>
+				PanelTemplates_TabResize(0);
+			</OnShow>
+		</Scripts>
+		<NormalText	name="$parentText" inherits="GameFontNormalSmall">
+			<Anchors>
+				<Anchor	point="CENTER">
+					<Offset>
+						<AbsDimension	x="0"	y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText name="$parentHighlightText" inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor	point="CENTER">
+					<Offset>
+						<AbsDimension	x="0"	y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText	name="$parentDisabledText" inherits="GameFontGreenSmall">
+			<Anchors>
+				<Anchor	point="CENTER">
+					<Offset>
+						<AbsDimension	x="0"	y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+	</Button>
+
+		<Button	name="MetaMapNotes_NoteTemplate" hidden="true" virtual="true">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="CENTER"/>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<Texture name="$parentTexture" setAllPoints="true"/>
+				</Layer>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentHighlight" setAllPoints="true"/>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetFrameLevel(this:GetFrameLevel()	+1);
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+				</OnLoad>
+				<OnEnter>
+					MetaMapNotes_OnEnter(this:GetID());
+				</OnEnter>
+				<OnLeave>
+					WorldMapTooltip:Hide()
+				</OnLeave>
+				<OnClick>
+					MetaMapNotes_Note_OnClick(arg1, this:GetID());
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button	name="WorldMapMetaMapNotesMiscTemplate"	hidden="true"	virtual="true">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="CENTER"/>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<Texture name="$parentTexture" file="Interface\AddOns\MetaMap\Icons\Icontloc"	setAllPoints="true"/>
+				</Layer>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentHighlight"	setAllPoints="true"/>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetFrameLevel(this:GetFrameLevel()	+	3)
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					if this:GetID()	== 1 then
+						MetaMapNotesPOIpartyTexture:SetTexture("Interface\\AddOns\\MetaMap\\POIIcons\\Iconparty")
+					end
+				</OnLoad>
+				<OnEnter>
+					if(this:GetID()	== 0) then
+						MetaMapNotes_OnEnter(0);
+					elseif(this:GetID()	== 1) then
+						MetaMapNotes_OnEnter(-1);
+					end
+				</OnEnter>
+				<OnLeave>
+					WorldMapTooltip:Hide()
+				</OnLeave>
+				<OnClick>
+					MetaMapNotes_Misc_OnClick(arg1)
+				</OnClick>
+			</Scripts>
+		</Button>
+
+	<CheckButton name="MetaMap_FilterCheckboxTemplate" inherits="UICheckButtonTemplate"	virtual="true">
+		<Size>
+			<AbsDimension	x="20" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture">
+					<Size>
+						<AbsDimension	x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension	x="0"	y="-1"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				MetaMap_FilterNotes();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+		<Button	name="MetaMapList_ScrollFrameButtonTemplate" virtual="true">
+			<Size><AbsDimension	x="170"	y="20"/></Size>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight"	alphaMode="ADD"	setAllPoints="true"	hidden="true"/>
+					</Layer>
+				</Layers>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString	name="$parentName" inherits="GameFontNormal" text="" justifyH="LEFT">
+							<Size>
+								<AbsDimension	x="170"	y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="0"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString	name="$parentNoteID" inherits="GameFontNormal" hidden="true" text=""/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetParent():GetFrameLevel()+3);
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+					</OnLoad>
+					<OnClick>
+						MetaMapList_OnClick(arg1, tonumber(getglobal(this:GetName().."NoteID"):GetText()));
+					</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."Highlight"):Show();
+						MetaMapNotes_OnEnter(tonumber(getglobal(this:GetName().."NoteID"):GetText()));
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."Highlight"):Hide();
+						WorldMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalFont	name="$parentNormalText" inherits="GameFontNormal" justifyH="LEFT"/>
+			</Button>
+
+	<Model name="MetaMapPing"	file="Interface\MiniMap\Ping\MinimapPing.mdx"	scale="0.45" hidden="true" parent="WorldMapButton">
+		<Size>
+			<AbsDimension	x="60" y="60"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER" relativeTo="WorldMapButton"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel()	+	4)
+				MetaMapPing.timer	=	MetaMap_PingTime;
+			</OnLoad>
+			<OnUpdate>
+				MetaMapPing_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Model>
+
+	<CheckButton name="MetaMap_CheckButtonTemplate" inherits="UICheckButtonTemplate"	virtual="true">
+		<Size><AbsDimension	x="22" y="22"/></Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor	point="LEFT">
+							<Offset>
+								<AbsDimension	x="5"	y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<Frame name="MetaMap_DialogFrame"	toplevel="true"	movable="true" enableMouse="true"	frameStrata="FULLSCREEN" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension	x="575"	y="350"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension	x="0"	y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"	tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader"	file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension	x="375"	y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset>
+								<AbsDimension	x="1"	y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString	inherits="GameFontNormal"	text="METAMAP_OPTIONS_EXT" nonspacewrap="true">
+					<Anchors>
+						<Anchor	point="TOP"	relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension	x="0"	y="-13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="MetaMap_DialogFrameTab1" inherits="MetaMap_FrameTabButtonTemplate" id="1"	text="General">
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension	x="55" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMap_DialogFrameTab2" inherits="MetaMap_FrameTabButtonTemplate" id="2"	text="MetaNotes">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMap_DialogFrameTab1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension	x="-15"	y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMap_DialogFrameTab3" inherits="MetaMap_FrameTabButtonTemplate" id="3"	text="MetaKB">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMap_DialogFrameTab2" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension	x="-15"	y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMap_DialogFrameTab4" inherits="MetaMap_FrameTabButtonTemplate" id="4"	text="MetaFWM">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMap_DialogFrameTab3" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension	x="-15"	y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMap_DialogFrameTab5" inherits="MetaMap_FrameTabButtonTemplate" id="5"	text="Imports">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMap_DialogFrameTab4" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension	x="-15"	y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMap_DialogFrameTab6" inherits="MetaMap_FrameTabButtonTemplate" id="6"	text="ZoneShift">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMap_DialogFrameTab5" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension	x="-15"	y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMap_CloseButton" text="METAMAP_CLOSE_BUTTON"	inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension	x="70"	y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPRIGHT" relativeTo="$parent"	relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension	x="-8" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MetaMapExtOptions_Toggle();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				PanelTemplates_SetNumTabs(this,	6);
+			</OnLoad>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+				PanelTemplates_SetTab(this,	1);
+				MetaMap_ToggleDialog("MetaMap_GeneralDialog");
+				MetaMapBKP_NoLoad:Hide();
+			</OnShow>
+			<OnHide>
+				this:SetParent("UIParent");
+				this:SetFrameStrata("FULLSCREEN");
+			</OnHide>
+		</Scripts>		
+	</Frame>
+
+		<Frame name="MetaMap_GeneralDialog"	parent="MetaMap_DialogFrame" hidden="true">
+			<Size><AbsDimension	x="480"	y="280"	/></Size>
+				<Anchors>
+					<Anchor	point="CENTER"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString	name="MetaMapBKP_NoLoad" inherits="GameFontHighlight"	hidden="true" text="METAMAPBKP_NO_LOAD">
+							<Anchors>
+								<Anchor	point="TOP">
+								 <Offset><AbsDimension x="0" y="-25"/></Offset>
+								</Anchor>
+							 </Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					 <CheckButton	name="MetaMap_MenuModeCheckButton" inherits="MetaMap_CheckButtonTemplate">
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset><AbsDimension	x="40" y="-45"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText("	"..METAMAP_MENU_MODE);
+							</OnLoad>
+							<OnClick>
+								MetaMapOptions.MenuMode	=	not	MetaMapOptions.MenuMode;
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="MetaMap_TTWrapCheckButton"	inherits="MetaMap_CheckButtonTemplate">
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset><AbsDimension	x="40" y="-75"/></Offset>
+							</Anchor>
+						 </Anchors>
+						 <Scripts>
+							 <OnLoad>
+								 getglobal(this:GetName().."Text"):SetText(" "..METAMAP_OPTIONS_AUTOSEL)
+							 </OnLoad>
+							 <OnClick>
+									MetaMapOptions.TooltipWrap = not MetaMapOptions.TooltipWrap;
+							 </OnClick>
+						 </Scripts>
+					 </CheckButton>
+						<CheckButton name="MetaMap_MiniButtonCheckButton"	inherits="MetaMap_CheckButtonTemplate">
+							<Anchors>
+								<Anchor	point="TOPLEFT">
+									<Offset><AbsDimension	x="40" y="-105"	/></Offset>
+								</Anchor>
+							</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText("	"..METAMAP_OPTIONS_SHOWBUT)
+							</OnLoad>
+							<OnClick>
+									MetaMapOptions.MetaMapButtonShown	=	not	MetaMapOptions.MetaMapButtonShown;
+									MetaMapOptions_Init();
+							</OnClick>
+					 </Scripts>
+				</CheckButton>
+				<CheckButton name="MetaMap_ZoneHeaderButton"	inherits="MetaMap_CheckButtonTemplate">
+					<Anchors>
+						<Anchor	point="TOPLEFT">
+							<Offset><AbsDimension	x="40" y="-135"	/></Offset>
+						</Anchor>
+					</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("	"..METAMAP_OPTIONS_ZONEHEADER)
+					</OnLoad>
+					<OnClick>
+						MetaMapOptions.ZoneHeader	=	not	MetaMapOptions.ZoneHeader;
+						MetaMap_ZoneHeader();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+				<CheckButton name="MetaMap_ListColorsButton"	inherits="MetaMap_CheckButtonTemplate">
+					<Anchors>
+						<Anchor	point="TOPLEFT">
+							<Offset><AbsDimension	x="40" y="-165"	/></Offset>
+						</Anchor>
+					</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("	"..METAMAP_OPTIONS_LISTCOLORS)
+					</OnLoad>
+					<OnClick>
+						MetaMapOptions.ListColors	=	not	MetaMapOptions.ListColors;
+						MetaMapList_Init();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+				<CheckButton name="MetaMap_POICheckButton"	inherits="MetaMap_CheckButtonTemplate">
+					<Anchors>
+						<Anchor	point="TOPLEFT">
+							<Offset><AbsDimension	x="40" y="-195"	/></Offset>
+						</Anchor>
+					</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("	"..METAMAP_OPTIONS_POI)
+					</OnLoad>
+					<OnClick>
+						MetaMapOptions.usePOI	=	not	MetaMapOptions.usePOI;
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button	name="MetaMap_LoadBKPButton" inherits="UIPanelButtonTemplate2" text="Load Backup Module">
+				 <Size><AbsDimension x="150" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="BOTTOM">
+						 <Offset><AbsDimension x="0" y="10"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnClick>
+						MetaMap_LoadBKP();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMap_DialogFrame:GetWidth()-20);
+				this:SetHeight(MetaMap_DialogFrame:GetHeight()-20);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMap_NotesDialog"	parent="MetaMap_DialogFrame" hidden="true">
+		<Size>
+			<AbsDimension	x="480"	y="280"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMapNotes_InfoText" inherits="GameFontHighlight"	hidden="true" text="">
+					<Anchors>
+						<Anchor	point="TOP">
+						 <Offset><AbsDimension x="0" y="-25"/></Offset>
+						</Anchor>
+					 </Anchors>
+				</FontString>
+				<FontString	name="MetaMapNotes_ZoneSearchResult" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor	point="BOTTOMLEFT">
+							<Offset><AbsDimension	x="50"	y="40"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="MetaMapNotes_ZoneSearchResultHint" inherits="GameFontDisableSmall" text="METAMAPNOTES_ZONESEARCH_TEXTHINT">
+					<Anchors>
+						<Anchor	point="LEFT" relativePoint="LEFT" relativeTo="MetaMapNotes_ZoneSearchResult">
+							<Offset><AbsDimension	x="0"	y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			 </Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="MetaMap_LastNoteHighlight"	inherits="MetaMap_CheckButtonTemplate">
+				<Anchors>
+					<Anchor	point="TOPLEFT">
+						<Offset><AbsDimension	x="50" y="-50"	/></Offset>
+					</Anchor>
+				</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetText("	"..METAMAPNOTES_HIGHLIGHT_LASTCREATED)
+				</OnLoad>
+				<OnClick>
+					MetaMapOptions.LastHighlight	=	not	MetaMapOptions.LastHighlight;
+					MetaMapNotes_MapUpdate();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="MetaMap_LastMiniHighlight"	inherits="MetaMap_CheckButtonTemplate">
+			<Anchors>
+				<Anchor	point="TOP"	relativePoint="BOTTOM" relativeTo="MetaMap_LastNoteHighlight">
+					<Offset><AbsDimension	x="0"	y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetText("	"..METAMAPNOTES_HIGHLIGHT_MININOTE)
+				</OnLoad>
+				<OnClick>
+					MetaMapOptions.LastMiniHighlight =	not	MetaMapOptions.LastMiniHighlight;
+					MetaMapNotes_MapUpdate();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="MetaMap_AcceptIncoming" inherits="MetaMap_CheckButtonTemplate">
+			<Anchors>
+				<Anchor	point="TOP"	relativePoint="BOTTOM" relativeTo="MetaMap_LastMiniHighlight">
+					<Offset><AbsDimension	x="0"	y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetText("	"..METAMAPNOTES_ACCEPTINCOMING)
+				</OnLoad>
+				<OnClick>
+					MetaMapOptions.AcceptIncoming	=	not	MetaMapOptions.AcceptIncoming;
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="MetaMap_PartyAsMini" inherits="MetaMap_CheckButtonTemplate">
+			<Anchors>
+				<Anchor	point="TOP"	relativePoint="BOTTOM" relativeTo="MetaMap_AcceptIncoming">
+					<Offset><AbsDimension	x="0"	y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetText("	"..METAMAPNOTES_AUTOPARTYASMININOTE)
+				</OnLoad>
+				<OnClick>
+					MetaMapOptions.MiniParty = not MetaMapOptions.MiniParty;
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="MetaMap_ShowCreator" inherits="MetaMap_CheckButtonTemplate">
+			<Anchors>
+				<Anchor	point="TOP"	relativePoint="BOTTOM" relativeTo="MetaMap_PartyAsMini">
+					<Offset><AbsDimension	x="0"	y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetText("	"..METAMAP_OPTIONS_SHOWAUTHOR)
+				</OnLoad>
+				<OnClick>
+					MetaMapOptions.MetaMapShowAuthor = not MetaMapOptions.MetaMapShowAuthor;
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+			<Button name="MetaMap_DeleteNotesList" toplevel="true" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MetaMapNotes_ZoneSearchResult">
+						<Offset>
+							<AbsDimension x="-20" y="-3" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMap_DialogFrame:GetWidth()-20);
+				this:SetHeight(MetaMap_DialogFrame:GetHeight()-20);
+			</OnLoad>
+			<OnShow>
+				MetaMapNotes_InfoText:Hide();
+				UIDropDownMenu_ClearAll(MetaMap_DeleteNotesList);
+				UIDropDownMenu_Initialize(MetaMap_DeleteNotesList, MetaMap_DeleteNotesListInit, "MENU");
+				MetaMap_ZoneHeader();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaKB_HoldingFrame"	parent="MetaMap_DialogFrame" hidden="true">
+		<Size><AbsDimension	x="480"	y="280"	/></Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="$parentInfo"	inherits="GameFontHighlight"	text="METAKB_NOT_LOADED">
+					<Anchors>
+						<Anchor	point="TOP">
+						 <Offset><AbsDimension x="0" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="$parentLoad" inherits="UIPanelButtonTemplate2" toplevel="true" text="METAKB_LOAD_MODULE">
+				<Size><AbsDimension	x="100" y="24"/></Size>
+				<Anchors>
+					<Anchor	point="BOTTOM">
+						<Offset><AbsDimension	x="0"	y="30" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MetaMap_LoadWKB(3);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMap_DialogFrame:GetWidth()-20);
+				this:SetHeight(MetaMap_DialogFrame:GetHeight()-20);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaFWM_HoldingFrame"	parent="MetaMap_DialogFrame" hidden="true">
+		<Size><AbsDimension	x="480"	y="280"	/></Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="$parentInfo" inherits="GameFontHighlight"	text="METAFWM_NOT_LOADED">
+					<Anchors>
+						<Anchor	point="TOP">
+						 <Offset><AbsDimension x="0" y="-20"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="$parentLoad" inherits="UIPanelButtonTemplate2" toplevel="true" text="METAKB_LOAD_MODULE">
+				<Size><AbsDimension	x="100" y="24"/></Size>
+				<Anchors>
+					<Anchor	point="BOTTOM">
+						<Offset><AbsDimension	x="0"	y="30" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MetaMap_LoadFWM();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMap_DialogFrame:GetWidth()-20);
+				this:SetHeight(MetaMap_DialogFrame:GetHeight()-20);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMap_ImportDialog"	parent="MetaMap_DialogFrame" hidden="true">
+		<Size><AbsDimension	x="480"	y="280"	/></Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMap_ImportHeader"	inherits="GameFontHighlight"	text="METAMAP_IMPORTS_HEADER">
+					<Size><AbsDimension	x="460"	y="0"	/></Size>
+					<Anchors>
+						<Anchor	point="TOP">
+						 <Offset><AbsDimension x="0" y="-20"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_InstanceImportText"	inherits="GameFontHighlightSmall"	wraponspaces="true"	text="METAMAP_IMPORT_INSTANCE">
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT">
+						 <Offset><AbsDimension x="10" y="-45"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_InstanceImportTextInfo"	inherits="GameFontNormalSmall"	justifyH="LEFT"	wraponspaces="true"	text="METAMAP_IMPORT_INSTANCE_INFO">
+					<Size><AbsDimension	x="450"/></Size>
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="MetaMap_InstanceImportText">
+						 <Offset><AbsDimension x="80" y="-10"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_MapNotesImportText"	inherits="GameFontHighlightSmall"	wraponspaces="true"	text="METAMAP_IMPORT_NOTES">
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT">
+						 <Offset><AbsDimension x="10" y="-100"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_MapNotesImportTextInfo"	inherits="GameFontNormalSmall"	justifyH="LEFT"	wraponspaces="true"	text="METAMAP_IMPORT_NOTES_INFO">
+					<Size><AbsDimension	x="450"/></Size>
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT" relativeTO="MetaMap_MapNotesImportText">
+						 <Offset><AbsDimension x="80" y="-10"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_KBImportText"	inherits="GameFontHighlightSmall"	wraponspaces="true"	text="METAMAP_IMPORT_KB">
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT">
+						 <Offset><AbsDimension x="10" y="-155"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_KBImportTextInfo"	inherits="GameFontNormalSmall"	justifyH="LEFT"	wraponspaces="true"	text="METAMAP_IMPORT_KB_INFO">
+					<Size><AbsDimension	x="450"/></Size>
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT" relativeTO="MetaMap_KBImportText">
+						 <Offset><AbsDimension x="80" y="-10"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_WoWKBImportText"	inherits="GameFontHighlightSmall"	wraponspaces="true"	text="METAMAP_IMPORT_BLT">
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT">
+						 <Offset><AbsDimension x="10" y="-210"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_WoWKBImportTextInfo"	inherits="GameFontNormalSmall"	justifyH="LEFT"	wraponspaces="true"	text="METAMAP_IMPORT_BLT_INFO">
+					<Size><AbsDimension	x="450"/></Size>
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="TOPLEFT" relativeTO="MetaMap_WoWKBImportText">
+						 <Offset><AbsDimension x="80" y="-10"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+				<FontString	name="MetaMap_ImportInfo"	inherits="GameFontDisableSmall"	justifyH="CENTER"	text="METAMAP_IMPORTS_INFO">
+					<Anchors>
+						<Anchor	point="BOTTOM">
+						 <Offset><AbsDimension x="0" y="10"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+			 </Layer>
+		</Layers>
+		<Frames>
+			<Button	name="MetaMap_LoadImportsButton" inherits="UIPanelButtonTemplate2" text="METAMAP_LOADIMPORTS_BUTTON">
+				 <Size><AbsDimension x="150" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="BOTTOM">
+						 <Offset><AbsDimension x="-170" y="30"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnClick>
+						MetaMap_LoadImports();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMap_LoadExportsButton" inherits="UIPanelButtonTemplate2" text="METAMAP_LOADEXPORTS_BUTTON">
+				 <Size><AbsDimension x="150" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="BOTTOM">
+						 <Offset><AbsDimension x="0" y="30"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnClick>
+						MetaMap_LoadExports();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMap_ReLoadUIButton" inherits="UIPanelButtonTemplate2" text="METAMAP_RELOADUI_BUTTON">
+				 <Size><AbsDimension x="120" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="BOTTOM">
+						 <Offset><AbsDimension x="170" y="30"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnClick>
+						ReloadUI();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMap_InstanceImportButton" inherits="UIPanelButtonTemplate2" text="METAMAP_IMPORT_BUTTON">
+				 <Size><AbsDimension x="60" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MetaMap_InstanceImportText">
+						 <Offset><AbsDimension x="0" y="-10"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnLoad>
+						this:Disable();
+					</OnLoad>
+					<OnClick>
+						MetaMap_ImportOptions(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMap_MapNotesImportButton" inherits="UIPanelButtonTemplate2" text="METAMAP_IMPORT_BUTTON">
+				 <Size><AbsDimension x="60" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MetaMap_MapNotesImportText">
+						 <Offset><AbsDimension x="0" y="-10"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnLoad>
+						this:Disable();
+					</OnLoad>
+					<OnClick>
+						MetaMap_ImportOptions(2);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMap_KBImportButton" inherits="UIPanelButtonTemplate2" text="METAMAP_IMPORT_BUTTON">
+				 <Size><AbsDimension x="60" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MetaMap_KBImportText">
+						 <Offset><AbsDimension x="0" y="-10"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnLoad>
+						this:Disable();
+					</OnLoad>
+					<OnClick>
+						MetaMap_ImportOptions(3);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMap_BLTImportButton" inherits="UIPanelButtonTemplate2" text="METAMAP_IMPORT_BUTTON">
+				 <Size><AbsDimension x="60" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MetaMap_WoWKBImportText">
+						 <Offset><AbsDimension x="0" y="-10"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnLoad>
+						this:Disable();
+					</OnLoad>
+					<OnClick>
+						MetaMap_ImportOptions(4);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMap_DialogFrame:GetWidth()-20);
+				this:SetHeight(MetaMap_DialogFrame:GetHeight()-20);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMap_ZoneShiftDialog"	parent="MetaMap_DialogFrame" hidden="true">
+		<Size><AbsDimension	x="480"	y="280"	/></Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMapZSM_TextHeader"	inherits="GameFontHighlight"	wraponspaces="true"	text="">
+					<Anchors>
+						<Anchor	point="TOP">
+						 <Offset><AbsDimension x="0" y="-25"/></Offset>
+						</Anchor>
+					 </Anchors>
+				 </FontString>
+			 </Layer>
+		</Layers>
+		<Frames>
+			<Button	name="MetaMap_LoadZSMButton" inherits="UIPanelButtonTemplate2" text="Load ZoneShifts">
+				 <Size><AbsDimension x="120" y="24"/></Size>
+				 <Anchors>
+						<Anchor	point="BOTTOM">
+						 <Offset><AbsDimension x="0" y="20"	/></Offset>
+					 </Anchor>
+				 </Anchors>
+				 <Scripts>
+					<OnClick>
+						MetaMap_LoadZSM();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMap_DialogFrame:GetWidth()-20);
+				this:SetHeight(MetaMap_DialogFrame:GetHeight()-20);
+			</OnLoad>
+			<OnShow>
+				MetaMap_ZSMOnShow();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMapTopFrame"	enableMouse="false"	framestrata="BACKGROUND" parent="WorldMapFrame"	movable="true" hidden="false">
+		<Size>
+			<AbsDimension	x="1024" y="768"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER" relativeTo="WorldMapFrame"	relativePoint="CENTER">
+				<Offset>
+					<AbsDimension	x="0"	y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				MetaMapTopFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				MetaMap_OnEvent(event);
+			</OnEvent>
+			<OnShow>
+				MetaMapTopFrame_OnShow();
+			</OnShow>
+			<OnMouseDown>
+				if ( arg1	== "LeftButton"	)	then
+					this:GetParent():StartMoving();
+					this.isMoving	=	true;
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( this.isMoving ) then
+					this:GetParent():StopMovingOrSizing();
+					this.isMoving	=	false;
+					WorldMapFrame:SetUserPlaced(false);
+				end
+			</OnMouseUp>
+			<OnHide>
+				MetaMapTopFrame_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Button	name="MetaMap_OptionsButton" hidden="false"	parent="WorldMapFrame" inherits="OptionsButtonTemplate"	text="METAMAP_OPTIONS_BUTTON">
+		<Size>
+			<AbsDimension	x="100"	y="26"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER" relativeTo="WorldMapZoomOutButton"	relativePoint="CENTER">
+				<Offset>
+					<AbsDimension	x="0"	y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				if(not MetaMapOptions.MenuMode)	then
+					MetaMapMenu_OnShow("Mainmap");
+				end
+			</OnEnter>
+			<OnClick>
+				if(MetaMapOptions.MenuMode)	then
+					MetaMapMenu_OnShow("Mainmap");
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="MetaMapMainCoords"	hidden="true"	parent="WorldMapFrame" >
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMapCoordsCursorDesc" hidden="false"	inherits="GameFontNormal"	text="Cursor(x,y): ">
+					<Anchors>
+						<Anchor	point="BOTTOM" relativeTo="WorldMapDetailFrame"	relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension	x="-100" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="MetaMapCoordsCursor" hidden="false"	inherits="GameFontHighlight" text="">
+					<Anchors>
+						<Anchor	point="LEFT" relativeTo="MetaMapCoordsCursorDesc"	relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension	x="0"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="MetaMapCoordsPlayerDesc" hidden="false"	inherits="GameFontNormal"	text="Player(x,y): ">
+					<Anchors>
+						<Anchor	point="BOTTOM" relativeTo="WorldMapDetailFrame"	relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension	x="60" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="MetaMapCoordsPlayer" hidden="false"	inherits="GameFontHighlight" text="">
+					<Anchors>
+						<Anchor	point="LEFT" relativeTo="MetaMapCoordsPlayerDesc"	relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension	x="0"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnUpdate>
+				MetaMapCoordsWorldMap_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMapDropDownFrame" toplevel="true" enableMouse="true"	parent="WorldMapFrame" hidden="false">
+		<Frames>
+			<Button	name="MetaMapFrameDropDown"	inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor	point="RIGHT"	relativeTo="WorldMapContinentDropDown" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension	x="33" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						MetaMapFrameDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	inherits="GameFontNormalSmall" text="Instances">
+					<Anchors>
+						<Anchor	point="LEFT" relativeTo="WorldMapContinentDropDown"	relativePoint="LEFT">
+							<Offset>
+								<AbsDimension	x="-170" y="21"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="MetaMapText_NoteTotals"	inherits="GameFontNormal"	text="">
+					<Anchors>
+						<Anchor	point="TOPLEFT" relativeTo="WorldMapDetailFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension	x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+		<Frame name="MetaMap_ZoneHeaderFrame" hidden="true" toplevel="true" parent="WorldMapFrame"	frameStrata="FULLSCREEN">
+			<Size><AbsDimension	x="320"	y="20"/></Size>
+				 <Anchors>
+					 <Anchor point="BOTTOM"	relativeTo="WorldMapDetailFrame"	relativePoint="TOP">
+				 <Offset><AbsDimension x="0" y="47"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer>
+					<FontString	name="MetaMapZoneHeaderText1" inherits="GameFontNormalSmall"	text="">
+						<Anchors>
+							<Anchor	point="RIGHT" relativePoint="CENTER">
+								<Offset>
+									<AbsDimension	x="-100"	y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString	name="MetaMapZoneHeaderText2" inherits="GameFontNormalSmall"	text="">
+						<Anchors>
+							<Anchor	point="LEFT"	relativePoint="CENTER">
+								<Offset>
+									<AbsDimension	x="100"	y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0,0,0);
+					this:SetFrameLevel(WorldMapButton:GetFrameLevel()+1);
+				</OnLoad>
+			</Scripts>
+			<FontString	inherits="MetaMap_FontStringTemplate"	justifyH="LEFT"/>
+		</Frame>
+
+			<Button	name="MetaMapButton" parent="Minimap"	frameStrata="MEDIUM">
+				<Size>
+					<AbsDimension	x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT">
+						<Offset>
+							<AbsDimension	x="0"	y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\MetaMap\Images\MetaMapButton-Up"/>
+				<PushedTexture file="Interface\AddOns\MetaMap\Images\MetaMapButton-Down"/>
+				<HighlightTexture	alphaMode="ADD"	file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+				<Scripts>
+					<OnClick>
+						MetaMap_ToggleFrame(WorldMapFrame);
+					</OnClick>
+					<OnEnter>
+						MetaMap_ButtonTooltip();
+						if(not MetaMapOptions.MenuMode)	then
+							MetaMapMenu_OnShow("Minimap");
+						end
+					</OnEnter>
+					<OnMouseUp>
+						if(arg1	== "RightButton" and MetaMapOptions.MenuMode)	then
+							MetaMapMenu_OnShow("Minimap");
+						end
+					</OnMouseUp>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+	<Frame name="MetaMap_MiniCoords" parent="UIParent"	enableMouse="true" hidden="false"	frameStrata="MEDIUM" movable="true">
+		<Size>
+			<AbsDimension	x="40" y="10"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="BOTTOM" relativeTo="Minimap"	relativePoint="BOTTOM">
+				<Offset>
+					<AbsDimension	x="0"	y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMapMiniCoords" toplevel="true" hidden="false"	inherits="GameFontGreen" text="">
+					<Anchors>
+						<Anchor	point="CENTER">
+							<Offset>
+								<AbsDimension	x="0"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnUpdate>
+				MiniMapCoords_OnUpdate();
+			</OnUpdate>
+			<OnMouseDown>
+				if(arg1	== "LeftButton") then
+					if(IsShiftKeyDown() or IsControlKeyDown()) then
+						MiniMapCoords_OnClick();
+					else
+						this:StartMoving();
+					end
+				end
+					this.isMoving	=	true;
+			</OnMouseDown>
+			<OnMouseUp>
+				if(this.isMoving) then
+					this:StopMovingOrSizing();
+					this.isMoving	=	false;
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMapMenu"	toplevel="true"	frameStrata="FULLSCREEN" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension	x="200"	y="0"/>
+		</Size>
+		<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"	tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString	name="MetaMapMenu_Title" inherits="GameFontGreen"	text="METAMAP_NAME">
+						<Anchors>
+							<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+								<Offset>
+									<AbsDimension	x="0"	y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		<Frames>
+			<Button	name="MetaMapMenu_Option1" inherits="MetaMapMenu_ButtonTemplate" id="1">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension	x="40" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option2" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="2">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option3" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="3">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option4" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="4">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option5" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="5">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option6" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="6">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option7" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="7">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option8" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="8">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option9" hidden="true" inherits="MetaMapMenu_ButtonTemplate" id="9">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option10"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="10">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option11"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="11">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option10"	relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option12"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="12">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option11"	relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option13"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="13">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option12"	relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option14"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="14">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option13"	relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option15"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="15">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option14"	relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button	name="MetaMapMenu_Option16"	hidden="true"	inherits="MetaMapMenu_ButtonTemplate"	id="16">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="MetaMapMenu_Option15"	relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Frame name="MetaMapSliderMenu"	hidden="false">
+				<Size>
+					<AbsDimension	x="200"	y="95"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOP"	relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension	x="0"	y="15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"	tile="true">
+					<BackgroundInsets>
+						<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue	val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue	val="32"/>
+					</EdgeSize>
+				</Backdrop>
+				<Frames>
+			<Slider	name="MetaMapAlphaSlider"	inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension	x="160"	y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension	x="0"	y="-25"	/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(METAMAP_OPTIONS_TRANS);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						MetaMapAlphaSlider:SetMinMaxValues(0.0,1.0);
+						MetaMapAlphaSlider:SetValueStep(0.01);
+					</OnLoad>
+					<OnValueChanged>
+						MetaMap_UpdateAlpha();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider	name="MetaMapScaleSlider"	inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension	x="160"	y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension	x="0"	y="-50"	/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(METAMAP_OPTIONS_SCALE);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						MetaMapScaleSlider:SetMinMaxValues(0.0,1.0);
+						MetaMapScaleSlider:SetValueStep(0.01);
+					</OnLoad>
+					<OnValueChanged>
+						MetaMap_UpdateScale();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider	name="MetaMapTTScaleSlider"	inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension	x="160"	y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension	x="0"	y="-75"	/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(METAMAP_OPTIONS_TTSCALE);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						MetaMapTTScaleSlider:SetMinMaxValues(0.5,2.0);
+						MetaMapTTScaleSlider:SetValueStep(0.01);
+					</OnLoad>
+					<OnValueChanged>
+						MetaMap_UpdateTTScale();
+					</OnValueChanged>
+					<OnEnter>
+						WorldMapTooltip:SetOwner(this, "ANCHOR_CENTER");
+						WorldMapTooltip:SetText("Tooltip Scaling Sample",	0, 1,	0);
+						WorldMapTooltip:AddLine("Move	the	Tooltip	slider to	change the scale of	the	tooltips shown on	the	WorldMap", 1,	1, 1,	true);
+						WorldMapTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						WorldMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Slider	name="MetaMap_BackDropSlider"	inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension	x="160"	y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOP"	relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension	x="0"	y="-100"	/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(METAMAP_OPTIONS_SHADER);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0.0,1.0);
+						this:SetValueStep(0.01);
+					</OnLoad>
+					<OnValueChanged>
+						MetaMap_UpdateBackDrop();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider	name="MetaMapButtonSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension	x="160"	y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="BOTTOM" relativeTo="$parent"	relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension	x="0"	y="15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(METAMAP_OPTIONS_BUTPOS);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						MetaMapButtonSlider:SetMinMaxValues(0,360);
+						MetaMapButtonSlider:SetValueStep(1);
+					</OnLoad>
+					<OnValueChanged>
+						MetaMapOptions.MetaMapButtonPosition = MetaMapButtonSlider:GetValue();
+						MetaMapButton_UpdatePosition();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				UIPanelWindows['MetaMapMenu']	=	{area	=	'center',	pushable = 0};
+			</OnLoad>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+				MetaMapMenu_Init();
+			</OnShow>
+			<OnUpdate>
+				MetaMapMenu_OnUpdate();
+			</OnUpdate>
+		</Scripts>		
+	</Frame>
+
+	<Frame name="MetaMapFilterMenu"	toplevel="true"	hidden="true" parent="MetaMapMenu">
+		<Size>
+			<AbsDimension	x="125"	y="225"/>
+		</Size>
+			<Anchors>
+				<Anchor	point="TOPRIGHT"	relativeTo="$parent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension	x="10" y="-55"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"	tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMap_SubMenuTitle" inherits="GameFontGreen"	text="METAMAP_OPTIONS_SHOWNOTES">
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset>
+								<AbsDimension	x="0"	y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="MetaMapSubMenu_Option0" inherits="MetaMap_FilterCheckboxTemplate" id="0">
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset><AbsDimension	x="20" y="-35"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MetaMapSubMenu_Option1" inherits="MetaMap_FilterCheckboxTemplate" id="1">
+				<Anchors>
+					<Anchor	point="LEFT" relativeTo="MetaMapSubMenu_Option0" relativePoint="LEFT">
+						<Offset><AbsDimension	x="50" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MetaMapSubMenu_Option2" inherits="MetaMap_FilterCheckboxTemplate" id="2">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option0" relativePoint="LEFT">
+						<Offset><AbsDimension	x="0" y="-30"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MetaMapSubMenu_Option3" inherits="MetaMap_FilterCheckboxTemplate" id="3">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option2" relativePoint="LEFT">
+						<Offset><AbsDimension	x="50" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MetaMapSubMenu_Option4" inherits="MetaMap_FilterCheckboxTemplate" id="4">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option2" relativePoint="LEFT">
+						<Offset><AbsDimension	x="0" y="-30"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MetaMapSubMenu_Option5" inherits="MetaMap_FilterCheckboxTemplate" id="5">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option4" relativePoint="LEFT">
+						<Offset><AbsDimension	x="50" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton	name="MetaMapSubMenu_Option6" inherits="MetaMap_FilterCheckboxTemplate" id="6">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option4" relativePoint="LEFT">
+						<Offset><AbsDimension	x="0" y="-30"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton	name="MetaMapSubMenu_Option7" inherits="MetaMap_FilterCheckboxTemplate" id="7">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option6" relativePoint="LEFT">
+						<Offset><AbsDimension	x="50" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton	name="MetaMapSubMenu_Option8" inherits="MetaMap_FilterCheckboxTemplate" id="8">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option6" relativePoint="LEFT">
+						<Offset><AbsDimension	x="0" y="-30"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton	name="MetaMapSubMenu_Option9"	inherits="MetaMap_FilterCheckboxTemplate"	id="9">
+				<Anchors>
+					<Anchor	point="LEFT"	relativeTo="MetaMapSubMenu_Option8" relativePoint="LEFT">
+						<Offset><AbsDimension	x="50" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+				<Button	name="MetaMap_FilterOn" text="METAMAP_OPTIONS_FILTERON">
+					<Size>
+						<AbsDimension	x="100"	y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="BOTTOM">
+							<Offset><AbsDimension	x="0" y="30"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							MetaMap_FilterNotes(true);
+						</OnClick>
+					</Scripts>
+					<NormalFont inherits="GameFontNormalSmall"/>
+					<HighlightFont inherits="GameFontHighlightSmall"/>
+				</Button>
+				<Button	name="MetaMap_FilterOff" text="METAMAP_OPTIONS_FILTEROFF">
+					<Size>
+						<AbsDimension	x="100"	y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="BOTTOM">
+							<Offset><AbsDimension	x="0" y="15"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							MetaMap_FilterNotes(false);
+						</OnClick>
+					</Scripts>
+					<NormalFont inherits="GameFontNormalSmall"/>
+					<HighlightFont inherits="GameFontHighlightSmall"/>
+				</Button>
+			</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+		</Scripts>		
+	</Frame>
+
+	<Button	name="MetaMapFrame"	enableMouse="true" parent="WorldMapFrame"	hidden="true">
+		<Anchors>
+			<Anchor	point="CENTER" relativeTo="WorldMapDetailFrame"	relativePoint="CENTER">
+				<Offset>
+					<AbsDimension	x="0"	y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="MetaMap_MapBackDrop" file="Interface\AddOns\MetaMap\Shaders\Shader1">
+					<Anchors>
+						<Anchor	point="LEFT" relativeTo="MetaMapFrame" relativePoint="LEFT">
+							<Offset><AbsDimension	x="0"	y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMapText_Instance"	inherits="SubZoneTextFont">
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset>
+								<AbsDimension	x="0"	y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="MetaMapText_MapCredits"	inherits="QuestTitleFont" toplevel="true" text="METAMAP_MAPCREDITS">
+					<Anchors>
+						<Anchor	point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension	x="10" y="15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="MetaMap_MapImage">
+					<Anchors>
+						<Anchor	point="CENTER" relativeTo="MetaMapFrame" relativePoint="CENTER">
+							<Offset><AbsDimension	x="-50"	y="-10"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				this:SetWidth(WorldMapButton:GetWidth());
+				this:SetHeight(WorldMapButton:GetHeight());
+				MetaMap_MapImage:SetHeight(MetaMapFrame:GetHeight()-60);
+				MetaMap_MapImage:SetWidth(MetaMap_MapImage:GetHeight());
+			</OnLoad>
+			<OnClick>
+				MetaMapNotes_WorldMapButton_OnClick(arg1,	WorldMapButton)
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame parent="UIParent">
+		<Frames>
+			<Button	name="TitanPanelMetaMapButton" inherits="TitanPanelIconTemplate" frameStrata="FULLSCREEN"	toplevel="true">
+				<Scripts>
+					<OnLoad>
+						if(IsAddOnLoaded("Titan")) then
+							TitanPanelMetaMapButton_OnLoad();
+							TitanPanelButton_OnLoad();
+						else
+							this:Hide();
+						end
+					</OnLoad>
+					<OnClick>
+						TitalPanelMetaMapButton_OnClick(arg1);
+						TitanPanelButton_OnClick(arg1, 1);
+					</OnClick>
+					<OnEnter>
+						if(not MetaMapOptions.MenuMode)	then
+							MetaMapMenu_OnShow("Titan");
+						end
+					</OnEnter>
+					<OnMouseUp>
+						if(arg1	== "RightButton" and MetaMapOptions.MenuMode)	then
+							MetaMapMenu_OnShow("Titan");
+						end
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>		
+
+	<Frame name="MetaMapNotesLinesFrame" parent="WorldMapFrame"	hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() +1);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMapNotesEditFrame"	toplevel="true"	parent="UIParent" enablemouse="true"  frameStrata="FULLSCREEN" hidden="true">
+		<Size>
+			<AbsDimension	x="450"	y="380"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Backdrop	bgFile="Interface\Tooltips\UI-Tooltip-Background"	edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="MetaMapNotesEditFrameHeader"	file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension	x="300"	y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset><AbsDimension	x="0"	y="12"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString	name="MetaMapNotesEditFrameTitle"	inherits="GameFontNormal"	text="METAMAPNOTES_EDIT_NOTE">
+					<Anchors>
+						<Anchor	point="TOP"	relativeTo="MetaMapNotesEditFrameHeader">
+							<Offset><AbsDimension	x="0"	y="-14"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="MetaMapNotesButtonMiniNoteOff" inherits="UIPanelButtonTemplate2"	text="METAMAPNOTES_MININOTE_OFF">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="66" y="30"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption")
+						MetaMapNotes_ClearMiniNote()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapNotesButtonMiniNoteOn"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_MININOTE_ON">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="66" y="60"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MetaMapNotes_SetMiniNote(MetaMapNotes_TempData_Id, GetCurrentMapContinent(), GetCurrentMapZone());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapNotesButtonSendNote"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_SEND_NOTE">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="171"	y="30"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MetaMapNotes_ShowSendFrame(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapNotesButtonToggleLine"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_TOGGLELINE">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="171"	y="60"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MetaMapNotes_StartGUIToggleLine();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapNotesButtonSaveNote"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_SAVE_NOTE">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="276"	y="30"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MetaMapNotes_WriteNote();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapNotesButtonDeleteNote"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_DELETE_NOTE">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="276"	y="60"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MetaMap_CheckLinks(MetaMapNotes_TempData_Id);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapNotesButtonMoveNote"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_MOVE_NOTE">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="381"	y="60"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MetaMapNotes_StartMoveNote(MetaMapNotes_TempData_Id);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="$parentCancel" inherits="UIPanelButtonTemplate2" text="METAMAP_CLOSE_BUTTON">
+				<Size>
+					<AbsDimension	x="100"	y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension	x="381"	y="30"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon0">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT">
+						<Offset><AbsDimension	x="50" y="-41"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon0Texture" file="Interface\AddOns\MetaMap\Icons\Icon0">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(0)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon1">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon0">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon1Texture" file="Interface\AddOns\MetaMap\Icons\Icon1">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(1)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon2">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon1">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon2Texture" file="Interface\AddOns\MetaMap\Icons\Icon2">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(2)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon3">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon2">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon3Texture" file="Interface\AddOns\MetaMap\Icons\Icon3">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(3)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon4">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon3">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon4Texture" file="Interface\AddOns\MetaMap\Icons\Icon4">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(4)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon5">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon4">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon5Texture" file="Interface\AddOns\MetaMap\Icons\Icon5">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(5)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon6">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon5">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon6Texture" file="Interface\AddOns\MetaMap\Icons\Icon6">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(6)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon7">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon6">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon7Texture" file="Interface\AddOns\MetaMap\Icons\Icon7">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(7)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon8">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon7">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon8Texture" file="Interface\AddOns\MetaMap\Icons\Icon8">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(8)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="EditIcon9">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="EditIcon8">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="EditIcon9Texture" file="Interface\AddOns\MetaMap\Icons\Icon9">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetIcon(9)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="IconOverlay">
+				<Size>
+					<AbsDimension	x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="EditIcon0">
+						<Offset><AbsDimension	x="-3" y="3"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="IconOverlayTexture" file="Interface\AddOns\MetaMap\Icons\Overlay">
+							<Size>
+								<AbsDimension	x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+			<EditBox name="TitleWideEditBox" historyLines="0"	letters="100">
+				<Size>
+					<AbsDimension	x="400"	y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="EditIcon0">
+						<Offset><AbsDimension	x="-26"	y="-36"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="TitleBoxLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="TitleBoxRight"	file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="RIGHT">
+									<Offset><AbsDimension	x="10" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						TitleWideEditBox:SetText("")
+					</OnLoad>
+					<OnTextChanged>
+						if (TitleWideEditBox:GetText() ==	"" or	TitleWideEditBox:GetText() ==	nil) then
+							MetaMapNotesButtonSaveNote:Disable()
+						else
+							MetaMapNotesButtonSaveNote:Enable()
+						end
+					</OnTextChanged>
+					<OnEnterPressed>
+						PlaySound("igMainMenuOption");
+						MetaMapNotes_WriteNote();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:GetParent():Hide();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString	inherits="ChatFontNormal"/>
+			</EditBox>
+			<EditBox name="Info1WideEditBox" historyLines="0">
+				<Size>
+					<AbsDimension	x="400"	y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="TitleWideEditBox">
+						<Offset><AbsDimension	x="0"	y="-65"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="Info1Left"	file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="Info1Right" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="RIGHT">
+									<Offset><AbsDimension	x="10" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						PlaySound("igMainMenuOption")
+						MetaMapNotes_WriteNote()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:GetParent():Hide();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString	inherits="ChatFontNormal"/>
+			</EditBox>
+			<EditBox name="Info2WideEditBox" historyLines="0">
+				<Size>
+					<AbsDimension	x="400"	y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="Info1WideEditBox">
+						<Offset><AbsDimension	x="0"	y="-65"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="Info2Left"	file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="Info2Right" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="RIGHT">
+									<Offset><AbsDimension	x="10" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						PlaySound("igMainMenuOption")
+						MetaMapNotes_WriteNote()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:GetParent():Hide();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString	inherits="ChatFontNormal"/>
+			</EditBox>
+			<EditBox name="CreatorWideEditBox" historyLines="0"	letters="100">
+				<Size>
+					<AbsDimension	x="400"	y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="Info2WideEditBox">
+						<Offset><AbsDimension	x="0"	y="-65"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="CreatorLeft"	file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="CreatorRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension	x="256"	y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="RIGHT">
+									<Offset><AbsDimension	x="10" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						PlaySound("igMainMenuOption")
+						MetaMapNotes_WriteNote()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:GetParent():Hide();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString	inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button	name="TextColor0">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT">
+						<Offset><AbsDimension	x="50" y="-111"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="TextColor0Texture"	file="Interface\AddOns\MetaMap\Icons\Color0">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetTextColor(0)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="TextColor1">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor0">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="TextColor1Texture"	file="Interface\AddOns\MetaMap\Icons\Color1">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetTextColor(1)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="TextColor2">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor1">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="TextColor2Texture"	file="Interface\AddOns\MetaMap\Icons\Color2">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetTextColor(2)
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button	name="TextColor3">
+				<Size>
+					<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor2">
+						<Offset><AbsDimension	x="21" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="TextColor3Texture"	file="Interface\AddOns\MetaMap\Icons\Color3">
+							<Size>
+								<AbsDimension	x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+					</OnLoad>
+					<OnClick>
+						MetaMapNotes_Edit_SetTextColor(3)
+					</OnClick>
+				</Scripts>
+			</Button>
+		<Button	name="TextColor4">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor3">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColor4Texture"	file="Interface\AddOns\MetaMap\Icons\Color4">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetTextColor(4)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="TextColor5">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor4">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColor5Texture"	file="Interface\AddOns\MetaMap\Icons\Color5">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetTextColor(5)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="TextColor6">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor5">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColor6Texture"	file="Interface\AddOns\MetaMap\Icons\Color6">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetTextColor(6)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="TextColor7">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor6">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColor7Texture"	file="Interface\AddOns\MetaMap\Icons\Color7">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetTextColor(7)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="TextColor8">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor7">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColor8Texture"	file="Interface\AddOns\MetaMap\Icons\Color8">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetTextColor(8)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="TextColor9">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="TextColor8">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColor9Texture"	file="Interface\AddOns\MetaMap\Icons\Color9">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetTextColor(9)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="TextColorOverlay">
+			<Size>
+				<AbsDimension	x="32" y="32"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="TextColor0">
+					<Offset><AbsDimension	x="-3" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="TextColorOverlayTexture"	file="Interface\AddOns\MetaMap\Icons\Overlay">
+						<Size>
+							<AbsDimension	x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button	name="Info1Color0">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="TOPLEFT">
+					<Offset><AbsDimension	x="50" y="-175"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color0Texture" file="Interface\AddOns\MetaMap\Icons\Color0">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(0)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color1">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color0">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color1Texture" file="Interface\AddOns\MetaMap\Icons\Color1">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(1)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color2">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color1">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color2Texture" file="Interface\AddOns\MetaMap\Icons\Color2">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(2)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color3">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color2">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color3Texture" file="Interface\AddOns\MetaMap\Icons\Color3">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(3)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color4">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color3">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color4Texture" file="Interface\AddOns\MetaMap\Icons\Color4">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(4)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color5">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color4">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color5Texture" file="Interface\AddOns\MetaMap\Icons\Color5">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(5)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color6">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color5">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color6Texture" file="Interface\AddOns\MetaMap\Icons\Color6">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(6)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color7">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color6">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color7Texture" file="Interface\AddOns\MetaMap\Icons\Color7">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(7)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color8">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color7">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color8Texture" file="Interface\AddOns\MetaMap\Icons\Color8">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(8)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1Color9">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info1Color8">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1Color9Texture" file="Interface\AddOns\MetaMap\Icons\Color9">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo1Color(9)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info1ColorOverlay">
+			<Size>
+				<AbsDimension	x="32" y="32"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="Info1Color0">
+					<Offset><AbsDimension	x="-3" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info1ColorOverlayTexture" file="Interface\AddOns\MetaMap\Icons\Overlay">
+						<Size>
+							<AbsDimension	x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button	name="Info2Color0">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="TOPLEFT">
+					<Offset><AbsDimension	x="50" y="-241"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info2Color0Texture" file="Interface\AddOns\MetaMap\Icons\Color0">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo2Color(0)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info2Color1">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color0">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info2Color1Texture" file="Interface\AddOns\MetaMap\Icons\Color1">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo2Color(1)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info2Color2">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color1">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info2Color2Texture" file="Interface\AddOns\MetaMap\Icons\Color2">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo2Color(2)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info2Color3">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color2">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info2Color3Texture" file="Interface\AddOns\MetaMap\Icons\Color3">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo2Color(3)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info2Color4">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color3">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info2Color4Texture" file="Interface\AddOns\MetaMap\Icons\Color4">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo2Color(4)
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button	name="Info2Color5">
+			<Size>
+				<AbsDimension	x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color4">
+					<Offset><AbsDimension	x="21" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="Info2Color5Texture" file="Interface\AddOns\MetaMap\Icons\Color5">
+						<Size>
+							<AbsDimension	x="16" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+				</OnLoad>
+				<OnClick>
+					MetaMapNotes_Edit_SetInfo2Color(5)
+				</OnClick>
+			</Scripts>
+		</Button>
+						<Button	name="Info2Color6">
+								<Size>
+										<AbsDimension	x="16" y="16"/>
+								</Size>
+								<Anchors>
+										<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color5">
+												<Offset><AbsDimension	x="21" y="0"/></Offset>
+										</Anchor>
+								</Anchors>
+								<Layers>
+										<Layer level="BACKGROUND">
+												<Texture name="Info2Color6Texture" file="Interface\AddOns\MetaMap\Icons\Color6">
+														<Size>
+																<AbsDimension	x="16" y="16"/>
+														</Size>
+														<Anchors>
+																<Anchor	point="CENTER"/>
+														</Anchors>
+												</Texture>
+										</Layer>
+								</Layers>
+								<Scripts>
+										<OnLoad>
+												this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+										</OnLoad>
+										<OnClick>
+												MetaMapNotes_Edit_SetInfo2Color(6)
+										</OnClick>
+								</Scripts>
+						</Button>
+						<Button	name="Info2Color7">
+								<Size>
+										<AbsDimension	x="16" y="16"/>
+								</Size>
+								<Anchors>
+										<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color6">
+												<Offset><AbsDimension	x="21" y="0"/></Offset>
+										</Anchor>
+								</Anchors>
+								<Layers>
+										<Layer level="BACKGROUND">
+												<Texture name="Info2Color7Texture" file="Interface\AddOns\MetaMap\Icons\Color7">
+														<Size>
+																<AbsDimension	x="16" y="16"/>
+														</Size>
+														<Anchors>
+																<Anchor	point="CENTER"/>
+														</Anchors>
+												</Texture>
+										</Layer>
+								</Layers>
+								<Scripts>
+										<OnLoad>
+												this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+										</OnLoad>
+										<OnClick>
+												MetaMapNotes_Edit_SetInfo2Color(7)
+										</OnClick>
+								</Scripts>
+						</Button>
+						<Button	name="Info2Color8">
+								<Size>
+										<AbsDimension	x="16" y="16"/>
+								</Size>
+								<Anchors>
+										<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color7">
+												<Offset><AbsDimension	x="21" y="0"/></Offset>
+										</Anchor>
+								</Anchors>
+								<Layers>
+										<Layer level="BACKGROUND">
+												<Texture name="Info2Color8Texture" file="Interface\AddOns\MetaMap\Icons\Color8">
+														<Size>
+																<AbsDimension	x="16" y="16"/>
+														</Size>
+														<Anchors>
+																<Anchor	point="CENTER"/>
+														</Anchors>
+												</Texture>
+										</Layer>
+								</Layers>
+								<Scripts>
+										<OnLoad>
+												this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+										</OnLoad>
+										<OnClick>
+												MetaMapNotes_Edit_SetInfo2Color(8)
+										</OnClick>
+								</Scripts>
+						</Button>
+						<Button	name="Info2Color9">
+								<Size>
+										<AbsDimension	x="16" y="16"/>
+								</Size>
+								<Anchors>
+										<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="Info2Color8">
+												<Offset><AbsDimension	x="21" y="0"/></Offset>
+										</Anchor>
+								</Anchors>
+								<Layers>
+										<Layer level="BACKGROUND">
+												<Texture name="Info2Color9Texture" file="Interface\AddOns\MetaMap\Icons\Color9">
+														<Size>
+																<AbsDimension	x="16" y="16"/>
+														</Size>
+														<Anchors>
+																<Anchor	point="CENTER"/>
+														</Anchors>
+												</Texture>
+										</Layer>
+								</Layers>
+								<Scripts>
+										<OnLoad>
+												this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+										</OnLoad>
+										<OnClick>
+												MetaMapNotes_Edit_SetInfo2Color(9)
+										</OnClick>
+								</Scripts>
+						</Button>
+						<Button	name="Info2ColorOverlay">
+								<Size>
+										<AbsDimension	x="32" y="32"/>
+								</Size>
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT"	relativeTo="Info2Color0">
+												<Offset><AbsDimension	x="-3" y="3"/></Offset>
+										</Anchor>
+								</Anchors>
+								<Layers>
+										<Layer level="BACKGROUND">
+												<Texture name="Info2ColorOverlayTexture" file="Interface\AddOns\MetaMap\Icons\Overlay">
+														<Size>
+																<AbsDimension	x="32" y="32"/>
+														</Size>
+														<Anchors>
+																<Anchor	point="CENTER"/>
+														</Anchors>
+												</Texture>
+										</Layer>
+								</Layers>
+						</Button>
+				</Frames>
+				<Layers>
+						<Layer level="ARTWORK">
+								<FontString	name="MetaMapNotes_EditFrame_Title"	inherits="GameFontNormalSmall" text="METAMAPNOTES_EDIT_TITLE"	justifyH="LEFT">
+										<Size>
+												<AbsDimension	x="222"	y="16"/>
+										</Size>
+										<Anchors>
+												<Anchor	point="TOPLEFT">
+														<Offset><AbsDimension	x="22" y="-65"/></Offset>
+												</Anchor>
+										</Anchors>
+								</FontString>
+								<FontString	name="MetaMapNotes_EditFrame_Info1"	inherits="GameFontNormalSmall" text="METAMAPNOTES_EDIT_INFO1"	justifyH="LEFT">
+										<Size>
+												<AbsDimension	x="222"	y="16"/>
+										</Size>
+										<Anchors>
+												<Anchor	point="TOPLEFT">
+														<Offset><AbsDimension	x="22" y="-130"/></Offset>
+												</Anchor>
+										</Anchors>
+								</FontString>
+								<FontString	name="MetaMapNotes_EditFrame_Info2"	inherits="GameFontNormalSmall" text="METAMAPNOTES_EDIT_INFO2"	justifyH="LEFT">
+										<Size>
+												<AbsDimension	x="222"	y="16"/>
+										</Size>
+										<Anchors>
+												<Anchor	point="TOPLEFT">
+														<Offset><AbsDimension	x="22" y="-195"/></Offset>
+												</Anchor>
+										</Anchors>
+								</FontString>
+								<FontString	name="MetaMapNotes_EditFrame_Creator"	inherits="GameFontNormalSmall" text="METAMAPNOTES_EDIT_CREATOR"	justifyH="LEFT">
+										<Size>
+												<AbsDimension	x="250"	y="16"/>
+										</Size>
+										<Anchors>
+												<Anchor	point="TOPLEFT">
+														<Offset><AbsDimension	x="22" y="-260"/></Offset>
+												</Anchor>
+										</Anchors>
+								</FontString>
+						</Layer>
+				</Layers>
+				<Scripts>
+						<OnLoad>
+								this:SetBackdropColor(0,0,0,1);
+						</OnLoad>
+						<OnShow>
+							this:SetAlpha(255);
+						</OnShow>
+				</Scripts>
+		</Frame>
+
+		<!-- enable	clicking through hidden	player frame that	triggers tooltip-->
+		<Button	name="MetaMapNotes_WorldMapPlayerButton" parent="WorldMapPlayer">
+				<Size>
+						<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+						<Anchor	point="CENTER"/>
+				</Anchors>
+				<Scripts>
+						<OnLoad>
+								this:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+						</OnLoad>
+						<OnEnter>
+								WorldMapPlayer:GetScript("OnEnter")()
+						</OnEnter>
+						<OnLeave>
+								WorldMapPlayer:GetScript("OnLeave")()
+						</OnLeave>
+						<OnClick>
+								MetaMapNotes_WorldMapButton_OnClick(arg1,	WorldMapButton)
+						</OnClick>
+				</Scripts>
+		</Button>
+
+<!-- for vNote & Party	function -->
+		<Button	name="MetaMapNotesPOIvNote" inherits="WorldMapMetaMapNotesMiscTemplate" id="0"	parent="WorldMapButton"/>
+		<Button	name="MetaMapNotesPOIparty"	inherits="WorldMapMetaMapNotesMiscTemplate"	id="1" parent="WorldMapButton"/>
+
+<!-- Adds	the	MiniNote POI to	MiniMapFrame -->
+		<Button	name="MiniNotePOI" parent="Minimap"	toplevel="true">
+				<Size>
+						<AbsDimension	x="16" y="16"/>
+				</Size>
+				<Anchors>
+						<Anchor	point="CENTER" relativeTo="MinimapBackdrop"	relativePoint="TOPLEFT">
+								<Offset><AbsDimension	x="-51"	y="60"/></Offset>
+						</Anchor>
+				</Anchors>
+				<Scripts>
+						<OnLoad>
+							this:SetFrameLevel(5)
+						</OnLoad>
+						<OnUpdate>
+								MetaMapNotes_MiniNote_OnUpdate(0)
+						</OnUpdate>
+						<OnClick>
+								MetaMapNotes_MiniNote_OnClick(arg1);
+						</OnClick>
+						<OnEnter>
+							MetaMapNotes_MiniNote_OnEnter();
+						</OnEnter>
+						<OnLeave>
+							GameTooltip:Hide()
+						</OnLeave>
+				</Scripts>
+				<NormalTexture name="MiniNotePOITexture" file="Interface\AddOns\MetaMap\Icons\Icon3"/>
+		</Button>
+
+		<Frame name="MetaMapNotesSendFrame"	parent="UIParent" toplevel="true" frameStrata="FULLSCREEN" hidden="true">
+			<Size>
+				<AbsDimension	x="350"	y="180"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="CENTER"/>
+			</Anchors>
+			<Backdrop	bgFile="Interface\Tooltips\UI-Tooltip-Background"	edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+				<BackgroundInsets>
+					<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+				</BackgroundInsets>
+				<TileSize>
+					<AbsValue	val="32"/>
+				</TileSize>
+				<EdgeSize>
+					<AbsValue	val="32"/>
+				</EdgeSize>
+			</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="MetaMapNotesSendHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+							<Size>
+								<AbsDimension	x="256"	y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOP">
+									<Offset><AbsDimension	x="0"	y="12"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<FontString	inherits="GameFontNormal"	text="METAMAPNOTES_SEND_MENU">
+							<Anchors>
+								<Anchor	point="TOP"	relativeTo="MetaMapNotesSendHeader">
+									<Offset><AbsDimension	x="0"	y="-14"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button	name="MetaMapNotesSendPlayer"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_SENDTOPLAYER">
+						<Size>
+							<AbsDimension	x="100"	y="20"/>
+						</Size>
+							<Anchors>
+								<Anchor	point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+									<Offset><AbsDimension	x="15"	y="45"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnClick>
+									PlaySound("igMainMenuOption")
+									MetaMapNotes_SendNote(1)
+								</OnClick>
+							</Scripts>
+						</Button>
+						<Button	name="MetaMapNotesSendParty" inherits="UIPanelButtonTemplate2"	text="METAMAPNOTES_SENDTOPARTY">
+							<Size>
+								<AbsDimension	x="100"	y="20"/>
+							</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="MetaMapNotesSendPlayer">
+										<Offset><AbsDimension	x="10" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										PlaySound("igMainMenuOption")
+										MetaMapNotes_SendNote(2)
+										</OnClick>
+								</Scripts>
+							</Button>
+					<Button	name="MetaMapNotesChangeSendFrame" inherits="UIPanelButtonTemplate2"	text="METAMAPNOTES_SLASHCOMMAND">
+						<Size>
+							<AbsDimension	x="100"	y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="MetaMapNotesSendParty">
+								<Offset><AbsDimension	x="10" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOption")
+								MetaMapNotes_ShowSendFrame(MetaMapNotes_ToggleSendValue)
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button	name="$parentCancel" inherits="UIPanelButtonTemplate2" text="METAMAP_CLOSE_BUTTON">
+						<Size>
+							<AbsDimension	x="100"	y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="TOP" relativePoint="BOTTOM" relativeTo="MetaMapNotesSendParty">
+								<Offset><AbsDimension	x="0" y="-10"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOption");
+								this:GetParent():Hide();
+								MetaMapNotesDeletePartyNote:Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+						<Button	name="MetaMapNotesDeletePartyNote"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_DELETE_NOTE">
+							<Size>
+								<AbsDimension	x="100"	y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOP" relativePoint="BOTTOM" relativeTo="MetaMapNotesChangeSendFrame">
+									<Offset><AbsDimension	x="0" y="-10"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnClick>
+									PlaySound("igMainMenuOption");
+									MetaMapNotes_ClearMiniNote(false);
+								</OnClick>
+							</Scripts>
+						</Button>
+						<EditBox name="SendWideEditBox"	historyLines="0" letters="255">
+							<Size>
+								<AbsDimension	x="300"	y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOPLEFT">
+									<Offset><AbsDimension	x="24" y="-63"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Layers>
+								<Layer level="BACKGROUND">
+									<Texture name="TitleLeft"	file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+										<Size>
+											<AbsDimension	x="256"	y="32"/>
+										</Size>
+										<Anchors>
+											<Anchor	point="LEFT">
+												<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+											</Anchor>
+										</Anchors>
+										<TexCoords left="0"	right="1.0"	top="0"	bottom="1.0"/>
+									</Texture>
+									<Texture name="TitleRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+										<Size>
+											<AbsDimension	x="75" y="32"/>
+										</Size>
+										<Anchors>
+											<Anchor	point="RIGHT">
+												<Offset><AbsDimension	x="10" y="0"/></Offset>
+											</Anchor>
+										</Anchors>
+										<TexCoords left="0.70703125" right="1.0" top="0" bottom="1.0"/>
+									</Texture>
+									<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+										<Size>
+											<AbsDimension	x="5"	y="32"/>
+										</Size>
+										<Anchors>
+											<Anchor	point="LEFT" relativeTo="TitleLeft"	relativePoint="RIGHT">
+												<Offset><AbsDimension	x="0"	y="0"/></Offset>
+											</Anchor>
+											<Anchor	point="RIGHT"	relativeTo="TitleRight"	relativePoint="LEFT">
+												<Offset><AbsDimension	x="0"	y="0"/></Offset>
+											</Anchor>
+										</Anchors>
+										<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+									</Texture>
+								</Layer>
+							</Layers>
+							<Scripts>
+								<OnLoad>
+									SendWideEditBox:SetText("")
+								</OnLoad>
+								<OnEscapePressed>
+									this:GetParent():Hide();
+								</OnEscapePressed>
+							</Scripts>
+							<FontString	inherits="ChatFontNormal"/>
+						</EditBox>
+				</Frames>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString	name="MetaMapNotes_SendFrame_Title"	inherits="GameFontNormal"	text="METAMAPNOTES_SEND_NOTE" justifyH="LEFT">
+							<Size>
+								<AbsDimension	x="222"	y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOPLEFT">
+									<Offset><AbsDimension	x="22" y="-22"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString	name="MetaMapNotes_SendFrame_Tip"	inherits="GameFontNormalSmall" text="METAMAPNOTES_SEND_TIP"	justifyH="LEFT">
+							<Size>
+								<AbsDimension	x="340"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOPLEFT">
+									<Offset><AbsDimension	x="22" y="-36"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="0.59"	g="0.49" b="0.1"/>
+						</FontString>
+						<FontString	name="MetaMapNotes_SendFrame_Player" inherits="GameFontNormalSmall"	text="METAMAPNOTES_SEND_PLAYER"	justifyH="LEFT">
+							<Size>
+								<AbsDimension	x="222"	y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOPLEFT">
+									<Offset><AbsDimension	x="22" y="-65"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						MetaMapNotes_OnLoad();
+						this:SetBackdropColor(0,0,0,1);
+						this:SetAlpha(255);
+					</OnLoad>
+					<OnShow>
+						this:SetAlpha(255);
+					</OnShow>
+					<OnHide>
+						MetaMapNotes_PartyNoteSet = false;
+					</OnHide>
+				</Scripts>
+		</Frame>
+
+	<Frame name="MetaMapNotes_QuickNoteFrame"	parent="UIParent"	toplevel="true" frameStrata="FULLSCREEN" hidden="true">
+		<Size>
+			<AbsDimension	x="450"	y="210"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Backdrop	bgFile="Interface\Tooltips\UI-Tooltip-Background"	edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="11"	right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="MetaMapNotes_QuickNoteHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension	x="256"	y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset><AbsDimension	x="0"	y="12"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString	inherits="GameFontNormal"	text="METAMAPNOTES_QUICKNOTE_DEFAULTNAME">
+					<Anchors>
+						<Anchor	point="TOP"	relativeTo="MetaMapNotes_QuickNoteHeader">
+							<Offset><AbsDimension	x="0"	y="-14"/></Offset>
+						</Anchor>
+					</Anchors>
+					</FontString>
+						<FontString	name="MetaMapNotes_QuickNote_Title"	inherits="GameFontNormal"	text="METAMAPNOTES_QUICKNOTE_DEFAULTNAME"	justifyH="LEFT">
+							<Size>
+								<AbsDimension	x="75" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="TOPLEFT">
+									<Offset><AbsDimension	x="22" y="-25"/></Offset>
+								</Anchor>
+							</Anchors>
+							</FontString>
+							<FontString	name="MetaMapNotes_QuickNote_Tip"	inherits="GameFontNormalSmall" text="METAMAPNOTES_CHAT_COMMAND_QUICKNOTE"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="300"	y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="MetaMapNotes_QuickNote_Title" relativePoint="RIGHT">
+										<Offset><AbsDimension	x="10" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Color r="0.59"	g="0.49" b="0.1"/>
+							</FontString>
+							<FontString	name="MetaMapNotes_vNote_Title" inherits="GameFontNormal" text="METAMAPNOTES_VNOTE_DEFAULTNAME"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="75" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset><AbsDimension	x="22" y="-45"/></Offset>
+									</Anchor>
+								</Anchors>
+							</FontString>
+							<FontString	name="MetaMapNotes_vNote_Tip" inherits="GameFontNormalSmall"	text="METAMAPNOTES_VNOTE_INFO"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="300"	y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="MetaMapNotes_vNote_Title"	relativePoint="RIGHT">
+										<Offset><AbsDimension	x="10" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Color r="0.59"	g="0.49" b="0.1"/>
+							</FontString>
+							<FontString	name="MetaMapNotes_MiniNote_Title" inherits="GameFontNormal" text="METAMAPNOTES_MININOTE_DEFAULTNAME"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="75" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset><AbsDimension	x="22" y="-65"/></Offset>
+									</Anchor>
+								</Anchors>
+							</FontString>
+							<FontString	name="MetaMapNotes_MiniNote_Tip" inherits="GameFontNormalSmall"	text="METAMAPNOTES_MININOTE_INFO"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="300"	y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="MetaMapNotes_MiniNote_Title"	relativePoint="RIGHT">
+										<Offset><AbsDimension	x="10" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Color r="0.59"	g="0.49" b="0.1"/>
+							</FontString>
+							<FontString	name="MetaMapNotes_QuickNote_EditTitle"	inherits="GameFontNormalSmall" text="METAMAPNOTES_EDIT_TITLE"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="222"	y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset><AbsDimension	x="22" y="-97"/></Offset>
+									</Anchor>
+								</Anchors>
+							</FontString>
+							<FontString	name="MetaMapNotes_QuickNote_Coords" inherits="GameFontNormalSmall"	text="METAMAPNOTES_SETCOORDS"	justifyH="LEFT">
+								<Size>
+									<AbsDimension	x="222"	y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset><AbsDimension	x="300"	y="-97"/></Offset>
+									</Anchor>
+								</Anchors>
+							</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton name="MiniNote_CheckButton" inherits="MetaMap_CheckButtonTemplate">
+						<Size>
+							<AbsDimension	x="24" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT"	relativePoint="TOPLEFT">
+								<Offset><AbsDimension	x="30" y="-145"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString	inherits="GameFontNormalSmall" text="+MiniNote">
+									<Anchors>
+										<Anchor	point="LEFT">
+											<Offset><AbsDimension	x="20" y="1"/></Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								MetaMapNotes_NextMiniNote("on");
+							</OnClick> 
+						</Scripts>
+					</CheckButton>
+					<Button	name="QuickNote_Button"	inherits="UIPanelButtonTemplate2" text="METAMAPNOTES_QUICKNOTE_DEFAULTNAME">
+						<Size>
+							<AbsDimension	x="80" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+								<Offset><AbsDimension	x="35" y="20"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOption");
+								MetaMapNotes_SetQuickNote(1);
+								this:GetParent():Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button	name="MiniNote_Button" inherits="UIPanelButtonTemplate2"	text="METAMAPNOTES_MININOTE_DEFAULTNAME">
+						<Size>
+							<AbsDimension	x="80" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="QuickNote_Button">
+								<Offset><AbsDimension	x="20" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOption")
+								MetaMapNotes_NextMiniNoteOnly("on")
+								MetaMapNotes_SetQuickNote(1);
+								this:GetParent():Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button	name="vNote_Button" inherits="UIPanelButtonTemplate2"	text="METAMAPNOTES_VNOTE">
+						<Size>
+							<AbsDimension	x="80" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="MiniNote_Button">
+								<Offset><AbsDimension	x="20" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOption")
+								MetaMapNotes_SetQuickNote(2);
+								this:GetParent():Hide();
+							</OnClick>
+						</Scripts>
+						</Button>
+						<Button	name="$parentCancel" inherits="UIPanelButtonTemplate2" text="METAMAP_CLOSE_BUTTON">
+						<Size>
+							<AbsDimension	x="80" y="20"/>
+						</Size>
+							<Anchors>
+								<Anchor	point="LEFT" relativePoint="RIGHT" relativeTo="vNote_Button">
+									<Offset><AbsDimension	x="20" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnClick>
+									PlaySound("igMainMenuOption")
+									this:GetParent():Hide()
+								</OnClick>
+							</Scripts>
+						</Button>
+						<EditBox name="Note_EditBox" autoFocus="true" historyLines="0">
+								<Size>
+										<AbsDimension	x="250"	y="64"/>
+								</Size>
+								<Anchors>
+										<Anchor	point="TOPLEFT">
+												<Offset><AbsDimension	x="30" y="-95"/></Offset>
+										</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="Title_Left" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension	x="256"	y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor	point="LEFT">
+													<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0"	right="1.0"	top="0"	bottom="1.0"/>
+											</Texture>
+												<Texture name="Title_Right"	file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+													<Size>
+														<AbsDimension	x="75" y="32"/>
+													</Size>
+													<Anchors>
+														<Anchor	point="RIGHT">
+															<Offset><AbsDimension	x="10" y="0"/></Offset>
+														</Anchor>
+													</Anchors>
+													<TexCoords left="0.70703125" right="1.0" top="0" bottom="1.0"/>
+												</Texture>
+												<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+														<Size>
+																<AbsDimension	x="5"	y="32"/>
+														</Size>
+														<Anchors>
+																<Anchor	point="LEFT" relativeTo="Title_Left" relativePoint="RIGHT">
+																		<Offset><AbsDimension	x="0"	y="0"/></Offset>
+																</Anchor>
+																<Anchor	point="RIGHT"	relativeTo="Title_Right" relativePoint="LEFT">
+																		<Offset><AbsDimension	x="0"	y="0"/></Offset>
+																</Anchor>
+														</Anchors>
+														<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+												</Texture>
+										</Layer>
+								</Layers>
+								<FontString	inherits="ChatFontNormal"/>
+								<Scripts>
+									<OnShow>
+										this:SetBackdropColor(0,0,0,1);
+										this:SetAlpha(255);
+										this:SetText("");
+								</OnShow>
+								<OnEscapePressed>
+									this:GetParent():Hide();
+								</OnEscapePressed>
+								<OnEnterPressed>
+									MetaMapNotes_SetQuickNote(1);
+									this:GetParent():Hide();
+								</OnEnterPressed>
+							</Scripts>
+						</EditBox>
+					<EditBox name="Coords_EditBox" autoFocus="false" historyLines="0"	letters="5">
+						<Size>
+							<AbsDimension	x="100"	y="64"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset><AbsDimension	x="310"	y="-95"/></Offset>
+							</Anchor>
+						</Anchors>
+					<Layers>
+						<Layer level="BACKGROUND">
+							<Texture name="CoordsLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+								<Size>
+									<AbsDimension	x="100"	y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT">
+										<Offset><AbsDimension	x="-10"	y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<TexCoords left="0"	right="1.0"	top="0"	bottom="1.0"/>
+							</Texture>
+							<Texture name="CoordsRight"	file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+								<Size>
+									<AbsDimension	x="55" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="RIGHT">
+										<Offset><AbsDimension	x="10" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<TexCoords left="0.70703125" right="1.0" top="0" bottom="1.0"/>
+							</Texture>
+							<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+								<Size>
+									<AbsDimension	x="5"	y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="CoordsLeft" relativePoint="RIGHT">
+										<Offset><AbsDimension	x="0"	y="0"/></Offset>
+									</Anchor>
+									<Anchor	point="RIGHT"	relativeTo="CoordsRight" relativePoint="LEFT">
+										<Offset><AbsDimension	x="0"	y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+							</Texture>
+						</Layer>
+					</Layers>
+					<FontString	inherits="ChatFontNormal"/>
+				</EditBox>
+			</Frames>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0,0,0,1);
+					this:SetAlpha(255);
+				</OnLoad>
+				<OnShow>
+					MetaMapNotes_QuickNoteShow();
+				</OnShow>
+				<OnHide>
+					MetaMapNotes_Qnote = false;
+				</OnHide>
+			</Scripts>
+		</Frame>
+
+		<Frame name="MetaMap_MapListFrame" hidden="true" parent="WorldMapFrame">
+			<Size><AbsDimension	x="200"	y="350"/></Size>
+				 <Anchors>
+					 <Anchor point="TOPRIGHT"	relativeTo="WorldMapDetailFrame"	relativePoint="TOPRIGHT">
+				 <Offset><AbsDimension x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Backdrop	bgFile="Interface\RaidFrame\UI-RaidFrame-GroupBg" tile="true">
+				<BackgroundInsets>
+					<AbsInset	left="0" right="0" top="0" bottom="0"/>
+				</BackgroundInsets>
+				<TileSize>
+					<AbsValue	val="32"/>
+				</TileSize>
+			</Backdrop>
+			<Scripts>
+				<OnLoad>
+					MetaMapList_OnLoad();
+				</OnLoad>
+			</Scripts>
+		<Frames>
+		<Button	name="MetaMapList_Header" text="METAMAPLIST_SORTED">
+			<Size>
+				<AbsDimension	x="200" y="35"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="TOP">
+					<Offset><AbsDimension	x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentMiddle"	file="Interface\Buttons\UI-Panel-Button-Up"	alphaMode="ADD"	virtual="true">
+						<TexCoords left="0.09375"	right="0.53125"	top="0"	bottom="0.6875"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+				</OnLoad>
+				<OnClick>
+					PlaySound("igMainMenuOptionCheckBoxOn");
+					MetaMapOptions.SortList = not MetaMapOptions.SortList;
+					MetaMapList_Init();
+				</OnClick>
+			</Scripts>
+			<NormalFont	name="$parentText" inherits="GameFontNormal"/>
+			<HighlightFont inherits="GameFontHighlight"/>
+		</Button>
+		<Button	name="MetaMapList_Footer">
+			<Size>
+				<AbsDimension	x="200" y="60"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="BOTTOM">
+					<Offset><AbsDimension	x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString	name="MetaMapList_InfoText" inherits="GameFontDisable" text="METAMAP_MAPLIST_INFO"	justifyH="LEFT">
+						<Anchors>
+							<Anchor	point="CENTER">
+								<Offset><AbsDimension	x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Frames>
+				<Button	name="MetaMapList_PlayerButton"	inherits="MetaMapList_ScrollFrameButtonTemplate" hidden="false"	id="0">
+					<Anchors>
+						<Anchor	point="CENTER">
+							<Offset><AbsDimension	x="0"	y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							this:SetFrameLevel(this:GetParent():GetFrameLevel()+3);
+						</OnLoad>
+						<OnClick>
+							MetaMapList_OnClick(arg1, this:GetID());
+						</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."Highlight"):Show();
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."Highlight"):Hide();
+					</OnLeave>
+					</Scripts>
+				</Button>
+			</Frames>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentMiddle"	file="Interface\Buttons\UI-Panel-Button-Up"	alphaMode="ADD"	virtual="true">
+						<TexCoords left="0.09375"	right="0.53125"	top="0"	bottom="0.6875"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<ScrollFrame name="MetaMapList_ScrollFrame"	inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension	x="180"	y="350"/>
+			</Size>
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativeTo="MetaMap_MapListFrame">
+					<Offset><AbsDimension	x="0"	y="-35"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow>
+					this:SetHeight(this:GetParent():GetHeight()-90);
+				</OnShow>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(METAMAPLIST_SCROLL_FRAME_BUTTON_HEIGHT,	MetaMapList_UpdateScroll)
+				</OnVerticalScroll>
+			</Scripts>
+			<FontString	inherits="MetaMap_FontStringTemplate"	justifyH="LEFT"/>
+			<Scripts>
+				<OnLoad>
+					this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+				</OnLoad>
+			</Scripts>
+		</ScrollFrame>
+		<Button	name="MetaMapList_ScrollFrameButton1"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="1" hidden="true">
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativeTo="MetaMap_MapListFrame">
+					<Offset><AbsDimension	x="15" y="-35"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button	name="MetaMapList_ScrollFrameButton2"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="2" hidden="true">
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton1"	relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension	x="0"	y="1"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button	name="MetaMapList_ScrollFrameButton3"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="3" hidden="true">
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton2"	relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension	x="0"	y="1"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button	name="MetaMapList_ScrollFrameButton4"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="4" hidden="true">
+			<Anchors>
+				<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton3"	relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension	x="0"	y="1"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button	name="MetaMapList_ScrollFrameButton5"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="5" hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton4"	relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton6"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="6" hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton5"	relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton7"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="7" hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton6"	relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton8"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="8" hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton7"	relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton9"	inherits="MetaMapList_ScrollFrameButtonTemplate"	id="9" hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton8"	relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton10" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="10"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton9"	relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton11" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="11"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton10" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton12" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="12"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton11" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton13" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="13"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton12" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton14" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="14"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton13" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton15" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="15"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton14" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton16" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="16"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton15" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton17" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="17"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton16" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton18" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="18"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton17" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton19" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="19"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton18" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton20" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="20"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton19" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton21" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="21"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton20" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton22" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="22"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton21" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton23" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="23"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton22" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton24" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="24"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton23" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton25" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="25"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton24" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton26" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="26"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton25" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton27" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="27"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton26" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton28" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="28"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton27" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton29" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="29"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton28" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+						<Button	name="MetaMapList_ScrollFrameButton30" inherits="MetaMapList_ScrollFrameButtonTemplate"	id="30"	hidden="true">
+								<Anchors>
+										<Anchor	point="TOPLEFT"	relativeTo="MetaMapList_ScrollFrameButton29" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension	x="0"	y="1"/></Offset>
+										</Anchor>
+								</Anchors>
+						</Button>
+				</Frames>
+		</Frame>
+
+	<Frame name="X_Frame"	hidden="true">
+		<Scripts>
+			<OnKeyUp>
+				if(arg1	== GetBindingKey("METAMAP_FSTOGGLE") or	arg1 ==	GetBindingKey("METAMAP_SAVESET"))	then
+					MetaMap_FullScreenToggle();
+				end
+			</OnKeyUp>
+			<OnMouseDown>
+				if(arg1	== "LeftButton")	then
+					this:StartMoving();
+				end
+					this.isMoving	=	true;
+			</OnMouseDown>
+			<OnMouseUp>
+				if(this.isMoving) then
+					this:StopMovingOrSizing();
+					this.isMoving	=	false;
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MetaMapContainerFrame" parent="WorldMapFrame"	enableMouse="true" toplevel="true" hidden="true">
+		<Anchors>
+			<Anchor	point="BOTTOMLEFT"	relativeTo="WorldMapButton" relativePoint="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension	x="0"	y="-4"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="MetaMapContainer_InfoText" inherits="GameFontHighlightLarge" hidden="true" text="">
+					<Anchors>
+						<Anchor	point="CENTER">
+							<Offset>
+								<AbsDimension	x="0"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button	name="MetaMapContainer_Header">
+				<Anchors>
+					<Anchor	point="TOP">
+						<Offset><AbsDimension	x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString	name="MetaMapContainer_HeaderText" toplevel="true" inherits="GameFontNormalLarge"	text="">
+							<Anchors>
+								<Anchor	point="CENTER">
+									<Offset>
+										<AbsDimension	x="0"	y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString	name="MetaMapContainer_InfoText" inherits="GameFontHighlightLarge" hidden="true"	text="">
+							<Anchors>
+								<Anchor	point="BOTTOM">
+									<Offset>
+										<AbsDimension	x="0"	y="-100"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentMiddle"	file="Interface\Buttons\UI-Panel-Button-Up"	alphaMode="ADD"	virtual="true">
+							<TexCoords left="0.09375"	right="0.53125"	top="0"	bottom="0.6875"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+					</OnLoad>
+					<OnShow>
+						this:SetWidth(this:GetParent():GetWidth());
+						this:SetHeight(40);
+					</OnShow>
+				</Scripts>
+			</Button>
+			<Button	name="MetaMapContainer_Footer">
+				<Anchors>
+					<Anchor	point="BOTTOM">
+						<Offset><AbsDimension	x="0" y="4"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString	name="MetaMapContainer_FooterText" inherits="GameFontDisable" hidden="true" text="">
+							<Anchors>
+								<Anchor	point="CENTER">
+									<Offset>
+										<AbsDimension	x="0"	y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentMiddle"	file="Interface\Buttons\UI-Panel-Button-Up"	alphaMode="ADD"	virtual="true">
+							<TexCoords left="0.09375"	right="0.53125"	top="0"	bottom="0.6875"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button	name="MetaMapContainer_CloseButton" inherits="UIPanelButtonTemplate2" toplevel="true" text="METAMAP_CLOSE_BUTTON">
+						<Size><AbsDimension	x="80" y="24"/></Size>
+							<Anchors>
+								<Anchor	point="RIGHT">
+									<Offset><AbsDimension	x="-30"	y="-4" /></Offset>
+								</Anchor>
+							</Anchors>
+							<Scripts>
+								<OnLoad>
+									this:SetFrameLevel(this:GetParent():GetFrameLevel()+3);
+								</OnLoad>
+								<OnClick>
+									MetaMapContainerFrame:Hide();
+								</OnClick>
+							</Scripts>
+						</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+					</OnLoad>
+					<OnShow>
+						this:SetWidth(this:GetParent():GetWidth());
+						this:SetHeight(60);
+					</OnShow>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				MetaMapContainerFrame_OnLoad();
+			</OnLoad>
+			<OnShow>
+				PlaySoundFile("Sound\\interface\\iQuestLogOpenA.wav");
+			</OnShow>
+			<OnHide>
+				PlaySoundFile("Sound\\interface\\iQuestLogCloseA.wav");
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Button	name="MetaMap_InfoLineButton" parent="WorldMapFrame" toplevel="true" text="">
+		<Size>
+			<AbsDimension	x="32" y="46"/>
+		</Size>
+		<Anchors>
+			<Anchor	point="LEFT" relativeTo="MetaMap_OptionsButton" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension	x="10"	y="8"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+				this:SetFrameLevel(MetaMapList_Header:GetFrameLevel()+2);
+			</OnLoad>
+			<OnClick>
+				MetaMap_InfoLine(arg1);
+			</OnClick>
+			<OnEnter>
+				MetaMap_InfoLineOnEnter();
+			</OnEnter>
+			<OnLeave>
+				WorldMapTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-MicroButton-Help-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-MicroButton-Help-Down"/>
+		<HighlightTexture	alphaMode="ADD"	file="Interface\Buttons\UI-MicroButton-Hilight"/>
+	</Button>
+
+	<Frame name="MetaMap_InfoLineFrame"	hidden="true" parent="MetaMapContainerFrame">
+		<Anchors>
+			<Anchor	point="CENTER"/>
+		</Anchors>
+		<Backdrop	bgFile="Interface\DialogFrame\UI-DialogBox-Background"	tile="true">
+			<BackgroundInsets>
+				<AbsInset	left="0"	right="0" top="0"	bottom="0"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue	val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="$parentText" inherits="GameFontHighlightLarge" text="">
+					<Anchors>
+						<Anchor	point="CENTER">
+							<Offset>
+								<AbsDimension	x="0"	y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>
+				this:SetWidth(this:GetParent():GetWidth());
+				this:SetHeight(this:GetParent():GetHeight());
+				MetaMap_InfoLineFrameText:SetWidth(this:GetWidth() -200);
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

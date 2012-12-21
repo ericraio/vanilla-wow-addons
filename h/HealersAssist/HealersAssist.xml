@@ -1,0 +1,1048 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="HA_BS_localization.lua"/> 
+  <Script file="HA_BonusScanner.lua"/> 
+  <Script file="HA_plugins.lua"/> 
+  <Script file="HA_spells.lua"/> 
+  <Script file="gui_localization.lua"/> 
+  <Script file="localization.lua"/> 
+  <Script file="HA_chronos.lua"/> 
+  <Script file="HA_regexpr.lua"/> 
+  <Script file="HA_gui.lua"/> 
+  <Script file="HA_comm.lua"/> 
+  <Script file="HealersAssist.lua"/> 
+
+  <GameTooltip name="HealersAssistTooltip" parent="UIParent" inherits="GameTooltipTemplate" hidden="true"/>
+
+    <Frame name="HASystemFrame" frameStrata="LOW" enableMouse="false" hidden="false">
+            <Scripts>
+                    <OnLoad>
+                            HASystem_OnLoad();
+                    </OnLoad>
+                    <OnUpdate>
+                            HASystem_OnUpdate(arg1);
+                    </OnUpdate>
+                    <OnEvent>
+                            HASystem_OnEvent(event);
+                    </OnEvent>
+            </Scripts>
+    </Frame>
+
+  <Button name="HAColumnHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="10" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="5" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="53" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="4" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			HAHeader_SortByName(this.sortType);
+		</OnClick>
+	</Scripts>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+  </Button>
+
+  <Button name="HAItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="260" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parentState" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="CENTER">
+				<Size>
+					<AbsDimension x="58" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="71" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<StatusBar name="$parentMPBar" inherits="TextStatusBar">
+			<Size>
+				<AbsDimension x="68" y="14"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetMinMaxValues(0, 100);
+				</OnLoad>
+			</Scripts>
+			<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			<BarColor r="0.1" g="0.1" b="0.9"/>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="68" y="14"/>
+						</Size>
+					</FontString>
+				</Layer>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentBG" file="Interface\TargetingFrame\UI-StatusBar">
+						<Size>
+							<AbsDimension x="68" y="12"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</StatusBar>
+		<StatusBar name="$parentHPBar" inherits="TextStatusBar">
+			<Size>
+				<AbsDimension x="68" y="14"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentMPBar" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="62" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetMinMaxValues(0, 100);
+				</OnLoad>
+			</Scripts>
+			<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			<BarColor r="0" g="1" b="0"/>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="CENTER">
+						<Size>
+							<AbsDimension x="68" y="14"/>
+						</Size>
+					</FontString>
+				</Layer>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentBG" file="Interface\TargetingFrame\UI-StatusBar">
+						<Size>
+							<AbsDimension x="68" y="12"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</StatusBar>
+		<StatusBar name="$parentCTBar" inherits="TextStatusBar">
+			<Size>
+				<AbsDimension x="58" y="10"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHPBar" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetMinMaxValues(0, 100);
+				</OnLoad>
+			</Scripts>
+			<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			<BarColor r="1.0" g="0.7" b="0.2"/>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="CENTER">
+						<Size>
+							<AbsDimension x="58" y="14"/>
+						</Size>
+					</FontString>
+				</Layer>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentBG" file="Interface\TargetingFrame\UI-StatusBar">
+						<Size>
+							<AbsDimension x="58" y="10"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</StatusBar>
+		<Button name="$parentClassSpecific1">
+			<Size>
+				<AbsDimension x="14" y="14"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentMPBar" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-6" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture">
+						<Size>
+							<AbsDimension x="14" y="14"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(not this.isdead)
+					then
+						HA_GUI_ClassSpecificClick(this.ispell,this.me,this.cooldown);
+					end
+				</OnClick>
+				<OnEnter>
+					HA_GUI_ClassSpecificTooltip(this.spell,this.from,this.cooldown);
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+			</Scripts>
+		</Button>
+		<Button name="$parentClassSpecific2">
+			<Size>
+				<AbsDimension x="14" y="14"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentClassSpecific1" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-4" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture">
+						<Size>
+							<AbsDimension x="14" y="14"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(not this.isdead)
+					then
+						HA_GUI_ClassSpecificClick(this.ispell,this.me,this.cooldown);
+					end
+				</OnClick>
+				<OnEnter>
+					HA_GUI_ClassSpecificTooltip(this.spell,this.from,this.cooldown);
+				</OnEnter>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+			</Scripts>
+		</Button>
+                      <Frame name="$parentClick" setAllPoints="true">
+                              <Size>
+                                      <AbsDimension x="260" y="16"/>
+                              </Size>
+                              <Anchors>
+                                      <Anchor point="TOPLEFT"/>
+                              </Anchors>
+                              <Frames>
+                                      <Button name="$parentFrame">
+                                              <Size>
+                                                      <AbsDimension x="260" y="16"/>
+                                              </Size>
+                                              <Anchors>
+                                                      <Anchor point="TOPLEFT"/>
+                                              </Anchors>
+                                              <Scripts>
+                                                      <OnLoad>
+                                                              this:RegisterForClicks("LeftButtonDown", "RightButtonDown", "MiddleButtonDown", "Button4Down", "Button5Down");
+                                                      </OnLoad>
+                                                      <OnClick>
+                                                              local stopDefaultBehaviour;
+                                                              if ( type(HA_CustomOnClickFunction) == "function" ) then
+                                                                      stopDefaultBehaviour = HA_CustomOnClickFunction(arg1, this.unitid);
+                                                              end
+                                                              if ( not stopDefaultBehaviour ) then
+                                                                      if ( SpellIsTargeting() ) then
+                                                                              SpellTargetUnit(this.unitid);
+                                                                      else
+                                                                              TargetUnit(this.unitid);
+                                                                      end
+                                                              end
+                                                      </OnClick>
+                                              </Scripts>
+                                      </Button>
+                              </Frames>
+                      </Frame>
+	</Frames>
+ 	<Scripts>
+		<OnLoad>
+			getglobal(this:GetName() .. "HPBarText"):SetVertexColor(1.0, 1.0, 1.0, 0.8);
+			getglobal(this:GetName() .. "MPBarBG"):SetVertexColor(0, 0, 1, 0.2);
+			getglobal(this:GetName() .. "HPBarBG"):SetVertexColor(0, 1, 0, 0.3);
+			getglobal(this:GetName() .. "CTBarBG"):SetVertexColor(1.0, 0.7, 0.2, 0.3);
+		</OnLoad>
+	</Scripts>
+  </Button>
+
+  <Button name="HAItemEmergencyTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="260" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="CENTER">
+				<Size>
+					<AbsDimension x="68" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="1" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentCount" inherits="GameFontHighlightSmall" justifyH="CENTER" justifyV="CENTER">
+				<Size>
+					<AbsDimension x="58" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="141" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentTotal" inherits="GameFontHighlightSmall" justifyH="CENTER" justifyV="CENTER">
+				<Size>
+					<AbsDimension x="58" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="201" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<StatusBar name="$parentHPBar" inherits="TextStatusBar">
+			<Size>
+				<AbsDimension x="68" y="14"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="71" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetMinMaxValues(0, 100);
+				</OnLoad>
+			</Scripts>
+			<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			<BarColor r="0" g="1" b="0"/>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER">
+						<Size>
+							<AbsDimension x="68" y="14"/>
+						</Size>
+					</FontString>
+				</Layer>
+				<Layer level="BACKGROUND">
+					<Texture name="$parentBG" file="Interface\TargetingFrame\UI-StatusBar">
+						<Size>
+							<AbsDimension x="68" y="12"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</StatusBar>
+		<Button name="$parentOvertime1">
+			<Size>
+				<AbsDimension x="8" y="8"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentName" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-1" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture">
+						<Size>
+							<AbsDimension x="8" y="8"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button name="$parentOvertime2">
+			<Size>
+				<AbsDimension x="8" y="8"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentOvertime1" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-1" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture">
+						<Size>
+							<AbsDimension x="8" y="8"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button name="$parentOvertime3">
+			<Size>
+				<AbsDimension x="8" y="8"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentOvertime2" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-1" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture">
+						<Size>
+							<AbsDimension x="8" y="8"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button name="$parentOvertime4">
+			<Size>
+				<AbsDimension x="8" y="8"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentOvertime3" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="-1" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parentTexture">
+						<Size>
+							<AbsDimension x="8" y="8"/>
+						</Size>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Button>
+                      <Frame name="$parentClick" setAllPoints="true">
+                              <Size>
+                                      <AbsDimension x="260" y="16"/>
+                              </Size>
+                              <Anchors>
+                                      <Anchor point="TOPLEFT"/>
+                              </Anchors>
+                              <Frames>
+                                      <Button name="$parentFrame">
+                                              <Size>
+                                                      <AbsDimension x="260" y="16"/>
+                                              </Size>
+                                              <Anchors>
+                                                      <Anchor point="TOPLEFT"/>
+                                              </Anchors>
+                                              <Scripts>
+                                                      <OnLoad>
+                                                              this:RegisterForClicks("LeftButtonDown", "RightButtonDown", "MiddleButtonDown", "Button4Down", "Button5Down");
+                                                      </OnLoad>
+                                                      <OnClick>
+                                                              local stopDefaultBehaviour;
+                                                              if ( type(HA_CustomOnClickFunction) == "function" ) then
+                                                                      stopDefaultBehaviour = HA_CustomOnClickFunction(arg1, this.unitid);
+                                                              end
+                                                              if ( not stopDefaultBehaviour ) then
+                                                                      if ( SpellIsTargeting() ) then
+                                                                              SpellTargetUnit(this.unitid);
+                                                                      else
+                                                                              TargetUnit(this.unitid);
+                                                                      end
+                                                              end
+                                                      </OnClick>
+                                              </Scripts>
+                                      </Button>
+                              </Frames>
+                      </Frame>
+	</Frames>
+ 	<Scripts>
+		<OnLoad>
+			getglobal(this:GetName() .. "HPBarText"):SetVertexColor(1.0, 1.0, 1.0, 0.9);
+			getglobal(this:GetName() .. "HPBarBG"):SetVertexColor(0, 1, 0, 0.3);
+		</OnLoad>
+	</Scripts>
+</Button>
+
+
+  <Frame name="HealersAssistMainFrame" frameStrata="MEDIUM" parent="UIParent" hidden="true" toplevel="true" enableMouse="true" movable="true">
+    <Size>
+      <AbsDimension x="330" y="32"/>
+    </Size>
+    <Anchors>
+      <Anchor point="TOPLEFT">
+        <Offset>
+          <AbsDimension x="100" y="-104"/>
+        </Offset>
+      </Anchor>
+    </Anchors>
+    <Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize>
+        <AbsValue val="16"/>
+      </EdgeSize>
+      <TileSize>
+        <AbsValue val="16"/>
+      </TileSize>
+      <BackgroundInsets>
+        <AbsInset left="3" right="5" top="3" bottom="5"/>
+      </BackgroundInsets>
+    </Backdrop>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="HealersAssistTitle" inherits="GameFontNormal" text="HA title">
+          <Anchors>
+            <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+              <Offset>
+                <AbsDimension x="10" y="-6"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+	<Frames>
+		<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="2" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<CheckButton name="$parentCollapseHealers">
+			<Size>
+				<AbsDimension x="16" y="16" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-90" y="-6" />
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer>
+					<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="HA_GUI_COLLAPSE">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontHeight>
+							<AbsValue val="10" />
+						</FontHeight>
+						<Color r="0.8" g="0.8" b="0.8" />
+						<Shadow>
+							<Color r="0" g="0" b="0" />
+							<Offset>
+								<AbsDimension x="1" y="-1" />
+							</Offset>
+						</Shadow>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>HA_Collapse_Healers_Click(this:GetChecked());</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		</CheckButton>
+		<Button name="HAHeaderHealer" inherits="HAColumnHeaderTemplate" text="HA_GUI_HEALERS_HEALER">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="48" y="-25"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(70);
+				    this.sortType = true;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAHeaderState" inherits="HAColumnHeaderTemplate" text="HA_GUI_HEALERS_SPELL">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="HAHeaderHealer" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(60);
+				    this.sortType = false;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAHeaderTarget" inherits="HAColumnHeaderTemplate" text="HA_GUI_HEALERS_TARGET">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="HAHeaderState" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(70);
+				    this.sortType = false;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAHeaderCast" inherits="HAColumnHeaderTemplate" text="HA_GUI_HEALERS_CASTING">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="HAHeaderTarget" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(60);
+				    this.sortType = false;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAItem_1" inherits="HAItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAHeaderHealer" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_2" inherits="HAItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_3" inherits="HAItemTemplate" id="3">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_4" inherits="HAItemTemplate" id="4">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_5" inherits="HAItemTemplate" id="5">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_6" inherits="HAItemTemplate" id="6">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_7" inherits="HAItemTemplate" id="7">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_8" inherits="HAItemTemplate" id="8">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_9" inherits="HAItemTemplate" id="9">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_8" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_10" inherits="HAItemTemplate" id="10">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_9" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_11" inherits="HAItemTemplate" id="11">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_10" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_12" inherits="HAItemTemplate" id="12">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_11" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_13" inherits="HAItemTemplate" id="13">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_12" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_14" inherits="HAItemTemplate" id="14">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_13" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_15" inherits="HAItemTemplate" id="15">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_14" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItem_16" inherits="HAItemTemplate" id="16">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_15" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<CheckButton name="$parentSetResting">
+			<Size>
+				<AbsDimension x="16" y="16" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="HAHeaderHealer" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="-29" y="0" />
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer>
+					<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="HA_GUI_RESTING">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-2" y="1" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontHeight>
+							<AbsValue val="10" />
+						</FontHeight>
+						<Color r="0.8" g="0.8" b="0.8" />
+						<Shadow>
+							<Color r="0" g="0" b="0" />
+							<Offset>
+								<AbsDimension x="1" y="-1" />
+							</Offset>
+						</Shadow>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>HA_SetRegenMode(this:GetChecked());</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		</CheckButton>
+		<ScrollFrame name="HAItemScrollFrame" inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="280" y="160" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="HAHeaderCast" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-5" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(1, HA_UpdateList);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+
+		<Frame name="HAEmergencyFrame">
+			<Size>
+				<AbsDimension x="32" y="32"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItem_16" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Frames>
+		<Button name="HAHeaderEmergencyName" inherits="HAColumnHeaderTemplate" text="HA_GUI_EMERG_NAME">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(70);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAHeaderEmergencyDeficit" inherits="HAColumnHeaderTemplate" text="HA_GUI_EMERG_DEFICIT">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="HAHeaderEmergencyName" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(70);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAHeaderEmergencyCount" inherits="HAColumnHeaderTemplate" text="HA_GUI_EMERG_COUNT">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="HAHeaderEmergencyDeficit" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(60);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAHeaderEmergencyIncoming" inherits="HAColumnHeaderTemplate" text="HA_GUI_EMERG_ESTIM">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="HAHeaderEmergencyCount" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    HASetColumnWidth(60);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="HAItemEmergency_1" inherits="HAItemEmergencyTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAHeaderEmergencyName" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItemEmergency_2" inherits="HAItemEmergencyTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItemEmergency_1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItemEmergency_3" inherits="HAItemEmergencyTemplate" id="3">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItemEmergency_2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItemEmergency_4" inherits="HAItemEmergencyTemplate" id="4">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItemEmergency_3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItemEmergency_5" inherits="HAItemEmergencyTemplate" id="5">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItemEmergency_4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="HAItemEmergency_6" inherits="HAItemEmergencyTemplate" id="6">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="HAItemEmergency_5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+			</Frames>
+		</Frame>
+	</Frames>
+    <Scripts>
+      <OnUpdate>
+        HA_OnUpdate(arg1);
+      </OnUpdate>
+      <OnLoad>
+        HA_OnLoad();
+      </OnLoad>
+      <OnEvent>
+        HA_OnEvent();
+      </OnEvent>
+      <OnShow>
+        HA_OnShow();
+      </OnShow>
+      <OnMouseUp>
+        if ( this.isMoving ) then
+          this:StopMovingOrSizing();
+          this.isMoving = false;
+        end
+      </OnMouseUp>
+      <OnMouseDown>
+        if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+          this:StartMoving();
+          this.isMoving = true;
+        end
+      </OnMouseDown>
+      <OnHide>
+        if ( this.isMoving ) then
+          this:StopMovingOrSizing();
+          this.isMoving = false;
+        end
+        HA_OnHide();
+      </OnHide>
+    </Scripts>
+  </Frame>
+</Ui>
+

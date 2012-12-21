@@ -1,0 +1,877 @@
+--[[
+	TODO;
+HonorBar at lvl 60.
+Experience from mob text.
+	Figure out profile deletion
+	Element offsets
+for 1.9 Dissable dissable
+Vertical bars.
+Circular bars.
+Time to.... text...
+More text bars.
+Titan/DAB optional dependencies for frame attachment.
+Help tooltips for config
+Identify and fix position label wierdness
+Custom texture addons
+Element defaults
+OnMousover for bar/elements
+]]
+
+function BEB.OnLoad()
+	SlashCmdList["BEB"] = BEB.Slash_Handler
+	SLASH_BEB1 = "/beb"
+	SLASH_BEB2 = "/basicexperiencebar"
+	this:RegisterEvent("PLAYER_ENTERING_WORLD")
+	this:RegisterEvent("VARIABLES_LOADED")
+	BEBCurrentVersion = 0.81
+end
+
+function BEB.OnEvent(event)
+	if (event == "VARIABLES_LOADED") then
+		BEB.VARIABLES_LOADED = true
+		if ( BEB.ENTERING_WORLD ) then
+			BEB.Initialize()
+		end
+	elseif (event == "PLAYER_ENTERING_WORLD") then
+		BEB.ENTERING_WORLD = true
+		if ( BEB.VARIABLES_LOADED ) then
+			BEB.Initialize()
+		end
+	elseif (event == "PLAYER_LEVEL_UP") then
+		BEB.XpThisSession = BEB.XpThisSession + (UnitXPMax("player") - BEB.OldXp)
+		BEB.OldXp = 0
+	elseif (event == "PLAYER_UPDATE_RESTING") then
+		BEB.UpdateFlashers()
+		BEB.SetColors("force")
+	elseif ((event == "PLAYER_XP_UPDATE") or (event == "CHAT_MSG_COMBAT_XP_GAIN")) then
+		BEB.XpThisSession = BEB.XpThisSession + (UnitXP("player") - BEB.OldXp)
+		BEB.OldXp = UnitXP("player")
+		BEB.UpdateElement("BEBXpBar")
+		BEB.UpdateElement("BEBRestedXpBar")
+		BEB.UpdateElement("BEBRestedXpTick")
+	elseif (event == "UPDATE_EXHAUSTION") then
+		BEB.UpdateElement("BEBRestedXpBar")
+		BEB.UpdateElement("BEBRestedXpTick")
+		BEB.UpdateElement("BEBRestedXpTickGlow")
+		BEB.SetColors()
+	elseif (event == "PLAYER_LOGOUT") then
+		if (BEBCharSettings.BEBProfile) then
+			BEB.SaveProfile(BEBCharSettings.BEBProfile)
+		end
+	end
+end
+
+function BEB.Initialize()
+	BEB.INDEX = UnitName("player").." of "..GetCVar("realmName")
+	if (BEBCharSettings) then	
+		if (BEBCharSettings.BEBMain.BEBProfile) then
+			BEB.LoadProfile(BEBCharSettings.BEBProfile)
+			if (not BEBCharSettings.BEBMain.enabled) then
+				BEBINITIALIZED = true
+				BEB.DisableAddon()
+				return
+			end
+		end
+	end
+	if BEBINITIALIZED then
+		return
+	end
+	BEBMain:RegisterEvent("PLAYER_LOGOUT")
+	BEBMain:RegisterEvent("PLAYER_LEVEL_UP")
+	BEBMain:RegisterEvent("PLAYER_UPDATE_RESTING")
+	BEBMain:RegisterEvent("PLAYER_XP_UPDATE")
+	BEBMain:RegisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
+	BEBMain:RegisterEvent("UPDATE_EXHAUSTION")
+	BEBMain:RegisterForClicks("LeftButtonUp","RightButtonUp")
+	BEB.XpThisSession = 0
+	BEB.RateThisSession = 0
+	BEB.TTLThisSession = 0
+	BEB.StartTime = GetTime() - 1
+	BEB.OldXp = UnitXP("player")
+	BEB.flashers = {}
+	BEB.UpdateFrequency = 5
+	BEB.TimeFromLastUpdate = 0
+	BEB.StringOnUpdate = 0
+	BEBXpPerLvl = {400,900,1400,2100,2800,3600,4500,5400,6500,7600,8800,10100,11400,12900,14400,16000,17700,19400,21300,23200,25200,27300,29400,31700,34000,36400,38900,41400,44300,47400,50800,54500,58600,62800,67100,71600,76100,80800,85700,90700,95800,101000,106300,111800,117500,123200,129100,135100,141200,147500,153900,160400,167100,173900,180800,187900,195000,202300,209800,217400}
+	BEBRestedXpTickGlow.flashtime = .5
+	if (not BEBGlobal) then
+		BEBGlobal = {}
+		BEBGlobal.profiles = {}
+		BEBGlobal.Chars = {}
+		BEB.DefaultSettings()
+	end
+	local numprofiles = 0
+	for _,_ in BEBGlobal.profiles do
+		numprofiles = numprofiles + 1
+	end
+	table.setn(BEBGlobal.profiles,numprofiles)
+	if (not BEBCharSettings) then
+		BEB.DefaultSettings()
+	end
+	if (BEBCharSettings.Version < BEBCurrentVersion) then
+		BEB.DefaultSettings()
+	end
+	if (BEBCharSettings.BEBProfile) then
+		BEB.SaveProfile(BEBCharSettings.BEBProfile)
+	end
+	BEBGlobal.Chars[BEB.INDEX] = {Profile = BEBCharSettings.BEBProfile, Version = BEBCharSettings.Version}
+	BEB.SetupBars()
+	BEBINITIALIZED = true
+	BEB.OnEvent("PLAYER_UPDATE_RESTING")
+end
+
+function BEB.Slash_Handler(msg)
+	local command, param
+	local index = string.find(msg, " ")
+	if(index) then
+		command = string.sub(msg, 1, (index - 1))
+		param = string.sub(msg, (index + 1)  )
+	else
+		command = msg
+	end
+	if (command == "" or command == "defaults" or command == "enable") then
+		if (IsAddOnLoaded("BEBOptions")) then
+		else
+			local loaded,reason = LoadAddOn("BEBOptions")
+			if (not loaded) then
+				if (reason == "DISABLED") then
+					BEB.Feedback(BEB.TEXT.optionsdisabled)
+				elseif (reason == "MISSING") then
+					BEB.Feedback(BEB.TEXT.optionsmissing)
+				elseif (reason == "CORRUPT") then
+					BEB.Feedback(BEB.TEXT.optionscorrupt)
+				end
+				return
+			end
+		end
+		if (command == "") then
+			if (BEBConfigFrame:IsVisible() or BEBEnableFrame:IsVisible()) then
+				BEBConfigFrame:Hide()
+				BEBEnableFrame:Hide()
+			else
+				BEBConfigFrame:Show()
+			end
+		elseif (command == "defaults") then
+			BEBOPTIONS.LoadDefaults()
+		elseif (command == "enable") then
+			if (not BEBCharSettings.BEBMain.enabled) then
+				BEBOPTIONS.EnableAddon()
+			else
+				BEB.Feedback(BEB.TEXT.alreadyenabled)
+			end
+		end
+	else
+		if (command == "disable") then
+			if (not BEBCharSettings.BEBMain.enabled) then
+				BEB.Feedback(BEB.TEXT.alreadydisabled)
+			else
+				BEB.DisableAddon()
+			end
+		elseif (command == "help") then
+			BEB.Feedback(BEB.TEXT.validcommands)
+		else
+			BEB.Feedback(BEB.TEXT.invalidcommand)
+		end
+	end
+end
+function BEB.DefaultSettings()
+	if (not BEBCharSettings) then
+		BEBCharSettings = {}
+		BEBCharSettings.Version = 0
+	end
+	if (BEBCharSettings.Version < 0.7) then
+		BEBCharSettings = {
+			BEBBackground = {
+				maxrestcolor = {0, 0, 0, .25},
+				restcolor = {0, 0, 0, .25},
+				shown = true,
+				texture = "PlainBackdrop",
+				unrestcolor = {0, 0, 0, .25}
+			},
+			BEBBarText = {
+				clicktext = true,
+				location = {
+					point = "CENTER",
+					relpoint = "CENTER",
+					x = 0,
+					y = 0
+				},
+				maxrestcolor = {1, 1, 1, 1},
+				mouseover = false,
+				restcolor = {1, 1, 1, 1},
+				shown = true,
+				size = {y=10},
+				text = {string = "Lvl $plv, XP $cxp/$mxp, $pdl% , $rxp Rested Xp."},
+				unrestcolor = {1, 1, 1, 1}
+			},
+			BEBMain = {
+				dragable = true,
+				enabled = true,
+				location = {
+					point = "CENTER",
+					relpoint = "CENTER",
+					relto = "UIParent",
+					x = 0,
+					y = -337
+				},
+				size = {x=1024,y=12}
+			},
+			BEBMarkers = {
+				maxrestcolor = {1, 1, 1, 1},
+				restcolor = {1, 1, 1, 1},
+				shown = true,
+				texture = "BEB-ExperienceBarMarkers",
+				unrestcolor = {1, 1, 1, 1}
+			},
+			BEBProfile = false,
+			BEBRestedXpBar = {
+				maxrestcolor = {0.2, 0.3, 0.65, 1},
+				restcolor = {0.2, 0.3, 0.65, 1},
+				shown = true,
+				texture = "BEB-BarFill-RoundedLight"
+			},
+			BEBRestedXpTick = {
+				location = {x=0,y=0},
+				maxrestcolor = {1, 0, 0, 1},
+				restcolor = {1, 1, 1, 1},
+				shown = true,
+				size = {x=27,y=26},
+				texture = "BEB-ExhaustionTicks"
+			},
+			BEBRestedXpTickGlow = {
+				flashing = true,
+				maxrestcolor = {1, 0.8, 0.8, 1},
+				restcolor = {1, 1, 1, 1},
+				shown = true,
+				texture = "BEB-ExhaustionTicksGlow"
+			},
+			BEBXpBar = {
+				maxrestcolor = {0.4, 0, 0.7, 1},
+				restcolor = {0.4, 0, 0.7, 1},
+				texture = "BEB-BarFill-RoundedLight",
+				unrestcolor = {0.6, 0, 0.5, 1}
+			},
+			BEBXpTick = {
+				location = {x=0,y=0},
+				maxrestcolor = {1, 1, 1, 1},
+				restcolor = {1, 1, 1, 1},
+				shown = true,
+				size = {x=27,y=26},
+				texture = "BEB-ExhaustionTicks",
+				unrestcolor = {1, 1, 1, 1}
+			},
+			Version = 0.7,
+		}
+	end
+	if (BEBCharSettings.Version < 0.71) then
+		BEBCharSettings.BEBBackground.flashing = false
+		BEBCharSettings.BEBXpBar.flashing = false
+		BEBCharSettings.BEBRestedXpBar.flashing = false
+		BEBCharSettings.BEBMarkers.flashing = false
+		BEBCharSettings.BEBXpTick.flashing = false
+		BEBCharSettings.BEBRestedXpTick.flashing = false
+		BEBCharSettings.BEBBarText.flashing = false
+		BEBCharSettings.Version = 0.71
+	end
+	if (BEBCharSettings.Version < BEBCurrentVersion) then
+		BEBCharSettings.Version = BEBCurrentVersion
+	end
+end
+
+
+
+function BEB.OnDragStart()
+	if(not BEBCharSettings.BEBMain.dragable) then
+		BEB.Feedback(BEB.TEXT.framelocked)
+	else
+		BEBMain:StartMoving()
+	end
+end
+
+function BEB.OnDragStop()
+	  BEBMain:StopMovingOrSizing()
+	  BEB.GetPosition()
+	  BEBMain:SetUserPlaced(false)
+end
+
+function BEB.OnClick(arg1)
+	if (arg1 == "RightButton") then
+		BEB.Slash_Handler("")
+	elseif (arg1 == "LeftButton") then
+		if (BEBCharSettings.BEBBarText.shown and BEBCharSettings.BEBBarText.clicktext) then
+			ChatFrameEditBox:Insert(BEBBarText.textframe:GetText())
+		end
+	end
+end
+
+function BEB.OnEnter()
+	if (BEBCharSettings.BEBBarText.shown and BEBCharSettings.BEBBarText.mouseover) then
+		BEBBarText:Show()
+	end
+end
+function BEB.OnLeave()
+	if (BEBCharSettings.BEBBarText.shown and BEBCharSettings.BEBBarText.mouseover) then
+		BEBBarText:Hide()
+	end
+end
+
+function BEB.GetPosition()
+	local BEBPoint = {}
+	local BEBRelPoint = {}
+	local point = BEBCharSettings.BEBMain.location.point
+	local relpoint = BEBCharSettings.BEBMain.location.relpoint
+	local relto = getglobal(BEBCharSettings.BEBMain.location.relto)
+	if (point == "CENTER") then
+		BEBPoint.x, BEBPoint.y = BEBMain:GetCenter()
+	elseif (point == "TOPRIGHT") then
+		BEBPoint.x, BEBPoint.y = BEBMain:GetRight(), BEBMain:GetTop()
+	elseif (point == "TOPLEFT") then
+		BEBPoint.x, BEBPoint.y = BEBMain:GetLeft(), BEBMain:GetTop()
+	elseif (point == "BOTTOMRIGHT") then
+		BEBPoint.x, BEBPoint.y = BEBMain:GetRight(), BEBMain:GetBottom()
+	elseif (point == "BOTTOMLEFT") then
+		BEBPoint.x, BEBPoint.y = BEBMain:GetLeft(), BEBMain:GetBottom()
+	elseif (point == "TOP") then
+		BEBPoint.x, _, BEBPoint.y = BEBMain:GetCenter(), BEBMain:GetTop()
+	elseif (point == "BOTTOM") then
+		BEBPoint.x, _, BEBPoint.y = BEBMain:GetCenter(), BEBMain:GetBottom()
+	elseif (point == "LEFT") then
+		BEBPoint.x, _, BEBPoint.y = BEBMain:GetLeft(), BEBMain:GetCenter()
+	elseif (point == "RIGHT") then
+		BEBPoint.x, _, BEBPoint.y = BEBMain:GetRight(), BEBMain:GetCenter()
+	end
+	if (relpoint == "CENTER") then
+		BEBRelPoint.x, BEBRelPoint.y = relto:GetCenter()
+	elseif (relpoint == "TOPRIGHT") then
+		BEBRelPoint.x, BEBRelPoint.y = relto:GetRight(), relto:GetTop()
+	elseif (relpoint == "TOPLEFT") then
+		BEBRelPoint.x, BEBRelPoint.y = relto:GetLeft(), relto:GetTop()
+	elseif (relpoint == "BOTTOMRIGHT") then
+		BEBRelPoint.x, BEBRelPoint.y = relto:GetRight(), relto:GetBottom()
+	elseif (relpoint == "BOTTOMLEFT") then
+		BEBRelPoint.x, BEBRelPoint.y = relto:GetLeft(), relto:GetBottom()
+	elseif (relpoint == "TOP") then
+		BEBRelPoint.x, _, BEBRelPoint.y = relto:GetCenter(), relto:GetTop()
+	elseif (relpoint == "BOTTOM") then
+		BEBRelPoint.x, _, BEBRelPoint.y = relto:GetCenter(), relto:GetBottom()
+	elseif (relpoint == "LEFT") then
+		BEBRelPoint.x, _, BEBRelPoint.y = relto:GetLeft(), relto:GetCenter()
+	elseif (relpoint == "RIGHT") then
+		BEBRelPoint.x, _, BEBRelPoint.y = relto:GetRight(), relto:GetCenter()
+	end
+	BEBCharSettings.BEBMain.location.x, BEBCharSettings.BEBMain.location.y = BEBPoint.x - BEBRelPoint.x, BEBPoint.y - BEBRelPoint.y
+end
+
+function BEB.IsFrame(frameName)
+	if (getglobal(frameName)) then
+			local var = getglobal(frameName)
+		return ((type(var) == "table") and (type(var[0]) == "userdata") and (type(var.GetName) == "function") and (var:GetName() == frameName))
+	else
+		return false
+	end
+end
+
+function BEB.CompileString(instring)
+	local outstring = {events = {}}
+	local count = 0
+	local i = 1
+	while i<=string.len(instring) do
+		count = count +1
+		outstring[count] = {}
+		a,_ = string.find(instring,"%$",i)
+		if (a == i) then
+			local substring = string.sub(instring, i, i+3)
+			outstring[count].string = substring
+			if (BEB.VARIABLE_FUNCTIONS[substring]) then
+				outstring[count].func = BEB.VARIABLE_FUNCTIONS[substring].func
+				outstring[count].text = outstring[count].func()
+				for _,v in BEB.VARIABLE_FUNCTIONS[substring].events do
+					if (outstring.events[v]) then
+						table.insert(outstring.events[v],count)
+					else
+						outstring.events[v] = {count}
+					end
+				end
+			end
+			i = i+4
+		elseif (not a) then
+			outstring[count].string = string.sub(instring, i, string.len(instring))
+			outstring[count].text = outstring[count].string
+			i = string.len(instring) +1
+		else
+			outstring[count].string = string.sub(instring, i, a-1)
+			outstring[count].text = outstring[count].string
+			i = a
+		end
+	end
+	outstring.count = count
+	return outstring
+end
+
+function BEB.TexturePath(var)
+	if (string.find(var, "Interface\\")) then
+		return var
+	else
+		return "Interface\\AddOns\\BEB\\Textures\\"..var
+	end
+end
+
+function BEB.DisableAddon()
+	if ( not BEBINITIALIZED ) then
+		this:GetParent():Hide()
+		return
+	end
+	BEBMain:UnregisterEvent("PLAYER_LEVEL_UP")
+	BEBMain:UnregisterEvent("PLAYER_UPDATE_RESTING")
+	BEBMain:UnregisterEvent("PLAYER_XP_UPDATE")
+	BEBMain:UnregisterEvent("CHAT_MSG_COMBAT_XP_GAIN")
+	BEBMain:UnregisterEvent("UPDATE_EXHAUSTION")
+	if (BEBBarText.texttable and BEBBarText.texttable.events) then
+		for k,_ in BEBBarText.texttable.events do
+			BEBBarText:UnregisterEvent(k)
+		end
+	end
+	BEBMain:Hide()
+	BEBDisabled = true -- check
+	BEBCharSettings.BEBMain.enabled = false
+	if (BEBConfigFrame and BEBConfigFrame:IsShown()) then
+		BEBConfigFrame:Hide()
+		BEBEnableFrame:Show()
+	end
+end
+
+function BEB.LoadProfile(bebprofile)
+	if (BEBGlobal.profiles[bebprofile]) then
+		if (BEBCharSettings.BEBProfile == bebprofile) then
+			BEBCharSettings = BEB.TableCopy(BEBGlobal.profiles[bebprofile])
+			BEBCharSettings.BEBProfile = bebprofile
+		else
+			BEBCharSettings = BEB.TableCopy(BEBGlobal.profiles[bebprofile])
+		end
+	else
+		BEB.FeedBack(BEB.TEXT.profilemissing)
+		BEBCharSettings.BEBProfile = false
+	end
+end
+
+function BEB.SaveProfile(bebprofile)
+	BEBGlobal.profiles[bebprofile] = BEB.TableCopy(BEBCharSettings)
+	BEBGlobal.profiles[bebprofile].BEBProfile = false
+end
+
+function BEB.TableCopy(a)
+	local b={}
+	for k,v in a do
+		if type(v) == "table" then
+			b[k] = BEB.TableCopy(v)
+		else
+			b[k]=v
+		end
+	end 
+	return b
+end
+
+function BEB.SetupBars()
+	if (not BEBCharSettings.BEBMain.enabled) then
+		return
+	else
+		BEBMain:Show()
+	end
+	local elements = {"BEBMain","BEBBackground","BEBXpBar","BEBRestedXpBar","BEBMarkers","BEBXpTick","BEBRestedXpTick","BEBRestedXpTickGlow","BEBBarText"}
+	for _,v in ipairs(elements) do
+		BEB.SetupElement(v)
+	end
+	BEB.SetColors("force")
+end
+function BEB.SetupElement(element)
+	if (element == "BEBProfile") then
+		return
+	end
+	local Element = getglobal(element)
+	if (BEBCharSettings[element].flashing) then
+		BEB.flashers[element] = true
+		if ((IsResting() == 1) and (not Element.flashing)) then
+			BEB.StartFlashing(element,0.7,0.2,1)
+		end
+	else
+		BEB.flashers[element] = nil
+		if ((IsResting() == 1) and  Element.flashing) then
+			BEB.StopFlashing(element)
+		end
+	end
+
+	if (element == "BEBMain") then
+		if (BEB.IsFrame(BEBCharSettings.BEBMain.location.relto)) then
+			BEBMain:ClearAllPoints()
+			local Location = BEBCharSettings.BEBMain.location
+			BEBMain:SetPoint(Location.point, Location.relto, Location.relpoint, Location.x, Location.y)
+		else
+			BEB.Feedback(BEB.TEXT.framewasinvalid)
+			BEBMain:SetPoint("CENTER","UIParent","CENTER",0,0)
+		end
+		BEBMain:SetWidth(BEBCharSettings.BEBMain.size.x)
+		BEBMain:SetHeight(BEBCharSettings.BEBMain.size.y)
+		if (BEBCharSettings.BEBMain.dragable == true) then
+			BEBMain:RegisterForDrag("LeftButton")
+		else
+			BEBMain:RegisterForDrag()
+		end
+		BEBBarText:SetHeight(BEBCharSettings.BEBMain.size.y)
+		BEBXpBar:SetHeight(BEBCharSettings.BEBMain.size.y)
+		BEBRestedXpBar:SetHeight(BEBCharSettings.BEBMain.size.y)
+		BEBMainWidth = BEBMain:GetWidth()
+	elseif (element == "BEBBackground") then
+		if (BEBCharSettings.BEBBackground.shown) then
+			BEBBackground:ClearAllPoints()
+			BEBBackground:SetPoint("TOPLEFT", BEBMain, "TOPLEFT", 0, 0)
+			BEBBackground:SetPoint("BOTTOMRIGHT", BEBMain, "BOTTOMRIGHT", 0, 0)
+			BEBBackground.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBBackground.texture))
+			BEBBackground:Show()
+		else
+			BEBBackground:Hide()
+		end
+	elseif (element == "BEBXpBar") then
+		BEBXpBar:ClearAllPoints()
+		BEBXpBar:SetPoint("LEFT", BEBMain, "LEFT", 0, 0)
+		BEBXpBar.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBXpBar.texture))
+	elseif (element == "BEBRestedXpBar") then
+		if (BEBCharSettings.BEBRestedXpBar.shown) then
+			BEBRestedXpBar:ClearAllPoints()
+			BEBRestedXpBar:SetPoint("LEFT", BEBXpBar, "RIGHT", 0, 0)
+			BEBRestedXpBar.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBRestedXpBar.texture))
+			BEBRestedXpBar:Show()
+		else
+			BEBRestedXpBar:Hide()
+		end
+	elseif (element == "BEBMarkers") then
+		if (BEBCharSettings.BEBMarkers.shown) then
+			BEBMarkers:ClearAllPoints()
+			BEBMarkers:SetPoint("TOPLEFT", BEBMain, "TOPLEFT", 0, 0)
+			BEBMarkers:SetPoint("BOTTOMRIGHT", BEBMain, "BOTTOMRIGHT", 0, 0)
+			BEBMarkers.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBMarkers.texture))
+			BEBMarkers:Show()
+		else
+			BEBMarkers:Hide()
+		end
+	elseif (element == "BEBXpTick") then
+		if (BEBCharSettings.BEBXpTick.shown) then
+			BEBXpTick:ClearAllPoints()
+			BEBXpTick:SetPoint("CENTER", "BEBXpBar", "RIGHT", BEBCharSettings.BEBXpTick.location.x, BEBCharSettings.BEBXpTick.location.y)
+			BEBXpTick.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBXpTick.texture))
+			BEBXpTick.texture:SetTexCoord(0,0.5,0,0.5)
+			BEBXpTick:Show()
+		else
+			BEBXpTick:Hide()
+		end
+		BEBXpTick:SetWidth(BEBCharSettings.BEBXpTick.size.x)
+		BEBXpTick:SetHeight(BEBCharSettings.BEBXpTick.size.y)
+	elseif (element == "BEBRestedXpTick") then
+		if (BEBCharSettings.BEBRestedXpTick.shown) then
+			BEBRestedXpTick.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBRestedXpTick.texture))
+			BEBRestedXpTick:SetWidth(BEBCharSettings.BEBRestedXpTick.size.x)
+			BEBRestedXpTick:SetHeight(BEBCharSettings.BEBRestedXpTick.size.y)
+			BEBRestedXpTick:Show()
+		else
+			BEBRestedXpTick:Hide()
+		end
+	elseif (element == "BEBRestedXpTickGlow") then
+		if (BEBCharSettings.BEBRestedXpTickGlow.shown) then
+			BEBRestedXpTickGlow.texture:SetTexture(BEB.TexturePath(BEBCharSettings.BEBRestedXpTickGlow.texture))
+			BEBRestedXpTickGlow:ClearAllPoints()
+			BEBRestedXpTickGlow:SetPoint("TOPLEFT", "BEBRestedXpTick", "TOPLEFT", 0, 0)
+			BEBRestedXpTickGlow:SetPoint("BOTTOMRIGHT", "BEBRestedXpTick", "BOTTOMRIGHT", 0, 0)
+		end
+	elseif (element == "BEBBarText") then
+		BEBBarText.texttable = BEB.CompileString(BEBCharSettings.BEBBarText.text.string)
+		if (BEBCharSettings.BEBBarText.shown) then
+			BEBBarText:ClearAllPoints()
+			BEBBarText:SetPoint(BEBCharSettings.BEBBarText.location.point, "BEBMain", BEBCharSettings.BEBBarText.location.relpoint, BEBCharSettings.BEBBarText.location.x, BEBCharSettings.BEBBarText.location.y)
+			for k,_ in BEBBarText.texttable.events do
+				BEBBarText:RegisterEvent(k)
+			end
+			BEB.StringEvent("PLAYER_LEVEL_UP")
+			if (BEBCharSettings.BEBBarText.mouseover) then
+				BEBBarText:Hide()
+			else
+				BEBBarText:Show()
+			end
+		else
+			BEBBarText:Hide()
+		end
+		BEBBarText.textframe:SetTextHeight(BEBCharSettings.BEBBarText.size.y)
+		local scale = BEBMain:GetScale()
+		BEBMain:SetScale(scale + 0.1)
+		BEBMain:SetScale(scale)
+	end
+	BEB.UpdateElement(element)
+end
+
+function BEB.SetColors(force)
+	if (BEB.RestState) then
+		BEB.OldRestState = BEB.RestState
+	else
+		BEB.OldRestState = -1
+	end
+	if (GetRestState() == 1) then
+		if (GetXPExhaustion() == (UnitXPMax("player")*1.5)) then
+			BEB.RestState = 2
+		else
+			BEB.RestState = 1
+		end
+	else
+		BEB.RestState = 0
+	end
+	if ((BEB.RestState ~= BEB.OldRestState) or force) then
+		if (BEB.RestState == 0) then
+			BEBBarText.textframe:SetVertexColor(unpack(BEBCharSettings.BEBBarText.unrestcolor))
+			BEBXpTick.texture:SetVertexColor(unpack(BEBCharSettings.BEBXpTick.unrestcolor))
+			BEBMarkers.texture:SetVertexColor(unpack(BEBCharSettings.BEBMarkers.unrestcolor))
+			BEBXpBar.texture:SetVertexColor(unpack(BEBCharSettings.BEBXpBar.unrestcolor))
+			BEBBackground.texture:SetVertexColor(unpack(BEBCharSettings.BEBBackground.unrestcolor))
+		elseif (BEB.RestState == 1) then
+			BEBRestedXpTickGlow.texture:SetVertexColor(unpack(BEBCharSettings.BEBRestedXpTickGlow.restcolor))
+			BEBBarText.textframe:SetVertexColor(unpack(BEBCharSettings.BEBBarText.restcolor))
+			BEBRestedXpTick.texture:SetVertexColor(unpack(BEBCharSettings.BEBRestedXpTick.restcolor))
+			BEBXpTick.texture:SetVertexColor(unpack(BEBCharSettings.BEBXpTick.restcolor))
+			BEBMarkers.texture:SetVertexColor(unpack(BEBCharSettings.BEBMarkers.restcolor))
+			BEBXpBar.texture:SetVertexColor(unpack(BEBCharSettings.BEBXpBar.restcolor))
+			BEBRestedXpBar.texture:SetVertexColor(unpack(BEBCharSettings.BEBRestedXpBar.restcolor))
+			BEBBackground.texture:SetVertexColor(unpack(BEBCharSettings.BEBBackground.restcolor))
+		elseif (BEB.RestState == 2) then
+			BEBRestedXpTickGlow.texture:SetVertexColor(unpack(BEBCharSettings.BEBRestedXpTickGlow.maxrestcolor))
+			BEBBarText.textframe:SetVertexColor(unpack(BEBCharSettings.BEBBarText.maxrestcolor))
+			BEBRestedXpTick.texture:SetVertexColor(unpack(BEBCharSettings.BEBRestedXpTick.maxrestcolor))
+			BEBXpTick.texture:SetVertexColor(unpack(BEBCharSettings.BEBXpTick.maxrestcolor))
+			BEBMarkers.texture:SetVertexColor(unpack(BEBCharSettings.BEBMarkers.maxrestcolor))
+			BEBXpBar.texture:SetVertexColor(unpack(BEBCharSettings.BEBXpBar.maxrestcolor))
+			BEBRestedXpBar.texture:SetVertexColor(unpack(BEBCharSettings.BEBRestedXpBar.maxrestcolor))
+			BEBBackground.texture:SetVertexColor(unpack(BEBCharSettings.BEBBackground.maxrestcolor))
+		end
+	end
+end
+
+function BEB.UpdateElement(element)
+	if (element == "BEBXpBar") then
+		BEBScale = BEBMainWidth / UnitXPMax("player")
+		if ((not UnitXP("player")) or (UnitXP("player") == 0)) then
+			BEBXpWidth = 1
+		else
+			BEBXpWidth = BEBScale * UnitXP("player")
+		end
+		BEBXpBar:SetWidth(BEBXpWidth)
+		BEBXpBar.texture:SetTexCoord(0,(BEBXpWidth/BEBMainWidth),0,1)
+	elseif (element == "BEBRestedXpBar") then
+		if ((GetRestState() == 1) and BEBCharSettings.BEBRestedXpBar.shown) then
+			if ((UnitXP("player")+GetXPExhaustion()) > UnitXPMax("player")) then
+				BEBRestedXpBar:SetWidth(BEBMainWidth - BEBXpWidth)
+				BEBRestedXpBar.texture:SetTexCoord((BEBXpWidth/BEBMainWidth),1,0,1)
+			else
+				local BEBRestedXpWidth = (UnitXP("player")+GetXPExhaustion())*BEBScale
+				BEBRestedXpBar:SetWidth(BEBRestedXpWidth - BEBXpWidth)
+				BEBRestedXpBar.texture:SetTexCoord((BEBXpWidth/BEBMainWidth),(BEBRestedXpWidth/BEBMainWidth),0,1)
+			end
+		else
+			BEBRestedXpBar:Hide()
+		end
+	elseif (element == "BEBRestedXpTick") then
+		if ((GetRestState() == 1) and BEBCharSettings.BEBRestedXpTick.shown) then
+			local position
+			local xp, rest, xpmax, level = UnitXP("player"), GetXPExhaustion(), UnitXPMax("player"), UnitLevel("player")
+			if (level < 59) then
+				if ((xp + rest - xpmax) > BEBXpPerLvl[level+1]) then
+					position = ((xp + rest - xpmax - BEBXpPerLvl[level+1])/BEBXpPerLvl[level+2]) * BEBMainWidth
+					BEBRestedXpTick.texture:SetTexCoord(0, 0.5, 0.5, 1)
+					BEBRestState = 3
+				elseif ((xp + rest) > xpmax) then
+					position = ((xp + rest - xpmax)/BEBXpPerLvl[level+1]) * BEBMainWidth
+					BEBRestedXpTick.texture:SetTexCoord(0.5, 1, 0, 0.5)
+					BEBRestState = 2
+				else
+					position = (xp + rest)*BEBScale
+					BEBRestedXpTick.texture:SetTexCoord(0, 0.5, 0, 0.5)
+					BEBRestState = 1
+				end
+			elseif (level == 59) then
+				if ((xp + rest - xpmax) > BEBXpPerLvl[level+1]) then
+					position = BEBMainWidth
+					BEBRestedXpTick.texture:SetTexCoord(0, 0.5, 0.5, 1)
+					BEBRestState = 3
+				elseif ((xp + rest) > xpmax) then
+					position = ((xp + rest - xpmax)/BEBXpPerLvl[level+1]) * BEBMainWidth
+					BEBRestedXpTick.texture:SetTexCoord(0.5, 1, 0, 0.5)
+					BEBRestState = 2
+				else
+					position = (xp + rest)*BEBScale
+					BEBRestedXpTick.texture:SetTexCoord(0, 0.5, 0, 0.5)
+					BEBRestState = 1
+				end
+			elseif (level == 60) then
+				if ((xp + rest - xpmax) > BEBXpPerLvl[level+1]) then
+					position = BEBMainWidth
+					BEBRestedXpTick.texture:SetTexCoord(0, 0.5, 0.5, 1)
+					BEBRestState = 3
+				elseif ((xp + rest) > xpmax) then
+					position = BEBMainWidth
+					BEBRestedXpTick.texture:SetTexCoord(0.5, 1, 0, 0.5)
+					BEBRestState = 2
+				else
+					position = (xp + rest)*BEBScale
+					BEBRestedXpTick.texture:SetTexCoord(0, 0.5, 0, 0.5)
+					BEBRestState = 1
+				end
+			end
+			local offsets = BEBCharSettings.BEBRestedXpTick.location
+			BEBRestedXpTick:SetPoint("CENTER" ,"BEBMain" ,"LEFT", (position + offsets.x), offsets.y)
+			BEBRestedXpTick:Show()
+		else
+			BEBRestedXpTick:Hide()
+			BEBRestState = 0
+		end
+	elseif (element == "BEBRestedXpTickGlow") then
+		if (BEBCharSettings.BEBRestedXpTickGlow.shown and (BEBRestState ~= 0) and (IsResting() == 1)) then
+			if (BEBRestState == 1) then
+				BEBRestedXpTickGlow.texture:SetTexCoord(0, 0.5, 0, 0.5)
+				BEBRestedXpTickGlow:Show()
+			elseif (BEBRestState == 2) then
+				BEBRestedXpTickGlow.texture:SetTexCoord(0.5, 1, 0, 0.5)
+				BEBRestedXpTickGlow:Show()
+			elseif (BEBRestState == 3) then
+				BEBRestedXpTickGlow.texture:SetTexCoord(0, 0.5, 0.5, 1)
+				BEBRestedXpTickGlow:Show()
+			end
+		else
+			BEBRestedXpTickGlow:Hide()
+		end
+	end
+end
+
+function BEB.OnUpdate(elapsed)
+	if (BEBINITIALIZED and BEBCharSettings.BEBMain.enabled) then
+		if (BEBTextTimeToHide) then
+			if (BEBTextTimeToHide > 0) then
+				BEBTextTimeToHide = BEBTextTimeToHide - elapsed
+			else
+				BEBTextTimeToHide = nil
+				BEBBarText:Hide()
+			end
+		end
+		BEB.StringOnUpdate = BEB.StringOnUpdate +elapsed
+		if (BEB.StringOnUpdate > 0.5) then
+			BEB.StringEvent("ON_UPDATE")
+			BEB.StringOnUpdate = 0
+		end
+		BEB.TimeThisSession = GetTime() - BEB.StartTime
+		BEB.RateThisSession = BEB.XpThisSession/BEB.TimeThisSession
+		BEB.TimeFromLastUpdate = BEB.TimeFromLastUpdate + elapsed
+		if (BEB.TimeFromLastUpdate > BEB.UpdateFrequency) then
+			BEB.UpdateElement("BEBXpBar")
+			BEB.UpdateElement("BEBRestedXpBar")
+			BEB.UpdateElement("BEBRestedXpTick")
+			BEB.UpdateElement("BEBRestedXpTickGlow")
+			BEB.SetColors()
+			BEB.TimeFromLastUpdate = 0
+		end
+	end
+end
+
+function BEB.StringEvent(event)
+	if (BEBBarText.texttable.events[event]) then
+		local text = ""
+		for _,n in BEBBarText.texttable.events[event] do
+			BEBBarText.texttable[n].text = BEBBarText.texttable[n].func()
+		end
+		for i=1,BEBBarText.texttable.count do
+			text = text..BEBBarText.texttable[i].text
+		end
+		BEBBarText.textframe:SetText(text)
+		BEBBarText:SetWidth(BEBBarText.textframe:GetWidth())
+	end
+end
+
+function BEB.Feedback(msg)
+	DEFAULT_CHAT_FRAME:AddMessage( msg, 1.0, 1.0, 0.0 );
+end
+
+function BEB.StartFlashing(element,rate,min,max)
+	local Element = getglobal(element)
+	if (not Element.flashing) then
+		Element.flashing = true
+		Element.rate = rate
+		Element.min = min
+		Element.max = max
+		Element.scale = (max-min)/rate
+		Element.time = rate
+		if (Element.textframe) then
+			Element.textframe:SetAlpha(max)
+		elseif (Element.texture) then
+			Element.texture:SetAlpha(max)
+		end
+		Element:SetScript("OnUpdate",BEB.ElementFlashing)
+	end
+end
+
+function BEB.StopFlashing(element)
+	local Element = getglobal(element)
+	Element.flashing = nil
+	Element.rate = nil
+	Element.min = nil
+	Element.max = nil
+	Element.scale = nil
+	Element.time = nil
+	Element.reversed = nil
+	Element:SetScript("OnUpdate",nil)
+end
+
+function BEB.UpdateFlashers()
+	if (IsResting() == 1) then
+		for v,_ in BEB.flashers do
+			BEB.StartFlashing(v,0.7,0.2,1)
+		end
+	else
+		for v,_ in BEB.flashers do
+			BEB.StopFlashing(v)
+		end
+	end
+end
+
+function BEB.ElementFlashing()
+	this.time = this.time - arg1
+	while (this.time < 0) do
+		this.time = this.rate + this.time
+		if (this.reversed) then
+			this.reversed = nil
+		else
+			this.reversed = true
+		end
+	end
+	if (this.reversed) then
+		if (this.textframe) then
+			this.textframe:SetAlpha(this.max-(this.scale*this.time))
+		elseif (this.texture) then
+			this.texture:SetAlpha(this.max-(this.scale*this.time))
+		end
+	else
+		if (this.textframe) then
+			this.textframe:SetAlpha(this.min+(this.scale*this.time))
+		elseif (this.texture) then
+			this.texture:SetAlpha(this.min+(this.scale*this.time))
+		end
+	end
+end
+
+function BEB.SecondsToTime(seconds)
+	if (seconds < 60) then
+		return math.floor(seconds).."s"
+	elseif (seconds < 3600) then
+		return math.floor(seconds/60).."m"..math.floor(math.mod(seconds,60)).."s"
+	elseif (seconds < 86400) then
+		return math.floor(seconds/3600).."h"..math.floor(math.mod(seconds,3600)/60).."m"
+	else
+		return math.floor(seconds/86400).."d"..math.floor(math.mod(seconds,86400)/3600).."h"
+	end
+end
+
+function BEB.round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num  * mult + 0.5) / mult
+end

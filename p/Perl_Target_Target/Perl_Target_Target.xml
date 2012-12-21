@@ -1,0 +1,693 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Perl_Target_Target.lua"/>
+
+
+	<Frame name="Perl_Target_Target_Frame" movable="true" parent="UIParent" hidden="true" enableMouse="true">
+		<Size>
+			<!-- The size of this frame determines what can be clicked for the menu and moving, hence it is the same size as the name frame. (This is no longer true in 0.48) -->
+			<AbsDimension x="110" y="24"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="501" y="-43"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<!-- Frame for the drop down menu. -->
+			<Frame name="Perl_Target_Target_DropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						Perl_TargetTargetDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+
+			<!-- Target Name -->
+			<Frame name="Perl_Target_Target_NameFrame">
+				<Size>
+					<AbsDimension x="110" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="Perl_Target_Target_NameFrame_CastClickOverlay">
+						<Size>
+							<AbsDimension x="110" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnEnter>
+								Perl_Target_Target_Tip();
+								UnitFrame_OnEnter();
+							</OnEnter>
+							<OnLeave>
+								UnitFrame_OnLeave();
+							</OnLeave>
+							<OnClick>
+								Perl_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Backdrop bgFile="Interface\AddOns\Perl_Config\Perl_Black" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="OVERLAY">
+						<!-- Name Text -->
+						<Fontstring name="Perl_Target_Target_NameBarText" inherits="GameFontNormal" text="Error!">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="Perl_Target_Target_NameFrame" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Fontstring>
+					</Layer>
+				</Layers>
+			</Frame>
+
+
+			<!-- Target Stats -->
+			<Frame name="Perl_Target_Target_StatsFrame">
+				<Size>
+					<AbsDimension x="110" y="42"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="Perl_Target_Target_NameFrame">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\AddOns\Perl_Config\Perl_Black" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+					<!-- 1.10 Click Solution -->
+					<Button name="Perl_Target_Target_StatsFrame_CastClickOverlay">
+						<Size>
+							<AbsDimension x="110" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnClick>
+								Perl_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+
+					<!-- Health Bar -->
+					<StatusBar name="Perl_Target_Target_HealthBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_Target_Target_HealthBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0.8" b="0"/>
+						<Layers>
+							<!-- Health Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_Target_Target_HealthBarText" inherits="GameFontNormalSmall" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_Target_Target_HealthBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0.8" b="0" a="0.25"/>
+					</StatusBar>
+					<Button name="Perl_Target_Target_HealthBar_CastClickOverlay">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnEnter>
+								Perl_Target_Target_HealthShow();
+							</OnEnter>
+							<OnLeave>
+								Perl_Target_Target_HealthHide();
+							</OnLeave>
+							<OnClick>
+								Perl_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+
+					<!-- Mana Bar -->
+					<StatusBar name="Perl_Target_Target_ManaBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_Target_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_Target_Target_ManaBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0" b="1"/>
+						<Layers>
+							<!-- Mana Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_Target_Target_ManaBarText" inherits="GameFontNormalSmall" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_Target_Target_ManaBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0" b="1" a="0.25"/>
+					</StatusBar>
+					<Button name="Perl_Target_Target_ManaBar_CastClickOverlay">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnEnter>
+								Perl_Target_Target_ManaShow();
+							</OnEnter>
+							<OnLeave>
+								Perl_Target_Target_ManaHide();
+							</OnLeave>
+							<OnClick>
+								Perl_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+
+
+	<Frame name="Perl_Target_Target_Target_Frame" movable="true" parent="UIParent" hidden="true" enableMouse="true">
+		<Size>
+			<!-- The size of this frame determines what can be clicked for the menu and moving, hence it is the same size as the name frame. -->
+			<AbsDimension x="110" y="24"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="607" y="-43"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<!-- Frame for the drop down menu. -->
+			<Frame name="Perl_Target_Target_Target_DropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						Perl_TargetTargetTargetDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Target Name -->
+			<Frame name="Perl_Target_Target_Target_NameFrame">
+				<Size>
+					<AbsDimension x="110" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="Perl_Target_Target_Target_NameFrame_CastClickOverlay">
+						<Size>
+							<AbsDimension x="110" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnEnter>
+								Perl_Target_Target_Target_Tip();
+								UnitFrame_OnEnter();
+							</OnEnter>
+							<OnLeave>
+								UnitFrame_OnLeave();
+							</OnLeave>
+							<OnClick>
+								Perl_Target_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Backdrop bgFile="Interface\AddOns\Perl_Config\Perl_Black" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="OVERLAY">
+						<!-- Name Text -->
+						<Fontstring name="Perl_Target_Target_Target_NameBarText" inherits="GameFontNormal" text="Error!">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="Perl_Target_Target_Target_NameFrame" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Fontstring>
+					</Layer>
+				</Layers>
+			</Frame>
+
+
+			<!-- Target Stats -->
+			<Frame name="Perl_Target_Target_Target_StatsFrame">
+				<Size>
+					<AbsDimension x="110" y="42"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="Perl_Target_Target_Target_NameFrame">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\AddOns\Perl_Config\Perl_Black" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+					<!-- 1.10 Click Solution -->
+					<Button name="Perl_Target_Target_Target_StatsFrame_CastClickOverlay">
+						<Size>
+							<AbsDimension x="110" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnClick>
+								Perl_Target_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+
+					<!-- Health Bar -->
+					<StatusBar name="Perl_Target_Target_Target_HealthBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_Target_Target_Target_HealthBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0.8" b="0"/>
+						<Layers>
+							<!-- Health Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_Target_Target_Target_HealthBarText" inherits="GameFontNormalSmall" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_Target_Target_Target_HealthBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0.8" b="0" a="0.25"/>
+					</StatusBar>
+					<Button name="Perl_Target_Target_Target_HealthBar_CastClickOverlay">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnEnter>
+								Perl_Target_Target_Target_HealthShow();
+							</OnEnter>
+							<OnLeave>
+								Perl_Target_Target_Target_HealthHide();
+							</OnLeave>
+							<OnClick>
+								Perl_Target_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+
+					<!-- Mana Bar -->
+					<StatusBar name="Perl_Target_Target_Target_ManaBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Perl_Target_Target_Target_HealthBar">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture name="Perl_Target_Target_Target_ManaBarTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0" b="1"/>
+						<Layers>
+							<!-- Mana Text -->
+							<Layer level="OVERLAY">
+								<Fontstring name="Perl_Target_Target_Target_ManaBarText" inherits="GameFontNormalSmall" text="Error!">
+									<Anchors>
+										<Anchor point="TOP" relativePoint="TOP">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Fontstring>
+							</Layer>
+						</Layers>
+					</StatusBar>
+					<StatusBar name="Perl_Target_Target_Target_ManaBarBG" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_Target_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+						<BarColor r="0" g="0" b="1" a="0.25"/>
+					</StatusBar>
+					<Button name="Perl_Target_Target_Target_ManaBar_CastClickOverlay">
+						<Size>
+							<AbsDimension x="90" y="10"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="Perl_Target_Target_Target_ManaBar">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks('LeftButtonUp', 'RightButtonUp', 'MiddleButtonUp', 'Button4Up', 'Button5Up');
+							</OnLoad>
+							<OnEnter>
+								Perl_Target_Target_Target_ManaShow();
+							</OnEnter>
+							<OnLeave>
+								Perl_Target_Target_Target_ManaHide();
+							</OnLeave>
+							<OnClick>
+								Perl_Target_Target_Target_MouseClick(arg1);
+							</OnClick>
+							<OnMouseDown>
+								Perl_Target_Target_Target_MouseDown(arg1);
+							</OnMouseDown>
+							<OnMouseUp>
+								Perl_Target_Target_Target_MouseUp(arg1);
+							</OnMouseUp>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<FontString name="Perl_Target_Target_Font" font="Fonts\ARIALN.TTF" outline="NORMAL" virtual="true">
+		<FontHeight>
+			<AbsValue val="30"/>
+		</FontHeight>
+		<Color r="1" g="0.2" b="0"/>
+	</FontString>
+
+	<Frame name="Perl_Target_Target_BigWarning" toplevel="true" parent="UIParent" hidden="false">
+		<Size>
+			<AbsDimension x="800" y="128"/> <!-- 512, 128 -->
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="284"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="Perl_Target_Target_BigWarning_Text" inherits="Perl_Target_Target_Font" text="Error!">
+					<Size>
+						<AbsDimension x="800" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="Perl_Target_Target_BigWarning" relativePoint="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				Perl_Target_Target_BigWarning_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				Perl_Target_Target_BigWarning_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="Perl_Target_Target_Script_Frame" movable="true" parent="UIParent" hidden="false" enableMouse="true">
+		<Scripts>
+			<OnEvent>
+				Perl_Target_Target_OnEvent(event);
+			</OnEvent>
+			<OnLoad>
+				Perl_Target_Target_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				Perl_Target_Target_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

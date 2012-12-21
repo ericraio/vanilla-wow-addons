@@ -1,0 +1,3762 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="atsw_language.lua"/>
+	<Script file="atsw_abstraction.lua"/>
+    <Script file="atsw.lua"/>
+
+	<Button name="ATSWSkillButtonTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="293" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				ATSWSkillButton_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				getglobal(this:GetName().."SubText"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+				ATSW_DisplayTradeskillTooltip();
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."SubText"):SetTextColor(this.r, this.g, this.b);
+				ATSWTradeskillTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-MinusButton-UP">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture name="$parentHighlight" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+		<DisabledTexture file="Interface\Buttons\UI-PlusButton-Disabled">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledTexture>
+		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText name="$parentHighlightText" inherits="GameFontHighlight" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText name="$parentDisabledText" inherits="GameFontDisable" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+	</Button>
+
+	<Frame name="ATSWDialogBoxFrame_OnlyOK" virtual="true" toplevel="true" frameStrata="DIALOG" hidden="true">
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Button name="$parentOKButton">
+				<Size>
+					<AbsDimension x="128" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="DialogButtonNormalText" text="OKAY"/>
+				<HighlightText inherits="DialogButtonHighlightText" text="OKAY"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="ATSWDialogBoxFrame" virtual="true" toplevel="true" frameStrata="DIALOG" hidden="true">
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Button name="$parentOKButton">
+				<Size>
+					<AbsDimension x="128" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-70" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSWDBF_OnOK(this:GetParent():GetName());
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="DialogButtonNormalText" text="ATSW_CONTINUEQUEUE"/>
+				<HighlightText inherits="DialogButtonHighlightText" text="ATSW_CONTINUEQUEUE"/>
+			</Button>
+			<Button name="$parentAbortButton">
+				<Size>
+					<AbsDimension x="128" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="70" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSWDBF_OnAbort(this:GetParent():GetName());
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="DialogButtonNormalText" text="ATSW_ABORTQUEUE"/>
+				<HighlightText inherits="DialogButtonHighlightText" text="ATSW_ABORTQUEUE"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Button name="ATSWQueueItemButtonTemplate_Count" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="30" y="16"/>
+		</Size>
+		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="30" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+				</Anchor>
+			</Anchors>
+			<Color r="1" g="1" b="1" a="1"/>
+		</NormalText>
+	</Button>
+
+	<Button name="ATSWQueueItemButtonTemplate_Name" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="280" y="16"/>
+		</Size>
+		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="280" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+				</Anchor>
+			</Anchors>
+			<Color r="1" g="1" b="1" a="1"/>
+		</NormalText>
+	</Button>
+
+	<Button name="ATSWQueueItemButtonTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="314" y="16"/>
+		</Size>
+		<Frames>
+			<Button name="$parentCount" inherits="ATSWQueueItemButtonTemplate_Count">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentName" inherits="ATSWQueueItemButtonTemplate_Name">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="34" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+			</OnClick>
+			<OnEnter>
+			</OnEnter>
+			<OnLeave>
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<ScrollFrame name="ATSWListScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="120"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.9609375"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="160"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="-118"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="0.7"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="123"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<ScrollFrame name="ATSWQueueScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="80"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.6"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="80"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.4" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<Button name="ATSWItemTemplate" inherits="QuestItemTemplate" virtual="true">
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+				if(atsw_oldmode) then
+					GameTooltip:SetCraftItem(ATSWFrame.selectedSkill, this:GetID());
+				else
+					GameTooltip:SetTradeSkillItem(ATSWFrame.selectedSkill, this:GetID());
+				end
+				CursorUpdate();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+				ResetCursor();
+			</OnLeave>
+			<OnUpdate>
+				CursorOnUpdate();
+			</OnUpdate>
+			<OnClick>
+				if ( IsControlKeyDown() ) then
+					DressUpItemLink(ATSW_GetTradeSkillReagentItemLink(ATSWFrame.selectedSkill, this:GetID()));
+				elseif ( IsShiftKeyDown() ) then
+					if ( ChatFrameEditBox:IsVisible() ) then
+						ChatFrameEditBox:Insert(ATSW_GetTradeSkillReagentItemLink(ATSWFrame.selectedSkill, this:GetID()));
+					end
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="ATSWCheckerFrame" frameStrata="LOW" enableMouse="false" hidden="true">
+    	<Scripts>
+    		<OnUpdate>
+    			ATSW_CheckForTradeSkillWindow(arg1);
+    		</OnUpdate>
+    	</Scripts>
+    </Frame>
+
+	<Frame name="ATSWFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<TitleRegion setAllPoints="true"/>
+        <Size>
+            <AbsDimension x="768" y="512"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-104"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Layers>
+        	<Layer level="BACKGROUND">
+                <Texture name="ATSWFramePortrait" file="Interface\Spellbook\Spellbook-Icon">
+                    <Size>
+                        <AbsDimension x="54" y="54"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="10" y="-8"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+        		</Texture>
+	      	</Layer>
+	        <Layer level="ARTWORK">
+                <Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-BotLeftReplacement">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="-256"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-InBetween1">
+                    <Size>
+                        <AbsDimension x="128" y="512"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                        	<Offset>
+                                <AbsDimension x="256" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-InBetween2">
+                    <Size>
+                        <AbsDimension x="256" y="512"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="384" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\TaxiFrame\UI-TaxiFrame-TopRight">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="640" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-BotRightReplacement">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="640" y="-256"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="ATSWFrameTitleText" inherits="GameFontNormal" text="ATSW_VERSION">
+                    <Size>
+                        <AbsDimension x="600" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="ATSWFrame" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-17"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+			<Layer level="OVERLAY">
+				<Texture name="ATSWHorizontalBarLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="296" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="344" y="-326"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture name="ATSWHorizontalBarLeftAddon" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="90" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="ATSWHorizontalBarLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+				<Texture name="ATSWHorizontalBarLeft2" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="296" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="344" y="-358"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture name="ATSWHorizontalBarLeft2Addon" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="90" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="ATSWHorizontalBarLeft2" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+				<Texture name="ATSWHorizontalBarLeft3" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="296" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="344" y="-458"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture name="ATSWHorizontalBarLeft3Addon" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="90" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="ATSWHorizontalBarLeft3" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+				<FontString name="ATSWSkillName" inherits="GameFontNormal" text="Skill Name" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="244" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="420" y="-90"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ATSWRequirementLabel" inherits="GameFontHighlightSmall" text="REQUIRES_LABEL">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ATSWSkillName" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ATSWRequirementText" inherits="GameFontHighlightSmall" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="180" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ATSWRequirementLabel" relativePoint="TOPRIGHT" >
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ATSWSkillCooldown" inherits="GameFontRedSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ATSWRequirementLabel" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="ATSWDetailHeaderLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-DetailHeaderLeft">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="372" y="-83"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-DetailHeaderRight">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="ATSWDetailHeaderLeft" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="ATSWReagentLabel" inherits="GameFontNormalSmall" text="SPELL_REAGENTS">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="380" y="-136"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ATSWCraftDescription" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="290" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="380" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="ATSWFilterLabel" inherits="GameFontNormalSmall" text="ATSW_FILTERLABEL">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="86" y="-98"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+			</Layer>
+	    </Layers>
+	    <Frames>
+            <Button name="ATSWFrameCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="ATSWFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-29" y="-8"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_HideWindow();
+					</OnClick>
+				</Scripts>
+            </Button>
+
+			<StatusBar name="ATSWRankFrame" drawLayer="BACKGROUND" minValue="0" maxValue="1" defaultValue="0">
+				<Size>
+					<AbsDimension x="268" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="456" y="-37"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentSkillName" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="6" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSkillRank" inherits="GameFontHighlightSmall" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="128" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentSkillName" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="13" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Color r="1.0" g="1.0" b="1.0" a="0.2"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentBorder">
+						<Size>
+							<AbsDimension x="281" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture name="$parentNormal" file="Interface\PaperDollInfoFrame\UI-Character-Skills-BarBorder" />
+					</Button>			
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:RegisterEvent("SKILL_LINES_CHANGED");
+					</OnLoad>
+					<OnEvent>
+						if ( event == "SKILL_LINES_CHANGED" ) then
+							ATSWFrame_Update();
+						end
+					</OnEvent>
+				</Scripts>
+				<BarTexture name="$parentBar" file="Interface\PaperDollInfoFrame\UI-Character-Skills-Bar" />
+				<BarColor r="0.25" g="0.25" b="0.75" />
+			</StatusBar>
+
+			<Frame name="ATSWHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="293" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="ATSWHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="ATSWSkill1" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-120"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill2" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill3" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill4" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill5" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill6" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill7" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill8" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill9" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill10" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill11" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill12" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill13" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill14" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill15" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill16" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill17" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill18" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill19" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill18" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill20" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill21" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill22" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill21" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWSkill23" inherits="ATSWSkillButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWSkill22" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<ScrollFrame name="ATSWListScrollFrame" inherits="ATSWListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="296" y="396"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="26" y="-96"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(ATSW_TRADE_SKILL_HEIGHT, ATSWFrame_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="ATSWExpandButtonFrame">
+				<Size>
+					<AbsDimension x="54" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-71"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="ATSWExpandTabLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ExpandTab-Left">
+							<Size>
+								<AbsDimension x="8" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+						<Texture name="ATSWExpandTabMiddle" file="Interface\QuestFrame\UI-QuestLogSortTab-Middle">
+							<Size>
+								<AbsDimension x="38" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="ATSWExpandTabLeft" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="ATSWExpandTabRight" file="Interface\QuestFrame\UI-QuestLogSortTab-Right">
+							<Size>
+								<AbsDimension x="8" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="ATSWExpandTabMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="ATSWCollapseAllButton" hidden="false" inherits="ATSWSkillButtonTemplate">
+						<Size>
+							<AbsDimension x="40" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="ATSWExpandTabLeft" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName()):SetText(ALL);
+							</OnLoad>
+							<OnClick>
+								ATSWCollapseAllButton_OnClick();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<Frame name="ATSWInvSlotDropDown" inherits="UIDropDownMenuTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="198" y="-66"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						ATSWInvSlotDropDown_OnLoad();
+					</OnLoad>
+					<OnShow>
+						ATSWInvSlotDropDown_OnShow();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="ATSWSubClassDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="ATSWInvSlotDropDown" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="34" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						ATSWSubClassDropDown_OnLoad();
+					</OnLoad>
+					<OnShow>
+						ATSWSubClassDropDown_OnShow();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			
+			<CheckButton name="ATSWHeaderSortButton" virtual="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWFrame">
+                        <Offset>
+                            <AbsDimension x="80" y="-34"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString name="ATSWHeaderSortButtonText" inherits="GameFontHighlightSmall" text="ATSW_SORTBYHEADERS">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(this:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							ATSW_OrderBy("nothing");
+							ATSWNameSortButton:SetChecked(false);
+							ATSWDifficultySortButton:SetChecked(false);
+							ATSWCustomSortButton:SetChecked(false);
+                        else
+							ATSWHeaderSortButton:SetChecked(true);
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+
+			<CheckButton name="ATSWNameSortButton" virtual="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWFrame">
+                        <Offset>
+                            <AbsDimension x="80" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString name="ATSWNameSortButtonText" inherits="GameFontHighlightSmall" text="ATSW_SORTBYNAMES">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(this:GetChecked()) then
+                            PlaySound("igMainMenuOptionCheckBoxOn");
+							ATSW_OrderBy("name");
+							ATSWHeaderSortButton:SetChecked(false);
+							ATSWDifficultySortButton:SetChecked(false);
+							ATSWCustomSortButton:SetChecked(false);
+						else
+							ATSWNameSortButton:SetChecked(true);
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+
+			<CheckButton name="ATSWDifficultySortButton" virtual="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWFrame">
+                        <Offset>
+                            <AbsDimension x="240" y="-34"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString name="ATSWDifficultySortButtonText" inherits="GameFontHighlightSmall" text="ATSW_SORTBYDIFFICULTY">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(this:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							ATSW_OrderBy("difficulty");
+							ATSWNameSortButton:SetChecked(false);
+							ATSWHeaderSortButton:SetChecked(false);
+							ATSWCustomSortButton:SetChecked(false);
+                        else
+							ATSWDifficultySortButton:SetChecked(true);
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+
+			<CheckButton name="ATSWCustomSortButton" virtual="true">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWFrame">
+                        <Offset>
+                            <AbsDimension x="240" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString name="ATSWCustomSortButtonText" inherits="GameFontHighlightSmall" text="ATSW_CUSTOMSORTING">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(this:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							ATSW_OrderBy("custom");
+							ATSWNameSortButton:SetChecked(false);
+							ATSWHeaderSortButton:SetChecked(false);
+							ATSWDifficultySortButton:SetChecked(false);
+                        else
+							ATSWCustomSortButton:SetChecked(true);
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+
+
+			<Button name="ATSWSkillIcon">
+				<Size>
+					<AbsDimension x="37" y="37"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="380" y="-90"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="ATSWSkillIconCount" inherits="NumberFontNormal" justifyH="RIGHT" hidden="false">
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-5" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this.hasItem = 1;
+					</OnLoad>
+					<OnClick>
+						if ( IsControlKeyDown() ) then
+							DressUpItemLink(ATSW_GetTradeSkillItemLink(ATSWFrame.selectedSkill));
+						elseif ( IsShiftKeyDown() ) then
+							if ( ChatFrameEditBox:IsVisible() ) then
+								ChatFrameEditBox:Insert(ATSW_GetTradeSkillItemLink(ATSWFrame.selectedSkill));
+							end
+						end
+					</OnClick>
+					<OnEnter>
+						if ( ATSWFrame.selectedSkill ~= 0 ) then
+							GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+							if(atsw_oldmode) then	
+								GameTooltip:SetCraftSpell(ATSWFrame.selectedSkill);
+							else
+								GameTooltip:SetTradeSkillItem(ATSWFrame.selectedSkill);
+							end
+							CursorUpdate();
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+						ResetCursor();
+					</OnLeave>
+					<OnUpdate>
+						CursorOnUpdate();
+					</OnUpdate>
+				</Scripts>
+			</Button>
+			<Button name="ATSWReagent1" inherits="ATSWItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWReagentLabel" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent2" inherits="ATSWItemTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWReagent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent3" inherits="ATSWItemTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWReagent1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent4" inherits="ATSWItemTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWReagent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent5" inherits="ATSWItemTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWReagent3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent6" inherits="ATSWItemTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWReagent5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent7" inherits="ATSWItemTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWReagent5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWReagent8" inherits="ATSWItemTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWReagent7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="ATSWCreateButton" inherits="UIPanelButtonTemplate" text="CREATE">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="626" y="-348"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if(ATSWFrame.selectedSkillName~=nil) then
+							ATSW_AddJob(ATSWFrame.selectedSkillName,ATSWInputBox:GetNumber());
+							ATSWFrame_UpdateQueue();
+							ATSWInputBox:ClearFocus();
+							ATSW_StartStopProcessing();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWQueueButton" inherits="UIPanelButtonTemplate" text="ATSW_QUEUE">
+				<Size>
+					<AbsDimension x="60" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWCreateButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if(ATSWFrame.selectedSkillName~=nil) then
+							ATSW_AddJob(ATSWFrame.selectedSkillName,ATSWInputBox:GetNumber());
+							ATSWFrame_UpdateQueue();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWCreateAllButton" inherits="UIPanelButtonTemplate" text="CREATE_ALL">
+				<Size>
+					<AbsDimension x="76" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="ATSWCreateButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-82" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if(ATSWFrame.numAvailable>0 and ATSWFrame.selectedSkillName~=nil) then
+							ATSW_AddJob(ATSWFrame.selectedSkillName,ATSW_GetNumItemsPossibleWithInventory(ATSWFrame.selectedSkillName));
+							ATSWFrame_UpdateQueue();
+							ATSWInputBox:ClearFocus();
+							ATSW_StartStopProcessing();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWQueueAllButton" inherits="UIPanelButtonTemplate" text="ATSW_QUEUEALL">
+				<Size>
+					<AbsDimension x="76" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="ATSWCreateAllButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if(ATSWFrame.numAvailable>0 and ATSWFrame.selectedSkillName~=nil) then
+							ATSW_AddJob(ATSWFrame.selectedSkillName,ATSWFrame.numAvailable);
+							ATSWFrame_UpdateQueue();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWDecrementButton">
+				<Size>
+					<AbsDimension x="23" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWCreateAllButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSWFrameDecrement_OnClick();
+						ATSWInputBox:ClearFocus();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<EditBox name="ATSWInputBox" letters="3" historyLines="0" numeric="true" autoFocus="false">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWDecrementButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						if ( this:GetText() == "0" ) then
+							this:SetText("1");
+						end
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						this:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="ATSWIncrementButton">
+				<Size>
+					<AbsDimension x="23" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="ATSWCreateButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSWFrameIncrement_OnClick();
+						ATSWInputBox:ClearFocus();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+
+			<Button name="ATSWQueueItem1" inherits="ATSWQueueItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="352" y="-373"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWQueueItem1DeleteButton" inherits="UIPanelButtonTemplate" text="ATSW_DELETELETTER">
+				<Size>
+					<AbsDimension x="20" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWQueueItem1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_DeleteJob(this.jobindex);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="ATSWQueueItem2" inherits="ATSWQueueItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWQueueItem1" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWQueueItem2DeleteButton" inherits="UIPanelButtonTemplate" text="ATSW_DELETELETTER">
+				<Size>
+					<AbsDimension x="20" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWQueueItem2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_DeleteJob(this.jobindex);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="ATSWQueueItem3" inherits="ATSWQueueItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWQueueItem2" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWQueueItem3DeleteButton" inherits="UIPanelButtonTemplate" text="ATSW_DELETELETTER">
+				<Size>
+					<AbsDimension x="20" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWQueueItem3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_DeleteJob(this.jobindex);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="ATSWQueueItem4" inherits="ATSWQueueItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWQueueItem3" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="ATSWQueueItem4DeleteButton" inherits="UIPanelButtonTemplate" text="ATSW_DELETELETTER">
+				<Size>
+					<AbsDimension x="20" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ATSWQueueItem4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_DeleteJob(this.jobindex);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<ScrollFrame name="ATSWQueueScrollFrame" inherits="ATSWQueueScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="30" y="90"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="672" y="-370"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(22, ATSWFrame_UpdateQueue);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="ATSWQueueStartStopButton" inherits="UIPanelButtonTemplate" text="ATSW_STARTQUEUE">
+				<Size>
+					<AbsDimension x="150" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="430" y="-480"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_StartStopProcessing();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWEnchantButton" inherits="UIPanelButtonTemplate" text="ATSW_ENCHANT">
+				<Size>
+					<AbsDimension x="150" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="540" y="-480"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_Enchant();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWQueueDeleteButton" inherits="UIPanelButtonTemplate" text="ATSW_DELETEQUEUE">
+				<Size>
+					<AbsDimension x="120" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="565" y="-480"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_DeleteQueue();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWReagentsButton" inherits="UIPanelButtonTemplate" text="ATSW_REAGENTBUTTON">
+				<Size>
+					<AbsDimension x="90" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="675" y="-480"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_ToggleReagentFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWOptionsButton" inherits="UIPanelButtonTemplate" text="ATSW_OPTIONSBUTTON">
+				<Size>
+					<AbsDimension x="90" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="685" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_ToggleOptionsFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="ATSWCSButton" inherits="UIPanelButtonTemplate" text="ATSW_CSBUTTON">
+				<Size>
+					<AbsDimension x="70" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="390" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSW_ToggleCSFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<EditBox name="ATSWFilterBox" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="190" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="126" y="-94"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						ATSW_UpdateFilter(this:GetText());
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						this:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+
+        </Frames>
+        <Scripts>
+          <OnLoad>
+		  ATSW_OnLoad();
+          </OnLoad>
+          <OnEvent>
+		  ATSWFrame_OnEvent();
+          </OnEvent>
+          <OnShow>
+          PlaySound("igBackPackOpen");
+          </OnShow>
+          <OnHide>
+		  ATSW_OnHide();
+          PlaySound("igBackPackClose");
+          </OnHide>
+        </Scripts>
+    </Frame>
+
+	<Button name="ATSWRFTextTemplate_30" virtual="true">
+      <Size>
+        <AbsDimension x="40" y="16"/>
+      </Size>
+        <NormalText name="$parentText" inherits="GameFontNormal" justifyH="right">
+            <Size>
+                <AbsDimension x="40" y="12"/>
+            </Size>
+            <Anchors>
+                <Anchor point="LEFT"/>
+            </Anchors>
+            <Color r="1" g="1" b="1" a="1"/>
+        </NormalText>
+    </Button>
+
+	<Button name="ATSWRFTextTemplate_300" virtual="true">
+      <Size>
+        <AbsDimension x="150" y="16"/>
+      </Size>
+	  	<Scripts>
+            <OnLoad>
+            </OnLoad>
+            <OnClick>
+            </OnClick>
+			<OnEnter>
+                ATSWItemButton_OnEnter(this);
+            </OnEnter>
+            <OnLeave>
+                ATSWItemButton_OnLeave();
+            </OnLeave>
+        </Scripts>
+        <NormalText name="$parentText" inherits="GameFontNormal" justifyH="left">
+            <Size>
+                <AbsDimension x="150" y="12"/>
+            </Size>
+            <Anchors>
+                <Anchor point="LEFT"/>
+            </Anchors>
+            <Color r="1" g="1" b="1" a="1"/>
+        </NormalText>
+    </Button>
+
+	<Button name="ATSWRFTextTemplate_60" virtual="true">
+      <Size>
+        <AbsDimension x="50" y="16"/>
+      </Size>
+        <NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="center">
+            <Size>
+                <AbsDimension x="50" y="12"/>
+            </Size>
+            <Anchors>
+                <Anchor point="LEFT"/>
+            </Anchors>
+            <Color r="1" g="1" b="1" a="1"/>
+        </NormalText>
+    </Button>
+
+	<Button name="ATSWRFTextTemplate_40" virtual="true">
+      <Size>
+        <AbsDimension x="40" y="16"/>
+      </Size>
+        <NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="left">
+            <Size>
+                <AbsDimension x="40" y="12"/>
+            </Size>
+            <Anchors>
+                <Anchor point="LEFT"/>
+            </Anchors>
+            <Color r="1" g="1" b="1" a="1"/>
+        </NormalText>
+    </Button>
+	
+	<Frame name="ATSWRFReagentTemplate" virtual="true">
+    	<Size>
+            <AbsDimension x="700" y="16"/>
+        </Size>
+        <Frames>
+			<Button name="$parentCount" inherits="ATSWRFTextTemplate_30">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentItem" inherits="ATSWRFTextTemplate_300">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentCount" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="6" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentInventory" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentItem" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="6" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentBank" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentInventory" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentAlt" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentBank" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+				  <OnClick>
+					ATSWAlt_GetItemLocation(this.itemname);
+				  </OnClick>
+				</Scripts>
+            </Button>
+			<Button name="$parentMerchant" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentAlt" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentMissing" inherits="ATSWRFTextTemplate_40">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentMerchant" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+		</Frames>
+	</Frame>
+
+	<Button name="ATSWColumnHeaderTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="10" y="20"/>
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+                    <Size>
+                        <AbsDimension x="5" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                    <TexCoords left="0" right="0.078125" top="0.75" bottom="0"/>
+                </Texture>
+                <Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+                    <Size>
+                        <AbsDimension x="53" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentLeft" relative="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.078125" right="0.90625" top="0.75" bottom="0"/>
+                </Texture>
+                <Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+                    <Size>
+                        <AbsDimension x="4" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.90625" right="0.96875" top="0.75" bottom="0"/>
+                </Texture>
+            </Layer>
+        </Layers>
+        <NormalText inherits="GameFontHighlightSmall">
+            <Anchors>
+                <Anchor point="LEFT">
+                    <Offset>
+                        <AbsDimension x="8" y="2"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </NormalText>
+    </Button>
+
+	<Frame name="ATSWReagentFrame" frameStrata="MEDIUM" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+        <Size>
+            <AbsDimension x="512" y="512"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="120" y="-20"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Layers>
+	        <Layer level="ARTWORK">
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-TopLeftReplacement2">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\TaxiFrame\UI-TaxiFrame-BotLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="-256"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-TopRightReplacement2">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="256" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-BotRightReplacement2">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="256" y="-256"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="ATSWReagentFrameTitleText" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAMETITLE" justifyH="left">
+                    <Size>
+                        <AbsDimension x="450" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="ATSWReagentFrame" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-28"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWReagentFrameCH1" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH1" justifyH="center">
+                    <Size>
+                        <AbsDimension x="100" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWReagentFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="204" y="-54"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWReagentFrameCH2" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH2" justifyH="center">
+                    <Size>
+                        <AbsDimension x="100" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWReagentFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="254" y="-54"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWReagentFrameCH3" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH3" justifyH="center">
+                    <Size>
+                        <AbsDimension x="100" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWReagentFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="304" y="-54"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWReagentFrameCH4" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH4" justifyH="center">
+                    <Size>
+                        <AbsDimension x="100" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWReagentFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="354" y="-54"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+			<Button name="ATSWReagentFrameCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="ATSWReagentFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-31" y="-10"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Frame name="ATSWRFReagent1" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="26" y="-76"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="ATSWRFReagent2" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent1" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent3" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent2" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent4" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent3" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent5" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent4" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent6" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent5" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent7" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent6" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent8" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent7" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent9" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent8" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent10" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent9" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent11" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent10" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent12" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent11" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent13" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent12" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent14" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent13" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent15" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent14" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent16" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent15" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent17" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent16" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent18" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent17" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent19" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent18" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWRFReagent20" inherits="ATSWRFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWRFReagent19" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Button name="ATSWBuyReagentsButton" inherits="UIPanelButtonTemplate" text="ATSW_BUYREAGENTBUTTON">
+				<Size>
+					<AbsDimension x="440" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="ATSWReagentFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="246" y="-416"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ATSWMerchant_Buy();
+					</OnClick>
+				</Scripts>
+			</Button>
+        </Frames>
+
+        <Scripts>
+          <OnLoad>
+          </OnLoad>
+          <OnEvent>
+          </OnEvent>
+          <OnShow>
+          </OnShow>
+          <OnHide>
+          </OnHide>
+        </Scripts>
+    </Frame>
+
+	<Frame name="ATSWOptionsFrame" inherits="ATSWDialogBoxFrame_OnlyOK" frameStrata="DIALOG">
+		<Size>
+			<AbsDimension x="384" y="400"/>
+		</Size>
+		<Frames>
+			<Frame>
+				<Size>
+					<AbsDimension x="360" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="ATSWOFTitle" inherits="GameFontNormalLarge" justifyH="CENTER" justifyV="TOP" text="ATSW_OPTIONS_TITLE">
+							<Size>
+								<AbsDimension x="360" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+		<CheckButton name="ATSWOFUnifiedCounterButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="20" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIBText" inherits="GameFontHighlightSmall" text="ATSWOFUCB_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_multicount=true;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+						ATSWOFSeparateCounterButton:SetChecked(false);
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		<CheckButton name="ATSWOFSeparateCounterButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="20" y="-70"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIBText" inherits="GameFontHighlightSmall" text="ATSWOFSCB_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_multicount=false;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+						ATSWOFUnifiedCounterButton:SetChecked(false);
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		<CheckButton name="ATSWOFIncludeBankButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="40" y="-100"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIBText" inherits="GameFontHighlightSmall" text="ATSWOFIB_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_considerbank=true;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					else
+						PlaySound("igMainMenuOptionCheckBoxOff");
+						atsw_considerbank=false;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		<CheckButton name="ATSWOFIncludeAltsButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="40" y="-130"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIAText" inherits="GameFontHighlightSmall" text="ATSWOFIA_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_consideralts=true;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					else
+						PlaySound("igMainMenuOptionCheckBoxOff");
+						atsw_consideralts=false;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		<CheckButton name="ATSWOFIncludeMerchantsButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="40" y="-160"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIMText" inherits="GameFontHighlightSmall" text="ATSWOFIM_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_considermerchants=true;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					else
+						PlaySound("igMainMenuOptionCheckBoxOff");
+						atsw_considermerchants=false;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		<CheckButton name="ATSWOFAutoBuyButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="60" y="-196"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIMText" inherits="GameFontHighlightSmall" text="ATSWOFAB_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_autobuy=true;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					else
+						PlaySound("igMainMenuOptionCheckBoxOff");
+						atsw_autobuy=false;
+						ATSW_ResetPossibleItemCounts();
+						ATSWFrame_Update();
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>			
+
+		<CheckButton name="ATSWOFTooltipButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="20" y="-230"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFIMText" inherits="GameFontHighlightSmall" text="ATSWOFTB_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_recipetooltip=true;
+					else
+						PlaySound("igMainMenuOptionCheckBoxOff");
+						atsw_recipetooltip=false;
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		<CheckButton name="ATSWOFShoppingListButton" virtual="true">
+			<Size>
+				<AbsDimension x="20" y="20"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="ATSWOptionsFrame">
+					<Offset>
+						<AbsDimension x="20" y="-260"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="ATSWOFSLText" inherits="GameFontHighlightSmall" text="ATSWOFSLB_TEXT" justifyH="LEFT">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					if(this:GetChecked()) then
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						atsw_displayshoppinglist=true;
+					else
+						PlaySound("igMainMenuOptionCheckBoxOff");
+						atsw_displayshoppinglist=false;
+					end
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+			<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+			<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		</CheckButton>
+
+		</Frames>
+    </Frame>
+
+	<GameTooltip name="ATSWTradeskillTooltipTemplate" frameStrata="TOOLTIP" hidden="true" virtual="true">
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTextLeft1" inherits="GameTooltipHeaderText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight1" inherits="GameTooltipHeaderText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft1" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft2" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft1" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight2" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft2" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft3" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft2" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight3" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft3" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft4" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft3" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight4" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft4" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft5" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft4" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight5" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft5" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft6" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft5" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight6" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft6" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft7" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft6" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight7" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft7" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft8" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft7" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight8" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft8" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft9" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft8" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight9" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft9" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft10" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft9" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight10" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft10" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft11" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft10" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight11" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft11" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft12" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft11" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight12" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft12" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft13" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft12" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight13" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft13" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft14" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft13" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight14" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft14" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft15" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft14" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight15" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft15" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft16" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft15" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight16" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft16" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft17" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft16" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight17" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft17" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft18" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft17" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight18" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft18" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft19" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft18" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight19" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft19" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft20" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft19" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight20" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft20" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft21" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft20" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight21" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft21" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft22" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft21" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight22" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft22" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft23" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft22" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight23" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft23" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft24" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft23" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight24" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft24" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft25" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft24" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight25" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft24" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft26" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft25" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight26" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft25" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft27" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft26" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight27" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft26" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft28" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft27" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight28" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft27" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft29" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft28" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight29" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft28" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextLeft30" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTextLeft29" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTextRight30" inherits="GameTooltipText" hidden="true">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentTextLeft29" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<StatusBar name="$parentStatusBar" hidden="true">
+				<Size>
+					<AbsDimension x="0" y="8"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-1"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnValueChanged>
+						HealthBar_OnValueChanged(arg1);
+					</OnValueChanged>
+				</Scripts>
+				<BarTexture name="$parentTexture" file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+			</StatusBar>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTextLeft1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				GameTooltip_OnLoad();
+			</OnLoad>
+			<OnHide>
+				GameTooltip_OnHide();
+			</OnHide>
+			<OnTooltipSetDefaultAnchor>
+				GameTooltip_SetDefaultAnchor(this, UIParent);
+			</OnTooltipSetDefaultAnchor>
+			<OnTooltipAddMoney>
+				SetTooltipMoney(this, arg1);
+			</OnTooltipAddMoney>
+			<OnTooltipCleared>
+				GameTooltip_ClearMoney();
+			</OnTooltipCleared>
+		</Scripts>
+	</GameTooltip>
+
+	<Frame name="ATSWContinueFrame" inherits="ATSWDialogBoxFrame" frameStrata="DIALOG">
+		<Size>
+			<AbsDimension x="384" y="200"/>
+		</Size>
+		<Frames>
+			<Frame>
+				<Size>
+					<AbsDimension x="360" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="ATSWCFTitle" inherits="GameFontNormalLarge" justifyH="CENTER" justifyV="TOP" text="ATSWCF_TITLE">
+							<Size>
+								<AbsDimension x="360" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+						<FontString name="ATSWCFText" inherits="GameFontNormal" justifyH="center" justifyV="TOP" text="ATSWCF_TEXT">
+							<Size>
+								<AbsDimension x="320" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-40"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+						<FontString name="ATSWCFItemName" inherits="GameFontNormal" justifyH="center" justifyV="TOP" text="">
+							<Size>
+								<AbsDimension x="320" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-100"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+    </Frame>
+
+	<GameTooltip name="ATSWTradeskillTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="ATSWTradeskillTooltipTemplate">
+		<Scripts>
+			<OnLoad>
+			</OnLoad>
+			<OnEvent>
+			</OnEvent>
+			<OnHide>
+			</OnHide>
+		</Scripts>
+	</GameTooltip>
+
+
+	<Frame name="ATSWAutoBuyButtonFrame" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="300" y="50"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="ATSWAutoBuyButtonTopText" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="TOP" text="ATSW_AUTOBUYBUTTON_TOPTEXT">
+					<Size>
+						<AbsDimension x="300" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="ATSWAutoBuyButton" inherits="GameMenuButtonTemplate" parent="ATSWAutoBuyButtonFrame" text="ATSW_AUTOBUYBUTTON_TEXT">
+			  <Size>
+				<AbsDimension x="150" y="18"/>
+			  </Size>
+			  <Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="-25"/>
+					</Offset>
+				</Anchor>
+			  </Anchors>
+			  <Scripts>
+				<OnClick>
+					ATSWMerchant_ExecuteAutoBuy();
+				</OnClick>
+			  </Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="ATSWSLFReagentTemplate" virtual="true">
+    	<Size>
+            <AbsDimension x="700" y="16"/>
+        </Size>
+        <Frames>
+			<Button name="$parentCount" inherits="ATSWRFTextTemplate_30">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentItem" inherits="ATSWRFTextTemplate_300">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentCount" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="6" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						ATSWAuction_SearchForItem(this.itemname);
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Button name="$parentInventory" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentItem" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="6" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentBank" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentInventory" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentAlt" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentBank" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+				  <OnClick>
+					ATSWAlt_GetItemLocation(this.itemname);
+				  </OnClick>
+				</Scripts>
+            </Button>
+			<Button name="$parentMerchant" inherits="ATSWRFTextTemplate_60">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentAlt" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+			<Button name="$parentMissing" inherits="ATSWRFTextTemplate_40">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentMerchant" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="ATSWShoppingListFrame" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+        <Size>
+            <AbsDimension x="512" y="200"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="ATSWFrame" relativePoint="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="120" y="-20"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Layers>
+	        <Layer level="ARTWORK">
+                <Texture file="Interface\TaxiFrame\UI-TaxiFrame-BotLeft">
+                    <Size>
+                        <AbsDimension x="256" y="200"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\AddOns\AdvancedTradeSkillWindow\UI-TaxiFrame-BotRightReplacement2">
+                    <Size>
+                        <AbsDimension x="256" y="200"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="256" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+				<FontString name="ATSWShoppingListFrameTitleText" inherits="GameFontNormalSmall" text="ATSW_SHOPPINGLISTFRAMETITLE" justifyH="left">
+                    <Size>
+                        <AbsDimension x="450" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="ATSWShoppingListFrame" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-7"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWShoppingListFrameCH1" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH1" justifyH="center">
+                    <Size>
+                        <AbsDimension x="75" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWShoppingListFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="204" y="-28"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWShoppingListFrameCH2" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH2" justifyH="center">
+                    <Size>
+                        <AbsDimension x="75" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWShoppingListFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="254" y="-28"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWShoppingListFrameCH3" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH3" justifyH="center">
+                    <Size>
+                        <AbsDimension x="75" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWShoppingListFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="304" y="-28"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+				<FontString name="ATSWShoppingListFrameCH4" inherits="GameFontNormalSmall" text="ATSW_REAGENTFRAME_CH4" justifyH="center">
+                    <Size>
+                        <AbsDimension x="75" y="14"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeTo="ATSWShoppingListFrame" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="354" y="-28"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="1"/>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+			<Frame name="ATSWSLFReagent1" inherits="ATSWSLFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="14" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="ATSWSLFReagent2" inherits="ATSWSLFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWSLFReagent1" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWSLFReagent3" inherits="ATSWSLFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWSLFReagent2" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWSLFReagent4" inherits="ATSWSLFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWSLFReagent3" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<Frame name="ATSWSLFReagent5" inherits="ATSWSLFReagentTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="ATSWSLFReagent4" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+			<ScrollFrame name="ATSWSLScrollFrame" inherits="ATSWQueueScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="30" y="90"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ATSWShoppingListFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="416" y="-46"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(5, ATSWAuction_UpdateReagentList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+        </Frames>
+
+        <Scripts>
+          <OnLoad>
+          </OnLoad>
+          <OnEvent>
+          </OnEvent>
+          <OnShow>
+          </OnShow>
+          <OnHide>
+          </OnHide>
+        </Scripts>
+    </Frame>
+
+	<GameTooltip name="ATSWScanTooltip" frameStrata="TOOLTIP" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+</Ui>

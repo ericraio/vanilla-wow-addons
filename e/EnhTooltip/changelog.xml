@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<changelog>
+	<nextrelease>
+		<bugfix id="bugfix6" codedby="Luke1410" sourceforgeid="1292439" timestamp="2005-09-03 02:47">
+			<file name="Tooltip.lua">
+				<change function="TT_Chat_OnHyperlinkShow" />
+			</file>
+			<developer>
+				Used the wrong argument to generate the fabricatedLink. Though not sure in which case the second argument (which normally is the complete link) is nil, fixed that issue.
+				Though I could not test it myself, I'm almost 100% sure that this fixes the bug.
+			</developer>
+			<public>
+				Fixed the "error in Tooltip line 575 issue" when clicking on itemlinks in the chatwindow introduced in Tooltip 3.0.5.
+			</public>
+		</bugfix>
+	</nextrelease>
+	<release version="3.0.5" timestamp="2005-09-14 08:22">
+		<optimization id="optimization1" codedby="Luke1410" replace="bugfix4" text="concatenate" timestamp="2005-08-21 14:30">
+			<file name="Tooltip.lua">
+				<remove variable="TT_OldChatLinkItem" />
+				<add variable="OldChatLinkItem" />
+				<change function="TT_Chat_OnHyperlinkShow" />
+				<change function="TT_GameTooltip_OnHide" />
+			</file>
+			<developer>
+				Replaced the global variable TT_OldChatLinkItem with its local counterpart: OldChatLinkItem, as there's no need to have a global one.
+			</developer>
+		</optimization>
+		<bugfix id="bugfix5" codedby="Luke1410" sourceforgeid="1272712" replace="optimization1" text="concatenate" timestamp="2005-09-03 02:47">
+			<file name="Tooltip.lua">
+				<remove function="EnhTooltip_OnHyperLinkShow" />
+				<change function="TT_GameTooltip_OnHide" />
+				<change function="TT_Chat_OnHyperlinkShow" />
+			</file>
+			<developer>
+				In embed mode, the enhtooltiptext in the itemreftooltip became duplicated. This has been fixed. The itemreftooltip will now also adjust, when switching to/from embed mode while it is being displayed.
+			</developer>
+		</bugfix>
+		<bugfix id="bugfix4" codedby="Luke1410" sourceforgeid="1249951" timestamp="2005-08-20 10:58">
+			<file name="Tooltip.lua">
+				<add variable="TT_OldChatLinkItem" />
+				<add function="EnhTooltip_OnHyperLinkShow" />
+				<change function="TT_Chat_OnHyperlinkShow" />
+				<change function="TT_GameTooltip_OnHide" />
+			</file>
+			<public>
+				Only when /auctioneer embed = off: Moving the mouse over an item in your bagpack while there was already an item shown using a chatlink, the old enhTooltip disappeared while the WoW-Iteminfo was still displayed. Now the EnhTooltip will be displayed again, when you no longer mouse over the bagpackitem.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix3" codedby="Luke1410" sourceforgeid="1240137" submitby="pandarus" timestamp="2005-08-10 20:15">
+			<file name="Tooltip.lua">
+				<change function="TT_Chat_OnHyperlinkShow" />
+			</file>
+			<developer>
+				The WoW parameters of the function "ChatFrame_OnHyperlinkShow" was changed in WoW 1.6.0.
+			</developer>
+			<public>
+				The rightclickmenu on characternames in the chatmenu works again. Thx to pandarus for providing the patch.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix2" codedby="Luke1410" sourceforgeid="1254284" sbumitby="Derkyle" timestamp="2005-08-09 21:40">
+			<file name="Tooltip.lua">
+				<change function="fakeLink" />
+			</file>
+			<developer>
+				The reported error had been caused by a bug in ItemsMatrix. IM's function: ItemsMatrix_GetHyperlink returned nil because of an error which caused a nil error in TT_IMInv_ItemButton_OnEnter.
+				As fakeLink is a global function (TT_FakeLink), I changed that function to be nilsafe, so it won't cause any more errormessages for users, even if external addons cause trouble.
+			</developer>
+			<public>
+				Fixed the "attempt to call global `ItemsMatrix_GetHyperlink' (a nil value)"-bug (you should upgrade ItemsMatrix to version 15 or greater, too!)
+			</public>
+		</bugfix>
+		<bugfix id="bugfix1" codedby="Luke1410" sourceforgeid="1238391" timestamp="2005-08-05 01:10">
+			<file name="Tooltip.lua">
+				<change function="TT_Show" />
+			</file>
+			<developer>
+				changed the line: "elseif (parentRect.r + width < sWidth * 0.8) then" to "elseif (parentRect.r + width > sWidth * 0.8) then" as suggested by the sourceforgeuser (see sourceforgeid).
+			</developer>
+			<public>
+				the tooltip could swap over the right side of the window
+			</public>
+		</bugfix>
+		<added id="improvement1" codedby="Luke1410" timestamp="2005-08-05 00:19">
+			<file name="Tooltip.lua">
+				<change function="TT_GetTextGSC" />
+			</file>
+			<developer>
+				Added a new optional parameter to TT_GetTextGSC, to allow the exact amount being print to the tooltip.
+				If the second parameter is set to true, the amount of copper will also be printed out, even if the given money value is > 1g.
+				That functionality was needed to print the correct suggested price to the tooltip.
+			</developer>
+		</added>
+	</release>
+<!--
+		Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
+		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" timestamp="" replacebugfix="bugfix1" text="replace"></bugfix>
+		<added id="addition1" by="Alabana" text="concatenate"></added>
+		<removed id="remove1"></removed>
+-->
+</changelog>

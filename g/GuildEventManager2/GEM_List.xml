@@ -1,0 +1,1925 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="GEM_List.lua"/>
+
+	<Frame name="GEMListAdminMenu" inherits="UIDropDownMenuTemplate">
+		<Scripts>
+			<OnLoad>
+				GEMListAdminMenu_OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="GEMListTabFrame" hidden="true" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="500" y="180"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+
+  <!-- column header template -->
+  <Button name="GEMListAdminFrameColumnHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="10" y="24"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="5" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="53" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="4" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			GEMListAdmin_SortBy(this.sortType, this.sortDir);
+			this.sortDir = not this.sortDir;
+		</OnClick>
+	</Scripts>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+  </Button>
+  
+  <Button name="GEMListLimitFrameColumnHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="10" y="24"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="5" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="53" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="4" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+  </Button>
+
+  <Button name="GEMListLimitItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="385" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BORDER">
+			<FontString name="$parentClass" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="68" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentMin" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentClass" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentMax" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMin" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentTitular" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="78" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMax" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentSubstitute" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="78" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentTitular" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentReplacement" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="83" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSubstitute" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="385" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+  </Button>
+
+  <Button name="GEMListAdminItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="360" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BORDER">
+			<FontString name="$parentPlace" inherits="GameFontNormalSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="98" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentPlace" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentGuild" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="118" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentClass" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="68" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuild" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentLevel" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentClass" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="360" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+		</OnLoad>
+		<OnClick>
+			GEMListAdmin_EventOnClick(arg1);
+		</OnClick>
+		<OnEnter>
+			GEMListAdmin_EventOnHover();
+		</OnEnter>
+		<OnLeave>
+			GameTooltip:Hide();
+		</OnLeave>
+	</Scripts>
+  </Button>
+
+  <Button name="GEMListFrameColumnHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="10" y="24"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="5" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="53" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="4" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			GEMList_SortBy(this.sortType, this.sortDir);
+			this.sortDir = not this.sortDir;
+		</OnClick>
+	</Scripts>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+  </Button>
+  
+  <Button name="GEMEventItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="465" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BORDER">
+			<FontString name="$parentDate" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="138" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentWhere" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="128" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentDate" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentLeader" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="78" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentWhere" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentCount" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="68" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeader" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentRangeLevel" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="53" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentCount" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="500" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+	<Scripts>
+		<OnClick>
+			GEMList_EventOnClick();
+		</OnClick>
+		<OnEnter>
+			GEMList_EventOnHover();
+		</OnEnter>
+		<OnLeave>
+			GameTooltip:Hide();
+		</OnLeave>
+	</Scripts>
+  </Button>
+
+  <Frame name="GEMListFrame" parent="GEMMainFrame" inherits="GEMTabFrame">
+	<Layers>
+		<Layer level="BACKGROUND">
+			<FontString name="GEMListFrameCommentString" hidden="true" inherits="GameFontNormal" justifyH="LEFT" text="GEM_TEXT_COMMENT">
+				<Size>
+					<AbsDimension x="140" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="GEMListFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-140" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="GEMListFrameForcesubString" hidden="true" inherits="GameFontNormal" justifyH="LEFT" text="GEM_TEXT_FORCESUB">
+				<Size>
+					<AbsDimension x="140" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="GEMListFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="40" y="-37"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<CheckButton name="GEMListCalendarCheckBox" inherits="OptionsCheckButtonTemplate">
+			<Size>
+				<AbsDimension x="26" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-120" y="24"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<HitRectInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</HitRectInsets>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_EVENT_CALENDAR_VIEW">
+						<Size>
+							<AbsDimension x="100" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="26" y="1" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					GEMListCalendarCheckBox_OnClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<Frame name="$parentCalView" hidden="true">
+			<Size>
+				<AbsDimension x="512" y="216"/>
+			</Size>			
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parentMonthYear" justifyH="CENTER" inherits="GameFontNormalLarge">
+						<Size>
+							<AbsDimension x="160" y="32"/>
+						</Size>			
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="300" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parentComingSoon" justifyH="CENTER" inherits="GameFontNormalSmall" text="Coming soon, GEM events in calendar">
+						<Size>
+							<AbsDimension x="200" y="32"/>
+						</Size>			
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-70"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Frames>
+				<Frame name="$parentCal" inherits="GEMEventCalendarFrameTemplate">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Frame>
+				<Button name="$parentPrevious" hidden="false">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parentMonthYear" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							GEMEventCalendar_PreviousMonth();
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+					<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+					<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+					<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+				</Button>
+				<Button name="$parentNext" hidden="false">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMonthYear" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							GEMEventCalendar_NextMonth();
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+					<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+					<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+					<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+				</Button>
+				<Frame name="$parentResetsDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentCal" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="130" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Layers>
+						<Layer level="BACKGROUND">
+							<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_EVENT_CALENDAR_INSTANCE_RESET">
+								<Size>
+									<AbsDimension x="130" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT">
+										<Offset>
+											<AbsDimension x="-130" y="3" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</FontString>
+						</Layer>
+					</Layers>
+					<Scripts>
+						<OnShow> GEMEventCalendarResetsDropDown_OnShow(); </OnShow>
+					</Scripts>
+				</Frame>
+			</Frames>
+			<Scripts>
+				<OnShow>
+					GEMEventCalendar_OnShow(getglobal(this:GetName().."Cal"));
+				</OnShow>
+			</Scripts>
+		</Frame>
+		<Frame name="$parentListView">
+			<Size>
+				<AbsDimension x="512" y="216"/>
+			</Size>			
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Frames>
+			<Button name="GEMListFrameColumnHeader1" inherits="GEMListFrameColumnHeaderTemplate" text="GEM_HEADER_DATE">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+					    GEMSetColumnWidth(140);
+					    this.sortDir = true;
+					    this.sortType = GEM_SORTBY_DATE;
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="GEMListFrameColumnHeader2" inherits="GEMListFrameColumnHeaderTemplate" text="GEM_HEADER_WHERE">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GEMListFrameColumnHeader1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+					    GEMSetColumnWidth(130);
+    					    this.sortDir = true;
+					    this.sortType = GEM_SORTBY_WHERE;
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="GEMListFrameColumnHeader3" inherits="GEMListFrameColumnHeaderTemplate" text="GEM_HEADER_LEADER">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GEMListFrameColumnHeader2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+					    GEMSetColumnWidth(80);
+	    				    this.sortDir = true;
+					    this.sortType = GEM_SORTBY_LEADER;
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="GEMListFrameColumnHeader4" inherits="GEMListFrameColumnHeaderTemplate" text="GEM_HEADER_COUNT">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GEMListFrameColumnHeader3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+					    GEMSetColumnWidth(70);
+    					    this.sortDir = true;
+					    this.sortType = GEM_SORTBY_COUNT;
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="GEMListFrameColumnHeader5" inherits="GEMListFrameColumnHeaderTemplate" text="GEM_HEADER_RANGE_LEVEL">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GEMListFrameColumnHeader4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+					    GEMSetColumnWidth(65);
+	    				    this.sortDir = true;
+					    this.sortType = GEM_SORTBY_MINMAX;
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="GEMEventItem1" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMListFrameColumnHeader1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem2" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem3" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem4" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem5" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem6" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem7" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem8" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem9" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem10" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem11" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GEMEventItem12" inherits="GEMEventItemTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GEMEventItem11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<ScrollFrame name="GEMEventItemScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="455" y="192" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="GEMListFrameColumnHeader5" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-23" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(10, GEMList_UpdateEventList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<Button name="GEM_Help_ListTab_Events" inherits="GEM_HelpTemplate" id="1">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="GEMListFrameColumnHeader5">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			</Frames>
+		</Frame>
+		
+		<!-- Middle widgets -->
+		<Frame name="GEMListMiddleFrame">
+			<Size>
+				<AbsDimension x="500" y="210"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="6" y="-220"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+				<EdgeSize>
+					<AbsValue val="16"/>
+				</EdgeSize>
+				<TileSize>
+					<AbsValue val="16"/>
+				</TileSize>
+				<BackgroundInsets>
+					<AbsInset left="3" right="5" top="3" bottom="5"/>
+				</BackgroundInsets>
+			</Backdrop>
+			<Frames>
+				<Button name="$parentTab1" inherits="CharacterFrameTabButtonTemplate" id="1" text="GEM_TAB_LIST_DETAILS">
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT" relativeTo="GEMListMiddleFrame">
+							<Offset>
+								<AbsDimension x="35" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>GEMList_SelectTab(1);</OnClick>
+					</Scripts>
+				</Button>
+				<Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="GEM_TAB_LIST_CLASSES">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>GEMList_SelectTab(2);</OnClick>
+					</Scripts>
+				</Button>
+				<Button name="$parentTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="GEM_TAB_LIST_ADMIN">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>GEMList_SelectTab(3);</OnClick>
+					</Scripts>
+				</Button>
+			</Frames>
+		</Frame>
+		<!--  bottom buttons -->
+		<Button name="GEMListFrameUnsubscribe" inherits="UIPanelButtonTemplate" text="GEM_TEXT_UNSUBSCRIBE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMListFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-7" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMList_UnsubscribeOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<Button name="GEMListFrameUnclose" inherits="UIPanelButtonTemplate" text="GEM_TEXT_UNCLOSE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMListFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-7" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMList_UncloseOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<Button name="GEMListFrameEventIgnore" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_IGNORE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMListFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-7" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_IgnoreOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<Button name="GEMListFrameDelete" inherits="UIPanelButtonTemplate" text="GEM_TEXT_DELETE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="GEMListFrameUnclose" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMList_DeleteOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="GEMListFrameRecover" inherits="UIPanelButtonTemplate" text="GEM_TEXT_RECOVER">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMListFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-7" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMList_RecoverOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<Button name="GEMListFrameSubscribe" inherits="UIPanelButtonTemplate" text="GEM_TEXT_SUBSCRIBE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="GEMListFrameUnsubscribe" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMList_SubscribeOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Frame name="GEMListFrameRerollDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="GEMListFrameSubscribe" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="15" y="-3"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMListFrameRerollDropDown_OnShow(); </OnShow>
+			</Scripts>
+		</Frame>
+
+		<EditBox name="GEMListFrameComment" hidden="true" letters="100" numeric="false" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="170" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListFrameCommentString" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="100" y="5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</EditBox>
+
+		<CheckButton name="GEMListFrameForcesub" hidden="true" inherits="OptionsCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="GEMListFrame" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="-45"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<HitRectInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</HitRectInsets>
+			<Size>
+				<AbsDimension x="26" y="26"/>
+			</Size>
+		</CheckButton>
+
+	</Frames>
+	<Scripts>
+		<OnShow>
+			GEMList_OnShow();
+		</OnShow>
+		<OnLoad>
+			GEMList_OnLoad();
+		</OnLoad>
+	</Scripts>
+  </Frame>
+
+  <Frame name="GEMListLimitationsFrame" parent="GEMListMiddleFrame" inherits="GEMListTabFrame">
+	<Frames>
+		<Button name="GEMListLimitHeaderClass" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEMLIMIT_HEADER_CLASS">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="58" y="-15"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(70);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListLimitHeaderMin" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEMLIMIT_HEADER_MIN">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListLimitHeaderClass" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(40);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListLimitHeaderMax" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEMLIMIT_HEADER_MAX">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListLimitHeaderMin" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(40);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListLimitHeaderTitular" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEMLIMIT_HEADER_TITULAR">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListLimitHeaderMax" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(80);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListLimitHeaderSubstitute" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEMLIMIT_HEADER_SUBSTITUTE">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListLimitHeaderTitular" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(80);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListLimitHeaderReplacement" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEMLIMIT_HEADER_REPLACEMENT">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListLimitHeaderSubstitute" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(85);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListLimitItem_WARRIOR" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitHeaderClass" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_PALADIN" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_WARRIOR" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_SHAMAN" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_PALADIN" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_ROGUE" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_SHAMAN" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_MAGE" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_ROGUE" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_WARLOCK" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_MAGE" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_HUNTER" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_WARLOCK" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_DRUID" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_HUNTER" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListLimitItem_PRIEST" inherits="GEMListLimitItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListLimitItem_DRUID" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+	</Frames>
+	<Scripts>
+		<OnShow>
+			GEMListLimitations_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+
+  <Frame name="GEMListDetailsFrame" parent="GEMListMiddleFrame" inherits="GEMListTabFrame">
+	<Layers>
+		<Layer level="BACKGROUND">
+			<FontString name="$parent_Descr_Title" inherits="GameFontNormal" justifyH="LEFT" text="GEM_TEXT_DETAILS_DESCRIPTION">
+				<Size>
+					<AbsDimension x="140" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="10" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_Descr_Value" inherits="GameFontHighlight" justifyH="LEFT" justifyV="TOP" text="">
+				<Size>
+					<AbsDimension x="450" y="60"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Descr_Title" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_SortType_Title" inherits="GameFontNormal" justifyH="LEFT" text="GEM_TEXT_DETAILS_SORTTYPE">
+				<Size>
+					<AbsDimension x="300" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="10" y="-50" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_SortType_Value" inherits="GameFontHighlight" justifyH="LEFT" justifyV="TOP" text="">
+				<Size>
+					<AbsDimension x="450" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_SortType_Title" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnShow>
+			GEMListDetails_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+
+  <Frame name="GEMListAdminFrame" parent="GEMListMiddleFrame" inherits="GEMListTabFrame">
+	<Frames>
+		<Button name="GEMListAdminFrameClose" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_CLOSE">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="10" y="-12"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_CloseOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>		
+		<Button name="GEMListAdminFrameEdit" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_EDIT">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="GEMListAdminFrameClose">
+					<Offset>
+						<AbsDimension x="0" y="-5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_EditOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>		
+		<Button name="GEMListAdminFrameGroup" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_GROUP">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="GEMListAdminFrameEdit">
+					<Offset>
+						<AbsDimension x="0" y="-5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_GroupOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameAddExt" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_ADDEXT">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="GEMListAdminFrameGroup">
+					<Offset>
+						<AbsDimension x="0" y="-10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_AddExtOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameIgnore" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_IGNORE">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="GEMListAdminFrameAddExt">
+					<Offset>
+						<AbsDimension x="0" y="-30"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_IgnoreOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameBanned" inherits="UIPanelButtonTemplate" text="GEM_TEXT_ADMIN_BANNED">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="GEMListAdminFrameIgnore">
+					<Offset>
+						<AbsDimension x="0" y="-5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListAdmin_BannedOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameColumnHeader1" inherits="GEMListAdminFrameColumnHeaderTemplate" text="GEMADMIN_HEADER_PLACE">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="118" y="-10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(40);
+				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_PLACE;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameColumnHeader2" inherits="GEMListAdminFrameColumnHeaderTemplate" text="GEMADMIN_HEADER_NAME">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListAdminFrameColumnHeader1" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(100);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_NAME;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameColumnHeader3" inherits="GEMListAdminFrameColumnHeaderTemplate" text="GEMADMIN_HEADER_GUILD">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListAdminFrameColumnHeader2" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(120);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_GUILD;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameColumnHeader4" inherits="GEMListAdminFrameColumnHeaderTemplate" text="GEMADMIN_HEADER_CLASS">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListAdminFrameColumnHeader3" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(70);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_CLASS;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminFrameColumnHeader5" inherits="GEMListAdminFrameColumnHeaderTemplate" text="GEMADMIN_HEADER_LEVEL">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListAdminFrameColumnHeader4" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(55);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_LEVEL;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListAdminItem1" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminFrameColumnHeader1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem2" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem3" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem4" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem5" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem6" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem7" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem8" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem9" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem8" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListAdminItem10" inherits="GEMListAdminItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListAdminItem9" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<ScrollFrame name="GEMListAdminItemScrollFrame" inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="320" y="160" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="GEMListAdminFrameColumnHeader5" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-23" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(10, GEMListAdmin_UpdatePlayersList);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+	</Frames>
+	<Scripts>
+		<OnShow>
+			GEMListAdmin_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+
+  <Button name="GEMListBannedItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="360" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BORDER">
+			<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="98" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentReason" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="258" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="360" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+	<Scripts>
+		<OnClick>
+			GEMListBanned_EventOnClick();
+		</OnClick>
+		<OnEnter>
+			--GEMListBanned_EventOnHover();
+		</OnEnter>
+		<OnLeave>
+			--GameTooltip:Hide();
+		</OnLeave>
+	</Scripts>
+  </Button>
+
+  <Frame name="GEMListBannedFrame" movable="true" frameStrata="HIGH" hidden="true" parent="UIParent" enableMouse="true">
+	<Size>
+		<AbsDimension x="400" y="255"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset>
+				<AbsDimension x="100" y="-104"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<EdgeSize>
+			<AbsValue val="16"/>
+		</EdgeSize>
+		<TileSize>
+			<AbsValue val="16"/>
+		</TileSize>
+		<BackgroundInsets>
+			<AbsInset left="3" right="5" top="3" bottom="5"/>
+		</BackgroundInsets>
+	</Backdrop>
+	 <Layers>
+	     <Layer level="BACKGROUND">
+		 <FontString name="$parentTitle" inherits="GameFontNormal" text="GEM_TEXT_BANNED_HEADER">
+		     <Anchors>
+			 <Anchor point="TOP" relativePoint="TOP">
+			     <Offset>
+				 <AbsDimension x="-5" y="-6"/>
+			     </Offset>
+			 </Anchor>
+		     </Anchors>
+		 </FontString>
+	     </Layer>
+	 </Layers>
+	<Frames>
+		<Button name="GEMListBannedHeaderName" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEM_TEXT_BANNED_NAME">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-26"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(100);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListBannedHeaderReason" inherits="GEMListLimitFrameColumnHeaderTemplate" text="GEM_TEXT_BANNED_REASON">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMListBannedHeaderName" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(260);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMListBannedItem1" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedHeaderName" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem2" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem3" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem4" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem5" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem6" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem7" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem8" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem9" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem8" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMListBannedItem10" inherits="GEMListBannedItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMListBannedItem9" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<ScrollFrame name="GEMListBannedItemScrollFrame" inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="320" y="160" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="GEMListBannedHeaderReason" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-23" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(10, GEMListBanned_UpdatePlayersList);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+
+		<Button name="GEMListBannedCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="1" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Button name="GEMListBanned_UnBan" inherits="UIPanelButtonTemplate" text="GEM_TEXT_BANNED_UNBAN">
+			<Size>
+				<AbsDimension x="100" y="24"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="GEMListBannedFrame" relativePoint="BOTTOM">
+					<Offset>
+						<AbsDimension x="0" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMListBannedUnBan_OnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+	</Frames>
+	<Scripts>
+		<OnMouseUp>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnMouseUp>
+		<OnMouseDown>
+			if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+				this:StartMoving();
+				this.isMoving = true;
+			end
+		</OnMouseDown>
+		<OnHide>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnHide>
+		<OnShow>
+			GEMListBanned_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+
+</Ui>

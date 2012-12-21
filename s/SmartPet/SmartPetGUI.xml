@@ -1,0 +1,1086 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="SmartPetGUI.lua"/>
+	<Frame name="SmartPetOptionsFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent" enableKeyboard="true">
+		<Size>
+			<AbsDimension x="500" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="SmartPetOptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="SmartPet Options">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SmartPetOptionsFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+	<Frames>
+			<CheckButton name="SmartPetEnableToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="40" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SmartPetOptionsFrameHeader">
+						<Offset>
+							<AbsDimension x="-60" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Smartpet Enabled" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						SmartPetEnable_Toggle();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SmartPetOptionsToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetOptionsFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="100" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Show Options Icon" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetOptionButton:Show();
+							SmartPet_Config.Icon = true;
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetOptionButton:Hide();
+							SmartPet_Config.Icon = false;
+						end
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SmartPetToolTipsToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetOptionsToggleButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="140" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Enable ToolTips" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						SmartPet_OnSlashCommand(SMARTPET_TOOLTIPS);
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+	<Frame name="SmartPet_AllOptions" toplevel="false" enableMouse="true" movable="true" parent="SmartPetOptionsFrame" hidden="true">
+		<Size>
+			<AbsDimension x="500" y="200"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="20"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+	<Frames>
+				<CheckButton name="SmartPetAttackAlert" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="SmartPet_AllOptions">
+							<Offset>
+								<AbsDimension x="80" y="-20"/>
+							</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Give Alert On Attack" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPet_Config.Alert = true;
+							SmartPet_AddInfoMessage("You will now give an alert on attack");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPet_Config.Alert = false;
+							SmartPet_AddInfoMessage("You will no longer give an alert on attack");
+						end
+						
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+	
+	<CheckButton name="SmartPetSmartFocusCheckBox" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetAttackAlert" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Use Smart Focus" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						SmartPet_OnSlashCommand(SMARTPET_SMARTFOCUS);
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>			
+
+
+			<CheckButton name="SmartPetAttackRunCheckBox" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetSmartFocusCheckBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="150" y="0"/>
+						</Offset>
+				</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Use Dash/Dive On Attack" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPet_Config.RushAttack = true;
+							SmartPet_AddInfoMessage("Dash/Dive On Attack Enabled");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPet_Config.RushAttack = false;
+							SmartPet_AddInfoMessage("Dash/Dive On Attack Disabled");
+						end
+						
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+
+			<CheckButton name="SmartPetNoChaseToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetSmartFocusCheckBox" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Enable NoChase" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						SmartPet_OnSlashCommand(SMARTPET_NOCHASE);
+					</OnClick>
+				</Scripts>
+		</CheckButton>
+
+			<CheckButton name="SmartPetRecallAlert" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+						<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetNoChaseToggleButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="150" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Show Recall Warning" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPet_Config.RecallWarn = true;
+							SmartPet_AddInfoMessage("Recall Warning Shown");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPet_Config.RecallWarn = false;
+							SmartPet_AddInfoMessage("Recall Warning Hidden");
+						end
+						
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SmartPetAutoCowerToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetNoChaseToggleButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Use AutoCower" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						SmartPet_OnSlashCommand(SMARTPET_AUTOCOWER);
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+
+			<EditBox name="SmartPetAutoCowerPercentEditBox" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="30" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetAutoCowerToggleButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="250" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="Auto Cower%:">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-5" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						SmartPet_Config.CowerHealth  = SmartPetAutoCowerPercentEditBox:GetNumber();
+
+					</OnTabPressed>
+					<OnEnterPressed>
+						SmartPet_Config.CowerHealth  = SmartPetAutoCowerPercentEditBox:GetNumber();
+					</OnEnterPressed>
+					<OnValueChanged>
+						SmartPet_Config.CowerHealth  = SmartPetAutoCowerPercentEditBox:GetNumber();
+					</OnValueChanged>
+					<OnEditFocusLost>
+						SmartPet_Config.CowerHealth  = SmartPetAutoCowerPercentEditBox:GetNumber();
+					</OnEditFocusLost>
+				</Scripts>
+			</EditBox>
+
+
+		<CheckButton name="SmartPetSpellOnAttackToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetAutoCowerToggleButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Cast Spell on Pet Attack" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+							if (this:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPet_Config.SpellAttack = true;
+							SmartPet_AddInfoMessage( "Spell Attack");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPet_Config.SpellAttack = false;
+							SmartPet_AddInfoMessage( "no Spell Attack");
+						end	
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+<Button name="SmartPetAttackSpell" inherits="ActionButtonTemplate" frameStrata="DIALOG" virtual="true">
+					<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="SmartPetSpellOnAttackToggleButton" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="170" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+		<Size>
+			<AbsDimension x="35" y="35"/>
+		</Size>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SmartPetAttackSpellText" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton", "RightButton");
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				this:RegisterEvent("UPDATE_BINDINGS");
+			</OnLoad>
+			<OnClick>
+				SmartPetSelectedSpell();
+			</OnClick>
+			<OnDragStart>
+				SmartPetClearSpell();
+			</OnDragStart>
+			<OnReceiveDrag>
+				SmartPetSelectedSpell();
+			</OnReceiveDrag>
+		</Scripts>
+		<NormalTexture name="defaultNormalTexture2" file="Interface\Buttons\UI-EmptySlot-Disabled">
+			<Size>
+				<AbsDimension x="35" y="35"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+	</Button>
+			
+
+<CheckButton name="SmartPetScatterToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetSpellOnAttackToggleButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Use Scatter Shot Call Off" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+								SmartPet_Config.Scatter = true;
+								SmartPet_ScatterOptions:Show();
+
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+								SmartPet_Config.Scatter = false;
+								SmartPet_ScatterOptions:Hide();
+
+						end		
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+				<Frame name="SmartPet_ScatterOptions" toplevel="true" enableMouse="true" movable="true" parent="SmartPet_AllOptions" hidden="true">
+			<Size>
+			<AbsDimension x="500" y="45"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="SmartPetScatterToggleButton" relativePoint="BOTTOMLEFT">
+		<Offset>
+			<AbsDimension x="-80" y="0"/>
+		</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12"  top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+	<Frames>
+
+<CheckButton name="SmartPetScatterDefensiveButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Defensive" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetScatterMoodToggle("defensive");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetScatterMoodToggle("clear");
+
+						end	
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SmartPetScatterPassiveButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetScatterDefensiveButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="75" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Passive" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetScatterMoodToggle("passive");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetScatterMoodToggle("clear");
+						end		
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+
+
+<CheckButton name="SmartPetScatterStayButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetScatterPassiveButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="75" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Stay" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+								SmartPetScatterCommandToggle("stay");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetScatterCommandToggle("clear");
+						end		
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="SmartPetScatterFollowButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPetScatterStayButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="75" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Follow" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetScatterCommandToggle("follow");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetScatterCommandToggle("clear");
+						end		
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+		</Frames>
+		</Frame>
+	
+
+
+
+<CheckButton name="SmartPetAutoWarnToggleButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SmartPet_ScatterOptions" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="80" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Use AutoWarn" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPet_HealthWarningChanels:Show();
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPet_HealthWarningChanels:Hide();
+						end
+						SmartPetAutowarn_Toggle();
+						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<EditBox name="SmartPetAutoWarnPercentEditBox" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="30" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetAutoWarnToggleButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="250" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="Auto Warn%:">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-5" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						SmartPet_Config.WarnHealth  = SmartPetAutoWarnPercentEditBox:GetNumber();
+
+					</OnTabPressed>
+					<OnEnterPressed>
+						SmartPet_Config.WarnHealth  = SmartPetAutoWarnPercentEditBox:GetNumber();
+					</OnEnterPressed>
+					<OnValueChanged>
+						SmartPet_Config.WarnHealth  = SmartPetAutoWarnPercentEditBox:GetNumber();
+					</OnValueChanged>
+					<OnEditFocusLost>
+						SmartPet_Config.WarnHealth  = SmartPetAutoWarnPercentEditBox:GetNumber();
+					</OnEditFocusLost>
+				</Scripts>
+			</EditBox>
+	<Frame name="SmartPet_HealthWarningChanels" toplevel="true" enableMouse="true" movable="true" parent="SmartPet_AllOptions" hidden="true">
+			<Size>
+			<AbsDimension x="500" y="45"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="SmartPetAutoWarnToggleButton" relativePoint="BOTTOMLEFT">
+		<Offset>
+			<AbsDimension x="-80" y="0"/>
+		</Offset>
+			</Anchor>
+		</Anchors>
+<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+	<Frames>
+
+<CheckButton name="SmartPetHealthWarning_Say" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="SAY" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetHealthWarning_Group:SetChecked(0);
+							SmartPetHealthWarning_Raid:SetChecked(0);
+							SmartPetHealthWarning_Channel:SetChecked(0);
+							SmartPetHealthWarning_Guild:SetChecked(0);
+							SmartPet_Config.Channel = "say";
+							
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetHealthWarning_Say:SetChecked(1);
+						end
+					</OnClick>
+				</Scripts>
+		</CheckButton>
+
+<CheckButton name="SmartPetHealthWarning_Group" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetHealthWarning_Say" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="35" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="GROUP" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetHealthWarning_Raid:SetChecked(0);
+							SmartPetHealthWarning_Say:SetChecked(0);
+							SmartPetHealthWarning_Channel:SetChecked(0);
+							SmartPetHealthWarning_Guild:SetChecked(0);
+							SmartPet_Config.Channel = "party";
+							
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetHealthWarning_Group:SetChecked(1);
+						end
+					</OnClick>
+				</Scripts>
+		</CheckButton>
+
+<CheckButton name="SmartPetHealthWarning_Guild" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetHealthWarning_Group" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="50" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="GUILD" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetHealthWarning_Group:SetChecked(0);
+							SmartPetHealthWarning_Say:SetChecked(0);
+							SmartPetHealthWarning_Channel:SetChecked(0);
+							SmartPetHealthWarning_Raid:SetChecked(0);
+							SmartPet_Config.Channel = "guild";
+							
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetHealthWarning_Guild:SetChecked(1);
+						end
+					</OnClick>
+				</Scripts>
+		</CheckButton>
+
+		<CheckButton name="SmartPetHealthWarning_Raid" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetHealthWarning_Guild" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="45" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="RAID" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetHealthWarning_Group:SetChecked(0);
+							SmartPetHealthWarning_Say:SetChecked(0);
+							SmartPetHealthWarning_Channel:SetChecked(0);
+							SmartPetHealthWarning_Guild:SetChecked(0);
+							SmartPet_Config.Channel = "raid";
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetHealthWarning_Raid:SetChecked(1);
+						end
+					</OnClick>
+				</Scripts>
+		</CheckButton>
+
+<CheckButton name="SmartPetHealthWarning_Channel" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetHealthWarning_Raid" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="35" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="Channel #" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+							SmartPetHealthWarning_Group:SetChecked(0);
+							SmartPetHealthWarning_Say:SetChecked(0);
+							SmartPetHealthWarning_Raid:SetChecked(0);
+							SmartPetHealthWarning_Guild:SetChecked(0);
+							SmartPet_Config.Channel = "channel";
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							SmartPetHealthWarning_Channel:SetChecked(1);
+						end	
+					</OnClick>
+				</Scripts>
+		</CheckButton>
+
+<EditBox name="SmartPet_AutoWarnChannelEditBox" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="30" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SmartPetHealthWarning_Channel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="60" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" >
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-5" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						SmartPetChannelSet;()
+					</OnTabPressed>
+					<OnEnterPressed>
+						SmartPetChannelSet();
+					</OnEnterPressed>
+					<OnTextChanged>
+						PlaySound("igMainMenuOptionCheckBoxOff");
+
+					</OnTextChanged>
+					<OnEditFocusGained>
+													SmartPetHealthWarning_Group:SetChecked(0);
+						SmartPetHealthWarning_Say:SetChecked(0);
+						SmartPetHealthWarning_Raid:SetChecked(0);
+						SmartPetHealthWarning_Guild:SetChecked(0);
+						SmartPetHealthWarning_Channel:SetChecked(1);
+						SmartPet_Config.Channel = "channel";
+					</OnEditFocusGained>
+					<OnEditFocusLost>
+						SmartPetChannelSet();
+					</OnEditFocusLost>
+				</Scripts>
+			</EditBox>
+
+
+</Frames>
+		</Frame>
+
+
+
+	</Frames>
+</Frame>
+
+
+
+
+
+
+			<Button name="SmartPetOptionsFrameDone" inherits="OptionsButtonTemplate" text="Done">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(SmartPetOptionsFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				UIPanelWindows["SmartPetOptionsFrame"] = {area = "center", pushable = 0};
+				SmartPetOptions_OnLoad();
+			</OnLoad>
+			<OnShow>
+				SmartPetOptions_OnShow();
+			</OnShow>
+			<OnHide>
+				SmartPetOptions_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

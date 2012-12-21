@@ -1,0 +1,258 @@
+<Ui>	
+	<Script file="tradeDispenser_Banlist.lua"/>
+
+	<Frame name="tradeDispenserBanlist" hidden="true" parent="tradeDispenserTradeControl" enableMouse="true">
+		<Size>	<AbsDimension x="182" y="346"/>	</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT"  relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset><AbsDimension x="2" y="0"/></Offset>
+			</Anchor>
+		</Anchors>	
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>	<AbsValue val="16"/>	</EdgeSize>
+			<TileSize>	<AbsValue val="0"/>		</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+		</Backdrop>
+	
+	
+		<Frames>
+			<Frame name="$parentTitleBkg" hidden="false">
+				<Size>	<AbsDimension x="182" y="28"/>	</Size>
+				<Anchors>
+					<Anchor point="BOTTOM"  relativeTo="$parent" relativePoint="TOP">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>	<AbsValue val="16"/>	</EdgeSize>
+					<TileSize>	<AbsValue val="0"/>		</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="4" right="4" top="4" bottom="4"/>
+					</BackgroundInsets>
+				</Backdrop>	
+				<Layers>
+					<Layer level="ARTWORK">		<!-- TITLE -->
+						<FontString name="$parentLbL" inherits="GameFontNormal" text="Banned Players:">
+							<Anchors>
+								<Anchor point="Center">
+									<Offset><AbsDimension x="0" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetWidth(this:GetParent():GetWidth());
+						this:SetBackdropBorderColor(1, 1, 1,1);
+						this:SetBackdropColor(0.2, 0, 0, 1);
+						getglobal(this:GetName().."LbL"):SetText(tD_Loc.Banlist.Title);
+						getglobal(this:GetName().."LbL"):SetTextColor(1,1,1);
+					</OnLoad>
+				</Scripts>
+			</Frame>		
+			<Frame name="$parentScrollBkg" hidden="false">
+				<Size>	<AbsDimension x="141" y="206"/>	</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"  relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="10" y="-130"/></Offset>
+					</Anchor>
+				</Anchors>	
+				<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>	<AbsValue val="16"/>	</EdgeSize>
+					<TileSize>	<AbsValue val="0"/>		</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="4" right="4" top="4" bottom="4"/>
+					</BackgroundInsets>
+				</Backdrop>			
+				<Layers>
+					<Layer level="Artwork">		
+						<FontString name="tradeDispenserBanlistScrollText" inherits="GameFontNormal" text="dummy" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset><AbsDimension x="10" y="5"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>		
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(1, 1, 1, 1)
+						this:SetBackdropColor(0, 0, 0, 1)
+					</OnLoad>
+					<OnMouseWheel>
+						tradeDispenserBanlistScrollBar:SetValue(tradeDispenserBanlistScrollBar:GetValue()-arg1);
+						tradeDispenser_Banlist_Scroll()
+					</OnMouseWheel>
+				</Scripts>
+			</Frame>
+			<Slider name="$parentScrollBar" inherits="OptionsSliderTemplate">
+				<Size><AbsDimension x="16" y="206"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentScrollBkg" relativePoint="TOPRIGHT">
+						<Offset><AbsDimension x="3" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("");
+						getglobal(this:GetName().."High"):SetText("");
+						getglobal(this:GetName().."Low"):SetText("");
+						this:SetMinMaxValues(1, 10);
+						this:SetValueStep(1);
+						this:SetValue(1);
+						this:SetOrientation("VERTICAL");
+					</OnLoad>
+					<OnValueChanged>
+						tradeDispenser_Banlist_Scroll()
+					</OnValueChanged>
+				</Scripts>
+			</Slider>	
+		
+			<Button name="$parentImport" inherits="UIPanelButtonTemplate" text="Import Ignorelist">
+				<Size>	<AbsDimension x="160" y="26"/>	</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(tD_Loc.Banlist.Import);
+					</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						tradeDispenser_Banlist_Import()
+					</OnClick>
+				</Scripts>
+			</Button>
+					
+			<Button name="$parentAdd" inherits="UIPanelButtonTemplate" text="Add">
+				<Size>	<AbsDimension x="75" y="22"/>	</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentImport" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="3" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(tD_Loc.Banlist.Add);
+					</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						local name = getglobal(this:GetParent():GetName().."Name"):GetText();
+						tradeDispenser_Banlist_Add(name)
+					</OnClick>
+				</Scripts>
+			</Button>	
+			
+			<Button name="$parentRemove" inherits="UIPanelButtonTemplate" text="Remove">
+				<Size>	<AbsDimension x="75" y="22"/>	</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentImport" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(tD_Loc.Banlist.Remove);
+					</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						local name = getglobal(this:GetParent():GetName().."Name"):GetText();
+						tradeDispenser_Banlist_Remove(name)
+					</OnClick>
+				</Scripts>
+			</Button>	
+		
+			<EditBox name="$parentName" inherits="UIEditBoxTemplate" letters="80" historyLines="0" autoFocus="false">
+				<Size><AbsDimension x="138" y="16"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentImport" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>				
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="12" y="29"/>	</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset><AbsDimension x="-11" y="2"/></Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="135" y="29"/></Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="12" y="29"/>	</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+						</Texture>						
+					</Layer>
+				</Layers>				
+				<FontString inherits="GameFontHighlight"/>
+				<Scripts>
+					<OnLoad>
+						this:ClearFocus();
+						this:SetText("");
+						this:SetTextColor(1,1,1);
+					</OnLoad>
+					<OnEditFocusLost>
+					</OnEditFocusLost>
+					<OnEscapePressed>
+						this:ClearFocus()
+					</OnEscapePressed>
+					<OnEnterPressed>
+						this:ClearFocus()
+						if (this:GetText() and strlen(this:GetText())>=1) then
+							if (tD_Temp.BanListStatus=="add") then tradeDispenser_Banlist_Add(this:GetText()) 
+							elseif (tD_Temp.BanListStatus=="remove") then tradeDispenser_Banlist_Remove(this:GetText()) end
+						end
+					</OnEnterPressed>
+					<OnTextChanged>
+						tradeDispenser_Banlist_Edit(this)
+					</OnTextChanged>
+					<OnEditFocusGained>
+					</OnEditFocusGained>
+				</Scripts>
+			</EditBox>
+	
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(1, 1, 1,1)
+				this:SetBackdropColor(0, 0, 0.2, 1)
+			</OnLoad>
+			<OnShow>
+				tradeDispenser:RegisterEvent("PLAYER_TARGET_CHANGED")
+				tradeDispenser_Banlist_OnShow()
+			</OnShow>
+			<OnHide>
+				tradeDispenser:UnregisterEvent("PLAYER_TARGET_CHANGED")
+			</OnHide>
+			<OnMouseDown> this:GetParent():GetParent():StartMoving();  </OnMouseDown>
+			<OnMouseUp>  this:GetParent():GetParent():StopMovingOrSizing(); </OnMouseUp>
+			<OnDragStop> this:GetParent():GetParent():StopMovingOrSizing(); </OnDragStop>
+		</Scripts>
+	</Frame>	
+</Ui>

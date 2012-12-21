@@ -1,0 +1,79 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Frame name="StatRingsMana" parent="UIParent" inherits="StatRingsRingTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Moog_HudRight" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="15" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				StatRings_RegisterRing(this, "Mana");
+      			StatRingsRingTemplate_OnLoad();
+				this:SetReversed(true);
+      			
+				this:SetAlpha(0.1);
+        		
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+				this:RegisterEvent("UNIT_MANA");
+				this:RegisterEvent("UNIT_MAXMANA");
+				this:RegisterEvent("UNIT_ENERGY");
+				this:RegisterEvent("UNIT_MAXENERGY");
+				this:RegisterEvent("UNIT_RAGE");
+				this:RegisterEvent("UNIT_MAXRAGE");
+				this:RegisterEvent("UNIT_DISPLAYPOWER");
+				this:RegisterEvent("PLAYER_LEVEL_UP");
+    				if (UnitPowerType("player") == 0) then
+					info = { r = 0.00, g = 0.7, b = 1.00 };
+				else
+					info = ManaBarColor[UnitPowerType("player")];
+				end
+				this:UpdateColor(info);
+				this:SetMax(UnitManaMax("player"));
+				this:SetValue(UnitMana("player"));
+
+				function this:UpdateAlpha()
+					if this.startValue &lt; this.maxValue then
+						StatRingsTest_SetAlpha(self, 0.4);
+					elseif this.startValue == this.maxValue then
+						StatRingsTest_SetAlpha(self, 0.1);
+					end
+				end
+				this:AddUpdateFunction(this.UpdateAlpha);
+				this.dirty = true;
+			</OnLoad>
+			<OnEvent>
+				if (event == "PLAYER_ENTERING_WORLD") then
+    					if (UnitPowerType("player") == 0) then
+						info = { r = 0.00, g = 0.7, b = 1.00 };
+					else
+						info = ManaBarColor[UnitPowerType("player")];
+					end
+					this:UpdateColor(info);
+					this:SetMax(UnitManaMax("player"));
+					this:SetValue(UnitMana("player"));
+					return;
+				elseif event == "PLAYER_LEVEL_UP" then
+					this:SetMax(UnitManaMax("player"));
+				end
+				if (arg1 == "player") then 
+				  	if (event == "UNIT_DISPLAYPOWER") then
+    						if (UnitPowerType("player") == 0) then
+							info = { r = 0.00, g = 0.7, b = 1.00 };
+						else
+							info = ManaBarColor[UnitPowerType("player")];
+						end
+						this:UpdateColor(info);
+						this:SetMax(UnitManaMax("player"));
+					elseif event == "UNIT_MAXMANA" then
+				    		this:SetMax(UnitManaMax("player"));
+					end
+					this:SetValue(UnitMana("player"));
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

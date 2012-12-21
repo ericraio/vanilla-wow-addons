@@ -1,0 +1,111 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+  <!-- 
+       $Id:$
+  -->
+  <Script file="localization.lua" />
+  <Script file="CleanMinimapMover.lua" />
+  <!-- Templates -->
+  <Button name="ResizingButtonTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="8" y="8"/>
+    </Size>
+    <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize>
+        <AbsValue val="4"/>
+      </EdgeSize>
+      <TileSize>
+        <AbsValue val="8"/>
+      </TileSize>
+      <BackgroundInsets>
+        <AbsInset left="2" right="2" top="2" bottom="2"/>
+      </BackgroundInsets>
+    </Backdrop>
+    <Scripts>
+      <OnLoad>
+        local anchorto, anchor = CleanMinimapMover_SizingAnchor( this );
+        this:SetPoint( anchor, this:GetParent():GetName(), anchorto, 0, 0 );
+      </OnLoad>
+      <OnShow>
+        this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+      </OnShow>
+      <OnMouseDown>
+        this:GetParent().SizingAnchor = CleanMinimapMover_SizingAnchor( this );
+        this:GetParent():StartSizing( CleanMinimapMover_SizingAnchor( this ) );
+      </OnMouseDown>
+      <OnMouseUp>
+        this:GetParent():StopMovingOrSizing()
+        CleanMinimapMover_UpdatePosition( this:GetParent() );
+        this:GetParent().MASizingAnchor = nil;
+        if( arg1 == "RightButton" and not IsShiftKeyDown() ) then
+          CleanMinimapMover_StopMoving(this:GetParent());
+          CleanMinimap_StopMoving();
+        end
+      </OnMouseUp>
+    </Scripts>
+  </Button>
+
+  <Frame name="CleanMinimapMoverTemplate" frameStrata="DIALOG" enableMouse="true" hidden="true" parent="UIParent" movable="true" resizable="true" virtual="true" setAllPoints="true">
+    <Size>
+      <AbsDimension x="100" y="100"/>
+    </Size>
+    <ResizeBounds>
+      <minResize>
+        <AbsDimension x="50" y="50"/>
+      </minResize>
+      <maxResize>
+        <AbsDimension x="300" y="300"/>
+      </maxResize>
+    </ResizeBounds>
+    <Anchors>
+      <Anchor point="BOTTOMLEFT"/>
+    </Anchors>
+    <Scripts>
+      <OnMouseDown>
+        this:StartMoving();
+      </OnMouseDown>
+      <OnMouseUp>
+        this:StopMovingOrSizing()
+        CleanMinimapMover_UpdatePosition( this );
+        CleanMinimapMover_StopMoving( this );
+        CleanMinimap_StopMoving();
+      </OnMouseUp>
+      <OnSizeChanged>
+        CleanMinimapMover_OnSizeChanged( this );
+      </OnSizeChanged>
+      <OnShow>
+        --getglobal( this:GetName().."BackdropMovingFrameName" ):SetText( "Moving\n");
+      </OnShow>
+    </Scripts>
+    <Frames>
+      <Frame name="$parentBackdrop" setAllPoints="true" enableMouse="false">
+      <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+        <EdgeSize>
+            <AbsValue val="8"/>
+        </EdgeSize>
+        <TileSize>
+            <AbsValue val="16"/>
+        </TileSize>
+        <BackgroundInsets>
+            <AbsInset left="3" right="3" top="3" bottom="3"/>
+        </BackgroundInsets>
+      </Backdrop> 
+      <Layers>
+          <Layer level="ARTWORK">
+            <FontString name="$parentMovingFrameName" inherits="GameFontNormal">
+              <Anchors>
+                <Anchor point="CENTER" />
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+      <Button name="$parentResize_TOP" inherits="ResizingButtonTemplate"/>
+      <Button name="$parentResize_LEFT" inherits="ResizingButtonTemplate"/>
+      <Button name="$parentResize_BOTTOM" inherits="ResizingButtonTemplate"/>
+      <Button name="$parentResize_RIGHT" inherits="ResizingButtonTemplate"/>
+    </Frames>
+  </Frame>
+
+  <!-- The real frame -->
+  <Frame name="CleanMinimapMoverFrame" inherits="CleanMinimapMoverTemplate" parent="UIParent" />
+</Ui>

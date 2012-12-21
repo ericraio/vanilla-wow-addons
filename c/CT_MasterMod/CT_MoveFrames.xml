@@ -1,0 +1,100 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_MoveFrames.lua"/>
+	<Frame name="CT_MoveDragFrame" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				CT_CastBarFrame_Update();
+				DurabilityFrame:ClearAllPoints();
+				DurabilityFrame:SetPoint("TOPRIGHT", "CT_Durability_Drag", "TOPRIGHT", -10, 0);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Button name="CT_CastBarFrame" enableMouse="true" frameStrata="HIGH" movable="true" toplevel="true" parent="UIParent" hidden="false">
+		<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="206" y="26"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOM">
+				<Offset>
+					<AbsDimension x="0" y="135"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				CT_CastBarFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				CT_CastBarFrame_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Button>
+	<Button name="CT_QuestWatch_Drag" frameStrata="LOW" parent="UIParent" hidden="false" movable="true" toplevel="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-200" y="-425"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<NormalTexture file="Interface\AddOns\CT_MasterMod\Images\DragButton"/>
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText("Click to drag");
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseDown>
+				this:StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing();
+			</OnMouseUp>
+			<OnLoad>
+				QuestWatchFrame:SetMovable(1);
+				CT_LinkFrameDrag(QuestWatchFrame, this, "TOPLEFT", "TOPLEFT", 2, -2);
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Button name="CT_Durability_Drag" frameStrata="LOW" parent="UIParent" hidden="false" movable="true" toplevel="true">
+		<Size>
+			<AbsDimension x="50" y="80"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				if ( CT_DurabilityVisible() ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText("Click to drag");
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseDown>
+				if ( CT_DurabilityVisible() ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing();
+			</OnMouseUp>
+			<OnLoad>
+				CT_LinkFrameDrag(DurabilityFrame, this, "TOPRIGHT", "TOPRIGHT", -10, 0);
+			</OnLoad>
+		</Scripts>
+	</Button>
+</Ui>

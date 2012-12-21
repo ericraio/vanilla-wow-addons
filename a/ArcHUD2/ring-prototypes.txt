@@ -1,0 +1,191 @@
+ArcHUD Rings support
+---------------------
+
+Since 1.2 ArcHUD's rings have been completely reworked. Every ring are now created from
+a base class. This class has a few predefined functions and behind-the-scenes functionality.
+This makes it very easy to add your own rings to ArcHUD. If you want to add your own ring to
+ArcHUD there are a few guidelines you need to follow. What will follow below is a basic setup
+to get a ring up and running.
+
+Rings created can be added as a new addon with ArcHUD as a dependency. This is the preferred way
+to add your own custom rings to ArcHUD.
+
+First you will need to create your ring object, if you've worked with Ace2 addons previously this
+will be very similar to how you create an addon with Ace2. Alot of things will be set up for you
+however. Things such as locale and database support are created for every new ring added. To access
+the database you use the object self.db. To access the locale table you use self.L. You can read more
+about these objects at the WoWAce Wiki at http://wiki.wowace.com/index.php/Ace2.
+
+-------------------------------------------------------------------
+local module = ArcHUD:NewModule("MyRing")
+module.unit = "player"
+defaults = {
+	Enabled = true,
+	Outline = true,
+}
+options = {
+	attach = false,
+}
+-------------------------------------------------------------------
+
+This will create a module with the name MyRing and a few default options.
+All options needed for the ring are specified in the defaults table. They are automatically added to
+the ArcHUD DB when you load the ring.
+
+There are few base methods you will need to get the ring set up. These are Initialize and Enable.
+If you don't have the Initialize method the ring wont load. Initialize is a good place to create
+any frames the ring will use, for example the ring frame itself.
+
+-------------------------------------------------------------------
+function module:Initialize()
+	self.f = self:CreateRing(true, ArcHUDFrame)
+	self.f:SetPoint("TOPLEFT", self.parent:GetModule("Anchors").Left, "TOPLEFT", -30, 0);
+end
+-------------------------------------------------------------------
+
+We've now created a ring with a background outline and stored it in self.f. The ring is now a
+child frame of ArcHUDFrame, the main frame for ArcHUD. It has also been positioned onto the left
+anchor as the second ring from the center. Attaching to the anchors will make sure the ring follows
+the width option.
+
+Next we will need an Enable method. This will contain things that will be run every time the ring
+is enabled. Initialize will only run once while Enable will run if the user enables or disables the
+ring.
+
+-------------------------------------------------------------------
+function module:Enable()
+	-- Take care of options
+	if(self.db.profile.Outline) then
+		self.f.BG:Show()
+	else
+		self.f.BG:Hide()
+	end
+
+	-- Register some events
+	self:RegisterEvent("UNIT_HEALTH")
+
+	-- Override Update timer
+	self:UnregisterMetro(self.name .. "Update")
+	self:RegisterMetro(self.name .. "Update", self.UpdateAlpha, 0.05, self)
+
+	-- Activate timer
+	self:StartMetro(self.name .. "Alpha")
+	self:StartMetro(self.name .. "Fade")
+	self:StartMetro(self.name .. Update")
+end
+
+function module:UpdateAlpha()
+	if(self.f.startValue < self.f.maxValue) then
+		self.f:SetRingAlpha(ArcHUD.FadeOOC)
+	else
+		self.f:SetRingAlpha(ArcHUD.FadeFull)
+	end
+end
+-------------------------------------------------------------------
+
+Now that that's done you will need to take care of that event somehow. This works just like in an Ace 
+addon
+
+-------------------------------------------------------------------
+function module:UNIT_HEALTH()
+	self.f:SetValue(UnitHealth(self.unit))
+end
+-------------------------------------------------------------------
+
+This is a very basic ring and will probably not do very much good. At least you got a little something
+start from. I suggest you look at the other rings to get a better understanding of how it all works.
+
+
+ArcHUDRing reference
+---------------------
+
+SPECIAL TABLES
+
+The base class will look for certain special tables in the created ring object. These are listed below
+along with the format in which they should be in.
+
+unit = "unit"				This is an optional variable. Specify the unit name the ring will be
+					working with here and use it through the code.
+
+
+defaults = {				defaults contains all the default options the ring uses. These
+	option1 = value1,		will be added to the user options if they load the ring for the
+	option2 = value2,		first time. These will also get loaded into the main defaults
+}					table to be used in case the user requests a reset of the options.
+
+					NOTE: Enabled and Outline must be present on all rings! If you want
+					      the ring to be movable in the options you must also specify
+					      a default placement by use of Side and Level.
+
+
+options = {				options contains the options and locals to be used in the options
+	{name = "option1",		frame. Do not include Enabled, Outline, Side and Level in this
+	 text = "Sets option1",		table. The first two are handled automatically by the options frame
+	 tooltip = "This will set 	and the last two are controlled by the attach entry. If attach is 
+		    option1"},		TRUE then the ring will be allowed to repositioned.
+	{name = "option2",
+	 text = "Sets option2",		NOTE: name must match the option name in the defaults table! You
+	 tooltip = "This will set 	      must have this table if you want your ring to appear in the
+		    option2"},		      options frame. Leave it empty if you don't have any other
+	attach = false,			      options other than Enabled and Outline.
+}
+
+
+disableEvents = {			disableEvents contains certain events that you want the ring to
+	{frame = "framename",		disable on load. This could be to prevent another frame from
+	 events = {"event1", 		recieving events that your ring should be taking care of. An
+		   "event2"}},		example of this can be seen in the Casting and MirrorTimer rings.
+	{frame = "framename2",
+	 events = {"event1", 		NOTE: Events specified will be disabled when the ring is enabled
+		   "event2"}},		      and re-enabled once the ring is disabled.
+}
+
+
+METHODS
+
+The base class got a few functions for you to start off with.
+
+
+self:CreateRing(hasBG, parent)
+	This will create a ring for you and return the object.
+
+	Parameters:
+	hasBG		- Set to true to also create a background outline
+	parent		- The parent object for the ring (must pass an object, not a string)
+
+	Returns:
+	frame		- Frame containing the ring
+
+
+self:CreateFontString(parent, layer, size, fontsize, justify, color, point)
+	This creates a FontString object, sets the font, size, color, justification and positions it.
+
+	Parameters:
+	parent		- The parent object for the fontstring (must pass an object, not a string)
+	layer		- The layer of which it will be created on (see WoWWiki for more information)
+	size		- An array of two values. Sets the size of the fontstring. 
+			  {width, height}
+	fontsize	- The size of the font
+	justify		- Horizontal justification (LEFT, CENTER, RIGHT)
+	color		- The color of the fontstring in RGB values.
+			  {red, green, blue}
+	point		- Same as the arguments passed to frame:SetPoint
+			  {"point","relativeFrame" or relativeObject,"relativePoint"[,xOfs,yOfs]}
+
+	Returns:
+	fontstring	- Fontstring created according to input parameters
+
+
+self:CreateTexture(parent, layer, size, texture, point)
+	This creates a texture object, optionally sets the texture and position.
+
+	Parameters:
+	parent		- The parent object for the texture (must pass an object, not a string)
+	layer		- The layer of which it will be created on (see WoWWiki for more information)
+	size		- An array of two values. Sets the size of the texture.
+			  {width, height}
+	point		- Same as the arguments passed to frame:SetPoint
+			  {"point","relativeFrame" or relativeObject,"relativePoint"[,xOfs,yOfs]}
+
+	Returns:
+	texture		- Texture created according to input parameters

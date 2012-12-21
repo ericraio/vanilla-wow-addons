@@ -1,0 +1,1005 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="Inspector.lua"/>
+
+	<!-- Button Template -->
+	<Button name="InspectorButtonTemplate" inherits="ItemButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				InspectorChatLinkItem(arg1);
+			</OnClick>
+			<OnEnter>
+				InspectorDisplayItemLink();
+				InspectorCheckCursor( "Mouse" );
+			</OnEnter>
+			<OnUpdate>
+				if( KeyTimerUpdate() == 1 and InspectorFrame:IsVisible() ) then
+					InspectorCheckCursor( "Key" );
+				end
+			</OnUpdate>
+			<OnLeave>
+				GameTooltip:Hide();
+				InspectorCheckCursor( "Off" );
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-Quickslot2">
+			<Size>
+				<AbsDimension x="64" y="64"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	</Button>
+	<!-- End Button Template -->
+
+
+	<!-- OVERALL FRAME -->
+	<Frame name="InspectorFrame" parent="UIParent" enableMouse="true" hidden="true">
+		
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+            <Anchor point="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="-106"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="45"/>
+		</HitRectInsets>
+		
+		
+
+		<Layers>
+
+			<!-- BACKGROUND level - used for portrait -->
+			<Layer level="BACKGROUND">
+				<Texture name="InspectorPortraitTexture">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<!-- ARTWORK - Middle Frame Graphics -->
+            <Layer level="ARTWORK">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-L1">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-R1">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="256" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-BottomLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="-256"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-BottomRight">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="256" y="-256"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+			</Layer>  
+			<!-- END BACKGROUND Frame Graphics -->
+
+			<!-- FOREGROUND text stuff -->
+			<Layer level="FOREGROUND">
+
+				<FontString name="InspectorPlayerNameText" inherits="GameFontWhite" text="Player Name">
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorFrame" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-19"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+				<FontString name="InspectorPlayerInfoText" inherits="GameFontNormalSmall" text="Player Info">
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerNameText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-18"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+				<FontString name="InspectorPlayerGuildText" inherits="GameFontNormalSmall" text="Player Guild Info">
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerInfoText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-10"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+				<FontString name="InspectorPlayerPVPRankText" inherits="GameFontNormal" text="Player PvP Rank">
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerGuildText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-38"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+				<Texture name="InspectorPlayerPVPRankTexture" file="Interface\PvPRankBadges\PvPRank01">
+					<Size>
+						<AbsDimension x="24" y="24"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="RIGHT" relativeTo="InspectorPlayerPVPRankText" relativePoint="LEFT">
+                            <Offset>
+                                <AbsDimension x="-5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</Texture>
+
+				<!-- HONOR ############################################### -->
+
+
+				<!-- TODAY *********************************************** -->
+				<FontString name="InspectorPlayerPVPTodayText" inherits="GameFontNormal" text="Today" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="240" y="20"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerPVPRankText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-20"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+					<FontString name="InspectorPlayerPVPTodayHKText" inherits="GameFontHighlightSmall" text="Honorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPTodayText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPTodayHK" inherits="GameFontGreenSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPTodayHKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPTodayDKText" inherits="GameFontHighlightSmall" text="Dishonorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPTodayHKText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					
+						<FontString name="InspectorPlayerPVPTodayDK" inherits="GameFontRedSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPTodayDKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+
+				<!-- YESTERDAY *********************************************** -->
+				<FontString name="InspectorPlayerPVPYesterdayText" inherits="GameFontNormal" text="Yesterday" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="240" y="20"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerPVPTodayText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-40"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+					<FontString name="InspectorPlayerPVPYesterdayHKText" inherits="GameFontHighlightSmall" text="Honorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPYesterdayText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPYesterdayHK" inherits="GameFontGreenSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPYesterdayHKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPYesterdayHonorText" inherits="GameFontHighlightSmall" text="Honor" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPYesterdayHKText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPYesterdayHonor" inherits="GameFontNormalSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPYesterdayHonorText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+
+
+
+
+
+				<!-- THIS WEEK *********************************************** -->
+				<FontString name="InspectorPlayerPVPThisWeekText" inherits="GameFontNormal" text="This Week" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="240" y="20"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerPVPYesterdayText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-40"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+					<FontString name="InspectorPlayerPVPThisWeekHKText" inherits="GameFontHighlightSmall" text="Honorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPThisWeekText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPThisWeekHK" inherits="GameFontGreenSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPThisWeekHKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPThisWeekHonorText" inherits="GameFontHighlightSmall" text="Honor" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPThisWeekHKText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPThisWeekHonor" inherits="GameFontNormalSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPThisWeekHonorText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+
+
+				<!-- LAST WEEK *********************************************** -->
+				<FontString name="InspectorPlayerPVPLastWeekText" inherits="GameFontNormal" text="Last Week" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="240" y="20"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerPVPThisWeekText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-40"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+					<FontString name="InspectorPlayerPVPLastWeekHKText" inherits="GameFontHighlightSmall" text="Honorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPLastWeekHK" inherits="GameFontGreenSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekHKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPLastWeekHonorText" inherits="GameFontHighlightSmall" text="Honor" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekHKText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPLastWeekHonor" inherits="GameFontNormalSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekHonorText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPLastWeekStandingText" inherits="GameFontHighlightSmall" text="Standing" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekHonorText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPLastWeekStanding" inherits="GameFontNormalSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekStandingText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+
+
+
+				<!-- LIFETIME *********************************************** -->
+				<FontString name="InspectorPlayerPVPLifetimeText" inherits="GameFontNormal" text="Lifetime" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="240" y="20"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerPVPLastWeekText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-52"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+					<FontString name="InspectorPlayerPVPLifetimeHKText" inherits="GameFontHighlightSmall" text="Honorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPLifetimeHK" inherits="GameFontGreenSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeHKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPLifetimeDKText" inherits="GameFontHighlightSmall" text="Dishonorable Kills" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeHKText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPLifetimeDK" inherits="GameFontRedSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeDKText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+					<FontString name="InspectorPlayerPVPLifetimeRankText" inherits="GameFontHighlightSmall" text="Highest Rank" justifyH="LEFT">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeDKText" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-11"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+
+						<FontString name="InspectorPlayerPVPLifetimeRank" inherits="GameFontNormalSmall" text="??" justifyH="RIGHT">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeRankText" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+
+
+				<!-- MOVE CLOSER TEXT *********************************************** -->
+				<FontString name="InspectorPlayerPVPRangeText" inherits="GameFontGreen" text="Move Closer To See Honor Stats" >
+					<Size>
+						<AbsDimension x="240" y="20"/>
+					</Size>
+					<Anchors>
+                        <Anchor point="TOP" relativeTo="InspectorPlayerPVPLifetimeText" relativePoint="TOP">
+                            <Offset>
+                                <AbsDimension x="-10" y="-70"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+				</FontString>
+
+			</Layer>
+			<!-- END FOREGROUND text stuff -->
+
+
+		</Layers>
+
+
+		<!-- BEGIN BUTTONS -->
+		<Frames> 
+
+
+			<!-- CLOSE BUTTON -->
+			<Button name="InspectorFrameClose" parent="InspectorFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="324" y="-9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight"/>
+				<Scripts>
+					<OnClick>
+						InspectorFrameHide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+			<!-- PLAYER MODEL -->
+			<PlayerModel name="InspectorPlayerModel" parent="InspectorFrame">
+				<Size>
+					<AbsDimension x="235" y="350" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="65" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</PlayerModel>
+
+
+			<!-- Rotate Left Button -->
+			<Button name="InspectorModelRotationButtonLeft" parent="InspectorFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>	
+					<Anchor point="BOTTOMLEFT" relativeTo="InspectorFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="75" y="123"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-RotationLeft-Button-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-RotationLeft-Button-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Round"/>
+				<Scripts>
+					<OnMouseDown>
+						SetRotationMode("Right");
+					</OnMouseDown>
+					<OnMouseUp>
+						SetRotationMode("None");
+					</OnMouseUp>
+					<OnLeave>
+						SetRotationMode("None");
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+
+			<!-- Rotate Right Button -->
+			<Button name="InspectorModelRotationButtonRight" parent="InspectorFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>	
+					<Anchor point="BOTTOMLEFT" relativeTo="InspectorFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="256" y="123"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-RotationRight-Button-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-RotationRight-Button-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Round"/>
+				<Scripts>
+					<OnMouseDown>
+						SetRotationMode("Left");
+					</OnMouseDown>
+					<OnMouseUp>
+						SetRotationMode("None");
+					</OnMouseUp>
+					<OnLeave>
+						SetRotationMode("None");
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+
+
+			<!-- Mode Switch Button -->
+			<Button name="InspectorSwitchMode" parent="InspectorFrame" text="Show Honor">
+				<Size>
+					<AbsDimension x="145" y="32"/>
+				</Size>
+				<Anchors>	
+					<Anchor point="BOTTOMLEFT" relativeTo="InspectorFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="23" y="75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText name="InspectorSwitchModeText" inherits="GameFontNormal" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="90" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<HighlightText name="InspectorSwitchModeTextHighlight" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="90" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</HighlightText>
+				<NormalTexture file="Interface\Buttons\UI-Panel-Button-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-Button-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-Button-Highlight"/>
+				<HitRectInsets>
+					<AbsInset left="0" right="60" top="0" bottom="10"/>
+				</HitRectInsets>
+				<Scripts>
+					<OnClick>
+						if( GetInspectorMode() == "Honor" ) then
+							InspectorHideHonor();
+							InspectorShowModel();
+						else
+							InspectorShowHonor();
+							InspectorHideModel();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- INVENTORY Buttons -->
+			<Button name="InspectorHeadButton" inherits="InspectorButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="21" y="-74"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Head"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Head"/>
+			</Button>
+
+			<Button name="InspectorNeckButton" inherits="InspectorButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorHeadButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Neck"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Neck"/>
+			</Button>
+
+			<Button name="InspectorShoulderButton" inherits="InspectorButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorNeckButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Shoulder"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Shoulder"/>
+			</Button>
+
+			<Button name="InspectorBackButton" inherits="InspectorButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorShoulderButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Chest"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Chest"/>
+			</Button>
+
+			<Button name="InspectorChestButton" inherits="InspectorButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorBackButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Chest"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Chest"/>
+			</Button>
+
+			<Button name="InspectorShirtButton" inherits="InspectorButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorChestButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Shirt"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Shirt"/>
+			</Button>
+
+			<Button name="InspectorTabardButton" inherits="InspectorButtonTemplate" id="19">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorShirtButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Tabard"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Tabard"/>
+			</Button>
+
+			<Button name="InspectorWristButton" inherits="InspectorButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorTabardButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Wrists"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Wrists"/>
+			</Button>
+
+			<Button name="InspectorHandsButton" inherits="InspectorButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorHeadButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="285" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Hands"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Hands"/>
+			</Button>
+
+			<Button name="InspectorWaistButton" inherits="InspectorButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorHandsButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Waist"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Waist"/>
+			</Button>
+
+			<Button name="InspectorLegsButton" inherits="InspectorButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorWaistButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Legs"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Legs"/>
+			</Button>
+
+			<Button name="InspectorFeetButton" inherits="InspectorButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorLegsButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Feet"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Feet"/>
+			</Button>
+
+			<Button name="InspectorFinger1Button" inherits="InspectorButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorFeetButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Finger"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Finger"/>
+			</Button>
+
+			<Button name="InspectorFinger2Button" inherits="InspectorButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorFinger1Button" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Finger"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Finger"/>
+			</Button>
+
+			<Button name="InspectorTrinket1Button" inherits="InspectorButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorFinger2Button" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Trinket"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Trinket"/>
+			</Button>
+
+			<Button name="InspectorTrinket2Button" inherits="InspectorButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorTrinket1Button" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Trinket"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Trinket"/>
+			</Button>
+
+			<Button name="InspectorMainHandButton" inherits="InspectorButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="120" y="-385"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-MainHand"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-MainHand"/>
+			</Button>
+
+			<Button name="InspectorSecondaryHandButton" inherits="InspectorButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorMainHandButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-SecondaryHand"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-SecondaryHand"/>
+			</Button>
+
+			<Button name="InspectorRangedButton" inherits="InspectorButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="InspectorSecondaryHandButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Ranged"/>
+				<PushedTexture file="Interface\PaperDoll\UI-PaperDoll-Slot-Ranged"/>
+			</Button>
+
+			<!-- END INVENTORY Buttons -->
+		
+		</Frames>
+		
+
+
+
+		<Scripts>
+			<OnLoad>
+				InspectorFrame_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				InspectorCheckHonorStatus(arg1);
+				InspectorCheckRotation();
+			</OnUpdate>
+		</Scripts>
+	
+	</Frame>
+	
+</Ui>

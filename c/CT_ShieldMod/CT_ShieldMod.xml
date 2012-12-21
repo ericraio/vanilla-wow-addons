@@ -1,0 +1,78 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="CT_ShieldMod.lua"/>
+	<Frame name="CT_ShieldFrame" parent="UIParent" movable="true" hidden="true">
+		<Size>
+			<AbsDimension x="100" y="35"/>
+		</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Anchors>
+			<Anchor point="RIGHT" relativeTo="Minimap" relativePoint="LEFT">
+				<Offset>
+					<AbsDimension x="-14" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" hidden="false" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				CT_ShieldMod_OnLoad();
+			</OnLoad>
+			<OnShow>
+				this:SetBackdropColor(0, 0, 1, 0.5);
+				this.recognized = 1;
+				getglobal(this:GetName() .. "Text"):SetText("Damage Left: |c00FFFFFF" .. CT_ShieldMod_ShieldDamageLeft .. "|r");
+				this:SetWidth(getglobal(this:GetName() .. "Text"):GetWidth()+10);
+				this:SetHeight(getglobal(this:GetName() .. "Text"):GetHeight()+15);
+			</OnShow>
+			<OnEvent>
+				CT_ShieldMod_OnEvent(event);
+			</OnEvent>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" and ( not CT_RegisterMod or CT_MF_ShowFrames ) ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnEnter>
+				CT_ShieldMod_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<GameTooltip name="CT_ShieldModTooltip" hidden="true" inherits="GameTooltipTemplate" parent="WorldFrame">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+</Ui>

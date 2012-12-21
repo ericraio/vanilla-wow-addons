@@ -1,0 +1,300 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+ 	<!-- group cell template -->
+	<Button name="FixCTGroupsCellTemplate" parent="FixCTGroupsCellsFrame" movable="true" clampedToScreen="true" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+	
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlightLarge">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	
+		<Scripts>
+			<OnLoad>
+				this.bg = {r = 0, g = 0, b = 0};
+				this.hover = {r = 1, g = 0.5, b = 0};
+
+				this:SetMovable(1);
+				this:SetFrameLevel(this:GetFrameLevel() + 2);
+				this:RegisterForDrag("LeftButton");
+				--this:RegisterForClicks('LeftButtonDown', 'RightButtonDown');
+
+				this.slot = nil;
+				--this.slot = getglobal(this:GetParent():GetName().."CellSlot"..this:GetID());
+				--this.slot.button = this;
+
+				--this:ClearAllPoints();
+				--this:SetPoint("TOPLEFT", this.slot, "TOPLEFT", 0, 0);
+
+				getglobal(this:GetName().."Label"):SetText(this:GetID());
+
+				this:SetBackdropColor(0.0, 0.0, 0.0);
+			</OnLoad>
+			<OnShow>
+				
+			</OnShow>
+			<OnClick>
+				--FixCTGroupsCellOnClick(arg1);
+			</OnClick>
+			<OnDragStart>
+				FixCTGroupsCellOnDragStart();
+			</OnDragStart>
+			<OnDragStop>
+				FixCTGroupsCellOnDragStop();
+			</OnDragStop>
+			<OnEnter>
+				--this:SetBackdropColor(this.hover.r, this.hover.g, this.hover.b);
+			</OnEnter>
+			<OnLeave>
+				--this:SetBackdropColor(this.bg.r, this.bg.g, this.hover.b);
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-- group slot template -->
+	<Button name="FixCTGroupsCellSlotTemplate" parent="FixCTGroupsCellsFrame" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+	
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontDarkGraySmall" text="">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnLoad>
+				this.bg = {r = 0, g = 0, b = 0};
+				this.hover = {r = 0, g = 0.5, b = 0};
+	
+				this.button = nil;
+				this:SetBackdropColor(this.bg.r, this.bg.g, this.bg.b);
+				this:ClearAllPoints();
+
+				if this:GetID() == 1 then
+					this:SetPoint("TOPLEFT", this:GetParent(), "TOPLEFT", 15, -28);
+				elseif math.mod((this:GetID() - 1), 8) == 0 then
+					this:SetPoint("TOPLEFT", this:GetParent():GetName().."CellSlot"..(this:GetID() - 8), "BOTTOMLEFT", 0, 0);
+				else
+					this:SetPoint("TOPLEFT", this:GetParent():GetName().."CellSlot"..(this:GetID() - 1), "TOPRIGHT", 0, 0);
+				end
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<!-- the main frame -->
+	<Frame name="FixCTGroupsCellsFrame"
+			toplevel="true" hidden="true" 
+			movable="false" parent="UIParent"
+			frameStrata="DIALOG">
+		<Size>
+			<AbsDimension x="285" y="320"/>
+		</Size>
+		
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />	
+				<Size>
+					<AbsDimension x="128" y="17" />
+				</Size>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Frame header background texture -->
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="250" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				
+				<!-- Frame header label -->
+				<FontString inherits="GameFontNormal" text="Groups">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Button name="$parentClose" inherits="OptionsButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- 64 group cell slots -->
+			<Button name="$parentCellSlot1" inherits="FixCTGroupsCellSlotTemplate" id="1"/>
+			<Button name="$parentCellSlot2" inherits="FixCTGroupsCellSlotTemplate" id="2"/>
+			<Button name="$parentCellSlot3" inherits="FixCTGroupsCellSlotTemplate" id="3"/>
+			<Button name="$parentCellSlot4" inherits="FixCTGroupsCellSlotTemplate" id="4"/>
+			<Button name="$parentCellSlot5" inherits="FixCTGroupsCellSlotTemplate" id="5"/>
+			<Button name="$parentCellSlot6" inherits="FixCTGroupsCellSlotTemplate" id="6"/>
+			<Button name="$parentCellSlot7" inherits="FixCTGroupsCellSlotTemplate" id="7"/>
+			<Button name="$parentCellSlot8" inherits="FixCTGroupsCellSlotTemplate" id="8"/>
+
+			<Button name="$parentCellSlot9" inherits="FixCTGroupsCellSlotTemplate" id="9"/>
+			<Button name="$parentCellSlot10" inherits="FixCTGroupsCellSlotTemplate" id="10"/>
+			<Button name="$parentCellSlot11" inherits="FixCTGroupsCellSlotTemplate" id="11"/>
+			<Button name="$parentCellSlot12" inherits="FixCTGroupsCellSlotTemplate" id="12"/>
+			<Button name="$parentCellSlot13" inherits="FixCTGroupsCellSlotTemplate" id="13"/>
+			<Button name="$parentCellSlot14" inherits="FixCTGroupsCellSlotTemplate" id="14"/>
+			<Button name="$parentCellSlot15" inherits="FixCTGroupsCellSlotTemplate" id="15"/>
+			<Button name="$parentCellSlot16" inherits="FixCTGroupsCellSlotTemplate" id="16"/>
+
+			<Button name="$parentCellSlot17" inherits="FixCTGroupsCellSlotTemplate" id="17"/>
+			<Button name="$parentCellSlot18" inherits="FixCTGroupsCellSlotTemplate" id="18"/>
+			<Button name="$parentCellSlot19" inherits="FixCTGroupsCellSlotTemplate" id="19"/>
+			<Button name="$parentCellSlot20" inherits="FixCTGroupsCellSlotTemplate" id="20"/>
+			<Button name="$parentCellSlot21" inherits="FixCTGroupsCellSlotTemplate" id="21"/>
+			<Button name="$parentCellSlot22" inherits="FixCTGroupsCellSlotTemplate" id="22"/>
+			<Button name="$parentCellSlot23" inherits="FixCTGroupsCellSlotTemplate" id="23"/>
+			<Button name="$parentCellSlot24" inherits="FixCTGroupsCellSlotTemplate" id="24"/>
+
+			<Button name="$parentCellSlot25" inherits="FixCTGroupsCellSlotTemplate" id="25"/>
+			<Button name="$parentCellSlot26" inherits="FixCTGroupsCellSlotTemplate" id="26"/>
+			<Button name="$parentCellSlot27" inherits="FixCTGroupsCellSlotTemplate" id="27"/>
+			<Button name="$parentCellSlot28" inherits="FixCTGroupsCellSlotTemplate" id="28"/>
+			<Button name="$parentCellSlot29" inherits="FixCTGroupsCellSlotTemplate" id="29"/>
+			<Button name="$parentCellSlot30" inherits="FixCTGroupsCellSlotTemplate" id="30"/>
+			<Button name="$parentCellSlot31" inherits="FixCTGroupsCellSlotTemplate" id="31"/>
+			<Button name="$parentCellSlot32" inherits="FixCTGroupsCellSlotTemplate" id="32"/>
+
+			<Button name="$parentCellSlot33" inherits="FixCTGroupsCellSlotTemplate" id="33"/>
+			<Button name="$parentCellSlot34" inherits="FixCTGroupsCellSlotTemplate" id="34"/>
+			<Button name="$parentCellSlot35" inherits="FixCTGroupsCellSlotTemplate" id="35"/>
+			<Button name="$parentCellSlot36" inherits="FixCTGroupsCellSlotTemplate" id="36"/>
+			<Button name="$parentCellSlot37" inherits="FixCTGroupsCellSlotTemplate" id="37"/>
+			<Button name="$parentCellSlot38" inherits="FixCTGroupsCellSlotTemplate" id="38"/>
+			<Button name="$parentCellSlot39" inherits="FixCTGroupsCellSlotTemplate" id="39"/>
+			<Button name="$parentCellSlot40" inherits="FixCTGroupsCellSlotTemplate" id="40"/>
+
+			<Button name="$parentCellSlot41" inherits="FixCTGroupsCellSlotTemplate" id="41"/>
+			<Button name="$parentCellSlot42" inherits="FixCTGroupsCellSlotTemplate" id="42"/>
+			<Button name="$parentCellSlot43" inherits="FixCTGroupsCellSlotTemplate" id="43"/>
+			<Button name="$parentCellSlot44" inherits="FixCTGroupsCellSlotTemplate" id="44"/>
+			<Button name="$parentCellSlot45" inherits="FixCTGroupsCellSlotTemplate" id="45"/>
+			<Button name="$parentCellSlot46" inherits="FixCTGroupsCellSlotTemplate" id="46"/>
+			<Button name="$parentCellSlot47" inherits="FixCTGroupsCellSlotTemplate" id="47"/>
+			<Button name="$parentCellSlot48" inherits="FixCTGroupsCellSlotTemplate" id="48"/>
+
+			<Button name="$parentCellSlot49" inherits="FixCTGroupsCellSlotTemplate" id="49"/>
+			<Button name="$parentCellSlot50" inherits="FixCTGroupsCellSlotTemplate" id="50"/>
+			<Button name="$parentCellSlot51" inherits="FixCTGroupsCellSlotTemplate" id="51"/>
+			<Button name="$parentCellSlot52" inherits="FixCTGroupsCellSlotTemplate" id="52"/>
+			<Button name="$parentCellSlot53" inherits="FixCTGroupsCellSlotTemplate" id="53"/>
+			<Button name="$parentCellSlot54" inherits="FixCTGroupsCellSlotTemplate" id="54"/>
+			<Button name="$parentCellSlot55" inherits="FixCTGroupsCellSlotTemplate" id="55"/>
+			<Button name="$parentCellSlot56" inherits="FixCTGroupsCellSlotTemplate" id="56"/>
+
+			<Button name="$parentCellSlot57" inherits="FixCTGroupsCellSlotTemplate" id="57"/>
+			<Button name="$parentCellSlot58" inherits="FixCTGroupsCellSlotTemplate" id="58"/>
+			<Button name="$parentCellSlot59" inherits="FixCTGroupsCellSlotTemplate" id="59"/>
+			<Button name="$parentCellSlot60" inherits="FixCTGroupsCellSlotTemplate" id="60"/>
+			<Button name="$parentCellSlot61" inherits="FixCTGroupsCellSlotTemplate" id="61"/>
+			<Button name="$parentCellSlot62" inherits="FixCTGroupsCellSlotTemplate" id="62"/>
+			<Button name="$parentCellSlot63" inherits="FixCTGroupsCellSlotTemplate" id="63"/>
+			<Button name="$parentCellSlot64" inherits="FixCTGroupsCellSlotTemplate" id="64"/>
+
+			<!-- the 8 group cells -->
+			<Button name="$parentCell1" inherits="FixCTGroupsCellTemplate" id="1"/>
+			<Button name="$parentCell2" inherits="FixCTGroupsCellTemplate" id="2"/>
+			<Button name="$parentCell3" inherits="FixCTGroupsCellTemplate" id="3"/>
+			<Button name="$parentCell4" inherits="FixCTGroupsCellTemplate" id="4"/>
+			<Button name="$parentCell5" inherits="FixCTGroupsCellTemplate" id="5"/>
+			<Button name="$parentCell6" inherits="FixCTGroupsCellTemplate" id="6"/>
+			<Button name="$parentCell7" inherits="FixCTGroupsCellTemplate" id="7"/>
+			<Button name="$parentCell8" inherits="FixCTGroupsCellTemplate" id="8"/>
+	</Frames>
+		
+		<Scripts>
+    	    <OnLoad>
+        	  <!-- allow pressing escape to close frame -->
+	          tinsert(UISpecialFrames, this:GetName());
+	        </OnLoad>
+			<OnShow>
+				FixCTGroupsCellsFrameOnShow();
+	   		</OnShow>
+			<OnUpdate>
+				FixCTGroupsCellsFrameOnUpdate();
+			</OnUpdate>
+			<OnHide>
+				FixCTGroupsCellsFrameOnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+</Ui>

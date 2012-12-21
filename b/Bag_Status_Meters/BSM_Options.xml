@@ -1,0 +1,619 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="localization-EFD.lua"/>
+
+	<CheckButton name="BSM_CheckButton" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" text="">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		<Scripts>
+            <OnShow>
+				BSM_CheckOnShow(this);
+			</OnShow>
+			<OnClick>
+				BSM_CheckOnClick(this);
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="BSM_CheckButtonSub1" inherits="BSM_CheckButton" virtual="true">
+		<Size>
+			<AbsDimension x="28" y="28"/>
+		</Size>
+	</CheckButton>
+	<CheckButton name="BSM_CheckButtonSub2" inherits="BSM_CheckButton" virtual="true">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+	</CheckButton>
+
+	<Frame name="BSM_Divider" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="420" y="40"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension y="40"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentHeaderText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLine" file="Interface\HelpFrame\HelpFrameDivider">
+					<Size>
+						<AbsDimension x="420" y="20" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension y="7"/>
+                            </Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0.3125" bottom="0.625" />
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+            <OnShow>
+                BSM_DividerOnShow(this);
+            </OnShow>
+		</Scripts>
+	</Frame>
+
+	<EditBox name="BSM_Text" letters="4" historyLines="0" autoFocus="false" virtual="true">
+		<Size>
+			<AbsDimension x="52" y="17"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="17"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-8" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="30" y="17"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="17"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnTabPressed>
+				this:ClearFocus();
+            </OnTabPressed>
+			<OnEditFocusLost>
+				this:HighlightText(0, 0);
+            </OnEditFocusLost>
+			<OnEnterPressed>
+				this:ClearFocus();
+                BSM_SetPosition(this);
+			</OnEnterPressed>
+			<OnEscapePressed>
+				this:ClearFocus();
+			</OnEscapePressed>
+			<OnTextChanged>
+			</OnTextChanged>
+		</Scripts>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+	<Frame name="BSM_PositionFrame" virtual="true">
+		<Size>
+			<AbsDimension x="400" y="24"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+        <Frames>
+            <EditBox name="$parentX" inherits="BSM_Text">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentText" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+        		<Scripts>
+        			<OnTabPressed>
+        				getglobal(this:GetParent():GetName().."Y"):SetFocus();
+                    </OnTabPressed>
+        			<OnEnterPressed>
+        				getglobal(this:GetParent():GetName().."Y"):SetFocus();
+                        BSM_SetPosition(this);
+        			</OnEnterPressed>
+        		</Scripts>
+            </EditBox>
+            <EditBox name="$parentY" inherits="BSM_Text">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentX" relativePoint="RIGHT"/>
+                </Anchors>
+            </EditBox>
+            <Button name="$parentSet" inherits="GameMenuButtonTemplate" text="BSM_TEXT_SET">
+                <Size>
+                    <AbsDimension x="25" y="21"/>
+                </Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentY" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-3" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+                        BSM_SetPosition(this);
+					</OnClick>
+				</Scripts>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnShow>
+                getglobal(this:GetName().."X"):SetText(math.floor(BSM_Save.dispX));
+                getglobal(this:GetName().."Y"):SetText(math.floor(BSM_Save.dispY));
+                BSM_CheckOnShow(this);
+            </OnShow>
+        </Scripts>
+	</Frame>
+
+	<Frame name="BSM_Options" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="450" y="640"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="BSM_OptionsHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="BSM_OPTIONS">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="BSM_OptionsHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontHighlight" text="BSM_VERSION">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-12" y="-12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+            <Frame name="BSM_Divider_Individual" inherits="BSM_Divider">
+                <Anchors>
+                    <Anchor point="TOP">
+                        <Offset>
+                            <AbsDimension y="-25"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_Options_Individual">
+                <Size>
+                    <AbsDimension x="420" y="200"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="BSM_Divider_Individual" relativePoint="BOTTOM"/>
+                </Anchors>
+                <Frames>
+                    <CheckButton name="BSM_Check_Individual" inherits="BSM_CheckButton">
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="10" y="20"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Overlay" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Individual" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="20" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Bars" inherits="BSM_CheckButtonSub2">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Overlay" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="20" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Labels" inherits="BSM_CheckButtonSub2">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Bars" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Dropdown" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Labels" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="-20" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Bindings" inherits="BSM_CheckButtonSub2">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Dropdown" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="20" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_IndvLabels" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Bindings" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="-20" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_IndvColor" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_IndvLabels" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_IndvTotals" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_IndvColor" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_IndvSlots" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_IndvTotals" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                </Frames>
+            </Frame>
+
+            <Frame name="BSM_Divider_Overall" inherits="BSM_Divider">
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="BSM_Options_Individual" relativePoint="BOTTOM">
+                        <Offset>
+                            <AbsDimension y="-10"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_Options_Overall">
+                <Size>
+                    <AbsDimension x="420" y="190"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="BSM_Divider_Overall" relativePoint="BOTTOM"/>
+                </Anchors>
+                <Frames>
+                    <CheckButton name="BSM_Check_Overall" inherits="BSM_CheckButton">
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="10" y="20"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Title" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Overall" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="20" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_Back" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Title" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_OverallLabels" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Back" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_OverallColor" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_OverallLabels" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_OverallTotals" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_OverallColor" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_OverallSlots" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_OverallTotals" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_OverallLock" inherits="BSM_CheckButtonSub1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_OverallSlots" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <Frame name="BSM_Options_Position" inherits="BSM_PositionFrame">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_OverallLock" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="5" y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+
+            <Frame name="BSM_Divider_Global" inherits="BSM_Divider">
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="BSM_Options_Overall" relativePoint="BOTTOM">
+                        <Offset>
+                            <AbsDimension y="-10"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_Options_Global">
+                <Size>
+                    <AbsDimension x="420" y="75"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="BSM_Divider_Global" relativePoint="BOTTOM"/>
+                </Anchors>
+                <Frames>
+                    <CheckButton name="BSM_Check_Notify" inherits="BSM_CheckButton">
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="10" y="20"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="BSM_Check_OptionsButton" inherits="BSM_CheckButton">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="BSM_Check_Notify" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension y="5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                </Frames>
+            </Frame>
+
+			<Button name="BSM_Options_Close" inherits="GameMenuButtonTemplate" text="BSM_OPTIONS_CLOSE">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="BSM_Options_Default" inherits="GameMenuButtonTemplate" text="BSM_OPTIONS_DEFAULT">
+                <Size>
+                    <AbsDimension x="55" y="21"/>
+                </Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-12" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BSM_Save = nil;
+						BSM_loadVariables();
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+            <OnLoad>
+                -- Add HelloWorldOptionsFrame to the UIPanelWindows list
+                UIPanelWindows["BSMOptionsPane"] = {area = "center", pushable = 0};
+            </OnLoad>
+            <OnHide>
+                -- Check if the options frame was opened by myAddOns
+                if(MYADDONS_ACTIVE_OPTIONSFRAME == this) then
+                    ShowUIPanel(myAddOnsFrame);
+                end
+            </OnHide>
+            <OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					this:StartMoving();
+				end
+            </OnMouseDown>
+            <OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+            </OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<Button name="BSM_OptionsButton" toplevel="false" enableMouse="true" hidden="false" frameStrata="LOW" parent="UIParent">
+		<Size>
+			<AbsDimension x="33" y="33"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="BSM_Frame" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\Icons\INV_Misc_Bag_01.blp">
+					<Size>
+    					<AbsDimension x="18" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+    			</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size>
+						<AbsDimension x="52" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+            <OnClick>
+                if not getglobal("BSM_Options"):IsVisible() then
+                    getglobal("BSM_Options"):Show();
+                else
+                    getglobal("BSM_Options"):Hide();
+                end
+            </OnClick>
+		</Scripts>
+	</Button>
+</Ui>

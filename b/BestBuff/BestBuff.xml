@@ -1,0 +1,541 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+   <Script file="BestBuff.lua"/>
+   <Script file="BestBuff_Defaults.lua"/>
+
+	<Button name = "BestBuffNameButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="220" y="18" />
+		</Size>
+		<Layers>
+			<Layer level = "BACKGROUND">
+				<FontString name="$parent_Text" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" text="Power Word: Fortitude">
+					<Size>
+						<AbsDimension x="180" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="20" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0.9" g="0.9" b="0.9"/>
+				</FontString>
+				<FontString name="$parentInfo" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="220" y="18" />
+					</Size>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseDown>
+				BestBuff_OnMouseDown(arg1);
+			</OnMouseDown>
+			<OnMouseUp>
+				BestBuff_OnMouseUp(arg1);
+			</OnMouseUp>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+	</Button>
+
+
+	<EditBox name="BestBuffEditBoxTemplate" letters="256" historyLines="0" virtual="true" autoFocus="false">
+		<Size>
+			<AbsDimension x="214" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="12" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-11" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="190" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Size>
+						<AbsDimension x="12" y="29"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+
+	<GameTooltip name="BestBuffTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+
+	<Frame name="BestBuffFrame" toplevel="false" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="275" y="290"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="CENTER">
+ 				<Offset>
+ 					<AbsDimension x="0" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="BestBuffbackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString inherits="GameFontNormal" text="BestBuff">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="16" y="-12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BestBuffEnable" inherits="GameFontNormal" text="Enable">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-100" y="-12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<Texture name="BestBuffTopLeft" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+					<Size>
+						<AbsDimension x="256" y="4"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+
+				<Texture name="BestBuffBottomLeft" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+					<Size>
+						<AbsDimension x="256" y="4"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="8" y="104"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+
+				<FontString name="BestBuffNotify" inherits="GameFontNormal" text="Notify">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="100" y="88" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BestBuffSelfCast" inherits="GameFontNormal" text="Self Cast">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="180" y="88" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="BestBuffEditName" inherits="GameFontNormal" justifyH="RIGHT" text="Buff:">
+					<Size>
+						<AbsDimension x="55" y="24" />
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="60" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BestBuffEditLevels" inherits="GameFontNormal" justifyH="RIGHT" text="Levels:">
+					<Size>
+						<AbsDimension x="55" y="24" />
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="40" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+
+
+			</Layer>
+		</Layers>
+
+		<Frames>
+
+			<Button name="BestBuffCloseButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffCloseButton_OnClick();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\BestBuff\CloseButton-Up"/>
+				<PushedTexture file="Interface\AddOns\BestBuff\CloseButton-Down"/>
+				<HighlightTexture file="Interface\AddOns\BestBuff\Status-Idle" alphaMode="ADD"/>
+			</Button>
+
+			<Button name="BestBuffName1" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffTopLeft" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="16" y="-3" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName2" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName1" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(2);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName3" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName2" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(3);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName4" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName3" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(4);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName5" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName4" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(5);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName6" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName5" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(6);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName7" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName6" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(7);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffName8" inherits="BestBuffNameButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="BestBuffName7" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BestBuffNameButton_OnClick(8);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+			<ScrollFrame name="BestBuffScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="240" y="135"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-38" y="-42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(8, BestBuffList_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+
+
+			<CheckButton name="BestBuffEnableCheckButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="BestBuffEnable" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-1" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffEnableCheckButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						BestBuffEnableCheckButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</CheckButton>			
+
+			<CheckButton name="BestBuffNotifyCheckButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="BestBuffNotify" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-1" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffNotifyCheckButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						BestBuffNotifyCheckButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</CheckButton>			
+			<CheckButton name="BestBuffSelfCastCheckButton" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="BestBuffSelfCast" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-1" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffSelfCastCheckButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						BestBuffSelfCastCheckButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</CheckButton>			
+
+
+			<EditBox name="BestBuffEditNameBox" inherits="BestBuffEditBoxTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="65" y="60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffEditNameBox_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnEscapePressed>
+						BestBuffEditBox_OnEscapePressed();
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+			<EditBox name="BestBuffEditLevelsBox" inherits="BestBuffEditBoxTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="65" y="40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffEditLevelsBox_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnEscapePressed>
+						BestBuffEditBox_OnEscapePressed();
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+
+			<Button name="BestBuffAddButton" inherits="GameMenuButtonTemplate" text="Add">
+				<Size>
+					<AbsDimension x="70" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="22" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffAddButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						BestBuffAddButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffChangeButton" inherits="GameMenuButtonTemplate" text="Change">
+				<Size>
+					<AbsDimension x="70" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="102" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffChangeButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						BestBuffChangeButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="BestBuffDeleteButton" inherits="GameMenuButtonTemplate" text="Delete">
+				<Size>
+					<AbsDimension x="70" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="182" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						BestBuffDeleteButton_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						BestBuffDeleteButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				BestBuff_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				BestBuff_OnEvent();
+			</OnEvent>
+			<OnMouseDown>
+				BestBuff_OnMouseDown(arg1);
+			</OnMouseDown>
+			<OnMouseUp>
+				BestBuff_OnMouseUp(arg1);
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+</Ui>

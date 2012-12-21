@@ -1,0 +1,43 @@
+local L = AceLibrary("AceLocale-2.0"):new("FuBar_HonorFu")
+
+L:RegisterTranslations("enUS", function() return {
+	["Target hostile flagholder"] = true,
+	["Target the current opposing flagholder. (also /tflag or /tarflag)"] = true,
+	["Show honor"] = true,
+	["Show battlegrounds score"] = true,
+	["Show kills and deaths"] = true,
+	["Show PvP cooldown"] = true,
+	["Auto-release when dead"] = true,
+	["Toggle whether to automatically release when dead in battlegrounds"] = true,
+	["Auto-open minimap for battlegrounds"] = true,
+	["Toggle whether to automatically open the battlegrounds minimap"] = true,
+	["Print out PvP reputation gains"] = true,
+	["Print out honor gains"] = true,
+	["Add info to enemy tooltip"] = true,
+	["Reset battlegrounds scores"] = true,
+	["Reset the battlegrounds scores to 0-0"] = true,
+	["Gained %d reputation with %s"] = true, -- "Gained 50 reputation with Warsong Outriders"
+	["Kill: %s %s. %d honor gained. Killed %d times today"] = true, -- "Kill: Private Guy. 50 honor gained. Killed 2 times today"
+	["Gained %d bonus honor"] = true, -- "Gained 50 bonus honor"
+	["Killed Today"] = true,
+	["Number of kills today.\nIf more than 10 kills, then no more honor from this player."] = true,
+	["%d Kills - |cff%s%.0f%% %s|r"] = true, -- "3 Kills - |cffcfcfcf70% Honor|r"
+	["On"] = true,
+	["Off"] = true,
+	["Kills-Deaths:"] = true,
+	["Today's HK honor:"] = true,
+	["Today's bonus honor:"] = true,
+	["Today's total honor:"] = true,
+	["Flagged"] = true,
+	["PvP Cooldown:"] = true,
+	["Progress:"] = true,
+	["Yesterday's honor:"] = true,
+	["This week's honor:"] = true,
+	["Last week's honor:"] = true,
+	["Rating limit:"] = true,
+	["Rank limit:"] = true,
+	["Battlegrounds score:"] = true,
+	["%s score"] = true, -- "Warsong Gulch score"
+	["%s weekend"] = true, -- "Warsong Gulch weekend"
+	["Click to target flag carrier (%s)"] = true, -- "Click to target flag carrier (Guy)"
+} end)

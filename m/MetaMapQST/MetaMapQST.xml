@@ -1,0 +1,605 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Script file="MetaMapQST.loc"/>
+	<Script file="MetaMapQST.lua"/>
+	
+	<Button name="QST_ButtonTemplate" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="MetaMap_FontTemplate" justifyH="LEFT" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentStatus" inherits="MetaMap_FontTemplate" text="">
+					<Size><AbsDimension	x="100"	y="14"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText" relativePoint="TOPRIGHT">
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNoted" inherits="MetaMap_FontTemplate" text="">
+					<Size><AbsDimension	x="100"	y="14"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentStatus" relativePoint="TOPRIGHT">
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight"	alphaMode="ADD"	setAllPoints="true"	hidden="true"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				QSTButton_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				getglobal(this:GetName().."Highlight"):SetVertexColor(0.5, 0.5, 0.5);
+				getglobal(this:GetName().."Highlight"):Show();
+				QSTButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."Highlight"):Hide();
+				WorldMapTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Button name="QST_RewardTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="41" y="41"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIconTexture">
+					<Size>
+						<AbsDimension x="39" y="39"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentIconTexture">
+							<Offset>
+								<AbsDimension x="-4" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this.hasItem = 1;
+			</OnLoad>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				if(this.rewardType == "item") then
+					GameTooltip:SetHyperlink(this.itemID);
+				elseif(this.rewardType == "spell" ) then
+					GameTooltip:SetHyperlink(this.name);
+				end
+				CursorUpdate();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+				ResetCursor();
+			</OnLeave>
+			<OnUpdate>
+				CursorOnUpdate();
+			</OnUpdate>
+			<OnClick>
+				QST_RewardItemOnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="QST_DisplayFrame" parent="MetaMapContainerFrame" enableMouse="true" hidden="true">
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString	name="QST_HeaderText" toplevel="true" inherits="MetaMap_HeaderTemplate"	text="">
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset>
+								<AbsDimension	x="0"	y="-8"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="QST_InfoText1" toplevel="true" inherits="MetaMap_FontTemplate" justifyH="LEFT" text="">
+					<Anchors>
+						<Anchor	point="TOPLEFT">
+							<Offset>
+								<AbsDimension	x="10"	y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString	name="QST_InfoText2" toplevel="true" inherits="MetaMap_FontTemplate" justifyH="RIGHT" text="">
+					<Anchors>
+						<Anchor	point="TOPRIGHT">
+							<Offset>
+								<AbsDimension	x="-10"	y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="QST_FooterPanel" toplevel="true">
+				<Anchors>
+					<Anchor	point="BOTTOMLEFT">
+						<Offset><AbsDimension	x="0"	y="0" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<EditBox name="QST_SearchBox" inherits="MetaMap_SearchBoxTemplate">
+						<Anchors> 
+							<Anchor point="LEFT">
+								<Offset><AbsDimension x="80" y="0"/></Offset>
+							</Anchor>
+						</Anchors> 
+						<Scripts>
+							<OnTextChanged>
+								QST_LastSearch = this:GetText();
+								QST_RefreshDisplay();
+							</OnTextChanged>
+						</Scripts>
+					</EditBox>
+					<Frame name="QST_FilterSelect" inherits="MetaMap_DropdownTemplate" id="1">
+						<Size>
+							<AbsDimension	x="220"	y="24" />
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="QST_SearchBox" relativePoint="RIGHT">
+								<Offset><AbsDimension x="40" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Button	name="QST_OptionsButton" inherits="UIPanelButtonTemplate2" text="QST_OPTIONS_TEXT">
+						<Size>
+							<AbsDimension	x="80"	y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="LEFT" relativeTo="QST_FilterSelect" relativePoint="RIGHT">
+								<Offset><AbsDimension	x="40"	y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MetaMap_ToggleFrame(QST_OptionsFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button	name="QST_HelpButton" inherits="UIPanelButtonTemplate2" text="?">
+						<Size>
+							<AbsDimension	x="26" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor	point="LEFT" relativeTo="QST_OptionsButton" relativePoint="RIGHT">
+								<Offset><AbsDimension	x="40"	y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnEnter>
+								QST_HintTooltip();
+							</OnEnter>
+							<OnLeave>
+								WorldMapTooltip:Hide();
+							</OnLeave>
+							<OnClick>
+								MetaMap_ContextHelp("MetaMapQST");
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetHeight(60);
+						this:SetWidth(MetaMapContainerFrame:GetWidth());
+						this:SetFrameLevel(MetaMapContainerFrame:GetFrameLevel()+2);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<ScrollFrame name="QST_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="256" y="512"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="QST_DisplayFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-38"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="RIGHT" relativeTo="QST_DisplayFrame" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-22" y="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMLEFT" relativeTo="QST_DisplayFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<Frame name="QST_ScrollChild">
+						<Size>
+							<AbsDimension x="600" y="500"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="TOPRIGHT"/>
+						</Anchors>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetWidth(MetaMapContainerFrame:GetWidth());
+				this:SetHeight(MetaMapContainerFrame:GetHeight());
+				QST_ScrollChild:SetWidth(this:GetWidth());
+			</OnLoad>
+			<OnHide>
+				QST_EditorFrame:Hide();
+				QST_OptionsFrame:Hide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Frame name="QST_RewardFrame"	enableMouse="true" hidden="true" frameStrata="FULLSCREEN" toplevel="true" parent="UIParent">
+		<Size>
+			<AbsDimension	x="200"	y="100"/>
+		</Size>
+		<Backdrop bgFile="Interface\AddOns\MetaMapQST\background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="false">
+			<BackgroundInsets>
+				<AbsInset	left="11" right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="QST_RewardTitleText" inherits="QuestTitleFont" text="QUEST_REWARDS">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="QST_RewardItemChooseText" inherits="QuestFont" text="REWARD_CHOOSE" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="20" y="-45"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="QST_RewardItemReceiveText" inherits="QuestFont" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="QST_RewardItem1" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem2" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem3" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem4" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem5" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem6" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem7" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem8" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem9" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Button name="QST_RewardItem10" toplevel="true" inherits="QST_RewardTemplate">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Button>
+			<Frame name="QST_RewardMoneyFrame" toplevel="true" inherits="MoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						MoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(WorldMapFrame:GetFrameLevel()+10);
+			</OnLoad>
+			<OnUpdate>
+				if(this:IsVisible()) then
+					if(not MouseIsOver(this)) then
+						this:Hide();
+					end
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="QST_EditorFrame"	enableMouse="true" hidden="true" frameStrata="FULLSCREEN" toplevel="true" parent="UIParent">
+		<Size><AbsDimension	x="350"	y="250"/></Size>
+		<Anchors><Anchor point="CENTER"/></Anchors>
+		<Backdrop bgFile="Interface\AddOns\MetaMapQST\background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="false">
+			<BackgroundInsets>
+				<AbsInset	left="11" right="12" top="12"	bottom="11"/>
+			</BackgroundInsets>
+			<EdgeSize>
+				<AbsValue	val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="QST_NotesTitle" inherits="QuestTitleFont" text="QST_NOTES_TITLE">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<ScrollFrame name="$parentScrollFrame" inherits="UIPanelScrollFrameTemplate" toplevel="true">
+				<Size>
+					<AbsDimension	x="300"	y="160" />
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset><AbsDimension x="-10" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<EditBox name="QST_NotesEditBox" multiLine="true" autofocus="false" toplevel="true">
+						<Size>
+							<AbsDimension	x="300"	y="150" />
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors> 
+						<Scripts>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+							<OnTextChanged>
+								local scrollBar = getglobal(this:GetParent():GetName().."ScrollBar")
+								this:GetParent():UpdateScrollChildRect();
+								local min, max = scrollBar:GetMinMaxValues();
+								if(max > 0 and (this.max ~= max)) then
+									this.max = max;
+									scrollBar:SetValue(max);
+								end
+							</OnTextChanged>
+						</Scripts>
+						<FontString inherits="QuestFont">
+							<Color r="0" g="0" b="0"/>
+						</FontString>
+					</EditBox>
+				</ScrollChild>
+			</ScrollFrame>
+			<Button name="QST_SaveNote" toplevel="true" inherits="UIPanelButtonTemplate2" text="QST_NOTES_SAVE">
+				<Size><AbsDimension	x="80" y="20"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="-70" y="15"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						QST_QuestNoteUpdate();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="QST_CancelNote" toplevel="true" inherits="UIPanelButtonTemplate2" text="QST_NOTES_EXIT">
+				<Size><AbsDimension	x="80" y="20"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="70" y="15"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(WorldMapFrame:GetFrameLevel()+10);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="QST_OptionsFrame" inherits="MetaMap_OptionsFrameTemplate" toplevel="true" hidden="true" parent="UIParent">
+		<Frames>
+			<CheckButton name="QST_Check_SaveHistory" inherits="MetaMap_CheckButtonTemplate">
+				<Anchors>
+					<Anchor	point="TOPLEFT">
+						<Offset><AbsDimension	x="15"	y="-35" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.option = string.gsub(this:GetName(), "QST_Check_", "");
+						getglobal(this:GetName().."Text"):SetText(QST_HISTORY_SAVE);
+					</OnLoad>
+					<OnShow>
+						this:SetChecked(QST_Options[this.option]);
+					</OnShow>
+					<OnClick>
+						QST_ToggleOptions(this.option);
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="QST_Check_SaveDesc" inherits="MetaMap_CheckButtonTemplate">
+				<Anchors>
+					<Anchor	point="TOPLEFT" relativeTo="QST_Check_SaveHistory">
+						<Offset><AbsDimension	x="0"	y="-30" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.option = string.gsub(this:GetName(), "QST_Check_", "");
+						getglobal(this:GetName().."Text"):SetText(QST_HISTORY_DESC);
+					</OnLoad>
+					<OnShow>
+						this:SetChecked(QST_Options[this.option]);
+					</OnShow>
+					<OnClick>
+						QST_ToggleOptions(this.option);
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="QST_Check_SaveRew" inherits="MetaMap_CheckButtonTemplate">
+				<Anchors>
+					<Anchor	point="TOPLEFT" relativeTo="QST_Check_SaveDesc">
+						<Offset><AbsDimension	x="0"	y="-30" /></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.option = string.gsub(this:GetName(), "QST_Check_", "");
+						getglobal(this:GetName().."Text"):SetText(QST_HISTORY_REW);
+					</OnLoad>
+					<OnShow>
+						this:SetChecked(QST_Options[this.option]);
+					</OnShow>
+					<OnClick>
+						QST_ToggleOptions(this.option);
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider	name="QST_Slider_Padding"	inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension	x="120"	y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor	point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension	x="15"	y="40"	/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.option = string.gsub(this:GetName(), "QST_Slider_", "");
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 30);
+						this:SetValueStep(1);
+					</OnLoad>
+					<OnShow>
+						this:SetValue(QST_Options[this.option]);
+						getglobal(this:GetName().."Text"):SetText(QST_TEXT_PADDING.." |cff00ff00"..this:GetValue());
+					</OnShow>
+					<OnValueChanged>
+						getglobal(this:GetName().."Text"):SetText(QST_TEXT_PADDING.." |cff00ff00"..this:GetValue());
+						QST_ToggleOptions(this.option, this:GetValue());
+						QST_ShowDisplay();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Text"):SetText("MetaMapQST");
+				getglobal(this:GetName().."Text"):SetTextHeight(14);
+			</OnLoad>
+			<OnShow>
+			</OnShow>
+			<OnHide>
+			</OnHide>
+		</Scripts>		
+	</Frame>
+
+	<Frame name="QST_EventFrame" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				QST_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				QST_OnUpdate(arg1);
+			</OnUpdate>
+			<OnEvent>
+				QST_OnEvent(event, arg1);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

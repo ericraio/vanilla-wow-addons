@@ -1,0 +1,781 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="localization.ge.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="CT_MailMod.lua"/>
+	<Button name="CT_MailButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="37" y="37"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Buttons\UI-Slot-Background">
+					<Size>
+						<AbsDimension x="39" y="39"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-2" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.640625"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture name="$parentIconTexture"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnReceiveDrag>
+				CT_MailButton_OnClick();
+			</OnReceiveDrag>
+			<OnDragStart>
+				CT_MailButton_OnClick();
+			</OnDragStart>
+			<OnClick>
+				CT_MailButton_OnClick();
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				if ( this.item and this.bag ) then
+					GameTooltip:SetBagItem(this.bag,this.item)
+				else
+					GameTooltip:SetText(ATTACHMENT_TEXT, 1.0, 1.0, 1.0);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts> 
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	</Button>
+	<Frame name="CT_MailFrame" parent="MailFrame" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="CT_MailTitleText" inherits="GameFontNormal" text="CT_MAIL_SEND">
+					<Size>
+						<AbsDimension x="224" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="6" y="230"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_MailStatusText" inherits="GameFontNormal">
+					<Size>
+						<AbsDimension x="224" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="125"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString justifyH="left" justifyV="top" name="CT_MailHelpText" inherits="GameFontNormal" text="CT_MAIL_HELP">
+					<Size>
+						<AbsDimension x="300" y="150"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="30" y="-105"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="CT_MailHorizontalBarLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="256" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-350"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="75" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="CT_MailHorizontalBarLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="CT_MailNameEditBox" letters="12" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="122" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="105" y="-46"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormal" text="MAIL_TO_LABEL" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-12" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="100" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						CT_MailSubjectEditBox:SetFocus();
+					</OnTabPressed>
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnChar>
+						CT_Mail_AutoComplete();
+					</OnChar>
+					<OnEnterPressed>
+						CT_MailSubjectEditBox:SetFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						CT_MailNameEditBox:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						CT_Mail_CanSend();
+					</OnTextChanged>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Frame name="CT_MailCostMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-46" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormal" text="SEND_MAIL_COST">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-3" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+						MoneyFrame_Update("CT_MailCostMoneyFrame", GetSendMailPrice());	
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<EditBox name="CT_MailSubjectEditBox" letters="64" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="237" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_MailNameEditBox" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormal" text="MAIL_SUBJECT_LABEL" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-12" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="221" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						CT_MailNameEditBox:SetFocus();
+					</OnTabPressed>
+					<OnEscapePressed>
+						CT_MailSubjectEditBox:ClearFocus();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Frame name="CT_MailMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="183" y="84"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Button name="CT_MailCancelButton" inherits="UIPanelButtonTemplate" text="CANCEL">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-39" y="80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(MailFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="CT_MailMailButton" inherits="UIPanelButtonTemplate" text="SEND_LABEL">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="SendMailCancelButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_Mail_AcceptSendFrame:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="CT_MailAbortButton" hidden="true" inherits="UIPanelButtonTemplate" text="CT_MAIL_ABORT">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="105"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_MailStatusText:SetText(format(CT_MAIL_ABORTED, CT_MailGlobalFrame.total-(getn(CT_MailGlobalFrame.queue)-1), CT_MailGlobalFrame.total));
+						CT_MailGlobalFrame.queue = { };
+						CT_MailGlobalFrame.total = 0;
+						CT_MailGlobalFrame:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="CT_MailButton1" inherits="CT_MailButtonTemplate" id="1" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-222"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton2" inherits="CT_MailButtonTemplate" id="2" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton1">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton3" inherits="CT_MailButtonTemplate" id="3" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton2">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton4" inherits="CT_MailButtonTemplate" id="4" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton3">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton5" inherits="CT_MailButtonTemplate" id="5" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton4">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton6" inherits="CT_MailButtonTemplate" id="6" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton5">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton7" inherits="CT_MailButtonTemplate" id="7" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton6">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+			<Button name="CT_MailButton8" inherits="CT_MailButtonTemplate" id="8" hidden="false">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CT_MailButton1">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton9" inherits="CT_MailButtonTemplate" id="9" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton8">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton10" inherits="CT_MailButtonTemplate" id="10" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton9">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton11" inherits="CT_MailButtonTemplate" id="11" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton10">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton12" inherits="CT_MailButtonTemplate" id="12" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton11">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton13" inherits="CT_MailButtonTemplate" id="13" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton12">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton14" inherits="CT_MailButtonTemplate" id="14" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton13">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+			<Button name="CT_MailButton15" inherits="CT_MailButtonTemplate" id="15" hidden="false">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CT_MailButton8">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton16" inherits="CT_MailButtonTemplate" id="16" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton15">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton17" inherits="CT_MailButtonTemplate" id="17" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton16">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton18" inherits="CT_MailButtonTemplate" id="18" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton17">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton19" inherits="CT_MailButtonTemplate" id="19" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton18">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton20" inherits="CT_MailButtonTemplate" id="20" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton19">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CT_MailButton21" inherits="CT_MailButtonTemplate" id="21" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CT_MailButton20">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				CT_MailNameEditBox:SetFocus();
+			</OnShow>
+			<OnLoad>
+				CT_MailFrame.num = 0;
+				this:RegisterEvent("MAIL_CLOSED");
+			</OnLoad>
+			<OnEvent>
+				CT_Mail_ClearItems();
+				CT_MailGlobalFrame.total = 0;
+				CT_MailGlobalFrame.queue = { };
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+	<Button name="MailFrameTab3" inherits="FriendsFrameTabTemplate" id="3" parent="MailFrame" text="Mass Mail">
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="MailFrameTab2" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="-8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				MailFrameTab_OnClick();
+			</OnClick>
+			<OnLoad>
+				PanelTemplates_SetNumTabs(MailFrame, 3);
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<Frame name="CT_Mail_AcceptSendFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="CT_MailFrame">
+		<Size>
+			<AbsDimension x="400" y="150"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="CT_MAIL_SEND">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal" text="CT_MAIL_SENDINFO">
+					<Size>
+						<AbsDimension x="350" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-78"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfoString" justifyV="top" inherits="GameFontNormal" text="CT_MAIL_SENDINFO2">
+					<Size>
+						<AbsDimension x="350" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfoItems" justifyV="top" inherits="GameFontNormal" text="">
+					<Size>
+						<AbsDimension x="350" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentInfoString" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentInfo">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+						MoneyFrame_Update(this:GetName(), GetSendMailPrice());	
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parentSendButton" hidden="false" inherits="GameMenuButtonTemplate" text="CT_MAIL_SENDBUTTON">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-32" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_MailGlobalFrame.queue = CT_Mail_FillItemTable();
+						CT_MailGlobalFrame.total = getn(CT_MailGlobalFrame.queue);
+						CT_Mail_ClearItems();
+						CT_MailGlobalFrame:Show();
+						this:GetParent():Hide();
+						CT_Mail_CanSendNext = 1;
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelButton" hidden="false" inherits="GameMenuButtonTemplate" text="CT_MAIL_CANCELBUTTON">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="32" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				getglobal(this:GetName() .. "InfoItems"):SetText(CT_MailFrame.num .. " " .. CT_MAIL_ITEMS);
+				MoneyFrame_Update(this:GetName() .. "MoneyFrame", CT_MailFrame.num*GetSendMailPrice());	
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_MailGlobalFrame" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnUpdate>
+				CT_Mail_ProcessQueue(arg1);
+			</OnUpdate>
+			<OnLoad>
+				this.queue = { };
+				this.update = 0;
+				this.total = 0;
+				this.sendmail = 0;
+				this.latency = 2.25;
+				this:RegisterEvent("MAIL_SEND_INFO_UPDATE");
+				this:RegisterEvent("MAIL_SEND_SUCCESS");
+			</OnLoad>
+			<OnEvent>
+				CT_Mail_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<GameTooltip name="CT_MMTooltip" inherits="GameTooltipTemplate">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+</Ui>

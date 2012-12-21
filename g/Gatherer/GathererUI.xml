@@ -1,0 +1,2515 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+	..\FrameXML\UI.xsd">
+	<!--
+		Version: <%version%>
+		Revision: $Id: GathererUI.xml,v 1.18 2006/01/04 12:36:29 islorgris Exp $
+	-->
+	<Script file="UI_localization.lua"/>
+	<Script file="GathererUI_Lang.lua"/>
+	<Script file="GathererUI.lua"/>
+
+	<!-- event catcher and init GUI frame -->
+	<Frame name="GathererUI"> 
+		<Scripts> 
+			<OnLoad>
+				GathererUI_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				GathererUI_OnEvent();
+			</OnEvent>
+			<OnUpdate>
+     			GathererUI_OnUpdate(arg1);
+     		</OnUpdate>
+  		</Scripts>
+   	</Frame>
+
+	<!-- Templates -->
+	<Button name="GathererUI_FrameTabButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="115" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeftDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+					<Size>
+						<AbsDimension x="20" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="5"/>
+        						</Offset>
+        					</Anchor>
+        				</Anchors>
+					<TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
+        			</Texture>
+				<Texture name="$parentMiddleDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+        				<Size>
+        					<AbsDimension x="88" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
+        			</Texture>
+				<Texture name="$parentRightDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+        				<Size>
+        					<AbsDimension x="20" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentMiddleDisabled" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
+        			</Texture>
+				<Texture name="$parentLeft" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+        				<Size>
+        					<AbsDimension x="20" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="TOPLEFT"/>
+        				</Anchors>
+					<TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
+        		</Texture>
+				<Texture name="$parentMiddle" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+        				<Size>
+        				<AbsDimension x="88" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
+        		</Texture>
+				<Texture name="$parentRight" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+        				<Size>
+        					<AbsDimension x="20" y="32"/>
+        				</Size>
+        				<Anchors>
+        					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+        				</Anchors>
+					<TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
+        		</Texture>
+        		</Layer>
+        	</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() + 4);
+			</OnLoad>
+			<OnClick>
+				PanelTemplates_Tab_OnClick(GathererUI_DialogFrame);
+				GathererUIFrameTab_OnClick();
+			</OnClick>
+			<OnShow>
+				PanelTemplates_TabResize(0);
+				getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 30);
+			</OnShow>
+		</Scripts>
+		<NormalText name="$parentText" inherits="GameFontNormalSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText name="$parentHighlightText" inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText name="$parentDisabledText" inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+		<HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="10" y="2"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="RIGHT">
+					<Offset>
+						<AbsDimension x="-10" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<!-- Minimap Icon frame -->
+	<Frame name="GathererUI_IconFrame" enableMouse="true" hidden="true" parent="Minimap" frameStrata="MEDIUM">
+		<Size>
+			<AbsDimension x="33" y="33"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="GathererUI_IconTexture" file="Interface\Addons\Gatherer\Skin\GatherOrb">
+					<Size>
+						<AbsDimension x="17" y="17"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size>
+						<AbsDimension x="52" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				GathererUI_IconFrameOnEnter();
+			</OnEnter>
+			<OnMouseUp>
+				GathererUI_IconFrameOnClick();
+			</OnMouseUp> 
+		</Scripts>
+	</Frame>
+
+	<!-- Quickmenu button template -->
+	<Button name="GathererUI_PopupButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="64" y="12"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				GathererUI_ButtonClick();
+			</OnClick>
+		</Scripts>
+		<NormalText inherits="GameFontNormal" justifyH="LEFT"/>
+		<HighlightText inherits="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledText inherits="GameFontDisable" justifyH="LEFT"/>
+	</Button>
+
+	<!-- Quickmenu frame -->
+	<Frame name="GathererUI_Popup" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Frames>
+			<Button name="GathererUI_TitleButton" inherits="GathererUI_PopupButtonTemplate" text="GATHERER_TEXT_TITLE_BUTTON">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetWidth(this:GetTextWidth() + 2 * GathererUI_BORDER_WIDTH);
+						this.tooltipText=GATHERER_MENUTITLE_TIP;
+					</OnLoad>
+					<OnClick>
+						GathererUI_ShowOptions();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_Popup, "ANCHOR_LEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalText inherits="GameFontGreen"/>
+				<HighlightText inherits="GameFontRed"/>
+				<DisabledText inherits="GameFontDisable"/>
+			</Button>
+			<Button name="GathererUI_PopupButton1" inherits="GathererUI_PopupButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_TitleButton" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_PopupButton2" inherits="GathererUI_PopupButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_PopupButton1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_PopupButton3" inherits="GathererUI_PopupButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_PopupButton2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_PopupButton4" inherits="GathererUI_PopupButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_PopupButton3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_PopupButton5" inherits="GathererUI_PopupButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_PopupButton4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_PopupButton6" inherits="GathererUI_PopupButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_PopupButton5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_PopupButton7" inherits="GathererUI_PopupButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="GathererUI_PopupButton6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+				GathererUI_InitializeMenu();
+			</OnShow>
+		</Scripts>		
+	</Frame>
+
+	<!-- Gatherer Options Dialog frame -->
+	<Frame name="GathererUI_DialogFrame" toplevel="true" movable="true" enableMouse="true" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="440" y="315"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativeTo="UIParent" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-40"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="375" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="1" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="GATHERER_TEXT_CONFIG_TITLE" nonspacewrap="true">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="GathererUI_OptionIconTexture" file="Interface\Addons\Gatherer\Skin\GatherOrb">
+					<Size>
+						<AbsDimension x="26" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-7" y="7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<!-- Tabs -->
+			<Button name="GathererUI_DialogFrameTab1" inherits="GathererUI_FrameTabButtonTemplate" id="1" text="GATHERER_TAB_FILTERS_TEXT">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(GATHERER_TAB_FILTERS_TEXT_TIP);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GathererUI_DialogFrameTab2" inherits="GathererUI_FrameTabButtonTemplate" id="2" text="GATHERER_TAB_GLOBALS_TEXT">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_DialogFrameTab1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(GATHERER_TAB_GLOBALS_TEXT_TIP);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GathererUI_DialogFrameTab3" inherits="GathererUI_FrameTabButtonTemplate" id="3" text="GATHERER_TAB_MENU_TEXT">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_DialogFrameTab2" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(GATHERER_TAB_MENU_TEXT_TIP);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<!-- Frame handling buttons -->
+			<Button name="GathererUI_CallHelpButton">
+				<Size>
+					<AbsDimension x="24" y="30" /> 
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GathererUI_HelpFrame_Update();
+						if ( GathererUI_HelpFrame:IsShown() ) then
+							GathererUI_HelpFrame:Hide();
+						else
+							GathererUI_HelpFrame:Show();
+						end
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-MicroButton-Help-Up" /> 
+				<PushedTexture file="Interface\Buttons\UI-MicroButton-Help-Down" /> 
+				<HighlightTexture file="Interface\Buttons\UI-MicroButton-Hilight" alphaMode="ADD" /> 
+			</Button>
+			
+			<Button name="GathererUI_CloseButton" text="CLOSE" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GathererUI_HideOptions();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="GathererUI_ZoneRematchButton" text="Zone Match" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = GATHERER_ZMBUTTON_TIP;
+					</OnLoad>
+					<OnClick>
+						GathererUI_ShowRematchDialog();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GathererUI_ReportButton" text="GATHERER_TEXT_TOGGLE_REPORT" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_ZoneRematchButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = GATHERER_REPORT_TIP;
+					</OnLoad>
+					<OnClick>
+						showGathererInfo(1);
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="GathererUI_SearchtButton" text="GATHERER_TEXT_TOGGLE_SEARCH" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="GathererUI_CloseButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = GATHERER_SEARCH_TIP;
+					</OnLoad>
+					<OnClick>
+						showGathererInfo(2);
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				-- Tab Handling code
+				PanelTemplates_SetNumTabs(this, 3);
+				PanelTemplates_SetTab(this, 1);
+			</OnLoad>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+				ToggleGathererUI_Dialog(GATHERERUI_SUBFRAMES[PanelTemplates_GetSelectedTab(GathererUI_DialogFrame)]);
+			</OnShow>
+			<OnHide>
+				 -- Check if the options frame was opened by myAddOns
+				if (MYADDONS_ACTIVE_OPTIONSFRAME == this) then
+					ShowUIPanel(myAddOnsFrame);
+				end
+			</OnHide>
+		</Scripts>		
+	</Frame>
+
+	<!-- Filtering DropDown menus and skill level editboxes -->
+	<Frame name="GathererUI_FiltersOptionsBorderFrame" parent="GathererUI_DialogFrame" inherits="OptionFrameBoxTemplate" hidden="true" id="1">
+		<Size>
+			<AbsDimension x="410" y="250"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GathererUI_DialogFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="16" y="-25"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0,0,0)	
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<Frame name="GathererUI_DropDownHerbs" inherits="UIDropDownMenuTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(100);
+						this.tooltipText=GATHERER_HERBDDM_TIP;
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_ClearAll(this);
+						UIDropDownMenu_Initialize(this, GathererUIDropDownHerbs_Initialize);
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="GATHERER_TEXT_FILTER_HERBS" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_DropDownHerbs" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="15" y="15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="GathererUI_HerbSkillEditBox" letters="3" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="45" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="GathererUI_DropDownHerbs" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText=GATHERER_HERBSKLEB_TIP;
+					</OnLoad>
+					<OnEnterPressed>
+						GathererUI_OnEnterPressed_HerbSkillEditBox();
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnShow>
+						if ( Gather_Player and GatherConfig.users[Gather_Player].minSetHerbSkill ) then
+							this:SetNumber(GatherConfig.users[Gather_Player].minSetHerbSkill);
+						else
+							this:SetNumber(0);
+						end
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<Frame name="GathererUI_DropDownOre" inherits="UIDropDownMenuTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="135" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(100);
+						this.tooltipText=GATHERER_OREDDM_TIP;
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_ClearAll(this);
+						UIDropDownMenu_Initialize(this, GathererUIDropDownOre_Initialize);
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="GATHERER_TEXT_FILTER_ORE" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_DropDownOre" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="15" y="15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="GathererUI_OreSkillEditBox" letters="3" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="45" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="GathererUI_DropDownOre" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText=GATHERER_ORESKLEB_TIP;
+					</OnLoad>
+					<OnEnterPressed>
+						GathererUI_OnEnterPressed_OreSkillEditBox();
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnShow>
+						if ( Gather_Player and GatherConfig.users[Gather_Player].minSetOreSkill ) then
+							this:SetNumber(GatherConfig.users[Gather_Player].minSetOreSkill);
+						else
+							this:SetNumber(0);
+						end
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<Frame name="GathererUI_DropDownTreasure" inherits="UIDropDownMenuTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="265" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(100);
+						this.tooltipText= GATHERER_TREASUREDDM_TIP;
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_ClearAll(this);
+						UIDropDownMenu_Initialize(this, GathererUIDropDownTreasure_Initialize);
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="GATHERER_TEXT_FILTER_TREASURE" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_DropDownTreasure" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="15" y="15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<CheckButton name="GathererUI_CheckHerbRecord" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_LINKRECORD);
+						this.tooltipText = GATHERER_TEXT_LINKRECORD_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.users[Gather_Player].filterRecording[1] = 1;
+						else
+   							GatherConfig.users[Gather_Player].filterRecording[1] = nil;
+							GathererUI_CheckHerbRecord:SetChecked(GatherConfig.users[Gather_Player].filterRecording[1]);
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="GathererUI_CheckOreRecord" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="150" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_LINKRECORD);
+						this.tooltipText = GATHERER_TEXT_LINKRECORD_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.users[Gather_Player].filterRecording[2] = 1;
+						else
+   							GatherConfig.users[Gather_Player].filterRecording[2] = nil;
+							GathererUI_CheckHerbRecord:SetChecked(GatherConfig.users[Gather_Player].filterRecording[2]);
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="GathererUI_CheckTreasureRecord" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="280" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_LINKRECORD);
+						this.tooltipText = GATHERER_TEXT_LINKRECORD_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.users[Gather_Player].filterRecording[0] = 1;
+						else
+   							GatherConfig.users[Gather_Player].filterRecording[0] = nil;
+							GathererUI_CheckHerbRecord:SetChecked(GatherConfig.users[Gather_Player].filterRecording[0]);
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="GathererUI_ButtonResetHerb" text="Reset" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckHerbRecord" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( Gather_Player and GatherConfig.users[Gather_Player].interested  ) then
+							if ( GatherConfig.users[Gather_Player].interested[1] ) then
+								GatherConfig.users[Gather_Player].interested[1] = nil;
+							end
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="GathererUI_ButtonResetOre" text="Reset" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckOreRecord" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( Gather_Player and GatherConfig.users[Gather_Player].interested ) then
+							if (  GatherConfig.users[Gather_Player].interested[2] ) then
+								GatherConfig.users[Gather_Player].interested[2] = nil;
+							end
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="GathererUI_ButtonResetTreasure" text="Reset" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckTreasureRecord" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( Gather_Player and GatherConfig.users[Gather_Player].interested ) then
+							if (  GatherConfig.users[Gather_Player].interested[0] ) then
+								GatherConfig.users[Gather_Player].interested[0] = nil;
+							end
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+	
+			<CheckButton name="GathererUI_CheckToggleWorldFilters" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_ButtonResetHerb" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_WMFILTERS);
+						this.tooltipText = GATHERER_TEXT_WMFILTERS_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.showWorldMapFilters = 1;
+							GathererWD_DropDownFilters:Show();
+						else
+   							GatherConfig.showWorldMapFilters = 0;
+							GathererWD_DropDownFilters:Hide();
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="GathererUI_CheckDisableWMFix" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckToggleWorldFilters" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="150" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_DISABLEWMFIX);
+						this.tooltipText = GATHERER_TEXT_DISABLEWMFIX_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.disableWMFreezeWorkaround = 1;
+							Gatherer_WorldMapDisplay:Show()
+						else
+							GatherConfig.disableWMFreezeWorkaround = 0;
+							Gatherer_WorldMapDisplay:Hide()
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+		</Frames>
+	</Frame>
+
+
+	<!-- Gatherer specific options -->
+	<Frame name="GathererUI_GathererOptionsBorderFrame" parent="GathererUI_DialogFrame" inherits="OptionFrameBoxTemplate" hidden="true" id="2">
+		<Size>
+			<AbsDimension x="410" y="250"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GathererUI_DialogFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="16" y="-25"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0,0,0)	
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<!-- Map Minder options -->
+			<CheckButton name="GathererUI_CheckMapMinder" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MAPMINDER);
+						this.tooltipText=GATHERER_MAPMINDER_TIP;
+					</OnLoad>
+					<OnShow>
+						if ( GatherConfig.mapMinder ~= nil ) then
+							this:SetChecked(GatherConfig.mapMinder)
+						end
+					</OnShow>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.mapMinder = true;
+						else
+							GatherConfig.mapMinder = false;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<Slider name="GathererUI_SliderMapMinder" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="215" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MAPMINDER_VALUE);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 30);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_MAPMINDER_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.minderTime) then
+							this:SetValue(GatherConfig.minderTime);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.minderTime = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MAPMINDER_VALUE.." : "..this:GetValue().."s");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+
+			<!-- Display Options -->
+			<Slider name="GathererUI_SliderFadePercent" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckMapMinder" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_FADEPERC);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 100);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_FADEPERC_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.fadePerc) then
+							this:SetValue(GatherConfig.fadePerc);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.fadePerc = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_FADEPERC.." : "..this:GetValue().."%");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Slider name="GathererUI_SliderFadeDist" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderMapMinder" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_FADEDIST);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(10, 60);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_FADEDIST_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.fadeDist) then
+							this:SetValue(GatherConfig.fadeDist);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.fadeDist = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_FADEDIST.." : "..this:GetValue()..".");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Frame name="GathererUI_DropDownTheme" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderFadePercent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="60" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(70);
+						this.tooltipText= GATHERER_THEME_TIP;
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_Initialize(this, GathererUIDropDownTheme_Initialize);
+					</OnShow>
+					<OnEvent>
+						<!--LocationDropDown_OnEvent();-->
+					</OnEvent>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormal" text="GATHERER_TEXT_THEME" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderFadePercent" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Slider name="GathererUI_SliderNumber" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderFadeDist" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_NUMBER);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(5, 25);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_NUMBER_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.number) then
+							this:SetValue(GatherConfig.number);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.number = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_NUMBER.." : "..this:GetValue()..".");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+
+			<Slider name="GathererUI_SliderMiniIconDist" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_DropDownTheme" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-60" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MINIIDIST);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 60);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_MINIIDIST_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.miniIconDist) then
+							this:SetValue(GatherConfig.miniIconDist);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.miniIconDist = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MINIIDIST.." : "..this:GetValue()..".");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+
+			<Slider name="GathererUI_SliderMaxDist" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderNumber" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MAXDIST);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 100);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_MAXDIST_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.maxDist) then
+							this:SetValue(GatherConfig.maxDist);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.maxDist = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_MAXDIST.." : "..this:GetValue()..".");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+
+			<CheckButton name="GathererUI_CheckNoMinIcon" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderMiniIconDist" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_NO_MINICONDIST);
+						this.tooltipText = GATHERER_NOMINIICONDIST_TIP
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.NoIconOnMinDist = 1;
+						else
+							GatherConfig.NoIconOnMinDist = 0;
+						end
+						Gatherer_OnUpdate(0, true);
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+
+			<CheckButton name="GathererUI_CheckRareOre" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_SliderMaxDist" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_RAREORE);
+						this.tooltipText= GATHERER_RAREORE_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.rareOre = 1;
+						else
+							GatherConfig.rareOre = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="GathererUI_CheckHideMiniNotes" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckNoMinIcon" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_HIDEMININOTES);
+						this.tooltipText = GATHERER_HIDEMININOTES_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.HideMiniNotes = 1;
+						else
+							GatherConfig.HideMiniNotes = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="GathererUI_CheckToggleWorldNotes" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckRareOre" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_TOGGLEWORLDNOTES);
+						this.tooltipText = GATHERER_TOGGLEWORLDNOTES_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.ToggleWorldNotes = 1;
+						else
+							GatherConfig.ToggleWorldNotes = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<EditBox name="GathererUI_WorldMapIconSize" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="30" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckHideMiniNotes" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="165" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="GATHERER_TEXT_WMICONSIZEEB" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_WorldMapIconSize" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-160" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText=GATHERER_WMICONSIZEEB_TIP;
+					</OnLoad>
+					<OnEnterPressed>
+						GathererUI_OnEnterPressed_IconSizeEditBox();
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnShow>
+						if ( Gather_Player and GatherConfig.IconSize ) then
+							this:SetNumber(GatherConfig.IconSize);
+						else
+							this:SetNumber(12);
+						end
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+			<EditBox name="GathererUI_WorldMapIconAlpha" letters="3" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="45" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckToggleWorldNotes" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="165" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="GATHERER_TEXT_WMICONALPHAEB" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_WorldMapIconAlpha" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-160" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText=GATHERER_WMICONALPHAEB_TIP;
+					</OnLoad>
+					<OnEnterPressed>
+						GathererUI_OnEnterPressed_IconAlphaEditBox();
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnShow>
+						if ( Gather_Player and GatherConfig.IconAlpha ) then
+							this:SetNumber(GatherConfig.IconAlpha);
+						else
+							this:SetNumber(80);
+						end
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<Slider name="GathererUI_SliderAlphaUnderMinIcon" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="160" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_WorldMapIconSize" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-150" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_ALPHAUNDER_MINICON);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(35, 100);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_ALPHAUNDER_MINICON_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.alphaUnderMinIcon) then
+							this:SetValue(GatherConfig.alphaUnderMinIcon);
+						else
+							this:SetValue(100);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.alphaUnderMinIcon = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_ALPHAUNDER_MINICON.." : "..this:GetValue()..".");
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+
+		</Frames>
+	</Frame>
+
+	<!-- UI config options -->
+	<Frame name="GathererUI_DisplayOptionsBorderFrame" parent="GathererUI_DialogFrame" inherits="OptionFrameBoxTemplate" hidden="true" id="3">
+		<Size>
+			<AbsDimension x="410" y="250"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GathererUI_DialogFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="16" y="-25"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0,0,0)	
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<CheckButton name="GathererUI_CheckShowOnMouse" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_SHOWONMOUSE);
+						this.tooltipText = GATHERER_SHOWONMOUSE_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.ShowOnMouse = 1;
+						else
+							GatherConfig.ShowOnMouse = 0;
+							GatherConfig.ShowOnClick = 1;
+							GathererUI_CheckShowOnClick:SetChecked(GatherConfig.ShowOnClick);
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="GathererUI_CheckHideOnMouse" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="200" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_HIDEONMOUSE);
+						this.tooltipText= GATHERER_HIDEONMOUSE_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.HideOnMouse = 1;
+						else
+							GatherConfig.HideOnMouse = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="GathererUI_CheckHideOnClick" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckHideOnMouse" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_HIDEONCLICK);
+						this.tooltipText = GATHERER_HIDEONCLICK_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.HideOnClick = 1;
+						else
+							GatherConfig.HideOnClick = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="GathererUI_CheckHideOnButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckHideOnClick" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_HIDEONBUTTON);
+						this.tooltipText= GATHERER_HIDEONBUTTON_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.HideOnButton = 1;
+						else
+							GatherConfig.HideOnButton = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="GathererUI_CheckShowOnClick" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckShowOnMouse" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_SHOWONCLICK);
+						this.tooltipText = GATHERER_SHOWONCLICK_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.ShowOnClick = 1;
+						else
+							GatherConfig.ShowOnClick = 0;
+							GatherConfig.ShowOnMouse = 1;
+							GathererUI_CheckShowOnMouse:SetChecked(GatherConfig.ShowOnMouse);
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="GathererUI_CheckHideIcon" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_CheckShowOnClick" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_HIDEICON);
+						this.tooltipText = GATHERER_HIDEICON_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							GatherConfig.HideIcon = 1;
+							GathererUI_IconFrame:Hide();
+						else
+							GatherConfig.HideIcon = 0;
+							GathererUI_IconFrame:Show();
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<Slider name="GathererUI_SliderPosition" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="360" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="GathererUI_CheckHideIcon" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_POSITION);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 360);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_POSITION_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.Position) then
+							this:SetValue(GatherConfig.Position);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.Position = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_POSITION.." : "..this:GetValue().."\194\176");
+						GathererUI_IconFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - (GathererUI_SliderRadius:GetValue() * cos(this:GetValue())), (GathererUI_SliderRadius:GetValue() * sin(this:GetValue())) - 52);
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Slider name="GathererUI_SliderRadius" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="360" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="GathererUI_SliderPosition" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_RADIUS);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(75, 130);
+						this:SetValueStep(1);
+						this.tooltipText = GATHERER_TEXT_RADIUS_TIP;
+					</OnLoad>
+					<OnShow>
+						if (GatherConfig.Radius) then
+							this:SetValue(GatherConfig.Radius);
+						end
+					</OnShow>
+					<OnValueChanged>
+						GatherConfig.Radius = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_RADIUS.." : "..this:GetValue().."\194\176");
+						GathererUI_IconFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - (this:GetValue() * cos(GathererUI_SliderPosition:GetValue())), (this:GetValue() * sin(GathererUI_SliderPosition:GetValue())) - 52);
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_DialogFrame, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+
+		</Frames>
+	</Frame>
+
+	<!-- Dialog for zone rematch facility -->
+	<Frame name="GathererUI_ZoneRematchDialog" toplevel="true" movable="true" enableMouse="true" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="250" y="200"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="LEFT">
+				<Offset>
+					<AbsDimension x="125" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="200" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="1" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="GATHERER_TEXT_REMATCH_TITLE" nonspacewrap="true">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="GathererUI_DataBuildStatus" id="19">
+				<Size>
+					<AbsDimension x="200" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" text="GATHERER_TEXT_LASTMATCH" nonspacewrap="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="15" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GathererUI_DataBuildStatusText" inherits="GameFontNormalSmall" nonspacewrap="true">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-15" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						if ( GatherConfig.DataBuild ) then
+							GathererUI_DataBuildStatusText:SetText(GatherConfig.DataBuild);
+						else
+							GathererUI_DataBuildStatusText:SetText(GATHERER_TEXT_LASTMATCH_NONE);
+						end
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<Frame name="GathererUI_SourceZoneDropDown" inherits="UIDropDownMenuTemplate" id="20">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(70);
+						this.tooltipText= GATHERER_ZM_SRCDDM_TIP;
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_ClearAll(this);
+						UIDropDownMenu_Initialize(this, GathererUIDropDownSourceZone_Initialize);
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_ZoneRematchDialog, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="Zones Source:" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-110" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame name="GathererUI_DestinationZoneDropDown" inherits="UIDropDownMenuTemplate" id="21">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="GathererUI_SourceZoneDropDown" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(70);
+						this.tooltipText= GATHERER_ZM_DESTDDM_TIP;
+						this:Hide();
+					</OnLoad>
+					<OnShow>
+						UIDropDownMenu_ClearAll(this);
+						UIDropDownMenu_Initialize(this, GathererUIDropDownDestionationZone_Initialize);
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_ZoneRematchDialog, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString inherits="GameFontNormalSmall" text="Zones Destination:" nonspacewrap="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GathererUI_SourceZoneDropDown" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-110" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="GathererUI_CheckFixItems" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="GathererUI_DestinationZoneDropDown" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-110" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(GATHERER_TEXT_FIXITEMS);
+						this.tooltipText = GATHERER_ZM_FIXITEM_TIP;
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							gathererFixItems = 1;
+						else
+							gathererFixItems = 0;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(GathererUI_ZoneRematchDialog, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText(this.tooltipText);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+		<!-- Frame handling buttons -->
+			<Button name="GathererUI_RematchCancelButton" text="CANCEL" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GathererUI_ZoneRematchDialog:Hide();
+						GathererUI_DestinationZoneDropDown:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="GathererUI_RematchApplyButton" text="ACCEPT" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="20" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GathererUI_ShowRematchDialogApply();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+ 				UIPanelWindows["GathererUI_ZoneRematch"] = {area = "left", pushable = 1};
+ 			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<!-- World Map filters -->
+	<Frame name="GathererWD_DropDownFilters" inherits="UIDropDownMenuTemplate" parent="WorldMapFrame" toplevel="true" id="2">
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="WorldMapPositioningGuide" relativePoint="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension x="110" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				UIDropDownMenu_SetWidth(100);
+				this.tooltipText=GATHERER_FILTERDM_TIP;
+				this:Hide();
+			</OnLoad>
+			<OnShow>
+				if ( GatherConfig.useMainmap and GatherConfig.showWorldMapFilters and GatherConfig.showWorldMapFilters == 1 ) 
+				then
+					UIDropDownMenu_ClearAll(this);
+					UIDropDownMenu_Initialize(this, Gatherer_WorldMapFilter_Load);
+					this:SetScale(this:GetParent():GetEffectiveScale() - 0.2);
+				else
+					this:Hide();
+				end
+			</OnShow>
+		</Scripts>
+	</Frame>
+	
+	<!-- Help Frame -->
+	<Frame name="GathererUI_HelpFrame" hidden="true">
+		<Size>
+			<AbsDimension x="340" y="335"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="256" y="-74"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0.125" bottom="0.21875"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="264" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0.125" bottom="0.21875"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="11" y="56"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-46"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.042968" top="0.21875" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="74" y="56"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="318" y="-46"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.421875" right="1.0" top="0.21875" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="11" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-102"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.042968" top="0.25" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="74" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="318" y="-102"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.421875" right="1.0" top="0.65625" bottom="0.25"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="11" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-154"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.042968" top="0.25" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="74" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="318" y="-154"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.421875" right="1.0" top="0.25" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="11" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-206"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.042968" top="0.25" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="74" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="318" y="-206"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.421875" right="1.0" top="0.65625" bottom="0.25"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="11" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-258"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.042968" top="0.25" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="74" y="52"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="318" y="-258"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.421875" right="1.0" top="0.25" bottom="0.65625"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="44"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="11" y="-310"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0.65625" bottom="1.0"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-Honor-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="44"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="264" y="-310"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0.65625" bottom="1.0"/>
+				</Texture>
+				<FontString name="GathererUI_HelpFrameName" inherits="GameFontNormal">
+					<Size>
+						<AbsDimension x="256" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="GathererUI_HelpFrameHelp" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="TOP" spacewrap="true" maxLines = "23">
+					<Size>
+						<AbsDimension x="290" y="230"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="26" y="-47"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="GathererUI_HelpFramePage" inherits="GameFontNormalSmall">
+					<Size>
+						<AbsDimension x="102" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="GathererUI_CloseHelpButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GathererUI_HelpFramePrevPageButton">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="GathererUI_HelpFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="38" y="35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormalSmall" justifyH="LEFT" text="PREV">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="GathererUI_HelpFramePrevPageButton" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						GathererUI_HelpFramePrevPageButton_OnClick();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="GathererUI_HelpFrameNextPageButton">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="GathererUI_HelpFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="302" y="35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormalSmall" justifyH="RIGHT" text="NEXT">
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="GathererUI_HelpFrameNextPageButton" relativePoint="LEFT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						GathererUI_HelpFrameNextPageButton_OnClick();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

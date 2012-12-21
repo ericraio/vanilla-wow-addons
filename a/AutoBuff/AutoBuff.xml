@@ -1,0 +1,1248 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+
+	<Script file="localization.en.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="localization.ko.lua"/>
+	
+	<Script file="AutoBuff.lua"/> 
+	
+	<Frame name="_AutoBuff"> 
+		<Scripts> 
+			<OnLoad>
+				AutoBuff_OnLoad(); 
+			</OnLoad> 
+			<OnEvent>
+				AutoBuff_OnEvent(event);
+			</OnEvent>
+		</Scripts> 
+	</Frame>
+
+	<Frame parent="UIParent" hide="true">
+		<Frames>
+			<Button name="TitanPanelAutoBuffButton" inherits="TitanPanelIconTemplate" frameStrata="FULLSCREEN" toplevel="true">
+				<Scripts>
+					<OnLoad>
+            if (TitanPanelButton_OnLoad) then
+							TitanPanelAutoBuffButton_OnLoad();
+							TitanPanelButton_OnLoad();
+						end
+					</OnLoad>
+					<OnClick>
+            TitanPanelAutoBuffButton_OnClick(arg1);
+            TitanPanelButton_OnClick(arg1);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>	
+
+	<Button name="AutoBuffOptionsButton" parent="UIParent" toplevel="true" hidden="false" frameStrata="LOW" enableMouse="true" movable="true">
+		<NormalTexture file="Interface\AddOns\AutoBuff\ABEnabled"/>
+		<HighlightTexture alphaMode="ADD" file="Interface\AddOns\AutoBuff\ABEnabled"/>
+		<Size>
+			<AbsDimension x="30" y="30"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent">
+				<Offset>
+					<AbsDimension x="200" y="200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				GameTooltip_SetDefaultAnchor(GameTooltip, UIParent);
+				GameTooltip:SetText(AUTOBUFF_BUTTON_TOOLTIP);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnLoad>
+				AutoBuffOptionsButton_OnLoad(this);
+			</OnLoad>
+			<OnClick>
+				AutoBuffOptionsButton_OnClick(arg1);
+			</OnClick>
+			<OnMouseUp>
+				AutoBuffOptionsButton_OnDragStop(this);
+			</OnMouseUp>
+			<OnDragStart>
+				AutoBuffOptionsButton_OnDragStart(this);
+			</OnDragStart>
+			<OnDragStop>
+				AutoBuffOptionsButton_OnDragStop(this);
+			</OnDragStop>
+		</Scripts>
+	</Button>
+
+	<Button name = "AutoBuffNameButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="290" y="18" />
+		</Size>
+		<Layers>
+			<Layer level = "BACKGROUND">
+				<FontString name="$parent_Text" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" text="PlaceHolder">
+					<Size>
+						<AbsDimension x="280" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="5" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0.9" g="0.9" b="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+	</Button>
+
+	<Slider name="AutoBuff_OptionsSliderTemplate" virtual="true" inherits="OptionsSliderTemplate">
+		<Scripts>
+			<OnEnter>
+				AutoBuffFrame_OnEnter();
+			</OnEnter>
+			<OnValueChanged>
+				AutoBuffFrame_OnValueChanged();
+			</OnValueChanged>
+			<OnLoad>
+				getglobal(this:GetName().."Text"):SetText();
+				getglobal(this:GetName().."High"):SetText();
+				getglobal(this:GetName().."Low"):SetText();
+				this:SetMinMaxValues(1, 99);
+				this:SetValueStep(1);
+			</OnLoad>
+		</Scripts>
+	</Slider>
+
+	<CheckButton name="AutoBuff_UICheckButtonTemplate" virtual="true" inherits="UICheckButtonTemplate">
+		<Scripts>
+			<OnEnter>
+				AutoBuffFrame_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnClick>
+				AutoBuffFrame_OnClick();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<Frame name="AutoBuffFrame" toplevel="false" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="300" y="35"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+ 				<Offset>
+ 					<AbsDimension x="0" y="300"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="AutoBuffbackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString inherits="GameFontNormal" text="AUTOBUFF_GUI_TITLE">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="16" y="-11"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="AutoBuffFrameCloseButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffFrameCloseButton_OnClick();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\AddOns\AutoBuff\CloseButton-Up"/>
+				<PushedTexture file="Interface\AddOns\AutoBuff\CloseButton-Down"/>
+				<HighlightTexture file="Interface\AddOns\AutoBuff\Status-Idle" alphaMode="ADD"/>
+			</Button>
+			<CheckButton name="AutoBuffFrameCheckButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameCloseButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				AutoBuffFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				AutoBuffFrame_OnHide();
+			</OnHide>
+			<OnMouseDown>
+				AutoBuffFrame_OnMouseDown(arg1);
+			</OnMouseDown>
+			<OnMouseUp>
+				AutoBuffFrame_OnMouseUp(arg1);
+			</OnMouseUp>
+		</Scripts>
+		
+	</Frame>
+	
+	
+	<Frame name="AutoBuffFrameAbility" toplevel="false" parent="AutoBuffFrame" hidden="true">
+		<Size>
+			<AbsDimension x="300" y="290"/>
+			<!--<AbsDimension x="300" y="374-93"/>-->
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT" relativeTo="AutoBuffFrame" relativePoint="BOTTOMLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="3"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="AutoBuffBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Frames>
+			<Button name="AutoBuffName1" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameAbility" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName2" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(2);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName3" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName2" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(3);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName4" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName3" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(4);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName5" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName4" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(5);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName6" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName5" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(6);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName7" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName6" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(7);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName8" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName7" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(8);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName9" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName8" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(9);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName10" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName9" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(10);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName11" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName10" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(11);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName12" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName11" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(12);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName13" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName12" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(13);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName14" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName13" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(14);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName15" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName14" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(15);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName16" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName15" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(16);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName17" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName16" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(17);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName18" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName17" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(18);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName19" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName18" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(19);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName20" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName19" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(20);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName21" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName20" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(21);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName22" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName21" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(22);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName23" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName22" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(23);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName24" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName23" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(24);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName25" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName24" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(25);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName26" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName25" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(26);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName27" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName26" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(27);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName28" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName27" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(28);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName29" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName28" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(29);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="AutoBuffName30" inherits="AutoBuffNameButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffName29" relativePoint="BOTTOMLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBuffNameButton_OnClick(30);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="AutoBuffFrameOptions" toplevel="false" parent="AutoBuffFrameAbility" hidden="true">
+		<Size>
+			<AbsDimension x="300" y="170"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameAbility" relativePoint="BOTTOMLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="3"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<Backdrop name="AutoBuffBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="AutoBuffFrameOptionsDefaultAbility" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_DEFAULTABILITY" hidden="true">
+					<Size>
+						<AbsDimension x="200" y="18"/>
+					</Size>
+					<Color r="0.6" g="0.6" b="1"/>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="AutoBuffFrameOptions" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsEnable_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_ENABLE">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="AutoBuffFrameOptions" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-25" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsTrigger_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_TRIGGER">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="0.9" g="0.9" b="0.9"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptions" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsTriggerWheelUp_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_TRIGGER_WHEELUP">
+					<Size>
+						<AbsDimension x="140" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTrigger_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsTriggerWheelDown_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_TRIGGER_WHEELDOWN">
+					<Size>
+						<AbsDimension x="140" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTriggerWheelUp_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsTriggerTarget_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_TRIGGER_TARGET">
+					<Size>
+						<AbsDimension x="140" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTriggerWheelDown_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				
+				<FontString name="AutoBuffFrameOptionsCombat_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_COMBAT">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="0.94" g="0.5" b="0.2"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTrigger_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsCombatIn_Text" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_COMBAT_IN">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsCombat_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsCombatOut_Text" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_COMBAT_OUT">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsCombatIn_Text" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsCombatAlways_Text" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_COMBAT_ALWAYS">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsCombatOut_Text" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsParty_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_PARTY">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="0.3" g="0.3" b="0.94"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsCombat_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsPartyIn_Text" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_COMBAT_IN">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsParty_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsPartyOut_Text" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_COMBAT_OUT">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsPartyIn_Text" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsPartyAlways_Text" inherits="GameFontNormal" justifyH="CENTER" text="AUTOBUFF_GUI_COMBAT_ALWAYS">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsPartyOut_Text" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsHealth_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_HEALTH">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="1" g="0.6" b="0.6"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsParty_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsMana_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_MANA">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="0.6" g="0.6" b="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsHealth_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsRebuff_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_REBUFF">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="0.6" g="0.6" b="0.6"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsMana_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsRebuff_ValueText" inherits="GameFontNormal" justifyH="LEFT" text="##s">
+					<Size>
+						<AbsDimension x="80" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRebuff_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="137" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+
+				<FontString name="AutoBuffFrameOptionsRank_Text" inherits="GameFontNormal" justifyH="RIGHT" text="AUTOBUFF_GUI_RANK">
+					<Size>
+						<AbsDimension x="68" y="18"/>
+					</Size>
+					<Color r="1" g="0.6" b="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRebuff_Text" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsRank_ValueText" inherits="GameFontNormal" justifyH="LEFT" text="#">
+					<Size>
+						<AbsDimension x="80" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRank_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="137" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="AutoBuffFrameOptionsHealth_ValueText" inherits="GameFontNormal" justifyH="LEFT" text=">##%">
+					<Size>
+						<AbsDimension x="40" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsHealth_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="137" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsMana_ValueText" inherits="GameFontNormal" justifyH="LEFT" text=">##%">
+					<Size>
+						<AbsDimension x="40" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsMana_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="137" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsDefaultTrigger_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTrigger_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsDefaultCombat_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsCombat_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsDefaultParty_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsParty_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsDefaultHealth_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsHealth_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsDefaultMana_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsMana_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="AutoBuffFrameOptionsDefaultRebuff_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRebuff_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoBuffFrameOptionsDefaultRank_Text" inherits="GameFontNormal" justifyH="LEFT" text="AUTOBUFF_GUI_USINGDEFAULT" hidden="true">
+					<Size>
+						<AbsDimension x="170" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRank_Text" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="AutoBuffFrameOptionsEnableButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsEnable_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="AutoBuffFrameOptionsCombatDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsCombat_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsPartyDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsParty_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsTriggerDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsTrigger_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="AutoBuffFrameOptionsTriggerWheelUpButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTriggerWheelUp_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsTriggerWheelDownButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTriggerWheelDown_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsTriggerTargetButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsTriggerTarget_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+
+			<CheckButton name="AutoBuffFrameOptionsHealthDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsHealth_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsManaDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsMana_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsRebuffDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsRebuff_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsRankDefaultButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoBuffFrameOptionsRank_Text" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<Slider name="AutoBuffFrameOptionsRebuff" inherits="AutoBuff_OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRebuff_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText();
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 299);
+						this:SetValueStep(5);
+					</OnLoad>
+				</Scripts>
+			</Slider>
+			
+			<Slider name="AutoBuffFrameOptionsRank" inherits="AutoBuff_OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsRank_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText();
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(1, 2);
+						this:SetValueStep(1);
+					</OnLoad>
+				</Scripts>
+			</Slider>
+			
+			
+			<Slider name="AutoBuffFrameOptionsHealth" inherits="AutoBuff_OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsHealth_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			<CheckButton name="AutoBuffFrameOptionsHealthButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsHealth" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="40" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<Slider name="AutoBuffFrameOptionsMana" inherits="AutoBuff_OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsMana_Text" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			<CheckButton name="AutoBuffFrameOptionsManaButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoBuffFrameOptionsMana" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="40" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsCombatInButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="AutoBuffFrameOptionsCombatIn_Text" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsCombatOutButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="AutoBuffFrameOptionsCombatOut_Text" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsCombatAlwaysButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="AutoBuffFrameOptionsCombatAlways_Text" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="AutoBuffFrameOptionsPartyInButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="AutoBuffFrameOptionsPartyIn_Text" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsPartyOutButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="AutoBuffFrameOptionsPartyOut_Text" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="AutoBuffFrameOptionsPartyAlwaysButton" inherits="AutoBuff_UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="AutoBuffFrameOptionsPartyAlways_Text" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+		</Frames>
+	</Frame>
+
+	<GameTooltip name="AutoBuffTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate">
+	<Scripts>
+		<OnLoad>
+			GameTooltip_OnLoad();
+			this:SetOwner(WorldFrame, "ANCHOR_NONE");
+		</OnLoad>
+	</Scripts>
+	</GameTooltip>
+	
+</Ui>

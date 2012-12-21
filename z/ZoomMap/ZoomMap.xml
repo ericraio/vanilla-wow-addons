@@ -1,0 +1,207 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="ZoomMap.lua"/>
+	<Frame name="ZoomMapCluster" frameStrata="BACKGROUND" enableMouse="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="192" y="192"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="30" right="10" top="0" bottom="30"/>
+		</HitRectInsets>
+		<Frames>
+			<Minimap name="ZoomMap" enableMouse="true" minimapPlayerModel="Interface\Minimap\MinimapArrow.mdx" minimapArrowModel="Interface\Minimap\Rotating-MinimapArrow.mdl">
+				<Size>
+					<AbsDimension x="540" y="540"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="9" y="-92"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="ZoomMapTrackingFrame" enableMouse="true" hidden="false">
+						<Size>
+							<AbsDimension x="33" y="33"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="50" y="-70"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="ZoomMapTrackingIcon">
+									<Size>
+										<AbsDimension x="26" y="26"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="7" y="-6"/>
+											</Offset>
+										</Anchor>
+									</Anchors>z
+								</Texture>
+							</Layer>
+							<Layer level="OVERLAY">
+								<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+									<Size>
+										<AbsDimension x="64" y="64"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								this:RegisterEvent("PLAYER_AURAS_CHANGED");
+							</OnLoad>
+							<OnEvent>
+								if ( event == "PLAYER_AURAS_CHANGED" ) then
+									local icon = GetTrackingTexture();
+									if ( icon ) then
+										ZoomMapTrackingIcon:SetTexture(icon);
+										ZoomMapTrackingFrame:Show();
+									else
+										ZoomMapTrackingFrame:Hide();
+									end
+								end
+							</OnEvent>
+							<OnMouseUp>
+								if ( arg1 == "RightButton" ) then
+									CancelTrackingBuff();			
+								end
+							</OnMouseUp> 
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT");
+								GameTooltip:SetTrackingSpell();
+							</OnEnter>							
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Frame>
+					
+					<Model name="ZoomMapPing" file="Interface\MiniMap\Ping\MinimapPing.mdx" scale="0.4" hidden="true">
+						<Size>
+							<AbsDimension x="50" y="50"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="ZoomMap"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								ZoomMap_OnLoad();
+							</OnLoad>
+							<OnEvent>
+								ZoomMap_OnEvent();
+							</OnEvent>
+							<OnUpdate>
+								ZoomMap_OnUpdate(arg1);
+							</OnUpdate>
+						</Scripts>
+					</Model>
+					<Frame name="ZoomMapBackdrop">
+						<Size>
+							<AbsDimension x="592" y="592"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="ZoomMapCluster">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					
+						<Frames>
+							<Button name="ZoomMapZoomIn">
+								<Size>
+									<AbsDimension x="32" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor point="CENTER">
+										<Offset>
+											<AbsDimension x="245" y="-140"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										ZoomMap_ZoomInClick();
+									</OnClick>
+									<OnEnter>
+										if ( GetCVar("UberTooltips") == "1" ) then
+											GameTooltip_SetDefaultAnchor(GameTooltip, UIParent);
+											GameTooltip:SetText(ZOOM_IN);
+										end
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+								<NormalTexture file="Interface\Minimap\UI-Minimap-ZoomInButton-Up"/>
+								<PushedTexture file="Interface\Minimap\UI-Minimap-ZoomInButton-Down"/>
+								<DisabledTexture file="Interface\Minimap\UI-Minimap-ZoomInButton-Disabled"/>
+								<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+							</Button>
+							<Button name="ZoomMapZoomOut">
+								<Size>
+									<AbsDimension x="32" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor point="CENTER">
+										<Offset>
+											<AbsDimension x="210" y="-180"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										ZoomMap_ZoomOutClick();
+									</OnClick>
+									<OnEnter>
+										if ( GetCVar("UberTooltips") == "1" ) then
+											GameTooltip_SetDefaultAnchor(GameTooltip, UIParent);
+											GameTooltip:SetText(ZOOM_OUT);
+										end
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+								<NormalTexture file="Interface\Minimap\UI-Minimap-ZoomOutButton-Up"/>
+								<PushedTexture file="Interface\Minimap\UI-Minimap-ZoomOutButton-Down"/>
+								<DisabledTexture file="Interface\Minimap\UI-Minimap-ZoomOutButton-Disabled"/>
+								<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+							</Button>
+						</Frames>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnMouseUp>
+						ZoomMap_OnClick();
+					</OnMouseUp>
+				</Scripts>
+			</Minimap>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				ZoomMap.timer = 0;
+				ZoomMap_Update();
+				this:RegisterEvent("MINIMAP_ZONE_CHANGED");
+			</OnLoad>
+			<OnEvent>
+				ZoomMap_Update();
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

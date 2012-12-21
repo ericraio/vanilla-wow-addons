@@ -1,0 +1,18 @@
+BUFFALO_DEFAULT_OPTIONS = {
+	xPos = {buff=400, debuff=400, weapon=400},
+	yPos = {buff=500, debuff=250, weapon=200},
+	scale = {buff = 1.0, debuff = 1.0, weapon = 1.0},
+	padding = {	buff = {x=5, y=15},
+				debuff = {x=5, y=15},
+				weapon = {x=5, y=15}},
+	growRight = {buff = nil, debuff = nil, weapon = nil},
+	growUpwards = {buff = nil, debuff = nil, weapon = nil},
+	rows = {buff=2, debuff=1, weapon=1},
+	cols = {buff=8, debuff=8, weapon=2},
+	growHorizontalFirst = {buff = true, debuff = true, weapon = true},
+	locked = false,
+	hide = {buff = nil, debuff = nil, weapon = nil},
+	verboseTimers = {buff = nil, debuff = true, weapon = nil},
+	whiteTimers = {buff = nil, debuff = nil, weapon = nil},
+	flashes = {buff = true, debuff = true, weapon = true},
+}

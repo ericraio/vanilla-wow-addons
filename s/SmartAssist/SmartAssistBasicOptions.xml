@@ -1,0 +1,677 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<!-- spell slot routine credits to Zuban -->	
+	
+	<Button name="SpellSlotTemplate" enableMouse="true" inherits="ItemButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp");
+			</OnLoad>
+			<OnClick>
+				SA_SpellSlot_OnReceiveDrag();
+			</OnClick>
+			<OnReceiveDrag>
+				SA_SpellSlot_OnReceiveDrag();
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+	
+	<!-- sort order frame, credits to CT TEAM! you gyus really rock -->
+	
+	<Frame name="SAClassOrderTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="130" y="16"/>
+		</Size>
+		<Frames>
+			<Button name="$parentMoveUp" inherits="UIPanelScrollUpButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="95" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SA_ClassOrderMove(-1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentMoveDown" inherits="UIPanelScrollDownButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentMoveUp">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SA_ClassOrderMove(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" justifyV="top" justifyH="left" inherits="ChatFontNormal" text="-bug-">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- end of sort order frame -->
+	
+	<Frame name="SABasicOptionsFrame" setAllPoints="true" enableMouse="true" parent="SAOptionsFrame" hidden="true">
+		<Size>
+			<AbsDimension x="500" y="380"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="SAOptionsFrame" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<Frames>
+		
+			<CheckButton name="SAPriorizeHealthCB" inherits="OptionsCheckButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAOptionsFrame">
+						<Offset>
+							<AbsDimension x="22" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="First priority if health below">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("PriorizeHealth");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Slider name="SAHealthSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="220" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SAPriorizeHealthCB" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("Priority health");
+						getglobal(this:GetName().."High"):SetText("80%");
+						getglobal(this:GetName().."Low"):SetText("5%");
+						SAHealthSlider:SetMinMaxValues(5,80);
+						SAHealthSlider:SetValueStep(1);
+					</OnLoad>
+					<OnValueChanged>
+						SA_Options_UpdateHealthSlider();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<CheckButton name="SAAssistOnEmoteCB" inherits="OptionsCheckButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAPriorizeHealthCB">
+						<Offset>
+							<AbsDimension x="0" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Auto assist party members from emotes">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Automaticly assist party members from emotes (helpme, attacktarget). Note that this doesn't (can not) cast auto assist spell, just selects target and displays large information text.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						SA_ToggleOption("AssistOnEmote");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SAVisualWarningCB" inherits="OptionsCheckButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAAssistOnEmoteCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Visual warning on passive targets">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("VisualWarning");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+						
+			<CheckButton name="SAFallbackTargetNearestCB" inherits="OptionsCheckButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAVisualWarningCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Fallback to target nearest enemy">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("FallbackTargetNearest");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("If SmartAssist is unable to find someone to assist then fallback to basic target nearest enemy.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SACheckNearestCB" inherits="OptionsCheckButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAFallbackTargetNearestCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Check for nearest before assisting raid">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("CheckNearest");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Check if there is (attacking) enemy near before assisting rest of the party/raid. Recommended for PVP and melee classes. Note that this will take priority over puller and other features. Hitting assist key second time will resume normal party/raid assisting.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="SANearestMustBePvPCB" inherits="OptionsCheckButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SACheckNearestCB">
+						<Offset>
+							<AbsDimension x="30" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Target must be PvP">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("NearestMustBePvP");
+					</OnClick>
+					<OnShow>
+						this:SetScale(0.8);
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SANearestMustBeTargetingCB" inherits="OptionsCheckButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SANearestMustBePvPCB">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Must be targetting me">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("NearestMustBeTargetting");
+					</OnClick>
+					<OnShow>
+						this:SetScale(0.8);
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+						
+			<CheckButton name="SAAutoAssistCB" inherits="OptionsCheckButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SACheckNearestCB">
+						<Offset>
+							<AbsDimension x="0" y="-100"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Auto assist with spell">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("AutoAssist");
+						SA_OPTIONS.AutoAttackWhineIgnored = false;
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("On successfull assist spell below will be cast on target.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			
+			<Button name="SAAssistWithSlot" inherits="SpellSlotTemplate" id="10">
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="SAAutoAssistCB" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="180" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" name="SAAssistText" text="click to open spellbook">
+							<Color r="1" g="1" b="1"/>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="50" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						if (not CursorHasSpell()) then
+							GameTooltip:SetText("Click to open spellbook.",1,1,1,1,1);
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			<CheckButton name="SAAutoPetAttackCB" inherits="OptionsCheckButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAAutoAssistCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Auto assist with pet">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("AutoPetAttack");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("On successfull assist attack target with pet.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SAAutoPetAttackBusyCB" inherits="OptionsCheckButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAAutoPetAttackCB">
+						<Offset>
+							<AbsDimension x="30" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Assist even if pet is busy">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("AutoPetAttackBusy");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Attack even if pet is already busy.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnShow>
+						this:SetScale(0.8);
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+					
+
+			<!-- class order frame -->
+			<Frame name="ClassOrderFrame">
+				<Size>
+					<AbsDimension x="150" y="205"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SAOptionsFrame">
+						<Offset>
+							<AbsDimension x="-30" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentInfo" inherits="GameFontNormalSmall" justifyH="LEFT" text="Assist in following order">
+							<Color r="1" g="1" b="1"/>
+							<Size>
+								<AbsDimension x="150" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="ClassOrderFrame">
+									<Offset>
+										<AbsDimension x="10" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>				
+			
+				<Frames>
+					<Frame name="$parentClass1" id="21" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parentInfo">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+				
+					<Frame name="$parentClass2" id="22" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass1">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass3" id="23" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass2">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass4" id="24" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass3">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass5" id="25" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass4">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass6" id="26" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass5">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass7" id="27" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass6">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass8" id="28" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass7">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentClass9" id="29" inherits="SAClassOrderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentClass8">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+
+			<!-- buttons -->
+
+			<Button name="SAClearPuller" inherits="OptionsButtonTemplate" text="Clear">
+				<Size>
+					<AbsDimension x="50" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="SAOptionsFrame">
+						<Offset>
+							<AbsDimension x="22" y="25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						<!-- quick'n dirty way to clear it -->
+						ClearTarget();
+						SA_SetPuller("target");
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="SA_CurrentPullerButton">
+				<Size>
+					<AbsDimension x="200" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="SAClearPuller">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormal" justifyH="LEFT" name="SACurrentPuller">
+							<Color r="0" g="0.8" b="1"/>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						SA_PullerText_OnEnter(this);
+					</OnEnter>
+					<OnLeave>
+						SA_PullerText_OnLeave();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+		</Frames>
+
+		<Scripts>
+			<OnShow>
+				SA_Options_OnShow();
+			</OnShow>
+			<OnHide>
+				SA_Options_OnHide();
+				SA_CheckForAssistAttack();
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+</Ui>	

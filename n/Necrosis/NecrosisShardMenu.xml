@@ -1,0 +1,306 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<Frame name="NecrosisShardMenu" frameStrata="DIALOG" movable="false" enableMouse="true" parent="NecrosisGeneralFrame">
+		<Size>
+			<AbsDimension x="350" y="452"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="NecrosisGeneralFrame"/>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="NecrosisShardsInventory_Section" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="0.5" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="30" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisSoulshardSort_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisSoulshardDestroy_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-60"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisShardsCount_Section" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="0.5" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="30" y="-145"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisShowCount_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-165"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Slider name="NecrosisBag_Slider" inherits="OptionsSliderTemplate" minValue="0" maxValue="4" valueStep="1" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisShardMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="120"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(5-this:GetValue());
+					</OnEnter>
+					<OnValueChanged>
+						GameTooltip:SetText(5-this:GetValue());
+					</OnValueChanged>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseUp>
+						GameTooltip:SetText(5-this:GetValue());
+						NecrosisConfig.SoulshardContainer = 4-this:GetValue();
+						Necrosis_SoulshardSwitch("MOVE");
+					</OnMouseUp>
+				</Scripts>
+			</Slider>
+			<Slider name="NecrosisCountType_Slider" inherits="OptionsSliderTemplate" minValue="1" maxValue="3" valueStep="1" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisShardMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						if this:GetValue() == 1 then
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Shard);
+						elseif this:GetValue() == 2 then
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Inferno);
+						else
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Rez);
+						end
+					</OnEnter>
+					<OnValueChanged>
+						if this:GetValue() == 1 then
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Shard);
+						elseif this:GetValue() == 2 then
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Inferno);
+						else
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Rez);
+						end
+					</OnValueChanged>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseUp>
+						NecrosisConfig.CountType = this:GetValue();
+						Necrosis_BagExplore();
+					</OnMouseUp>
+				</Scripts>
+			</Slider>
+			<Slider name="NecrosisCircle_Slider" inherits="OptionsSliderTemplate" minValue="1" maxValue="2" valueStep="1" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisShardMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						if this:GetValue() == 1 then
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Shard);
+						else
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Rez);
+						end
+					</OnEnter>
+					<OnValueChanged>
+						if this:GetValue() == 1 then
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Shard);
+						else
+							GameTooltip:SetText(NECROSIS_CONFIGURATION.Count.Rez);
+						end
+					</OnValueChanged>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseUp>
+						NecrosisConfig.Circle = this:GetValue();
+						Necrosis_BagExplore();
+					</OnMouseUp>
+				</Scripts>
+			</Slider>
+			<Slider name="NecrosisColor_Slider" inherits="OptionsSliderTemplate" minValue="1" maxValue="6" valueStep="1" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisShardMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>	
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						if (this:GetValue() == 1) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Pink);
+						elseif (this:GetValue() == 2) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Blue);
+						elseif (this:GetValue() == 3) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Orange);
+						elseif (this:GetValue() == 4) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Turquoise);
+						elseif (this:GetValue() == 5) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Purple);
+						else
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.X);
+						end
+					</OnEnter>
+					<OnValueChanged>
+						GameTooltip:SetText(this:GetValue());
+						if (this:GetValue() == 1) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Pink);
+							NecrosisConfig.NecrosisColor = "Rose";
+							NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Rose\\Shard16");
+						elseif (this:GetValue() == 2) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Blue);
+							NecrosisConfig.NecrosisColor = "Bleu";
+							NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Bleu\\Shard16");
+						elseif (this:GetValue() == 3) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Orange);
+							NecrosisConfig.NecrosisColor = "Orange";
+							NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Orange\\Shard16");
+						elseif (this:GetValue() == 4) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Turquoise);
+							NecrosisConfig.NecrosisColor = "Turquoise";
+							NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Turquoise\\Shard16");
+						elseif (this:GetValue() == 5) then
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.Purple);
+							NecrosisConfig.NecrosisColor = "Violet";
+							NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Violet\\Shard16");
+						else
+							GameTooltip:SetText(NECROSIS_COLOR_TOOLTIP.X);
+							NecrosisConfig.NecrosisColor = "X";
+							NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\X\\Shard16");
+						end
+					</OnValueChanged>
+					<OnLeave>
+						GameTooltip:Hide();
+						Necrosis_BagExplore();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<CheckButton name="NecrosisSoulshardSort_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.SoulshardSort = true;
+						else
+							NecrosisConfig.SoulshardSort = false;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="NecrosisSoulshardDestroy_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-55"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.SoulshardDestroy = true;
+						else
+							NecrosisConfig.SoulshardDestroy = false;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="NecrosisShowCount_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisShardMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-160"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.ShowCount = true;
+						else
+							NecrosisConfig.ShowCount = false;
+						end
+						Necrosis_BagExplore();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+     		<Scripts>
+        		<OnLoad>
+				HideUIPanel(NecrosisShardMenu);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

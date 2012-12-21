@@ -1,0 +1,1479 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	
+	<Script file="EQL3_Log.lua"/>
+
+	<Frame name="EQL3_QuestLogFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="-104"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="8" right="0" top="8" bottom="0"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_BookIcon">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>		
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EQL3_Top_Switch_Off" file="Interface\Addons\EQL3\Images\EQL3_TopSwitchOff">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EQL3_Bottom_Switch_Off" file="Interface\Addons\EQL3\Images\EQL3_BottomSwitchOff">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EQL3_Top_Switch_On" file="Interface\Addons\EQL3\Images\EQL3_TopSwitchOn" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EQL3_Bottom_Switch_On" file="Interface\Addons\EQL3\Images\EQL3_BottomSwitchOn" hidden="true">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>		
+			</Layer>
+			
+		</Layers>
+		<Frames>
+		
+			<Frame name="EQL3_QuestLogExpandButtonFrame">
+				<Size>
+					<AbsDimension x="54" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="EQL3_QuestLogCollapseAllButton" hidden="true" inherits="QuestLogTitleButtonTemplate" text="ALL">
+						<Size>
+							<AbsDimension x="40" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="EQL3_QuestLogExpandTabLeft" file="Interface\QuestFrame\UI-QuestLogSortTab-Left">
+									<Size>
+										<AbsDimension x="8" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-6" y="8"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+								<Texture name="EQL3_QuestLogExpandTabMiddle" file="Interface\QuestFrame\UI-QuestLogSortTab-Middle">
+									<Size>
+										<AbsDimension x="38" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="EQL3_QuestLogExpandTabLeft" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+								<Texture file="Interface\QuestFrame\UI-QuestLogSortTab-Right">
+									<Size>
+										<AbsDimension x="8" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="EQL3_QuestLogExpandTabMiddle" relativePoint="RIGHT"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								EQL3_QuestLogCollapseAllButtonNormalText:SetWidth(0);
+								EQL3_QuestLogExpandTabMiddle:SetWidth(this:GetTextWidth() + 24);
+							</OnLoad>
+							<OnClick>
+								QuestLogCollapseAllButton_OnClick();
+							</OnClick>
+							<OnEnter>
+								--
+							</OnEnter>
+							<OnLeave>
+								--
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			
+			<Frame name="EQL3_QuestLogTrack" enableMouse="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="EQL3_QuestLogExpandButtonFrame" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="5" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="-80" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="EQL3_QuestLogTrackTitle" inherits="GameFontHighlightSmall" text="TRACK_QUEST">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture file="Interface\Buttons\UI-RadioButton">
+							<TexCoords left="0" right="0.25" top="0" bottom="1"/>
+						</Texture>
+						<Texture name="EQL3_QuestLogTrackTracking" file="Interface\Buttons\UI-RadioButton">
+							<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						EQL3_QuestLogTrackTracking:SetVertexColor(1, 0, 0);
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(EQL3_QUEST_WATCH_TOOLTIP, nil,nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			
+			<Frame name="EQL3_EmptyQuestLogFrame" hidden="true">
+				<Size>
+					<AbsDimension x="768" y="512"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="19" y="-73"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="QuestLogNoQuestsText" inherits="GameFontHighlight" text="QUESTLOG_NO_QUESTS_TEXT">
+							<Size>
+								<AbsDimension x="200" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="QuestLogTitleText">
+									<Offset>
+										<AbsDimension x="-20" y="-90"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Button name="EQL3_QuestLogFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="EQL3_QuestLogFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-28" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<Button name="EQL3_QuestLogFrameMaximizeButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="EQL3_QuestLogFrameCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						EQL3_Maximize();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(EQL3_MAXIMIZE_TIP, nil,nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\EQL3\Images\MaximizeButton-Up"/>
+				<PushedTexture file="Interface\Addons\EQL3\Images\MaximizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" AlphaMode="ADD"/>
+			</Button>
+			
+			<Button name="EQL3_QuestLogFrameAbandonButton" inherits="UIPanelButtonTemplate" text="ABANDON_QUEST">
+				<Size>
+					<AbsDimension x="125" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="EQL3_QuestLogFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="16" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SetAbandonQuest();
+						StaticPopup_Show("ABANDON_QUEST", GetAbandonQuestName());
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(ABANDON_QUEST, 1.0, 1.0, 1.0, NEWBIE_TOOLTIP_ABANDONQUEST, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="EQL3_QuestFramePushQuestButton" inherits="UIPanelButtonTemplate" text="SHARE_QUEST">
+				<Size>
+					<AbsDimension x="123" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="EQL3_QuestLogFrameAbandonButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						QuestLogPushQuest();
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(SHARE_QUEST, 1.0, 1.0, 1.0, NEWBIE_TOOLTIP_SHAREQUEST, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			<ScrollFrame name="EQL3_QuestLogListScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="300" y="411"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogFrame">
+						<Offset>
+							<AbsDimension x="20" y="-74"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(QUESTLOG_QUEST_HEIGHT, QuestLog_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+		
+		</Frames>
+		<Scripts>
+			<OnEvent>
+				-- EQL_QuestLog_OnEvent(event);
+			</OnEvent>
+			<OnLoad>
+				-- EQL_QuestLog_OnLoad();
+			</OnLoad>
+			<OnShow>
+				QuestLog_OnShow();
+			</OnShow>
+			<OnHide>
+				QuestLog_OnHide();
+			</OnHide>
+			<OnUpdate>
+				-- EQL_QuestLog_OnUpdate(arg1);
+			</OnUpdate>
+			<OnMouseWheel>
+				return;
+			</OnMouseWheel>
+			<OnDragStart>
+				 this:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				 this:StopMovingOrSizing();
+				 QuestLogFrame_LockCorner();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	
+	
+	<Frame name="EQL3_QuestLogFrame_Description" toplevel="false" enableMouse="true" movable="false" parent="EQL3_QuestLogFrame" hidden="true">
+		<Size>
+			<AbsDimension x="320" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+ 				<Offset>
+ 					<AbsDimension x="0" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="24" top="8" bottom="0"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_TopMiddle">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_TopRight">
+					<Size>
+						<AbsDimension x="64" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_BottomMiddle">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\EQL3\Images\EQL3_BottomRight">
+					<Size>
+						<AbsDimension x="64" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>		
+			</Layer>
+		</Layers>
+		<Frames>
+		
+			<ScrollFrame name="EQL3_QuestLogDetailScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="300" y="413"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogListScrollFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="30" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<Frame name="EQL3_QuestLogDetailScrollChildFrame">
+						<Size>
+							<AbsDimension x="300" y="413"/>
+						</Size>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="EQL3_QuestLogQuestTitle" inherits="QuestTitleFont" justifyH="LEFT" text="Quest title">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="5" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjectivesText" inherits="QuestFont" justifyH="LEFT">
+									<Size>
+										<AbsDimension x="275" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogQuestTitle" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogTimerText" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjectivesText" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective1" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTimerText" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective2" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective1" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective3" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective2" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective4" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective3" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective5" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective4" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective6" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective5" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective7" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective6" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective8" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective7" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective9" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective8" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogObjective10" inherits="QuestFontNormalSmall" justifyH="LEFT" hidden="true">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective9" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogRequiredMoneyText" inherits="QuestFontNormalSmall" text="REQUIRED_MONEY">
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogDescriptionTitle" inherits="QuestTitleFont" justifyH="LEFT" text="QUEST_DESCRIPTION">
+									<Size>
+										<AbsDimension x="285" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogObjective10" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogQuestDescription" inherits="QuestFont" justifyH="LEFT">
+									<Size>
+										<AbsDimension x="270" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogDescriptionTitle" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogRewardTitleText" inherits="QuestTitleFont" text="QUEST_REWARDS" justifyH="LEFT">
+									<Size>
+										<AbsDimension x="300" y="18"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogQuestDescription" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-15"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogItemChooseText" inherits="QuestFont" text="REWARD_CHOICES" hidden="true" justifyH="LEFT">
+									<Size>
+										<AbsDimension x="295" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogRewardTitleText" relativePoint="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="EQL3_QuestLogItemReceiveText" inherits="QuestFont" text="Reward receive text" hidden="true" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Button name="EQL3_QuestLogItem1" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem2" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem3" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem4" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem5" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem6" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem7" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem8" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem9" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="EQL3_QuestLogItem10" inherits="QuestLogRewardItemTemplate" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Frame name="EQL3_QuestLogMoneyFrame" inherits="MoneyFrameTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="EQL3_QuestLogItemReceiveText" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="15" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										QuestMoneyFrame_OnLoad();
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="EQL3_QuestLogRequiredMoneyFrame" inherits="MoneyFrameTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="EQL3_QuestLogRequiredMoneyText" relativePoint="RIGHT">
+										<Offset>
+											<AbsDimension x="10" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										SmallMoneyFrame_OnLoad();
+										MoneyFrame_SetType("STATIC");
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Frame name="EQL3_QuestLogSpacerFrame">
+								<Size>
+									<AbsDimension x="5" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+			
+			<Button name="EQL3_QuestLogFrameCloseButton2">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="EQL3_QuestLogFrame_Description" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(EQL3_QuestLogFrame);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" AlphaMode="ADD"/>
+			</Button>
+			
+			<Button name="EQL3_QuestLogFrameMinimizeButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="EQL3_QuestLogFrameCloseButton2" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						EQL3_Minimize();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(EQL3_MINIMIZE_TIP, nil,nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Addons\EQL3\Images\RestoreButton-Up"/>
+				<PushedTexture file="Interface\Addons\EQL3\Images\RestoreButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" AlphaMode="ADD"/>
+			</Button>
+			
+		</Frames>
+		<Scripts>
+			<OnDragStart>
+				 EQL3_QuestLogFrame:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				 EQL3_QuestLogFrame:StopMovingOrSizing();
+				 QuestLogFrame_LockCorner();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+
+	
+	<Frame name="EQL3_QuestLogFrame_Details" toplevel="false" enableMouse="false" movable="false" parent="EQL3_QuestLogFrame" hidden="false">
+		<Size>
+			<AbsDimension x="784" y="512"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="TOPLEFT">
+ 				<Offset>
+ 					<AbsDimension x="-88" y="0"/>
+ 				</Offset>
+ 			</Anchor>
+ 		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="85" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="EQL3_QuestLogTitleText" inherits="GameFontHighlight" text="EQL3_QUEST_LOG">
+					<Size>
+						<AbsDimension x="300" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-114" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="EQL3_QuestLogVersionText" inherits="GameFontDisableSmall" justifyH="RIGHT" text="EQL3_QUESTLOG_VERSION">
+					<Size>
+						<AbsDimension x="64" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-395" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="EQL3_QuestLogCountRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-356" y="-43"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="EQL3_QuestLogCountMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="100" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="EQL3_QuestLogCountRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="EQL3_QuestLogCountLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="EQL3_QuestLogCountMiddle" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<FontString name="EQL3_QuestLogQuestCount" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="EQL3_QuestLogCountRight">
+							<Offset>
+								<AbsDimension x="-6" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="EQL3_QuestFrameOptionsButton" inherits="UIPanelButtonTemplate" text="EQL3_OPTIONS">
+				<Size>
+					<AbsDimension x="77" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-354" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						QuestLog_Options_Toggle();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Frame name="EQL3_QuestLogHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="293" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="EQL3_QuestLogSkillHighlight" file="Interface\QuestFrame\UI-QuestLogTitleHighlight" alphaMode="ADD"/>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+<!-- 27 of theese -->
+			
+			<Button name="EQL3_QuestLogTitle1" inherits="QuestLogTitleButtonTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogFrame">
+						<Offset>
+							<AbsDimension x="19" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle2" inherits="QuestLogTitleButtonTemplate" id="2" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle3" inherits="QuestLogTitleButtonTemplate" id="3" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle4" inherits="QuestLogTitleButtonTemplate" id="4" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle5" inherits="QuestLogTitleButtonTemplate" id="5" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle6" inherits="QuestLogTitleButtonTemplate" id="6" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle7" inherits="QuestLogTitleButtonTemplate" id="7" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle8" inherits="QuestLogTitleButtonTemplate" id="8" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle9" inherits="QuestLogTitleButtonTemplate" id="9" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle10" inherits="QuestLogTitleButtonTemplate" id="10" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle11" inherits="QuestLogTitleButtonTemplate" id="11" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle12" inherits="QuestLogTitleButtonTemplate" id="12" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle13" inherits="QuestLogTitleButtonTemplate" id="13" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle14" inherits="QuestLogTitleButtonTemplate" id="14" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle15" inherits="QuestLogTitleButtonTemplate" id="15" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle16" inherits="QuestLogTitleButtonTemplate" id="16" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle17" inherits="QuestLogTitleButtonTemplate" id="17" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle18" inherits="QuestLogTitleButtonTemplate" id="18" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle19" inherits="QuestLogTitleButtonTemplate" id="19" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle18" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle20" inherits="QuestLogTitleButtonTemplate" id="20" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle21" inherits="QuestLogTitleButtonTemplate" id="21" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle22" inherits="QuestLogTitleButtonTemplate" id="22" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle21" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle23" inherits="QuestLogTitleButtonTemplate" id="23" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle22" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle24" inherits="QuestLogTitleButtonTemplate" id="24" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle23" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle25" inherits="QuestLogTitleButtonTemplate" id="25" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle24" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle26" inherits="QuestLogTitleButtonTemplate" id="26" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle25" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="EQL3_QuestLogTitle27" inherits="QuestLogTitleButtonTemplate" id="27" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_QuestLogTitle26" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<!-- End of the 27 -->		
+		</Frames>
+
+		<Scripts>
+			<OnEvent>
+				EQL_QuestLog_OnEvent(event);
+			</OnEvent>
+			<OnLoad>
+				EQL_QuestLog_OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="EQL3_Organize_Popup" hidden="true" parent="UIParent" toplevel="true" enableMouse="false" movable="true" frameStrata="ARTWORK">
+		<Size>
+			<AbsDimension x="256" y="127"/>
+		</Size>
+		
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Frames>
+			<Button name="EQL3_Organize_Popup_Move" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="7" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_Organize_Popup_Move_Text" text="EQL3_POPUP_MOVE" hidden="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="0" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="1" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						-- EQL3_OrganizeFunctions("Tempy Lowlands");
+						EQL3_Organize_ShowNameWindow();
+						EQL3_Organize_Popup:Hide();
+					</OnClick>
+					<OnEnter>
+						EQL3_Organize_Popup:Show();
+						EQL3_Organize_Popup_Move_Text:SetTextColor(1.0, 1.0, 1.0, 1.0);
+					</OnEnter>
+					<OnLeave>
+						EQL3_Organize_Popup_Move_Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1.0);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			
+			<Button name="EQL3_Organize_Popup_Reset" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_Organize_Popup_Move" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_Organize_Popup_Reset_Text" text="EQL3_POPUP_RESET" hidden="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="0" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="1" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OrganizeFunctions("!!!reset");
+						EQL3_Organize_Popup:Hide();
+					</OnClick>
+					<OnEnter>
+						EQL3_Organize_Popup:Show();
+						EQL3_Organize_Popup_Reset_Text:SetTextColor(1.0, 1.0, 1.0, 1.0);
+					</OnEnter>
+					<OnLeave>
+						EQL3_Organize_Popup_Reset_Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1.0);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			
+			<Button name="EQL3_Organize_Popup_ResetAll" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_Organize_Popup_Reset" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_Organize_Popup_ResetAll_Text" text="EQL3_POPUP_RESETALL" hidden="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="0" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="1" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_OrganizeFunctions("!!!resetall");
+						EQL3_Organize_Popup:Hide();
+					</OnClick>
+					<OnEnter>
+						EQL3_Organize_Popup:Show();
+						EQL3_Organize_Popup_ResetAll_Text:SetTextColor(1.0, 1.0, 1.0, 1.0);
+					</OnEnter>
+					<OnLeave>
+						EQL3_Organize_Popup_ResetAll_Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1.0);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			
+			<Button name="EQL3_Organize_Popup_Track" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_Organize_Popup_ResetAll" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_Organize_Popup_Track_Text" text="EQL3_POPUP_TRACK" hidden="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="0" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="1" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Toggle_Track();
+						EQL3_Organize_Popup:Hide();
+					</OnClick>
+					<OnEnter>
+						EQL3_Organize_Popup:Show();
+						EQL3_Organize_Popup_Track_Text:SetTextColor(1.0, 1.0, 1.0, 1.0);
+					</OnEnter>
+					<OnLeave>
+						EQL3_Organize_Popup_Track_Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1.0);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			
+			
+			
+			<Button name="EQL3_Organize_Popup_Cancel" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="EQL3_Organize_Popup_Track" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="EQL3_Organize_Popup_Cancel_Text" text="EQL3_POPUP_CANCEL" hidden="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="0" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="1" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						EQL3_Organize_Popup:Hide();
+					</OnClick>
+					<OnEnter>
+						EQL3_Organize_Popup:Show();
+						EQL3_Organize_Popup_Cancel_Text:SetTextColor(1.0, 1.0, 1.0, 1.0);
+					</OnEnter>
+					<OnLeave>
+						EQL3_Organize_Popup_Cancel_Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1.0);
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+
+	<Scripts>
+		<OnLoad>
+			-- Lame method to find the longest string.. xD
+			
+			local temp = EQL3_Organize_Popup_ResetAll_Text:GetWidth();
+			
+			if(EQL3_Organize_Popup_Reset_Text:GetWidth() > temp) then
+				temp = EQL3_Organize_Popup_Reset_Text:GetWidth();
+			end
+			
+			if(EQL3_Organize_Popup_Move_Text:GetWidth() > temp) then
+				temp = EQL3_Organize_Popup_Move_Text:GetWidth();
+			end
+			
+			if(EQL3_Organize_Popup_Track_Text:GetWidth() > temp) then
+				temp = EQL3_Organize_Popup_Track_Text:GetWidth();
+			end
+			
+			EQL3_Organize_Popup_Track_Text:SetText(EQL3_POPUP_UNTRACK);
+			
+			if(EQL3_Organize_Popup_Track_Text:GetWidth() > temp) then
+				temp = EQL3_Organize_Popup_Track_Text:GetWidth();
+			end
+			
+			
+			EQL3_Organize_Popup_Move:SetWidth(temp);
+			EQL3_Organize_Popup_Reset:SetWidth(temp);
+			EQL3_Organize_Popup_ResetAll:SetWidth(temp);
+			EQL3_Organize_Popup:SetWidth(temp+(20 / GetCVar("UIScale")));
+    	this:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
+    	this:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b, 1.0);
+		</OnLoad>
+		<OnLeave>
+			EQL3_Organize_Popup:Hide();
+		</OnLeave>
+	</Scripts>
+		
+	</Frame>
+</Ui>

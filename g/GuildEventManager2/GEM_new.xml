@@ -1,0 +1,1432 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="GEM_new.lua"/>
+
+  <!-- column header template -->
+  <Button name="GEMNewAutoMembersHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="10" y="24"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="5" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="53" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="4" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			GEMNewAutoMembers_SortBy(this.sortType, this.sortDir);
+			this.sortDir = not this.sortDir;
+		</OnClick>
+	</Scripts>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+  </Button>
+
+  <Button name="GEMNewAutoMembersItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="360" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BORDER">
+			<FontString name="$parentPlace" inherits="GameFontNormalSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="98" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentPlace" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentGuild" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="118" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentClass" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="68" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuild" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentLevel" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentClass" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="360" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="5" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+		</OnLoad>
+		<OnClick>
+			GEMNewAutoMembers_OnClick(arg1);
+		</OnClick>
+	</Scripts>
+  </Button>
+
+
+  <Frame name="GEMNewAutoMembersFrame" movable="true" frameStrata="HIGH" hidden="true" parent="UIParent" enableMouse="true">
+	<Size>
+		<AbsDimension x="400" y="410"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset>
+				<AbsDimension x="100" y="-104"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<EdgeSize>
+			<AbsValue val="16"/>
+		</EdgeSize>
+		<TileSize>
+			<AbsValue val="16"/>
+		</TileSize>
+		<BackgroundInsets>
+			<AbsInset left="3" right="5" top="3" bottom="5"/>
+		</BackgroundInsets>
+	</Backdrop>
+	 <Layers>
+	     <Layer level="BACKGROUND">
+		 <FontString name="$parentTitle" inherits="GameFontNormal" text="GEM_TEXT_NEW_AUTOMEMBERS_TITLE">
+		     <Anchors>
+			 <Anchor point="TOP" relativePoint="TOP">
+			     <Offset>
+				 <AbsDimension x="-5" y="-6"/>
+			     </Offset>
+			 </Anchor>
+		     </Anchors>
+		 </FontString>
+	     </Layer>
+	 </Layers>
+	<Frames>
+		<Button name="$parentPHeader1" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_PLACE">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-26"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(40);
+				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_PLACE;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentPHeader2" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_NAME">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentPHeader1" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(100);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_NAME;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentPHeader3" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_GUILD">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentPHeader2" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(120);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_GUILD;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentPHeader4" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_CLASS">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentPHeader3" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(70);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_CLASS;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentPHeader5" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_LEVEL">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentPHeader4" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(55);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_LEVEL;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentPItem1" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPHeader1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem2" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem3" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem4" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem5" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem6" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem7" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentPItem8" inherits="GEMNewAutoMembersItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentPItem7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<ScrollFrame name="$parentPItemScrollFrame" inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="320" y="128" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parentPHeader5" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-23" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(10, GEMNewAutoMembers_UpdatePList);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+
+		<Button name="$parentP_Add" inherits="UIPanelButtonTemplate" text="GEM_TEXT_NEW_AUTOMEMBERS_ADD_TITULAR">
+			<Size>
+				<AbsDimension x="180" y="24"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+					<Offset>
+						<AbsDimension x="0" y="-182"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMExternal_Choose(GEMNewAutoMembers_PInfosSet,GEM_TEXT_NEW_AUTOMEMBERS_FILL_TITULAR,{});
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parentRHeader1" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_PLACE">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-220"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(40);
+				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_PLACE;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentRHeader2" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_NAME">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentRHeader1" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(100);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_NAME;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentRHeader3" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_GUILD">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentRHeader2" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(120);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_GUILD;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentRHeader4" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_CLASS">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentRHeader3" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(70);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_CLASS;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentRHeader5" inherits="GEMNewAutoMembersHeaderTemplate" text="GEMADMIN_HEADER_LEVEL">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentRHeader4" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(55);
+    				    this.sortDir = true;
+				    this.sortType = GEMADMIN_SORTBY_LEVEL;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parentRItem1" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRHeader1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem2" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem3" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem4" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem5" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem6" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem7" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRItem8" inherits="GEMNewAutoMembersItemTemplate" id="2">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentRItem7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<ScrollFrame name="$parentRItemScrollFrame" inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="320" y="128" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parentRHeader5" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-23" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(10, GEMNewAutoMembers_UpdateRList);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+
+		<Button name="$parentR_Add" inherits="UIPanelButtonTemplate" text="GEM_TEXT_NEW_AUTOMEMBERS_ADD_REPLACEMENT">
+			<Size>
+				<AbsDimension x="180" y="24"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+					<Offset>
+						<AbsDimension x="0" y="-376"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMExternal_Choose(GEMNewAutoMembers_RInfosSet,GEM_TEXT_NEW_AUTOMEMBERS_FILL_REPLACEMENT,{});
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="1" y="2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+	</Frames>
+	<Scripts>
+		<OnMouseUp>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnMouseUp>
+		<OnMouseDown>
+			if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+				this:StartMoving();
+				this.isMoving = true;
+			end
+		</OnMouseDown>
+		<OnHide>
+			if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			end
+		</OnHide>
+		<OnShow>
+			GEMNewAutoMembers_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+
+  <Frame name="GEMNew_Limitation" virtual="true" hidden="false">
+	<Frames>
+		<EditBox name="$parent_Min" letters="2" numeric="true" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="30" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="50" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</EditBox>
+		<EditBox name="$parent_Max" letters="2" numeric="true" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="30" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Min" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="10" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</EditBox>
+	</Frames>
+  </Frame>
+
+  <Frame name="GEMNewFrame" parent="GEMMainFrame" inherits="GEMTabFrame">
+	<Layers>
+		<Layer level="BACKGROUND">
+			<FontString name="GEMNew_Limit_String" inherits="GameFontNormal" justifyH="CENTER" text="GEM_TEXT_CLASS_LIMITATION">
+				<Size>
+					<AbsDimension x="220" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="GEMNewFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-200" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<EditBox name="GEMNew_Where" letters="40" numeric="false" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="166" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="200" y="-20"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_TEXT_WHERE">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-150" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnTabPressed>
+					GEMNew_Comment:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		
+		<Frame name="GEMNew_Event_ZoneDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMNew_Where" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="0" y="-3"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow>
+					GEMNew_Event_ZoneDropDown_OnShow();
+				</OnShow>
+			</Scripts>
+		</Frame>
+		
+		<EditBox name="GEMNew_Comment" letters="200" numeric="false" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="166" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="200" y="-50"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_TEXT_COMMENT">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-150" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnTabPressed>
+					GEMNew_Count:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+
+		<Button name="GEMNew_Date" inherits="UIPanelButtonTemplate" text="GEM_TEXT_DATE_CHOOSE">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="380" y="-80"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_HEADER_DATE">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-330" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parentValue" inherits="GameFontHighlightSmall" justifyH="LEFT" text="">
+						<Size>
+							<AbsDimension x="166" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-180" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parentValueServer" inherits="GameFontHighlightSmall" justifyH="LEFT" text="server time">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-140" y="-16" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					GEMNew_Date_OnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="GEMNew_AutoMembers" inherits="UIPanelButtonTemplate" text="GEM_TEXT_NEW_AUTOMEMBERS_BUTTON">
+			<Size>
+				<AbsDimension x="140" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="GEMNew_Date" relativePoint="BOTTOM">
+					<Offset>
+						<AbsDimension x="0" y="-20"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMNew_AutoMembers_OnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<EditBox name="GEMNew_Count" letters="2" numeric="true" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="30" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="200" y="-110"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_TEXT_COUNT">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-150" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnTabPressed>
+					GEMNew_MinLevel:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		
+		<EditBox name="GEMNew_MinLevel" letters="2" numeric="true" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="30" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="200" y="-140"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_TEXT_LEVEL">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-150" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnTabPressed>
+					GEMNew_MaxLevel:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		
+		<EditBox name="GEMNew_MaxLevel" letters="2" numeric="true" inherits="GEMEditBoxTemplate">
+			<Size>
+				<AbsDimension x="30" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="260" y="-140"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnTabPressed>
+					GEMNew_Limit_Warrior_Min:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		
+		<Frame name="GEMNew_Limit_Warrior" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNewFrame" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="40" y="-220"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_WARRIOR">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="GEMNew_Limit_Paladin" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Warrior" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_PALADIN">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="GEMNew_Limit_Shaman" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Paladin" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_SHAMAN">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+
+		<Frame name="GEMNew_Limit_Rogue" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Warrior" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_ROGUE">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="GEMNew_Limit_Mage" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Rogue" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_MAGE">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="GEMNew_Limit_Warlock" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Mage" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_WARLOCK">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+
+		<Frame name="GEMNew_Limit_Hunter" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Rogue" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_HUNTER">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="GEMNew_Limit_Druid" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Hunter" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_DRUID">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="GEMNew_Limit_Priest" inherits="GEMNew_Limitation">
+			<Size>
+				<AbsDimension x="140" y="26"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMNew_Limit_Druid" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="GEM_TEXT_CLASS_PRIEST">
+						<Size>
+							<AbsDimension x="60" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset>
+									<AbsDimension x="-20" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+
+		<Button name="GEMNew_Create" inherits="UIPanelButtonTemplate" text="GEM_TEXT_CREATE">
+			<Size>
+				<AbsDimension x="100" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMNewFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-7" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMNew_Create_OnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="GEMNewRerollDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="GEMNew_Create" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="15" y="-5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMNewRerollDropDown_OnShow(); </OnShow>
+			</Scripts>
+		</Frame>
+		<Frame name="GEMNewChannelDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="GEMNewRerollDropDown" relativePoint="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnShow> GEMNewChannelDropDown_OnShow(); </OnShow>
+			</Scripts>
+		</Frame>
+
+
+		<Frame name="GEMNewTemplateBorderFrame" inherits="OptionFrameBoxTemplate">
+			<Size>
+				<AbsDimension x="250" y="100"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="GEMNewFrame" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="-15"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="GEMNewTemplate_String" inherits="GameFontNormal" justifyH="CENTER" text="GEM_TEXT_TEMPLATE_HEADER">
+						<Size>
+							<AbsDimension x="220" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="8" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+                                                
+					</FontString>
+				</Layer>
+			</Layers>
+			<Frames>
+				<Button name="GEM_Help_NewTab_Templates" inherits="GEM_HelpTemplate" id="3">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Button>
+				<EditBox name="GEMNewTemplate_Name" letters="30" numeric="false" inherits="GEMEditBoxTemplate">
+					<Size>
+						<AbsDimension x="125" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="20" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</EditBox>
+				<Button name="GEMNewTemplate_Save" inherits="UIPanelButtonTemplate" text="GEM_TEXT_TEMPLATE_SAVE">
+					<Size>
+						<AbsDimension x="80" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="GEMNewTemplate_Name" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="10" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							GEMNewTemplate_Save_OnClick();
+						</OnClick>
+					</Scripts>
+				</Button>
+				<Frame name="GEMNewTemplateListDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="GEMNewTemplate_Name" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="-24" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnShow> GEMNewTemplateListDropDown_OnShow(); </OnShow>
+					</Scripts>
+				</Frame>
+				<Button name="GEMNewTemplate_Load" inherits="UIPanelButtonTemplate" text="GEM_TEXT_TEMPLATE_LOAD">
+					<Size>
+						<AbsDimension x="80" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="GEMNewTemplate_Save" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							GEMNewTemplate_Load_OnClick();
+						</OnClick>
+					</Scripts>
+				</Button>
+				<Button name="GEMNewTemplate_Delete" inherits="UIPanelButtonTemplate" text="GEM_TEXT_TEMPLATE_DELETE">
+					<Size>
+						<AbsDimension x="80" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="GEMNewTemplate_Load" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							GEMNewTemplate_Delete_OnClick();
+						</OnClick>
+					</Scripts>
+				</Button>
+			</Frames>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(1,1,1,0)
+				</OnLoad>
+			</Scripts>
+		</Frame>
+
+		<Frame name="GEMNewSortingBorderFrame" inherits="OptionFrameBoxTemplate">
+			<Size>
+				<AbsDimension x="200" y="75"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMNewFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-10" y="10"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="GEMNewSorting_String" inherits="GameFontNormal" justifyH="CENTER" text="GEM_TEXT_SORTING_HEADER">
+						<Size>
+							<AbsDimension x="170" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="8" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Frames>
+				<Button name="GEM_Help_NewTab_Sorting" inherits="GEM_HelpTemplate" id="4">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Button>
+				<Frame name="GEMNewSortingListDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="20" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad> GEMSetColumnWidth(120); </OnLoad>
+						<OnShow> GEMNewSortingListDropDown_OnShow(); </OnShow>
+						<OnEnter>
+							GEMNewSorting_EventOnHover();
+						</OnEnter>
+						<OnLeave>
+							GameTooltip:Hide();
+						</OnLeave>
+					</Scripts>
+				</Frame>
+				<Button name="GEMNewSorting_Configure" inherits="UIPanelButtonTemplate" text="GEM_TEXT_SORTING_CONFIGURE">
+					<Size>
+						<AbsDimension x="110" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="-20" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnClick>
+							GEMNewSorting_Configure_OnClick();
+						</OnClick>
+					</Scripts>
+				</Button>
+				<CheckButton name="GEMNewSorting_Default" inherits="OptionsCheckButtonTemplate">
+					<Size>
+						<AbsDimension x="26" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="GEMNewSorting_Configure" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<HitRectInsets>
+						<AbsInset left="0" right="0" top="0" bottom="0"/>
+					</HitRectInsets>
+					<Layers>
+						<Layer level="BACKGROUND">
+							<FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT" text="Def.">
+								<Size>
+									<AbsDimension x="60" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT">
+										<Offset>
+											<AbsDimension x="26" y="1" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</FontString>
+						</Layer>
+					</Layers>
+					<Scripts>
+						<OnClick>
+							GEMNewSorting_Default_OnClick();
+						</OnClick>
+					</Scripts>
+				</CheckButton>
+			</Frames>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(1,1,1,0)
+				</OnLoad>
+			</Scripts>
+		</Frame>
+
+	</Frames>
+	<Scripts>
+		<OnShow>
+			GEMNew_OnShow();
+		</OnShow>
+	</Scripts>
+  </Frame>
+  
+</Ui>

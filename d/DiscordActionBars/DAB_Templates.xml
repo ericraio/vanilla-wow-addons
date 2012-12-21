@@ -1,0 +1,365 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+<CheckButton name="DAB_ActionButtonTemplate" hidden="true" movable="true" parent="UIParent" virtual="true">
+	<Size><AbsDimension x="36" y="36"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Frames>
+		<Model name="$parent_Cooldown" inherits="CooldownFrameTemplate">
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="CENTER">
+						<Size><AbsDimension x="36" y="36"/></Size>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Model>
+	</Frames>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parent_Background">
+				<Size><AbsDimension x="36" y="36"/></Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+		<Layer level="BORDER">
+			<Texture name="$parent_Icon">
+				<Size><AbsDimension x="36" y="36"/></Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+		<Layer level="ARTWORK">
+			<Texture name="$parent_Flash" file="Interface\Buttons\UI-QuickslotRed" hidden="true">
+				<Size><AbsDimension x="36" y="36"/></Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Texture>
+			<FontString name="$parent_HotKey" inherits="NumberFontNormalSmallGray" justifyH="RIGHT">
+				<Size><AbsDimension x="32" y="10"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset><AbsDimension x="2" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_Count" inherits="NumberFontNormal" justifyH="RIGHT">
+				<Size><AbsDimension x="32" y="10"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="2" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_Timer" inherits="NumberFontNormal" justifyH="CENTER">
+				<Size><AbsDimension x="36" y="36"/></Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</FontString>
+			<Texture name="$parent_EquippedBorder" file="Interface\Buttons\UI-ActionButton-Border" hidden="true" alphaMode="ADD">
+				<Size><AbsDimension x="36" y="36"/></Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Name" inherits="GameFontHighlightSmallOutline">
+				<Size><AbsDimension x="36" y="10"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<NormalTexture name="$parent_Border" file="Interface\Buttons\UI-Quickslot2" hidden="true">
+		<Size><AbsDimension x="61" y="61"/></Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset><AbsDimension x="-12" y="12"/></Offset>
+			</Anchor>
+		</Anchors>
+	</NormalTexture>
+	<HighlightTexture name="$parent_Highlight" alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	<CheckedTexture name="$parent_Checked" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+	<Scripts>
+		<OnLoad>
+			DAB_ActionButton_OnLoad();
+		</OnLoad>
+		<OnEvent>
+			DAB_ActionButton_OnEvent(event);
+		</OnEvent>
+		<OnUpdate>
+			DAB_ActionButton_OnUpdate(arg1);
+		</OnUpdate>
+		<OnEnter>
+			DAB_ActionButton_OnEnter();
+		</OnEnter>
+		<OnLeave>
+			DAB_ActionButton_OnLeave();
+		</OnLeave>
+		<OnClick>
+			DAB_ActionButton_OnClick(this:GetID(), arg1);
+		</OnClick>
+		<OnHide>
+			if (DAB_Settings[DAB_INDEX].Buttons[this:GetID()].Bar == "F") then
+				DAB_Run_Script("OnHide", "Floaters", this:GetID());
+			end
+			this.cooldowncount = nil;
+			this.ccountlocked = nil;
+		</OnHide>
+		<OnShow>
+			DAB_ActionButton_Update();
+			DAB_ActionButton_UpdateState();
+			DAB_ActionButton_UpdateCooldown(this:GetID());
+			if (DAB_Settings[DAB_INDEX].Buttons[this:GetID()].Bar == "F") then
+				DAB_Run_Script("OnShow", "Floaters", this:GetID());
+			end
+		</OnShow>
+		<OnDragStart>
+			DAB_ActionButton_OnDragStart();
+		</OnDragStart>
+		<OnDragStop>
+			DAB_ActionButton_OnDragStop();
+		</OnDragStop>
+		<OnReceiveDrag>
+			DAB_ActionButton_OnReceiveDrag();
+		</OnReceiveDrag>
+		<OnMouseWheel>
+			DAB_ActionButton_OnMouseWheel(arg1);
+		</OnMouseWheel>
+	</Scripts>
+</CheckButton>
+
+<Button name="DAB_ActionBarTemplate" movable="true" hidden="true" virtual="true" frameStrata="LOW">
+	<Size><AbsDimension x="100" y="100"/></Size>
+	<Frames>
+		<Button name="$parent_Label" inherits="DiscordLib_PlainBackgroundTemplate">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormal">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForDrag("LeftButton");
+				</OnLoad>
+				<OnDragStart>
+					DAB_Bar_OnDragStart(this:GetParent():GetID(), 1);
+				</OnDragStart>
+				<OnDragStop>
+					DAB_Bar_OnDragStop(this:GetParent():GetID());
+				</OnDragStop>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForDrag("LeftButton");
+		</OnLoad>
+		<OnEnter>
+			DAB_Bar_OnEnter();
+			DAB_Run_Script("OnEnter", "Bar", this:GetID());
+		</OnEnter>
+		<OnEvent>
+			DAB_Run_Script("OnEvent", "Bar", this:GetID(), event);
+		</OnEvent>
+		<OnLeave>
+			if (this.moving) then
+				DAB_Bar_OnDragStart();
+			end
+			DAB_Bar_OnLeave();
+			DAB_Run_Script("OnLeave", "Bar", this:GetID());
+		</OnLeave>
+		<OnUpdate>
+			DAB_Bar_OnUpdate(arg1);
+		</OnUpdate>
+		<OnShow>
+			DAB_Run_Script("OnShow", "Bar", this:GetID());
+		</OnShow>
+		<OnHide>
+			if (this.moving) then
+				DAB_Bar_OnDragStart();
+			end
+			DAB_Bar_OnHide();
+			DAB_Run_Script("OnHide", "Bar", this:GetID());
+		</OnHide>
+		<OnDragStart>
+			DAB_Bar_OnDragStart();
+		</OnDragStart>
+		<OnDragStop>
+			DAB_Bar_OnDragStop();
+		</OnDragStop>
+		<OnMouseWheel>
+			DAB_Bar_OnMouseWheel(arg1);
+			DAB_Run_Script("OnMouseWheel", "Bar", this:GetID(), arg1);
+		</OnMouseWheel>
+		<OnClick>
+			if (this.moving) then
+				DAB_Bar_OnDragStop();
+			end
+			DAB_Run_Script("OnClickBefore", "Bar", this:GetID(), arg1);
+			DAB_Run_Script("OnClickAfter", "Bar", this:GetID(), arg1);
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Button name="DAB_ControlBoxTemplate" movable="true" hidden="true" virtual="true" frameStrata="LOW">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parent_Background">
+				<Size><AbsDimension x="10" y="10"/></Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</Texture>
+			<Texture name="$parent_1">
+				<Size><AbsDimension x="10" y="1"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</Texture>
+			<Texture name="$parent_2">
+				<Size><AbsDimension x="10" y="1"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</Texture>
+			<Texture name="$parent_3">
+				<Size><AbsDimension x="1" y="12"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</Texture>
+			<Texture name="$parent_4">
+				<Size><AbsDimension x="1" y="12"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<Color r="1" g="1" b="1"/>
+			</Texture>
+		</Layer>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Text" inherits="GameFontNormal" justifyH="CENTER" justifyV="CENTER">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForDrag("LeftButton");
+			this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+			this:EnableMouseWheel(1);
+		</OnLoad>
+		<OnEnter>
+			DAB_ControlBox_OnEnter();
+			DAB_Run_Script("OnEnter", "ControlBox", this:GetID());
+		</OnEnter>
+		<OnLeave>
+			if (this.moving) then
+				DAB_ControlBox_OnDragStop();
+			end
+			DAB_ControlBox_OnLeave();
+			DAB_Run_Script("OnLeave", "ControlBox", this:GetID());
+		</OnLeave>
+		<OnClick>
+			DAB_Run_Script("OnClickBefore", "ControlBox", this:GetID(), arg1);
+			DAB_ControlBox_OnClick(arg1);
+			DAB_Run_Script("OnClickAfter", "ControlBox", this:GetID(), arg1);
+		</OnClick>
+		<OnEvent>
+			DAB_Run_Script("OnEvent", "ControlBox", this:GetID(), event);
+		</OnEvent>
+		<OnUpdate>
+			DAB_ControlBox_OnUpdate(arg1);
+		</OnUpdate>
+		<OnMouseWheel>
+			DAB_Run_Script("OnMouseWheel", "ControlBox", this:GetID(), arg1);
+		</OnMouseWheel>
+		<OnDragStart>
+			DAB_ControlBox_OnDragStart();
+		</OnDragStart>
+		<OnDragStop>
+			DAB_ControlBox_OnDragStop();
+		</OnDragStop>
+		<OnHide>
+			if (this.moving) then
+				DAB_ControlBox_OnDragStop();
+			end
+			DAB_Run_Script("OnHide", "ControlBox", this:GetID());
+		</OnHide>
+		<OnShow>
+			DAB_Run_Script("OnShow", "ControlBox", this:GetID());
+		</OnShow>
+	</Scripts>
+</Button>
+
+<Button name="DAB_OtherBarTemplate" movable="true" hidden="true" virtual="true" frameStrata="LOW">
+	<Size><AbsDimension x="100" y="100"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForDrag("LeftButton");
+		</OnLoad>
+		<OnEvent>
+			DAB_OtherBar_OnEvent(event);
+		</OnEvent>
+		<OnUpdate>
+			DAB_OtherBar_OnUpdate(arg1);
+		</OnUpdate>
+		<OnHide>
+			if (this.moving) then
+				DAB_OtherBar_OnDragStart();
+			end
+		</OnHide>
+		<OnLeave>
+			if (this.moving) then
+				DAB_OtherBar_OnDragStart();
+			end
+		</OnLeave>
+		<OnDragStart>
+			DAB_OtherBar_OnDragStart();
+		</OnDragStart>
+		<OnDragStop>
+			DAB_OtherBar_OnDragStop();
+		</OnDragStop>
+	</Scripts>
+</Button>
+
+<Frame name="DAB_FloaterBoxTemplate" movable="true" hidden="true" parent="UIParent" virtual="true">
+	<Size><AbsDimension x="36" y="36"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+</Frame>
+
+</Ui>

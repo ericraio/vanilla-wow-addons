@@ -1,0 +1,617 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd"> 
+   <Script file="localization.lua"/>
+   <Script file="colorChart.lua"/>
+   <Script file="variableChecker.lua"/>
+   <Script file="anchorChanging.lua"/>
+   <Script file="slashCommands.lua"/>
+   <Script file="AF_ToolTip.lua"/>
+
+   <!-- Frame to handle all core events -->
+	<Frame name="AF_ToolTipFrame" hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("UPDATE_MOUSEOVER_UNIT");
+			</OnLoad>
+			<OnUpdate>
+				aftt_onUpdate(arg1);
+			</OnUpdate>
+			<OnEvent>
+				aftt_onEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="AF_ToolTipRefresh" hidden="true">
+		<Scripts>
+			<OnUpdate>
+				aftt_onRefresh();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="aftt_optionFrame" hidden="true" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="215" y="320"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Button name="aftt_closeOptionFrame">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="aftt_optionFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_toggleFrames();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next1">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("anchor");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_previous2">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="aftt_TextRight2" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("x-");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next2">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("x+");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_previous3">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="aftt_TextRight3" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("y-");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next3">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("y+");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next4">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("fade");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next5">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("pvp");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next6">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("tapped");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next7">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("reaction");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next8">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("guild");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+			<Button name="aftt_next9">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="aftt_TextRight9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						aftt_buttonToggle("rank");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\GlowStar" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextHeader" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="180" y="25"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft1" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight1" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo = "aftt_TextLeft1" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="30" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft2" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft1" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight2" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextRight1" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft3" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft2" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight3" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight2" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft4" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft3" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight4" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight3" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft5" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft4" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight5" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight4" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft6" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft5" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight6" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight5" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft7" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft6" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight7" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight6" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft8" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft7" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight8" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight7" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft9" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="aftt_TextLeft8" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextRight9" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="80" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="aftt_TextRight8" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextHeader2" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="180" y="25"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-235"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft10" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="180" y="25"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="aftt_TextHeader2" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<FontString name="aftt_TextLeft11" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="180" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="aftt_TextLeft10" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnUpdate>
+				aftt_optionFrame:RegisterForDrag("LeftButton");
+				aftt_onRefresh();
+			</OnUpdate>
+			<OnDragStart>
+				aftt_optionFrame:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				aftt_optionFrame:StopMovingOrSizing();
+			</OnDragStop>
+			<OnMouseUp>
+				aftt_optionFrame:StopMovingOrSizing();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+</Ui>

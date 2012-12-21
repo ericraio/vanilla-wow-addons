@@ -1,0 +1,352 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML/UI.xsd">
+	
+	<Script file="CalendarEditor.lua"/>
+	
+	<FontString name="CalendarEventOwnerFont" inherits="MasterFont" font="Fonts\FRIZQT__.TTF" virtual="true">
+		<FontHeight>
+			<AbsValue val="8"/>
+		</FontHeight>
+		<Color r="1.0" g="0.82" b="0"/>
+	</FontString>
+
+	<Button name="CalendarEventButtonTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="288" y="22"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentTime" inherits="GameFontNormal" justifyH="RIGHT" justifyV="BOTTOM">
+					<Size>
+						<AbsDimension x="67" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="65" y="6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTitle" inherits="GameFontNormal" justifyH="LEFT" justifyV="BOTTOM">
+					<Size>
+						<AbsDimension x="150" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentTime" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="6" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentOwner" inherits="CalendarEventOwnerFont" justifyH="RIGHT" justifyV="BOTTOM">
+					<Size>
+						<AbsDimension x="60" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="6" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentCircled" file="Interface\Addons\GroupCalendar\Textures\CircledDate">
+					<Size>
+						<AbsDimension x="80" y="22"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentTime">
+							<Offset>
+								<AbsDimension x="6" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<HighlightTexture alphaMode="ADD" file="Interface\HelpFrame\HelpFrameButton-Highlight">
+			<TexCoords left="0" right="1.0" top="0" bottom="0.578125"/>
+		</HighlightTexture>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Circled"):SetVertexColor(0.41, 0.61, 0.75, 0.7);
+			</OnLoad>
+		</Scripts>
+	</Button>
+	
+	<Button name="CalendarEventButton" inherits="CalendarEventButtonTemplate" hidden="false" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOptionCheckBoxOn");
+				CalendarEditor_EditIndexedEvent(this:GetID());
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<Frame name="CalendarEditorFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="318" y="344"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GroupCalendarFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="1" y="-21"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture name="CalendarEditorFrameTopLeft" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CalendarEditorFrameTopLeft" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CalendarEditorFrameTopLeft" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CalendarEditorFrameTopLeft" relativePoint="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" text="CalendarEditor_cEventsTitle" inherits="GameFontHighlight">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-10" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSubTitle" inherits="GameFontNormalLarge">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-10" y="-36"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="CalendarEditorCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="CalendarEditorFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorNewEventButton" inherits="UIPanelButtonTemplate" text="CalendarEditor_cNewEvent">
+				<Size>
+					<AbsDimension x="132" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						CalendarEditor_NewEvent();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="CalendarEditorScrollbarTrench" inherits="CalendarScrollbarTrenchTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-3" y="-58"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<ScrollFrame name="CalendarEditorScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="220" y="254"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="-63"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</ScrollFrame>
+			<Button name="CalendarEditorEvent1" inherits="CalendarEventButton" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent2" inherits="CalendarEventButton" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent3" inherits="CalendarEventButton" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent4" inherits="CalendarEventButton" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent5" inherits="CalendarEventButton" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent6" inherits="CalendarEventButton" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent7" inherits="CalendarEventButton" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent8" inherits="CalendarEventButton" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent9" inherits="CalendarEventButton" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent10" inherits="CalendarEventButton" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent11" inherits="CalendarEventButton" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent12" inherits="CalendarEventButton" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent13" inherits="CalendarEventButton" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent14" inherits="CalendarEventButton" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEditorEvent15" inherits="CalendarEventButton" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CalendarEditorEvent14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				CalendarEditor_OnShow();
+			</OnShow>
+			<OnHide>
+				CalendarEditor_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+</UI>

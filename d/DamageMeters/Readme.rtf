@@ -1,0 +1,541 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\fswiss\fcharset77 ArialMT;}
+{\colortbl;\red255\green255\blue255;}
+\vieww12000\viewh15840\viewkind0
+\deftab720
+\pard\pardeftab720\ql\qnatural
+
+\f0\fs20 \cf0 ************\
+DamageMeters - A user-interface modification for World of Warcraft.\
+************\
+\
+Author - Patrick Cyr (damagemeters at yahoo dot com) (Dandelion on Whisperwind)\
+	- v5.1.0+ has been modified by Karl Isenberg (karlkfi at cosmosui dot org) (AnduinLothar or Wraithhammer on Kil'Jaeden)\
+Permissions - Do anything you want with it except take credit for it or make money from it.\
+Additional Credit To - \
+	SeraphTC for the TitanPanel plugin.\
+	Zoldan and Chakotay1357 for the German translation.\
+	Kurty and eXess for the French translation.\
+	Author(s) of DPSPlus and CombatStats for the parsing technique.\
+	Authors of Sky (for their assert function).\
+	Zaxa (Author of Spellometer), whose code I blatantly stole.\
+Thanks To - Tagamogi, Rancor, Cyntax, Kixxs, Gileran, Dex, Zurai, Kotor, Sensi, Kon, Sterne, Pharaoh, and especially everyone in the Wanderers raid group for downloading the multitudes of beta versions and dealing with all their bugs.\
+\
+\
+************\
+**Contents**\
+************\
+I. Summary\
+II. How It Works\
+III. Features\
+	1) Interface\
+	2) Bar Counts\
+	3) Quantities\
+	4) Players\
+	5) Event Data\
+	6) Reporting\
+	   a) DMReporter.exe\
+	7) Synchronization\
+	   a) Event Synchronization\
+	   b) The Ready Command\
+	   c) Session Labels\
+	8) Memory Register\
+	9) Overhealing\
+IV. Version History\
+\
+-------------------------------------------------------------------------------\
+\
+***********\
+I. Summary:\
+***********\
+\
+DamageMeters keeps track of the damage you and nearby players does and shows the total damage as meters in a window on the screen.  It makes it easy to compare the relative damage/healing output of members of a party or raid.  At any time you can have the mod output the resulting information as text "say"s or to a channel of your choice.\
+\
+\
+*****************\
+II. How It Works:\
+*****************\
+\
+DM works by analyzing (parsing) text messages of the sort you see in your "Combat Log" chat window.  An example would be "You hit Onyxia for 10."  This is the only way a mod can know what damage/healing anyone is doing/taking, which is unfortunate because parsing strings isn't terribly fast or easy.\
+\
+There is a VERY important limitation to DM: a player only receives combat text messages for those players that are near him.  The distance varies quite a bit but it doesn't seem to ever be any higher than 45 yards or so.  You are not guaranteed to get messages even for members of your own party if they are not near you.  DM's Synchronization system provides something of a work-around for this problem.\
+\
+Also: it is a common misconception that you need to have messages turned on in your chat window in order for DM to work.  This is not the case: they are entirely independent of each other.\
+\
+\
+**************\
+III. Features:\
+**************\
+\
+-------------\
+1) Interface:\
+-------------\
+\
+DM appears as a frame (window) with a vertical stack of horizontal meters (bars).  Each bar represents a value for a single player.  Bars can be sorted in increasing or decreasing order, though almost always in the latter.  The bar for the player with the highest value of a given quantity will always be at full length.  Everyone else's bar will be some shorter length in proportion\
+to the lead player's value.  In addition to the bar itself, various text can be specified to be drawn over each bar, including the player name, the value, etc.  Moving the mouse over a given person's bar brings up a tooltip which shows detailed information for a given player.\
+\
+There are two interfaces for setting program options: menus and console commands.  There are two menus.  The main menu is reached by right clicking on the title of the DM window.  There is also a player menu which is reached by right clicking on a particular player's bar.  Console commands all start with /dm and are entered like chat commands.  Use /dmhelp to get a full list.\
+\
+The window can be moved by click-and-dragging on the title button.  Lastly, clicking on a player's bar will attempt to target them.\
+\
+\
+--------------\
+2) Bar Counts:\
+--------------\
+\
+When a player is detected doing something we are interested in, DM automatically adds it to its internal list.  The internal list can have at most 50 entries, at which point it is full and NO new players will be added.  The number of players in the list, though, is independant of the number of bars visible on the screen.  Generally, there are two ways you can specify the \
+number of bars: 1) as a hard number, or 2) as an up-to number.  The latter is called the "auto-count" number, and it basically means "show as many bars as I have player information for, up to this number."\
+\
+Again, though, it is important to note: the internal player list is NOT limited by the number of visible bars.\
+\
+There are two options which override bar counts.  The first is "Minimize", which causes only the player's bar to be visible.  (If there is no player entry one is automatically created.)  The second is "Show Max", which causes the maximum number of bars (40) to be shown.  You can set up key bindings to toggle either of these options quickly.\
+\
+The visible bars by default start at the first one in the list (for example, the player with the most damage done).  The "Self Always Visible" option can be set which makes it so the players shown is adjusted such that the player (self) is always visible in the list.\
+\
+\
+--------------\
+3) Quantities:\
+--------------\
+\
+DM monitors the following quantities:\
+\
+- Damage Done: The amount of damage done by a player.\
+\
+- Healing Done: The amount of healing done by a player.\
+\
+- Damage Taken: The amount of damage taken by a player.\
+\
+- Healing Taken: The amount of healing taken by a player.\
+\
+- Curing Done: The amount of cures/decurses/etc done by a player.\
+\
+- Idle Time: The amount of time that has passed since the player has last done something (either done damage or done healing).  This is useful for detecting when someone has gone ninja-afk.\
+\
+In addition, there are 4 pseudo-quantities which display the same info as the first 4, but only for the current Fight.  These quantities can be shown as totals or as the total divided by the current Fight time, thus providing a type of Damage-Per-Second meter.  \
+\
+DamageMeters has two ways of determining when a Fight starts and stops.  They are quite a bit different and can greatly effect what your personal DPS value is.  The default is "Group DPS Mode" ON.  In this mode, a Fight starts when anyone you are monitoring (for instance, a party member) does damage.  Fights end in that mode when you leave combat.  The advantage of this mode is that it provides a good comparison of the contributions of everyone of a group.\
+\
+When "Group DPS Mode" is OFF, a Fight is determined by whether or not a mob is aggro vs. you.  This mode is not very useful for comparing DPS with other group members, but can provide better personal numbers.\
+\
+\
+--------------\
+4) Players:\
+--------------\
+\
+DM, by default, monitors yourself, your pet, your party/raid members, any nearby friendly players, and miscellaneous things like totems.  There is a menu option, "Only Monitor Group Members", which tells DM to reject nearby friendlies and miscellaneous things.  There are valid reasons for having both options available. For example, in a pvp environment data from friendlys can quickly bury your own, and so you'd want to turn that option on.  However, if you are a soloing shaman you could be interested in how much healing your totems are doing, for instance, so you'd want the option off.\
+\
+Note: there is no easy way to distinguish totems from players, and there is no way at all to determine who dropped a particular totem.\
+\
+Pets present challenges for DM which require some understanding on the users part for best results.  DM CANNOT distinguish someone else's pet from a random friendly player.  If "Only Monitor Group Members" is on you will not see other players's pets.  DM CAN tell if something is YOUR pet.  Your pet is always shown.\
+\
+The "Treat Pet Data As Your Data" option is meant to help people determine what their total (themselves plus their pets) contributions are.  When this option is on, any data that registers for your pet is treated as if it came from yourself.  If you accumulate data from one or more pets with this option off, then turn the option on, the pet(s) data will be AUTOMATICALLY merged into your own.\
+\
+\
+--------------\
+5) Event Data.\
+--------------\
+\
+DamageMeters can be configured to record stats on an event-by-event basis. [I'm using the term event to refer to a specific damage/healing source, such as a melee attack or spell.]  While the information displayed isn't terribly in-depth, it can still be handy for quickly determining how much various abilities are contributing to someone's totals. Event data for a player is  displayed in their bar tooltip.  \
+\
+The downside to event data is that it takes up quite a bit of memory to store, so by default DM only saves event data for one's self.  It also makes sync'ing take a *lot* longer (see the section on synchronization).\
+\
+Here is an example of some DamageTaken events:\
+\
+Fireball = 300 (75%) 0/2 0% 150 (0 Fire)\
+[Melee] = 100 (25%) 1/2 50% 50\
+\
+The entries are:\
+"Fireball" - Event name\
+"300" - Total from this event (in this case, total damage taken)\
+"(75%)" - Percent that this event contributes to this quantity\
+"0/2" - Crits/hits\
+"0%" - Crit percentage\
+"150" - Average\
+"(0 Fire)" - The magic type and your average resistance (only if applicable)\
+\
+\
+--------------\
+6) Reporting.\
+--------------\
+\
+DM has a system for reporting its data to other people.  It is accessible using the "Report" menu or via the /dmreport command.  The former is quicker, but the latter is much more flexible.  \
+\
+The basic syntax for the /dmreport command is:\
+\
+/dmreport [X[#]] [tell target|channel]\
+\
+X is the report destination, and can be one of the following:\
+\
+c - Console: Chat messages that you only can see.  This is the default.\
+s - Say\
+p - Party\
+r - Raid\
+g - Guild\
+w - Whisper - For example, /dmreport w dandelion\
+h - cHannel - Use the channel name, not number: /dmreport h mychannel\
+f - Frame - Shows results in a frame (window), which you can use to copy the text to the clipboard.\
+\
+# is optional.  If specified, it limits the number of people reported to the top #.  For example, to output the top 10 to raid, use:\
+\
+/dmreport r10\
+\
+As far as doing reports via the menu: it works the same as the console command, though of course the Whisper and cHannel report types are unavailable.Also, note that when using the menu it will only report up to the number of bars you have visible.  [I only did this to cut down on the amount of spam it was generating in my raids, heh.]\
+\
+\
+a) DMReporter.exe\
+\
+DMReporter.exe is a stand-alone application that generates reports without having to cut-and-pase from the report frame.  To use, just run it: the first time it runs it will ask you where your SavedVariables.lua file is.  After that, it uses the scripts in DMReporter.lua.default to generate report files for you.  If you want to change the options or even try generating your own\
+reports, you can copy DMReporter.lua.default to DMReporter.lua.  The program will always load the latter file if it exists.\
+\
+A note about virus safety: the ONLY approved version of DamageMeters comes from www.curse-gaming.com.  If you get it from somewhere else I cannot vouch for the safety of DMReporter.exe.  \
+\
+\
+-------------------\
+7) Synchronization:\
+-------------------\
+\
+The Sync system is an attempt to work around the fundamental problem of people not receiving messages from people who are too far away from them. It was made with raid groups in mind, and so this discussion will focus on how raid groups can best use it.\
+\
+Here's how it works: in principle, the only source of errors in DM are from someone being outside of your range and so you miss their messages.  For example, a raid that is attacking a mob normally has a melee guys close to the mob and casters standing back.  A caster is very likely to miss messages from melee guys, and a melee guy is very likely to miss messages from a caster. However, if you took the melee guys' numbers for the melee players, and the caster's numbers for the other casters, you'd likely have a very good set of data.\
+\
+Thats basically what synchronizing does.  The actual mechanism is very simple: everyone transmits all their numbers, and then people just take whatever numbers are HIGHEST.  In theory, each player has perfect data for himself, so if everyone was involved in the sync'ing you would have a perfect picture. In practice, thats probably overkill...a handful of people who play different positions should be fine--maybe a healer, a melee'er, and a hunter.\
+\
+\
+Sync Quick-Start Guide:\
+\
+1) Someone (I'll call her the Sync Leader) chooses a channel name and joins it, ie. /dmsyncchan ourchannel.\
+2) The Sync Leader then calls /dmsyncbroadcastchan (or just /dmsyncb).  Anyone who is running a sufficiently recent version of DM will automatically be joined into that channel.\
+3) The Sync Leader choses a name for the session--for example, Onyxia-- then calls /dmsyncstart with that name. "/dmsyncstart Onyxia".  This will clear everyone's data and pause them, as well as mark them with this label.\
+3) Once everyone is in the channel, but before the activity begins, the Sync Leader should call /dmsyncready or /dmsyncunpause so that data collection can happen.\
+4) Play!  Collect data!\
+5) Finally, the Sync Leader calls /dmsync whenever she wants the raid to share data.  Since it can cause a little slowdown it is best to do this between fights (though not necessarily between every fight).  If event data is desired, call "/dmsync e", though it takes a lot longer to sync.\
+\
+Note: There is nothing special about the "Sync Leader": any player can perform any of these commands.  It just seems simpler to have one person in charge of it.\
+\
+\
+In addition to the above steps, I'd recommend that everyone doing sync'ing use the following settings:\
+\
+* "Only Monitor Group Members" ON: Totems, pets, and such can make the internal tables reach their limit, potentially preventing actual raid members from having their data recorded.\
+\
+* "Treat Pet Data As Your Data" ON: If you are a pet using class, this is the best (only) way to make sure your total contribution is counted.\
+\
+\
+a) Event Synchonization\
+\
+The "Event Data" menu options allow you to specify how much event data you record.  It defaults to self data only because event data can take up a lot of space.  This option also controls how what data you'll transmit and parse when sync'ing.\
+\
+Event syncs take much longer than normal ones...up to 90 seconds or so...and can bog down some people's machines.  \
+\
+\
+b) The Ready Command\
+\
+To avoid parsing healing done while not in combat, /dmsyncready has been added. Basically, /dmsyncready tells everyone to pause, but unpause immediately as soon as any damage (done or received) is detected.  In addition, the person(s) who detects the damage will broadcast an unpause event.  The idea is to "ready" after a wipe so that none of the healing done while recovering will count.  Ready will make it so you don't have to remember to unpause once you start combat.\
+\
+\
+c) Session Labels\
+\
+You can apply a text label to a session.  This serves two purposes.  First, it names the sesssion to you can see what data it refers to, such as "Onyxia" or "MC".  Second, it provides a mechanism for keeping unwanted data our of syncs. The system works as follows.  When someone does a /dmsyncclear, the session label and an index is transmitted.  Everyone who receives the clear saves the label and index.  Later, when a sync request is broadcast, the request contains the same label and index.  If anyone who receives the request has a different label and index it means that they weren't around for the original clear and could have bad data, so they automatically clear their own data and save the label and index.  The index itself is just a number that increments each time a clear happens.  Its only purpose is to make it so you don't have to think of a new label each time you want to clear.\
+\
+\
+-------------------\
+8) Memory Register:\
+-------------------\
+\
+DamageMeters has a second table of information, the Memory Register.  It functions pretty much exactly like a memory button on a calculator.  Its purpose is to have a place for you to save a set of information (for example, the data from your last raid).\
+\
+There is a menu option, "Accumulate Data", which makes it so whenever data is added to the main table (ie. when it appears in your bars), it is also added to the MR.  One possible use of this is in conjunction with the "Reset Data When Combat Starts" option.  If both options were on, for example, you could do an instance run and see what the data is for each fight \
+individually, and then at the end look at the memory data to see what the totals are.\
+\
+\
+-------------------\
+9) Overhealing:\
+-------------------\
+\
+DamageMeters tracks overhealing to a certain degree.  Basically, it tracks overhealing from direct heals or from individual HOT ticks, but it does NOT track overhealing from HOT ticks which are entirely lost to overhealing.  This is because WoW doesn't actually send a message when a HOT tick is 100% overhealing, and it would be incredibly difficult to keep track of how many HOT ticks are expected to tick for a various player.  First, it would be very difficult to figure out how much a HOT should tick for.  In some cases a person's gear can even change the number of ticks a given HOT has.  (8 piece Stormrage, for example.)  Second, a second player can cast the same HOT on someone and totally bump off the first player's HOT.  In addition to the difficulty in tracking this it also raises the question, "Who should be charged for this overhealing?"\
+\
+However, things aren't really as bad as they sound.  Basically, because of the missing HOT messages HOT overhealing has already been excluded from the "Healing Done" quantity.  Now that overhealing from direct heals is also included this means that "Healing Done" is actually a pretty good measure of the actual healing done.  What -isn't- really a fair comparison is the "Overhealing" quantity.  Someone who heals almost exclusively through HOTs will generally have a much lower Overheal quantity than someone who heals through direct heals.  Still, Overheal is handy at least for checking out which of your heal spells is doing the most overhealing, etc, via the event information.\
+\
+Lastly, the overhealing measurement depends upon WoW sending us exact numbers for a player's health and max health, and WoW only does this for party/raid members.  Thus, if you play with the "Monitor Group Members Only" option off (say, for example, in a PVP environment) you're not likely to get any meaningful overheal information from those players you're picking up from outside your group.\
+\
+\
+********************\
+IV. Version History:\
+********************\
+\
+5.1.1 - 9-1-06 (By AnduinLothar)\
+* Fixed some saved variable issues with not being set due to 1.12 changes\
+\
+5.1.0 - 8-31-06 (By AnduinLothar)\
+* Now uses SendAddonMessage for hidden channel communication\
+ - Broadcasting channels is no longer necessary (though you should still start a new session when you begin an instance)\
+ - Channel is only shared by party/raid members\
+* Added Channel and Whisper options to the report menu with static popups for input\
+* Added New Session, Sync, Ready, Pause and Clear options to the Synchronization menu\
+* Added an option to sync messages automatically. This will auto-sync when you leave combat once every three (3) minutes\
+ - This option is in BETA stages and has NOT been extensively tested in large groups\
+ - This option is disabled by default\
+* Message parsing has been slowed down a little to cause less frame lag on slow computers\
+* Outgoing chat traffic now uses the embedded ChatThrottleLib (by Mikk) to regulate bandwidth, so as not to be disconnected\
+* Removed /dmsynckick as it is no longer possible to kick someone from the automatic channels\
+* Updated TOC to 11200\
+\
+5.0.0 - 5-29-06\
+New Features:\
+* SYNC VERSION CHANGED: You will not be able to sync with users with older versions.\
+* Added "Overheal %" quantity.\
+* Added "Raw Healing Done" and "Fight Raw Heal. Done" quantities.  These essentially represent what the old "Healing Done" did: healing before subtracting overhealing.\
+* Added "Overhealing" quantity, which measures the amount of overhealing that someone has done (not taken).  The "Healing Done" quantity now automatically subtracts out overhealing.  There is atm no quantity which shows raw, non-adjusted healing like the old "Healing Done".  "Net Healing" is still ("Healing Done" - "Healing Taken"), so since "Healing Done" subtracts out overhealing it does, too.  Details on how overhealing is measured can be found in the readme file.\
+* Added "Health" quantity, which shows shows each player's health.  Unlike other quantities, the range of the bars isn't the maximum health of any player but rather their own max health value.  Thus, basically its like you're looking at everyone's healthbar.  There isn't a whole lot of use for this mode, though I suppose it could be used as a minimalist CTRA for healers that can click very carefully.\
+* The code which does the actual message parsing has drastically changed.  This should have no impact for DM users but should make localization a bit simpler.\
+* Plug-in mods are now somewhat possible.  A DM plug-ins are able to register themselves with DM and provide a custom Quantity.  The system isn't documented and is pretty much built around the needs of the first plugin, Threat..  This Threat plugin is developed separately from DM and will be released separately.\
+\
+Bug Fixes:\
+* Optimized memory usage a bit.\
+* Fixed some bugs preventing some sync commands to work (bugs introduced in beta 4).\
+* Several quantities (Fight Overhealing and Fight Curing) were using the main table to get their data from (instead of the fight table), causing the wrong data to be displayed.\
+* Added parsing for some missed messages (mostly heals-on-self by other people).\
+* Fixed parsing of friendly player's Night Dragon's Breath healing.\
+* Fixed error caused by running Bhaldie Infobar with DM.\
+* Doing a little better job of keeping track of people's health.\
+* Overheal now correctly detected when showing "Fight/PS" quantities.\
+* Changed default colors of some quantities.  \
+* Health quantity now updates regularly (ie. it resorts when someone's health changes).  Note that the health quantity is a little wierd, though, in that the length of the player's bar matches what their health bar would look like so you usually don't end up with a sloping bar chart like every other quantity.  Its really best to use alphabetical sorting with this quantity.\
+* Using upper case letters to specify reports in reverse order works again.\
+* Player tooltip now shows player rank for each quantity.\
+* Fixed bug which broke "click bar to target player" when using "Player Always Visible".\
+* "Click bar to target player" should now work for raid members who aren't in range.\
+* SessionLabels will now have a default value ("Default"!), and so since there is no command for clearing them they should never be nil and cause an error.\
+\
+\
+4.2.1 - 4-4-06\
+* Added "Clear When Joining A Party" menu option.\
+* Added "Delta" text option, which will show the difference between a given player's value and your own.\
+* Restored bar flashing when "Constant Visual Update" option is on.\
+* Reports will now include players whose values are less than or equal to zero.\
+* Fixed errors that would occur when trying to drag an empty DM window by dragging its interior.\
+* Changed event registration to improve load times.  (Disclaimer: DM didn't have bad load times to begin with, its just that I've learned of a recommended coding practice for minimizing load times and have modified DM to conform to it.  Its doubtful the improvement is going to be noticible.)\
+\
+\
+4.2.0 - 3-29-06 : Big update.\
+\
+Features:\
+* Restored "Reset Data When Combat Starts" option by popular demand.\
+* "Constant Visual Update" option added to the General options menu: this reenables constant update and all the old eye-candy, though at the expense of some performance.  \
+* Added some new Quantities:\
+ - Curing Done: This measures "cures" (decurses, cure diseases, resurrections, etc).\
+ - Net Damage: Damage Done - Damage Received.\
+ - Net Healing: Healing Done - Healing Received.\
+ - Damage+Healing: Damage Done + Healing Done.\
+* Key binding added for sync unpause.\
+* The DM TitanPanel plugin now has options for showing quantity values.\
+* Clicking and dragging on the main frame will now resize the window.  There are a few limits to this behavior. 1) When maximized, dragging the border will move the frame.  2) When minimized, dragging the top or bottom of the frame will move the window.  3) If you have less than 20 bars displayed, you can only resize the window up to 20 bars.  Likewise, if you have more than 20, you can only resize down to 21 minimum.  Basically, you cannot change the number of bar columns by resizing the window.\
+* Added 'o' report option for guild Officer chat.\
+* Compatible with 1.10.\
+\
+Bug Fixes, etc:\
+* Changing sort mode will now properly cause the list to resort to reflect the new setting.\
+* Tidying of TitanDamageMeters.lua by SeraphTC.  \
+* A message now appears in the combat chat window when a player enters your syncchannel and can be sync'ed with.  (Note that this message is not guaranteed to appear in every situation.)\
+* Fixed bad scrollbar texture in the report frame.\
+* The Fight table no longer gathers data when you're not in combat.\
+* A syncunpause request will no longer cause the Fight table to be cleared if you're not paused/readied.\
+* Calling ToggleVisible (either via command or hotkey) will now clear the "Visible Only In Party" option.\
+* Fixed bug which prevented player bar from being shown when "Player Always Visible" option was on and the player was at the end of the list.\
+* Fixed bug causing last two entries in a list to be reversed when using "Increasing" sort mode.\
+* Fixed bug causing Fight table to be cleared when player dies while in combat in a group.  (The proper behavior is that DM should consider the fight active until no combat messages are received for 5 continuous seconds.)  \
+* Fixed bug causing the TitanPanel plugin's values to not update while the meters were hidden.\
+* Switched the Readme file from .txt format to .rtf.\
+\
+4.1.3 - 1-28-06 : Fixed error which occurs when TitanPanel not loaded.\
+\
+4.1.2 - 1-27-06 : SeraphTC did some nice changes to the Titan plugin part \
+which resolved name conflicts with his original mod.  Fixed bug in the \
+/dmsave command (also in the menu command) which could result in a clear\
+of one table clearing the other.  /dmpop will no longer unready, nor will\
+it add a "[Pop]" event.  Added ModWatcher support.\
+\
+4.1.1 - 1-16-06 : Added /dmsetbarwidth.  Fixed bug preventing tooltips from\
+updating constantly.  Fixed bug which kept new players from entering the \
+list when syncing while in the ready state. Fixed bug which prevented % \
+text options from showing for Fight quantities.\
+\
+4.1.0 - 1-13-06 : DM now can behave as a TitanPanel plugin when TitanPanel\
+is installed.\
+\
+4.0.2 - 1-06-06 : Fixed typo in help for /dmsyncbroadcastchan.  Added \
+command to bar menu for clearing list of banned entities. \
+(/dmclearbanned still works.)  Added /dmsyncstart to /dmcmd list.  \
+Fixed color error for people who downloaded 4.0.0 before 4.0.1.  \
+(The downside is that this version wipes everyone's custom color settings.)\
+\
+4.0.1 - 1-05-06 : Fixed bug loading color information from older versions \
+which was causing errors when trying to view the Visible Quantity menu.\
+\
+4.0.0 - 1-03-06 : SYNC VERSION CHANGED.  You will not be able to sync with \
+players using older versions of DamageMeters.\
+\
+DamageMeters has been greatly optimized for performance.  On very low frame\
+rate encounters (such as Vael) it was hurting FPS.  It now \
+has very little impact on framerate, but a sacrifice has been made: the bars\
+only update once every second now.  Some eye candy has been sacrificed, such\
+as pulsing bars and sliding text, but I really think it is well worth it.\
+\
+Added the Labels to combat the problem of people arriving late and bringing \
+bad data to a sync session.  Added /dmsyncstart, which is a\
+convenience function which labels a session then broadcasts a clear and a \
+pause.  Added /dmsynclabel for manual labelling.  /dmsyncping now shows you \
+the label that each person is on.  Please see the Readme.txt or in-game\
+syncing help for the currently recommended sequence of sync functions.\
+\
+Removed DMReporter.exe for security reasons.  DMReporter.lua has been \
+modified so that any Lua executor can run it.  \
+http://lua-users.org/wiki/LuaBinaries has a link to Lua binaries.  DMReporter \
+has also been modified to recognize the labels and can include them in report \
+filenames.\
+\
+Added Minimize mode.  In this mode, only a single bar is visible.  This bar \
+always shows the player and the player's rank.  Since the title button is \
+invisible, the main menu is accessible by right-clicking on the bar itself.\
+\
+Changed the way DPS is handled.  Instead of just having DPS, DM now stores\
+an entire separate set of data for the current "fight", so you can see \
+the events for the current fight, and can also see per-second healing, etc.\
+The "Show Fight Data as Per/Second" can be used to toggle between showing \
+fight data as DPS vs. Total Damage, for example.  This change increases the\
+number of quantitites to 9 (4 regular, 4 fight, idle time).  A Quantity Filter\
+menu has been added to help you hide quantities you aren't interested in.\
+\
+Minor changes: Pausing or readying DM will now stop the combat timer used to \
+calculate DPS.  Removed /dmmerge as it was a pain to maintain and didn't seem\
+that useful.  Added a bunch of keybindings: check them out.  Fixed bug which\
+allowed you to move a "locked" DM window by dragging the border.  Bars now \
+pulse only when the currently visible quantity changes.  (Lies, bars don't \
+pulse at all.) Added "Set Default Options" menu option.  Removed "Lock \
+List" menu option (though /dmlock still works).  Added "Player Always Visible"\
+menu option.  Added "Group DPS Mode" menu option.  Created a "General Options"\
+menu to tidy things up.\
+\
+Lastly, an optional feature has been added to help Shaman determine how\
+effective they are with chain heal.  To use, make a macro to cast your chain\
+heals.  The first line of the macro should be "/script \
+DamageMeters_StartChainHeal()" (without the quotes), and the second line \
+should be your cast call.  DM will then track event data separately for \
+each jump of your chain heals (ie. "Chain Heal 1", "Chain Heal 2", etc).  \
+\
+3.2.0 - 9-16-05 : Fixed bug which caused just under half of all sync'ed\
+events to be ignored. Sorry. :(  Added /dmsyncleave command.  Added \
+/dmready, /dmsyncready, and /dmsynckick commands.  Added resist averaging\
+stuff.\
+\
+3.1.0 - 8-02-05 : Added more count options to the Bar Count menu.  Added \
+"Clear when joining" menu option.  SYNC VERSION CHANGED.  Simplified event\
+and sync options a bit. Added "e" option to /dmsync which specifies that\
+events are to be transmitted.\
+\
+3.0.0 - 7-20-05 : Event Data system added.  Synchronization system made much\
+more user friendly.  Too many bugs fixed and small features added to list .  \
+DMReporter.exe now included with DamageMeters.\
+\
+2.3.0 - 6-7-05 : SYNC VERSION CHANGED: This version will not\
+be able to sync with older versions. Added alphabetical sort option.  \
+Fixed major bug: all non-melee damage done to friendly characters \
+was being ignored.  Hit/crit counts now shown for all main \
+quantities, not just damage.  Added "Show Total" menu option.  Fixed bug\
+where invisible bars could still be clicked and would block mouse messages\
+intended for ui elements beneath them.  Added "% of Leader" text option.\
+\
+2.2.0 - 6-3-05 : Added /dmtotal, which displays the current quantity's \
+total in a small button beneath the frames.  Reports now list a total\
+at the bottom.  Added keybinding for /dmswap.  Added /dmsyncmsg for sending\
+msgs to other people in the same syncchan (assuming that everyone will have\
+that channel's messages hidden).  Reordered Report menu a little.  Added\
+/dmmemclear and menu option.  Fixed bug with all spells and effects with \
+"'s" in the name (Ramstein's Lighting Bolts, etc).  Created a new Position\
+menu which contains a few old position options and two new ones; "Resize Up"\
+and "Resize Left".  These determine the way the window moves when it changes\
+size.  Added /dmshowmax and keybinding for it.  \
+\
+2.1.0 - 5-30-05 : Synchronization data now has a version number (2), meaning\
+it will no longer be possible to synchronize with people with older versions.\
+Improved "total" reports: now shows rank of each person for each quantity.\
+Total reports also show who contributed to the report (if sync'ing was involved).\
+Fixed parsing for party/friendly players using Julie's Dagger.  Group-only option\
+now defaults on.  Added text cycling and quantity cycling menu options.  Added\
+/dmversion.  /dmsyncchan will now attempt to automatically join the channel you\
+specify.  Added a "Help" option to the Report menu. Added "Accumulate Data" \
+toggle to the memory menu.\
+\
+2.0.0 - 5-21-05 : Text options now settable via the menu.  Fixed bug \
+when reporting idle time.  The colors associated with various quantities \
+are now settable via the "Visible Quantities" menu.  Reordered the quantities\
+a little, thus requiring a version change (so once you install this\
+any saved data will be wiped).  Added key binding to cycle quantity \
+backwards.  Added DPS quantity. /dmsyncclear now clears your own meters \
+as well.  LOCALIZED FOR FRENCH AND GERMAN VERSIONS.  Renamed /dmsyncreport\
+to /dmsyncsend (the way it was listed in the help).  Syncing now \
+works while paused.  Reports now automatically omit characters with 0\
+of the given quantity.  Fixed huge bug in sync'ing--pretty much everything\
+but damage done was being computed wrong.  Idle time is now only reset \
+by "active" values (damage done, healing done).  Updated the help file to\
+be more...er, helpful.  Added "Frame" report option.  Fixed bug with \
+pet damage being added to player multiple times during syncs.  Added\
+key binding to open report frame.  \
+\
+1.1.0 - 5-6-05 : While help was in for /dmpause before, it is actually \
+implemented now.  Added /dmlockpos and menu option for locking the \
+position of the meters.  Paused and hidden states now save. Added \
+/dmgrouponly and menu option for making it so anyone who isn't yourself,\
+your pet, or a party or raid member is ignored. Added /dmsyncclear.\
+Damage done to pets now tracked. Spell damage done to self and party \
+now tracked. Added /dmaddpettoplayer command.  Fixed display bug when \
+there are an odd number of bars over 20.\
+\
+1.0.1 - 4-22-05 : Bug fixes:  Saved tables weren't having their time \
+reset, could pulse continuously after load.  Character classes weren't being\
+found for raid/party members.\
+\
+1.0.0 - 4-17-05 : All known bugs fixed.  Version added: if saved data is of \
+a different version the data will be cleared.\
+\
+0.9.9 - 4-15-05 : Added tracking of healing and damaged received.  Improved calculation\
+of crit percentage.  Removed dmsynclear, dmsyncleader, dmysncinfo.  Added\
+dmsyncsend.  dmsync now does both a send and a receive.\
+\
+0.9.8 - 4-13-05 :  dmpop command no longer clears the list.  Added dmlock.  \
+Added dmpause.  Added dmsyncclear, dmsyncleader, dmsyncinfo.  Both the regular\
+and memory data lists are now persistant.  Title button no longer visible \
+when interface is hidden with alt-z.\
+\
+0.9.7 - 4-11-05 : Added dmsync, dmsyncchan, dmsyncrequest commands. Added \
+dmpop command.  Completed fixing up the code in preparation to be \
+localized, though no localization has been done yet.  Hiding the window no\
+longer leaves the title button visible.  Added a few key bindings.  Added\
+rank text option.\
+\
+0.9.6 : Forgot...oops.\
+\
+0.9.5 - 4-08-05 : Removed dmfilter from the help list.  Fixed bug which was incorrectly\
+making friendly characters appear as though they were in your party.  Added\
+/dmvisinparty, /dmautocount, /dmlistbanned, and /dmclearbanned commands.\
+Added drop down menus.  Added title button for easy moving and clicking on.\
+Added ability to ban damage sources.\
+\
+0.9.4 - 4-02-05 : Removed /dmfilter, as it seems to be unlikely to ever work as \
+intended.  Window background now colored to reflect quantity being shown.  Added\
+g dmreport option for reporting to guild chat.  Improved time text display.\
+Believe I am catching all healing messages now, though in order to do so I am\
+getting some enemy heals too.\
+\
+0.9.3 - 4-01-05 : Added h dmreport option for reporting to a chat channel.\
+Reporting now reports on the current quantity (damage, healing, etc).\
+\
+0.9.2 - 3-31-05 : Separated functionality of dmsort into dmsort and dmquant. \
+Healing done is now tracked, just like damage dealt. Fixed bug where melee\
+damage done by non-party members was being lost.  Added detection of damage\
+shields (thorns, etc).\
+\
+0.9.1 - 3-30-05 : Removed Cosmos dependency.  (Was using their Print function.)\
+\
+0.9.0 - 3-30-05 : Released to guild for testing.\
+\
+}

@@ -1,0 +1,4886 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+
+
+
+
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>ParserLib Documentation</title>
+  <style type="text/css">
+body { font-family: Arial,Helvetica,sans-serif;
+}
+  </style>
+</head>
+
+
+<body style="background-color: rgb(144, 240, 240); color: rgb(0, 0, 0);" alink="#ee0000" link="#0000ee" vlink="#551a8b">
+
+
+
+
+
+
+
+<h2><a name="ToC"></a>Table of Contents</h2>
+
+
+
+
+
+
+
+<h3><a href="#Introduction_">Introduction</a></h3>
+
+
+
+
+
+
+
+<h3><a href="#Supported_Events_">Supported Events</a></h3>
+
+
+
+
+
+
+
+<h3><a href="#How_To_Use">How to use</a></h3>
+
+
+
+
+
+
+
+<h3><a href="#Example">Example</a></h3>
+
+
+
+
+
+
+
+<h3><a href="#Optimizer">Optimizer</a><br>
+</h3>
+<h3><a href="#API">API</a></h3>
+
+
+
+
+
+
+
+<h3><a href="#Variable_Description">Variable
+Description</a></h3>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h4><a name="Introduction_"></a>Introduction</h4>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+ParserLib is an embedded library which does all the combat message
+parsing and converting them into meaningful information.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+To use ParserLib, your addon register events to ParserLib like this:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<pre>local parser = ParserLib:GetInstance("1.1')<br>parser:RegisterEvent("MyAddon", "CHAT_MSG_COMBAT_SELF_HIT", "MyAddonEventHandler")</pre>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Very similar to what you do to frame:RegisterEvent(), when the
+registered event is fired, ParserLib will call your registered handler,
+but instead of arg1, it passes a table as the second parameter:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<pre>function MyAddonEventHandler(event, info)<br> if info.type == "hit" then ChatFrame1:AddMessage( info.source .. " hit " .. info.victim .. " for " .. info.damount .. "damage!" ) end<br>end</pre>
+
+
+
+
+
+
+
+All ParserLib do is convert the arg1 into a table, for now you'll still
+need to know which event to register. <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+So&nbsp;what's the benefits for using ParserLib?<br>
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li>By dynamically sorting the patterns in a special way,
+ParserLib works on all
+localizations. No worrying about:</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <ul>
+
+
+
+
+
+
+
+    <li>"Greater Heal critically" being parsed as spell name for
+"Your %s heals you for %d."</li>
+
+
+
+
+
+
+
+    <li>"you" being parsed as victim name for "%s hits %s for %s."</li>
+
+
+
+
+
+
+
+    <li>"30 mana from Someone's Blessing of Wisdom" being parsed
+as buff name for "%s gains %s."</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </ul>
+
+
+
+
+
+
+
+  <li>Minimal memory usage, if you don't register any event then
+almost only the raw codes are loaded.</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <ul>
+
+
+
+
+
+
+
+    <li>Multiple client addons share the same instance of
+ParserLib.</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </ul>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <ul>
+
+
+
+
+
+
+
+    <li>Only listen to an event when a client registers for it.</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </ul>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <ul>
+
+
+
+
+
+
+
+    <li>Load event-pattern list only when the event is actually
+fired.</li>
+
+
+
+
+
+
+
+    <li>Load pattern table only when that pattern is required to
+parse.</li>
+
+
+
+
+
+
+
+    <li>Recycles tables by using CompostLib.</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </ul>
+
+
+
+
+
+
+
+  <li>Better Efficiency</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  <ul>
+
+
+
+
+
+
+
+    <li>ParserLib knows what event will fire what patterns, and
+only parse through the possible patterns.</li>
+
+
+
+
+
+
+
+    <li>When there are multiple client addons, the patterns are
+only parsed once. Without using a common library, everyone will have to
+do their own parsing, which is a waste of resource.</li>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </ul>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="#ToC">Back to top</a>
+<h4><a name="Supported_Events_"></a>Supported
+Events</h4>
+
+
+
+
+
+
+
+Click the link to see what patterns will be fired from the event. <br>
+
+
+
+
+
+
+
+(They''re still not very complete though, I'm working hard on it.)<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="#Currently_supported">Currently supported</a><br>
+
+
+
+
+
+
+
+<a href="#Planned_to_support_in_the_future">Planned to
+support in the future</a><br>
+
+
+
+
+
+
+
+<a href="#Wont_be_supported">Won't be supported</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="Currently_supported"></a>Currently supported</span><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_CREATURE_VS_CREATURE_HITS">CHAT_MSG_COMBAT_CREATURE_VS_CREATURE_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_CREATURE_VS_CREATURE_MISSES">CHAT_MSG_COMBAT_CREATURE_VS_CREATURE_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_CREATURE_VS_PARTY_HITS">CHAT_MSG_COMBAT_CREATURE_VS_PARTY_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_CREATURE_VS_PARTY_MISSES">CHAT_MSG_COMBAT_CREATURE_VS_PARTY_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS">CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES">CHAT_MSG_COMBAT_CREATURE_VS_SELF_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_FACTION_CHANGE">CHAT_MSG_COMBAT_FACTION_CHANGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_FRIENDLYPLAYER_HITS">CHAT_MSG_COMBAT_FRIENDLYPLAYER_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_FRIENDLYPLAYER_MISSES">CHAT_MSG_COMBAT_FRIENDLYPLAYER_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_FRIENDLY_DEATH">CHAT_MSG_COMBAT_FRIENDLY_DEATH</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_HONOR_GAIN">CHAT_MSG_COMBAT_HONOR_GAIN</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS">CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_HOSTILEPLAYER_MISSES">CHAT_MSG_COMBAT_HOSTILEPLAYER_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_HOSTILE_DEATH">CHAT_MSG_COMBAT_HOSTILE_DEATH</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_PARTY_HITS">CHAT_MSG_COMBAT_PARTY_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_PARTY_MISSES">CHAT_MSG_COMBAT_PARTY_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_PET_HITS">CHAT_MSG_COMBAT_PET_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_PET_MISSES">CHAT_MSG_COMBAT_PET_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_SELF_HITS">CHAT_MSG_COMBAT_SELF_HITS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_SELF_MISSES">CHAT_MSG_COMBAT_SELF_MISSES</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_XP_GAIN">CHAT_MSG_COMBAT_XP_GAIN</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_AURA_GONE_OTHER">CHAT_MSG_SPELL_AURA_GONE_OTHER</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_AURA_GONE_SELF">CHAT_MSG_SPELL_AURA_GONE_SELF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_AURA_GONE_PARTY">CHAT_MSG_SPELL_AURA_GONE_PARTY</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_BREAK_AURA">CHAT_MSG_SPELL_BREAK_AURA</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_CREATURE_VS_CREATURE_BUFF">CHAT_MSG_SPELL_CREATURE_VS_CREATURE_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_CREATURE_VS_CREATURE_DAMAGE">CHAT_MSG_SPELL_CREATURE_VS_CREATURE_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_CREATURE_VS_PARTY_BUFF">CHAT_MSG_SPELL_CREATURE_VS_PARTY_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_CREATURE_VS_PARTY_DAMAGE">CHAT_MSG_SPELL_CREATURE_VS_PARTY_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_CREATURE_VS_SELF_BUFF">CHAT_MSG_SPELL_CREATURE_VS_SELF_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE">CHAT_MSG_SPELL_CREATURE_VS_SELF_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_DAMAGESHIELDS_ON_OTHERS">CHAT_MSG_SPELL_DAMAGESHIELDS_ON_OTHERS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_DAMAGESHIELDS_ON_SELF">CHAT_MSG_SPELL_DAMAGESHIELDS_ON_SELF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_FAILED_LOCALPLAYER">CHAT_MSG_SPELL_FAILED_LOCALPLAYER</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF">CHAT_MSG_SPELL_FRIENDLYPLAYER_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE">CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF">CHAT_MSG_SPELL_HOSTILEPLAYER_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE">CHAT_MSG_SPELL_HOSTILEPLAYER_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_ITEM_ENCHANTMENTS">CHAT_MSG_SPELL_ITEM_ENCHANTMENTS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PARTY_BUFF">CHAT_MSG_SPELL_PARTY_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PARTY_DAMAGE">CHAT_MSG_SPELL_PARTY_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_CREATURE_BUFFS">CHAT_MSG_SPELL_PERIODIC_CREATURE_BUFFS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE">CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS">CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_BUFFS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE">CHAT_MSG_SPELL_PERIODIC_FRIENDLYPLAYER_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS">CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_BUFFS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE">CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS">CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE">CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS">CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE">CHAT_MSG_SPELL_PERIODIC_SELF_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PET_BUFF">CHAT_MSG_SPELL_PET_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_PET_DAMAGE">CHAT_MSG_SPELL_PET_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_SELF_BUFF">CHAT_MSG_SPELL_SELF_BUFF</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_SELF_DAMAGE">CHAT_MSG_SPELL_SELF_DAMAGE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SPELL_TRADESKILLS">CHAT_MSG_SPELL_TRADESKILLS</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a style="font-weight: bold;" name="Planned_to_support_in_the_future"></a><span style="font-weight: bold;">Planned to support in the future</span><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_COMBAT_MISC_INFO">CHAT_MSG_COMBAT_MISC_INFO</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_SKILL">CHAT_MSG_SKILL</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Patterns_fired_from_each_CHAT_MSG_events#CHAT_MSG_LOOT">CHAT_MSG_LOOT</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a style="font-weight: bold;" name="Wont_be_supported"></a><span style="font-weight: bold;">Won't be supported</span><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG">CHAT_MSG</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_AFK">CHAT_MSG_AFK</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_BG_SYSTEM_ALLIANCE">CHAT_MSG_BG_SYSTEM_ALLIANCE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_BG_SYSTEM_HORDE">CHAT_MSG_BG_SYSTEM_HORDE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_BG_SYSTEM_NEUTRAL">CHAT_MSG_BG_SYSTEM_NEUTRAL</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_CHANNEL">CHAT_MSG_CHANNEL</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_CHANNEL_JOIN">CHAT_MSG_CHANNEL_JOIN</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_CHANNEL_LEAVE">CHAT_MSG_CHANNEL_LEAVE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_CHANNEL_LIST">CHAT_MSG_CHANNEL_LIST</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_CHANNEL_NOTICE">CHAT_MSG_CHANNEL_NOTICE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_CHANNEL_NOTICE_USER">CHAT_MSG_CHANNEL_NOTICE_USER</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_COMBAT_ERROR">CHAT_MSG_COMBAT_ERROR</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_DND">CHAT_MSG_DND</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_EMOTE">CHAT_MSG_EMOTE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_GUILD">CHAT_MSG_GUILD</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_IGNORED">CHAT_MSG_IGNORED</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_MONSTER_EMOTE">CHAT_MSG_MONSTER_EMOTE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_MONSTER_SAY">CHAT_MSG_MONSTER_SAY</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_MONSTER_WHISPER">CHAT_MSG_MONSTER_WHISPER</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_MONSTER_YELL">CHAT_MSG_MONSTER_YELL</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_OFFICER">CHAT_MSG_OFFICER</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_PARTY">CHAT_MSG_PARTY</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_RAID">CHAT_MSG_RAID</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_SAY">CHAT_MSG_SAY</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_SYSTEM">CHAT_MSG_SYSTEM</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_TEXT_EMOTE">CHAT_MSG_TEXT_EMOTE</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_WHISPER">CHAT_MSG_WHISPER</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_WHISPER_INFORM">CHAT_MSG_WHISPER_INFORM</a><br>
+
+
+
+
+
+
+
+<a href="http://www.wowwiki.com/Events_C_%28Cancel%2C_Character%2C_Chat%2C_Cinematic%2C_Clear%2C_Close%2C_Confirm%2C_Corpse%2C_Craft%2C_Current%2C_Cursor%2C_CVar%29#CHAT_MSG_YELL">CHAT_MSG_YELL</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#ToC">Back to top</a><br>
+
+
+
+
+
+
+
+<h4><a name="How_To_Use"></a>How To Use</h4>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+1. Put both CompostLib and ParserLib folder in your addon.<br>
+
+
+
+
+
+
+
+2. Add CompostLib&nbsp;and ParserLib to .toc so it looks like this:<br>
+
+
+
+
+
+
+
+<pre>	## Interface: 11000<br>	## Title: MyAddOn<br>	## Notes: A ParserLib client addon.<br>	CompostLib\CompostLib.lua<br>	ParserLib\ParserLib.lua<br>	SimpleCombatLog.xml<br></pre>
+
+
+
+
+
+
+
+3. In your lua file, get an instance of ParserLib by calling the
+ParserLib:GetInstance() method. <br>
+
+
+
+
+
+
+
+<pre>	local parser = ParserLib:GetInstance("1.1")</pre>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; Where the "1.1" is the major version
+number (variable <span style="font-style: italic;">vmajor</span>)
+which can be found at the top of ParserLib.lua<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+4. To listen to an event, do not Frame:RegisterEvent(), instead
+register the events to ParserLib:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<pre>	parser:RegisterEvent("MyAddOn", "CHAT_MSG_COMBAT_SELF_HITS", "MyAddOn_OnParserEvent")</pre>
+
+
+
+
+
+
+
+<pre></pre>
+
+
+
+
+
+
+
+5. Now define your event handler, ParserLib will call it when the
+registered event occurs.<br>
+
+
+
+
+
+
+
+<pre>	function MyAddOn_OnParserEvent(event, info)<br>	-- check info.type to know what's inside info.<br>	-- do whatever you want with the data.<br>	end</pre>
+
+
+
+
+
+
+
+<span style="font-family: monospace;"><br>
+
+
+
+
+
+
+
+</span><br>
+
+
+
+
+
+
+
+6. info is a table which contains parsed information. To know what
+information you can get from the table, check the info.type variable,
+detailed description for each type is <a href="#Variable_Description">here</a>.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+
+
+
+
+
+
+NOTE: ParserLib recycles the info table to reduce memory usage, if you
+want to do something with the table after the event handler, make sure
+you store them in your own data structure.<br>
+
+
+
+
+
+
+
+<br style="font-weight: bold;">
+
+
+
+
+
+
+
+<span style="font-weight: bold;">
+Let me say it again, the info table will be CLEARED after the event
+handler has finished. </span><br>
+
+
+
+
+
+
+
+<h3>
+YOU ARE EXPECTED TO COPY DOWN THE VARIABLES YOU NEED BEFORE THE END OF
+YOUR EVENT HANDLER.</h3>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#ToC">Back to top</a><br>
+
+
+
+
+
+
+
+<h4><a name="Example"></a>Example</h4>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<pre>	function MyAddOn_OnParserEvent(event, info)<br>	if info.type == "hit" then<br>	if info.source == ParserLib_SELF then info.source = "you" end<br>	if info.victim == ParserLib_SELF then info.source = "you" end<br>	if info.skill == ParserLib_MELEE then info.skill = "melee" end<br>	ChatFrame1:AddMessage(info.source .. " hits " .. info.victim .. " with " .. info.skill .. " for " .. info.amount)<br>	end<br>	end<br>	<br>	parser = ParserLib:GetInstance("1.1")<br>	parser:AddEventHandler("MyAddOn", "CHAT_MSG_COMBAT_SELF_HITS", "MyAddOn_OnParserEvent")<br>	parser:AddEventHandler("MyAddOn", "CHAT_MSG_COMBAT_PET_HITS", "MyAddOn_OnParserEvent")<br>	parser:AddEventHandler("MyAddOn", "CHAT_MSG_SPELL_SELF_DAMAGE", "MyAddOn_OnParserEvent")<br>	parser:AddEventHandler("MyAddOn", "CHAT_MSG_SPELL_PET_DAMAGE", "MyAddOn_OnParserEvent")<br>	parser:AddEventHandler("MyAddOn", "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE", "MyAddOn_OnParserEvent")<br>	parser:AddEventHandler("MyAddOn", "CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE", "MyAddOn_OnParserEvent")<br><span style="font-family: Courier New,Courier,monospace;"></span></pre>
+
+
+
+
+
+
+
+Now you got yourself an addon which will report melee and spell hits of
+you and your pet!<br>
+
+
+
+
+
+
+
+<br>
+<a href="documentation.html#ToC">Back to top</a><br>
+<br>
+<br>
+<h4><a name="Optimizer"></a>Optimizer</h4>
+&nbsp;&nbsp;&nbsp; ParserLib currently includes a file called <span style="font-style: italic;">optimizer-enUS.lua</span>, it can increase the parsing speed of ParserLib by around 20~30% on english locaization. By looking at the source code of <span style="font-style: italic;">optimizer-enUS.lua, </span>you
+can easily create an optimizer file for other localizations. Basically
+the optimizer is simply a table which contains 'keyword string' for the
+patterns in WoW. For example the keyword 'hit' in
+COMBATHITSCHOOLOTHEROTHER (%s hits %s for %d %s damage.). &nbsp;The
+optimizer is completely optional, ParserLib works fine without any
+optimizer, just that the existance of an optimizer for your
+localization can increase the parsing speed.<br>
+&nbsp;&nbsp;&nbsp; To load an optimizer, simply include that file on your .toc, so it looks like this:<br>
+<pre>	## Interface: 11000<br>	## Title: MyAddOn<br>	## Notes: A ParserLib client addon.<br>	CompostLib\CompostLib.lua<br>	ParserLib\ParserLib.lua<br>	ParserLib\optimizer-enUS.lua<br>	SimpleCombatLog.xml</pre>
+&nbsp;&nbsp;&nbsp; Note that the optimizer is global, which means if
+someone added an optimizer table which has the wrong keyword, it could
+mess out ParserLib which will affect all the ParserLib clients. This is
+not good so this part will probably get reworked, for now I suggest you
+don't try to add your own optimizer file, but optimizer-enUS.lua should
+work fine.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#ToC">Back to top</a><br>
+
+
+
+
+
+
+
+<h4><a name="API"></a>API</h4>
+<ul>
+  <li>RegisterEvent(addonID, event, handler) :
+Register an event with the event handler.</li>
+</ul>
+<ul>
+  <li>UnregisterEvent(addonID, event) :
+Unregister an event for the addonID.</li>
+</ul>
+<ul>
+  <li>UnregisterAllEvents(addonID) :
+Unregister all events for the addonID.</li>
+</ul>
+<ul>
+  <li>Deformat(text, pattern) : Use this to parse for custom patterns which is not supported by ParserLib.</li>
+</ul>
+<span style="font-family: monospace;"></span>
+<pre>	attacker, victim, amount, element = parser:Deformat("Rophy hits Pig for 500 fire damage.", COMBATHITSCHOOLOTHEROTHER)</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#ToC">Back to top</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<h4><a name="Variable_Description"></a>Variable
+Description</h4>
+
+
+
+
+
+
+
+The table passed to your event handler will always contains a variable
+called <span style="font-style: italic;"><span style="font-weight: bold;">type</span></span>,<span style="font-style: italic;"> </span>which you can
+check to know what other variables are stored in the table.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a name="type"></a>
+'type' is one of the following strings:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<table style="text-align: left; width: 100px;" border="0" cellpadding="4" cellspacing="4">
+
+
+
+
+
+
+
+  <tbody>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#hit">hit </a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#heal">heal </a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#miss">miss </a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#death">death </a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#debuff">debuff</a></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#buff">buff</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#fade">fade</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#cast">cast</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#dispel">dispel</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#extraattack">extraattack</a></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#gain">gain</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#drain">drain</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#leech">leech</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#interrupt">interrupt</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#fail">fail</a></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#environment">environment</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#honor">honor</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#experience">experience</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#reputation">reputation</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#feedpet">feedpet</a></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+    <tr>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#enchant">enchant</a></td>
+
+
+
+
+
+
+
+      <td><a href="documentation.html#create">create</a></td>
+
+
+
+
+
+
+
+      <td><a href="#durability">durability</a></td>
+
+
+
+
+
+
+
+      <td></td>
+
+
+
+
+
+
+
+      <td></td>
+
+
+
+
+
+
+
+    </tr>
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  </tbody>
+</table>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#ToC">Back to top</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+Normally all the variables are&nbsp;<span style="font-weight: bold;">string tokens</span> parsed
+from the combat message, with a few exceptions:<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<ul>
+
+
+
+
+
+
+
+  <li><span style="font-weight: bold; font-style: italic;">source</span>,
+    <span style="font-weight: bold; font-style: italic;">victim</span>, <span style="font-weight: bold;">sourceGained</span> might be a numeric constant <span style="font-weight: bold;">ParserLib_SELF</span>,
+which means it's you.</li>
+
+
+
+
+
+
+
+  <li><span style="font-weight: bold; font-style: italic;">skill</span>
+might be the numeric constant <span style="font-weight: bold;">ParserLib_MELEE</span>
+for melee, or <span style="font-weight: bold;">ParserLib_DAMAGESHIELD</span>
+for damage shields.</li>
+
+
+
+
+
+
+
+  <li><span style="font-style: italic; font-weight: bold;">amount</span>
+and its variations (<span style="font-weight: bold; font-style: italic;">amountGained</span>,
+    <span style="font-weight: bold; font-style: italic;">amountRaidPenality</span>
+etc ) are numbers.</li>
+
+
+
+
+
+
+
+  <li><span style="font-style: italic; font-weight: bold;">missType</span>
+is one of the following strings:&nbsp;<span style="font-weight: bold;">miss</span>, <span style="font-weight: bold;">dodge</span>, <span style="font-weight: bold;">block</span>, <span style="font-weight: bold;">deflect</span>, <span style="font-weight: bold;">immune</span>, <span style="font-weight: bold;">evade</span>, <span style="font-weight: bold;">parry</span>, <span style="font-weight: bold;">resist</span>, <span style="font-weight: bold;">reflect</span>, <span style="font-weight: bold;">absorb</span></li>
+
+
+
+
+
+
+
+  <li><span style="font-weight: bold; font-style: italic;">damageType</span>
+is one of the following strings: <span style="font-weight: bold;">drown</span>,
+    <span style="font-weight: bold;">fall</span>, <span style="font-weight: bold;">exhaust</span>, <span style="font-weight: bold;">fire</span>, <span style="font-weight: bold;">lava</span>, <span style="font-weight: bold;">slime</span>.</li>
+
+
+
+
+
+
+
+  <li>Variables starting with&nbsp;<span style="font-style: italic;"><span style="font-weight: bold;">is</span></span><span style="font-weight: bold;"><span style="font-weight: bold;">&nbsp;</span></span>are
+booleans, for example <span style="font-style: italic; font-weight: bold;">isDOT</span>,
+    <span style="font-weight: bold; font-style: italic;">isCrit</span>,
+    <span style="font-style: italic; font-weight: bold;">isItem</span>
+etc.</li>
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><span style="font-style: italic;"><span style="font-style: italic;"><span style="font-weight: bold;"></span></span></span><span style="font-weight: bold;"></span></span><br>
+
+
+
+
+
+
+
+Here is the list of all possible <span style="font-style: italic;"><span style="font-weight: bold;">type</span></span>,
+with the variables associated with them, a starting @ means that
+variable may not exist, depends on the combat message parsed.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+The list is in the following format:<br>
+
+
+
+
+
+
+
+<pre><span style="font-weight: bold;">TYPE </span>: simple description.<br><span style="font-style: italic;">* example combat message.</span><br>	<span style="font-weight: bold;">Variable : value</span><br>	<span style="font-weight: bold;"><span style="font-weight: bold;"><span style="font-weight: bold;">@OptionalVariable : value</span></span></span><span style="font-weight: bold;"><br><br></span></pre>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="hit"></a>hit</span>
+: including melee/spell/skill hits, crits, dots.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Your Shadow Bolt crits
+Pig for 50 shadow damage. (30 resisted)</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source
+</span>: ParserLib_YOU<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim
+</span>: "Pig"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill
+</span>: "Shadow Bolt"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount
+: </span>50<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">element
+: </span>"shadow"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isCrit : </span>true<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isDOT : </span>false<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isCrushing</span> : false<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isGlancing</span> : false<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountAbsorb</span> : nil<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountBlock</span> : nil<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountResist</span> : 30<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountVulnerable</span> : nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="heal"></a>heal
+: </span>including heals and HoTs.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* You gains 50 health
+from Priest's Renew.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Priest"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: ParserLib_YOU<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Renew"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+: 50<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isCrit</span> : false<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isDOT</span> : true<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="miss"></a>miss</span>
+: Including miss, dodge, block, deflect, immune, evade, parry, resist,
+reflect, absorb.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Warrior's Overpower
+was parried by Flamewaker.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Warrior"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Flamewaker"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Overpower"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">missType</span>
+: "parry" (This is a fixed string, not parsed)<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="death"></a>death</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Rophy is slain by
+Bigpotato!</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Rophy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: "Bigpotato"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isItem</span> : nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Magma Totem IV is
+destroyed.</span><br style="font-style: italic;">
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Magma Totem IV"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isItem</span> : true<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="debuff"></a>debuff</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Peter is afflicted by
+Shadow Vulnerability (2).</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Peter"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "<span style="font-style: italic;">Shadow Vulnerability</span>"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountRank</span>
+: 2&nbsp;<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="buff"></a>buff</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Rophy gains Power
+Word: Shield.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Rophy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Power Word: Shield"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountRank</span>
+: nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a name="fade"></a><span style="font-weight: bold;">fade</span> : this might be
+buff or debuff, can't be distinguished by the message.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Cheap Shot fades from
+Alterac Ram.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Alterac Ram"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Cheap Shot"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="cast"></a>cast</span>
+: note that this includes "cast" and "perform".<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Doggy casts Growl on
+Mirefin Oracle.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Doggy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Growl"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">victim</span>
+: "Mirefin Oracle" &nbsp;<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isBegin</span> :
+nil&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp; &lt;- only one will exist between isBegin and victim.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isPerform</span>
+: nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Rophy performs Opening
+on Onyxia's Gate.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Rophy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Opening"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">victim</span>
+: "Onyxia's Gate"<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;isBegin</span>
+: nil&nbsp;<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isPerform</span>
+: true<br>
+
+
+
+
+
+
+
+<br style="font-style: italic;">
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Stormpike Mountaineer
+begins to perform Shoot.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Stormpike Mountaineer"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Shoot"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">victim</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isBegin</span> : true<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isPerform</span>
+: true<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="gain"></a>gain</span>
+<br>
+
+
+
+
+
+
+
+* <span style="font-style: italic;">You gain 10 Mana from
+Pally's Blessing of Wisdom.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Pally"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: ParserLib_YOU<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Blessing of Wisdim"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+: 10<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">attribute</span>
+: "Mana"<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="drain"></a>drain</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Hunter's Viper Sting
+drains 277 Mana from Priest.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Hunter"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Priest"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Viper Sting"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+: 277<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">attribute</span>
+: "Mana"<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="leech"></a>leech</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Your Drain Mana drains
+140 Mana from Mage. You gain 140 Mana.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: ParserLib_YOU<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Mage"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Drain Mana"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+: 140<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">attribute</span>
+: "Mana"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">sourceGained:</span>
+ParserLib_YOU<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amountGained:</span>
+140<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">attributeGained:</span>
+"Mana"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="dispel"></a>dispel</span>
+: There are two kinds of message so I'll show two examples here.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Seasoned Guardian's
+Sap is removed.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Seasoned Guardian"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+"Sap"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isFailed</span> : false<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Nino fails to dispel
+Librabear's Gehennas' Curse.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Librabear"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Gehennas' Curse"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isFailed</span>
+: true<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: "Nino"<br>
+
+
+
+
+
+
+
+</span>&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="extraattack"></a>extraattack</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Rophy gains 2 extra
+attacks through Windfury Attack.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Rophy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill
+</span>: "Windfury Attack"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+: 2<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="environment"></a>environment</span>
+: falling, fire, lava dmg etc<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Rophy suffers 468 points of fire damage. (298 absorbed)</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Rophy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+:&nbsp;<span style="font-style: italic;">468</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">damageType</span>
+: "<span style="font-style: italic;">fire</span>"&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountAbsorb</span> :&nbsp;<span style="font-style: italic;">298</span><br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountBlock</span> : nil<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountResist</span> : nil<br>
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountVulnerable</span> : nil<br>
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="honor"></a>honor</span>
+: Two examples here.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* You have been awarded
+198 honor points.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amount</span>
+: 198<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">sourceRank</span>
+: nil<br>
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isDishonor</span> : nil <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Nino dies, honorable
+kill Rank: Stone Guard (Estimated Honor Points: 80)</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amount</span>
+: 80<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: "Nino"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">sourceRank</span>
+: "Stone Guard" &nbsp;&lt;-- if source exists then sourceRank
+exists too.<br>
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isDishonor</span> : nil<br>
+
+
+
+<br>
+
+
+
+* Someone dies, dishonorable kill.<br>
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amount</span> : nil<br>
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span> : "Someone"<br>
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">sourceRank</span> &nbsp;nil<br>
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isDishonor</span> :
+true&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &lt;-- amount is nil if and only if&nbsp;isDishonor
+is true, <span style="font-weight: bold;"></span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><br>
+
+
+
+
+
+
+
+</span><a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="experience"></a>experience</span>
+: This one is complicated, most of the time you just need to look for <span style="font-weight: bold; font-style: italic;">amount</span>
+though.<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Mob dies, you gain 300
+experience. (+160 exp Rested bonus, -20 raid penalty)</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span>
+: 300<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">source</span>
+: "Mob"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">victim</span>
+: nil &nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;-
+if nil then it's you who got the exp.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">bonusAmount</span>
+: "+160" &nbsp;&nbsp;&nbsp;&nbsp; &lt;- Note that
+this is a string with '+', not a number.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">bonusType</span>
+: "Rested" &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&lt;- if bonusAmount exists then this
+exists too.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">penaltyAmount</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">penaltyType</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountRaidPenalty</span>
+: 20<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amountGroupBonus</span>
+: nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Someone gains 200
+experience.<br>
+
+
+
+
+
+
+
+</span>&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">amount</span> : 200<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">victim</span>
+: "Someone"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">(all
+others are nil)</span><br>
+
+
+
+
+
+
+
+(This is the only pattern which has a victim, I have never seen it, but
+it exists anyway.)<span style="font-style: italic;"><br>
+
+
+
+
+
+
+
+</span>&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><br>
+
+
+
+
+
+
+
+Note: </span>the message of exp gained&nbsp;by discovering
+an area is fired by <span style="font-weight: bold;">CHAT_MSG_SYSTEM</span>,
+which will NOT be supported by ParserLib.<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><br>
+
+
+
+
+
+
+
+</span><a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><br>
+
+
+
+
+
+
+
+<a name="reputation"></a>reputation<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+</span><span style="font-style: italic;">* Your
+reputation with Undercity has slightly increased. (50 reputation gained)</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">faction</span>
+: "Undercity"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amount</span>
+: 50 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&lt;- if amount exists then rank is nil.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">rank</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isNegative</span> : nil
+&nbsp;&nbsp;&nbsp; &lt;- make sure you check this.<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+* You are now Friendly with Steamwheedle Cartel.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">faction</span>
+: "Steamwheedle Cartel"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">amount</span>
+: nil<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">rank</span>
+: "Friendly" &nbsp;&nbsp;&lt;- if rank exists then amount
+is nil.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: bold;">isNegative</span> : nil<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><br>
+
+
+
+
+
+
+
+</span><a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="feedpet"></a>feedpet</span><br>
+
+
+
+
+
+
+
+* Hunter's pet begins eating a Moist Cornbread.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span> : "Hunter"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">item</span> : "Moist Cornbread"<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a>&nbsp;&nbsp;&nbsp;
+<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="enchant"></a>enchant</span><br>
+
+
+
+
+
+
+
+* Rophy casts Scope (+7 Damage) on&nbsp;Mondain's Precisely
+Calibrated Boomstick.<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Rophy"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Mondain"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Scope (+7 Damage)"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">item</span>
+: "Precisely Calibrated Boomstick"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="fail"></a>fail</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* You fail to cast
+Immune Charm/Fear/Polymorph: Item is not ready yet.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: ParserLib_SELF<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "<span style="font-style: italic;">Immune
+Charm/Fear/Polymorph"</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">reason</span>
+: "<span style="font-style: italic;">Item is not ready yet"</span><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="interrupt"></a>interrupt</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* Bigpotato interrupts
+Scholomance Neophyte's Shadow Bolt.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: "Bigpotato"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span>
+: "Scholomance Neophyte"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span>
+: "Shadow Bolt"<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<span style="font-weight: bold;"><a name="create"></a>create</span><br>
+
+
+
+
+
+
+
+<span style="font-style: italic;">* You create Blinding
+Powder.</span><br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span>
+: ParserLib_SELF<br>
+
+
+
+
+
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">item</span>
+: "Blinding Powder"<br>
+
+
+
+
+
+
+
+<br>
+
+
+
+
+
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+<br>
+
+
+<br>
+
+
+<span style="font-weight: bold;"><a name="durability"></a>durability</span><br>
+
+
+<span style="font-style: italic;">* Ragnaros casts Melt Weapon on Dragonx: Bloodlord's Defender damaged.</span><br>
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">source</span> : "Ragnaros"<br>
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">skill</span> : "Melt Weapon"<br>
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">victim</span> : ParserLib_SELF<br>
+
+
+&nbsp;&nbsp;&nbsp; @<span style="font-weight: bold;">item</span>: "Bloodlord's Defender"<br>
+
+
+&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">isAllItems</span> :
+false &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;- if isAllItems true then
+item will be nil<br>
+
+
+<a href="documentation.html#type">Back to list</a><br>
+
+
+<br>
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,482 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+<Button name="DAB_NumButtonsTemplate" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH" virtual="true">
+	<Size><AbsDimension x="60" y="30"/></Size>
+	<Frames>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="20" y="20"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT">
+					<Offset><AbsDimension x="20" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("+");
+				</OnLoad>
+				<OnClick>
+					DAB_Add_ButtonOrPage();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="20" y="20"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("-");
+				</OnLoad>
+				<OnClick>
+					DAB_Remove_ButtonOrPage();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1" g="1" b="1"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_Setting" inherits="GameFontNormal">
+				<Color r="1" g="1" b="1"/>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			if (this:GetID() ~= 1 and this:GetID() ~= 99) then
+				this:SetPoint("TOP", this:GetParent(), -65, -(this:GetID() * 30 + 100));
+			end
+		</OnLoad>
+		<OnMouseWheel>
+			DAB_NumButtons_OnMouseWheel();
+		</OnMouseWheel>
+	</Scripts>
+</Button>
+
+<Button name="DAB_NumPagesTemplate" inherits="DAB_NumButtonsTemplate" virtual="true">
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			if (this:GetID() ~= 11) then
+				this:SetPoint("TOP", this:GetParent(), 45, -((this:GetID() - 10) * 30 + 100));
+			end
+		</OnLoad>
+	</Scripts>
+</Button>
+
+<CheckButton name="DAB_ButtonLayoutTabButtonTemplate" inherits="DL_TabButtonTemplate" virtual="true">
+	<Size><AbsDimension x="195" y="20"/></Size>
+</CheckButton>
+
+<Frame name="DAB_ButtonLayout" hidden="true" parent="DAB_Options" frameStrata="MEDIUM">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="DAB_Options_BarBrowser_OuterBorder" relativePoint="TOPRIGHT">
+			<Offset><AbsDimension x="5" y="-5"/></Offset>
+		</Anchor>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<CheckButton name="$parent_ButtonLayoutTab" inherits="DAB_ButtonLayoutTabButtonTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-22"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_Init_TabButton(DAB_TEXT.ButtonLayout, "DAB_BUTTONLAYOUT_OPTIONS", DAB_Select_ButtonLayoutOptions, 1);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_ActionIDsTab" inherits="DAB_ButtonLayoutTabButtonTemplate" id="2">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_ButtonLayoutTab" relativePoint="RIGHT">
+					<Offset><AbsDimension x="-2" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					DL_Init_TabButton(DAB_TEXT.SetActionIDs, "DAB_BUTTONLAYOUT_OPTIONS", DAB_Select_ButtonLayoutOptions);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+	</Frames>
+</Frame>
+
+<Frame name="DAB_NumButtons" hidden="false" parent="DAB_ButtonLayout" frameStrata="MEDIUM">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT"/>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<Frame inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="90" y="40"/></Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="0" y="-70"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="DAB_NumButtons_FreeButtonsLabel" inherits="GameFontNormal">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT">
+								<Offset><AbsDimension x="-5" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="DAB_NumButtons_FreeButtons" font="Fonts\FRIZQT__.TTF">
+						<Color r="1" g="1" b="0"/>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+						<Shadow>
+							<Offset>
+								<AbsDimension x="1" y="-1"/>
+							</Offset>
+							<Color r="0" g="0" b="0"/>
+						</Shadow>
+						<FontHeight>
+							<AbsValue val="22"/>
+						</FontHeight>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(1, 0, 0);
+					DAB_NumButtons_FreeButtonsLabel:SetText(DAB_TEXT.FreeButtons);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+
+		<Button name="$parent_Bar1" inherits="DAB_NumButtonsTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="-65" y="-130"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="DAB_NumButtons_ButtonLabel" inherits="GameFontNormal">
+						<Anchors>
+							<Anchor point="BOTTOM" relativePoint="TOP"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button name="$parent_Bar1Pages" inherits="DAB_NumPagesTemplate" id="11">
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="45" y="-130"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="DAB_NumButtons_PagesLabel" inherits="GameFontNormal">
+						<Anchors>
+							<Anchor point="BOTTOM" relativePoint="TOP"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Button>
+		<Button name="$parent_Bar2" inherits="DAB_NumButtonsTemplate" id="2"/>
+		<Button name="$parent_Bar3" inherits="DAB_NumButtonsTemplate" id="3"/>
+		<Button name="$parent_Bar4" inherits="DAB_NumButtonsTemplate" id="4"/>
+		<Button name="$parent_Bar5" inherits="DAB_NumButtonsTemplate" id="5"/>
+		<Button name="$parent_Bar6" inherits="DAB_NumButtonsTemplate" id="6"/>
+		<Button name="$parent_Bar7" inherits="DAB_NumButtonsTemplate" id="7"/>
+		<Button name="$parent_Bar8" inherits="DAB_NumButtonsTemplate" id="8"/>
+		<Button name="$parent_Bar9" inherits="DAB_NumButtonsTemplate" id="9"/>
+		<Button name="$parent_Bar10" inherits="DAB_NumButtonsTemplate" id="10"/>
+		<Button name="$parent_Bar2Pages" inherits="DAB_NumPagesTemplate" id="12"/>
+		<Button name="$parent_Bar3Pages" inherits="DAB_NumPagesTemplate" id="13"/>
+		<Button name="$parent_Bar4Pages" inherits="DAB_NumPagesTemplate" id="14"/>
+		<Button name="$parent_Bar5Pages" inherits="DAB_NumPagesTemplate" id="15"/>
+		<Button name="$parent_Bar6Pages" inherits="DAB_NumPagesTemplate" id="16"/>
+		<Button name="$parent_Bar7Pages" inherits="DAB_NumPagesTemplate" id="17"/>
+		<Button name="$parent_Bar8Pages" inherits="DAB_NumPagesTemplate" id="18"/>
+		<Button name="$parent_Bar9Pages" inherits="DAB_NumPagesTemplate" id="19"/>
+		<Button name="$parent_Bar10Pages" inherits="DAB_NumPagesTemplate" id="20"/>
+		<Button name="$parent_Floaters" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="60" y="30"/></Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="-65" y="-430"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Frames>
+				<Button inherits="UIPanelButtonTemplate">
+					<Size><AbsDimension x="20" y="20"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+						</Anchor>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							this:SetText("+");
+						</OnLoad>
+						<OnClick>
+							DAB_Add_Floater();
+						</OnClick>
+					</Scripts>
+				</Button>
+			</Frames>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Label" inherits="GameFontNormal">
+						<Color r="1" g="1" b="1"/>
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT">
+								<Offset><AbsDimension x="-5" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parent_Setting" inherits="GameFontNormal">
+						<Color r="1" g="1" b="1"/>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(1, 0, 0);
+				</OnLoad>
+				<OnMouseWheel>
+					DAB_AddFloater_OnMouseWheel();
+				</OnMouseWheel>
+			</Scripts>
+		</Button>
+		<Frame name="$parent_DeleteFloater" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="125" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_ScrollMenu";
+					this.table = "DAB_FLOATERS";
+					this.initFunc = DAB_Remove_Floater;
+					DL_Set_Label(DAB_TEXT.Delete);
+					DL_Set_Anchor("_Floaters", 25, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Frame>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Warning" font="Fonts\FRIZQT__.TTF">
+				<Color r="1" g="1" b="0"/>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="100"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Shadow>
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+					<Color r="0" g="0" b="0"/>
+				</Shadow>
+				<FontHeight>
+					<AbsValue val="18"/>
+				</FontHeight>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnUpdate>
+			DAB_NumButtons_WarningTimeOut(arg1);
+		</OnUpdate>
+		<OnShow>
+			DAB_Init_ButtonLayout();
+		</OnShow>
+	</Scripts>
+</Frame>
+
+<Frame name="DAB_SetActionIDTemplate" frameStrata="HIGH" virtual="true">
+	<Size><AbsDimension x="200" y="25"/></Size>
+	<Frames>
+		<Button name="$parent_ActionMenu" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="195" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset><AbsDimension x="160" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_ScrollMenu";
+					this.table = "DAB_ACTIONS";
+					this.index = "SETACTIONID";
+				</OnLoad>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Text" inherits="GameFontNormal">
+				<Color r="1" g="1" b="1"/>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset><AbsDimension x="5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<Texture name="$parentBorder">
+				<Size><AbsDimension x="365" y="2"/></Size>
+				<Color r=".4" g="0" b="0"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+</Frame>
+
+<Frame name="DAB_SetActionIDs" hidden="true" parent="DAB_ButtonLayout" frameStrata="MEDIUM">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT"/>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<ScrollFrame name="$parent_ScrollMenu" inherits="DL_ScrollFrameTemplate" frameStrata="MEDIUM">
+			<Size><AbsDimension x="365" y="485"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-80"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."_OuterBorder_Header"):SetText(DAB_TEXT.SetActionIDs);
+				</OnLoad>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(25, DAB_SetActionIDsMenu_Update);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Frame name="$parent_ScrollMenu_Button1" inherits="DAB_SetActionIDTemplate" id="1" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_ScrollMenu">
+					<Offset><AbsDimension x="5" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Frame>
+		<Frame name="$parent_ScrollMenu_Button2" inherits="DAB_SetActionIDTemplate" id="2" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button3" inherits="DAB_SetActionIDTemplate" id="3" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button4" inherits="DAB_SetActionIDTemplate" id="4" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button5" inherits="DAB_SetActionIDTemplate" id="5" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button6" inherits="DAB_SetActionIDTemplate" id="6" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button7" inherits="DAB_SetActionIDTemplate" id="7" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button8" inherits="DAB_SetActionIDTemplate" id="8" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button9" inherits="DAB_SetActionIDTemplate" id="9" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button10" inherits="DAB_SetActionIDTemplate" id="10" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button11" inherits="DAB_SetActionIDTemplate" id="11" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button12" inherits="DAB_SetActionIDTemplate" id="12" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button13" inherits="DAB_SetActionIDTemplate" id="13" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button14" inherits="DAB_SetActionIDTemplate" id="14" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button15" inherits="DAB_SetActionIDTemplate" id="15" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button16" inherits="DAB_SetActionIDTemplate" id="16" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button17" inherits="DAB_SetActionIDTemplate" id="17" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button18" inherits="DAB_SetActionIDTemplate" id="18" frameStrata="HIGH"/>
+		<Frame name="$parent_ScrollMenu_Button19" inherits="DAB_SetActionIDTemplate" id="19" frameStrata="HIGH"/>
+
+		<Button name="$parent_FilterMenu1" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="100" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_DropMenu";
+					this.table = "DAB_ACTIONID_FILTERS";
+					this.index = "filter1";
+					this.initFunc = DAB_Filter_ActionIDs;
+					DL_Set_Label(DAB_TEXT.Filters);
+					DL_Set_Anchor("_ScrollMenu", 30, -5);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_FilterMenu2" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="100" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_DropMenu";
+					this.table = "DAB_ACTIONID_FILTERS2";
+					this.index = "filter2";
+					this.initFunc = DAB_Filter_ActionIDs;
+					DL_Set_Anchor("_FilterMenu1", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_Min" inherits="DiscordLib_EditBoxTemplate">
+			<Size><AbsDimension x="75" y="25"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label("Set Range of IDs:  Min");
+					DL_Set_Anchor("_ScrollMenu", 0, -30);
+				</OnLoad>
+				<OnEscapePressed>
+					this:ClearFocus();
+				</OnEscapePressed>
+				<OnTabPressed>
+					DAB_SetActionIDs_Max:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_Max" inherits="DiscordLib_EditBoxTemplate">
+			<Size><AbsDimension x="75" y="25"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label("Max");
+					DL_Set_Anchor("_Min", 5, 0, "LEFT", "RIGHT");
+				</OnLoad>
+				<OnEscapePressed>
+					this:ClearFocus();
+				</OnEscapePressed>
+				<OnTabPressed>
+					DAB_SetActionIDs_Min:SetFocus();
+				</OnTabPressed>
+			</Scripts>
+		</EditBox>
+		<Button inherits="UIPanelButtonTemplate" text="APPLY">
+			<Size><AbsDimension x="60" y="24"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="DAB_SetActionIDs_Max" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DAB_Apply_IDRange();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+</Frame>
+
+</Ui>

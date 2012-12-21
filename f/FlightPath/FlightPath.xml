@@ -1,0 +1,641 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+   <Script file="FlightPath.lua"/>
+   <Script file="KnownPaths.lua"/>
+
+   <!-- ========================================================================================== -->
+   <!--                 This frame monitors all events and ondraw messages                         -->
+   <!-- ========================================================================================== -->
+
+   <Frame   name="FP_EventFrame"
+            frameStrata="BACKGROUND"
+            parent="UIParent"
+      >
+      <Scripts>
+         <OnLoad>FP_EventFrame_OnLoad();</OnLoad>
+         <OnEvent>FP_EventFrame_OnEvent();</OnEvent>
+         <OnUpdate>FP_EventFrame_OnUpdate();</OnUpdate>
+      </Scripts>
+   </Frame>
+
+   <!-- ========================================================================================== -->
+   <!--                      Frames used in the FlightPath query dialog                            -->
+   <!-- ========================================================================================== -->
+
+   <Frame   name="FP_UIFrame"
+            frameStrata="DIALOG"
+            toplevel="true"
+            enableMouse="true"
+            movable="true"
+            parent="UIParent"
+            hidden="true"
+      >
+      <Size>
+         <AbsDimension x="620" y="512"/>
+      </Size>
+      <Scripts>
+         <OnLoad>table.insert(UIMenus, "FP_UIFrame")</OnLoad>
+         <OnShow>FP_UIFrame_OnShow();</OnShow>
+      </Scripts>
+      <Anchors><Anchor point="CENTER"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor></Anchors>
+
+      <Layers>
+
+         <!-- Paint the static/graphic parts of the dialog -->
+         <Layer level="ARTWORK">
+            <Texture name="FP_UIFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+               <Size>
+                  <AbsDimension x="375" y="64"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOP">
+                     <Offset>
+                        <AbsDimension x="-12" y="12"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </Texture>
+            <FontString name="FP_DialogHeading" inherits="GameFontNormal">
+               <Size>
+                  <AbsDimension x="375" y="0"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOP" relativeTo="FP_UIFrameHeader">
+                     <Offset>
+                        <AbsDimension x="0" y="-14"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </FontString>
+            <FontString name="FP_DialogVersion" inherits="GameFontNormal">
+               <Size>
+                  <AbsDimension x="375" y="0"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOP" relativeTo="FP_UIFrameHeader">
+                     <Offset>
+                        <AbsDimension x="0" y="-40"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="BACKGROUND">
+            <Texture file="Interface\HelpFrame\HelpFrame-TopLeft">
+               <Size>
+                  <AbsDimension x="256" y="256"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOPLEFT"/>
+               </Anchors>
+            </Texture>
+            <Texture file="Interface\HelpFrame\HelpFrame-TopRight">
+               <Size>
+                  <AbsDimension x="128" y="256"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOPRIGHT"/>
+               </Anchors>
+            </Texture>
+
+            <Texture file="Interface\HelpFrame\HelpFrame-Top">
+               <Size>
+                  <AbsDimension x="236" y="256"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOPLEFT">
+                     <Offset>
+                        <AbsDimension x="256" y="0"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </Texture>
+            <Texture file="Interface\HelpFrame\HelpFrame-Bottom">
+               <Size>
+                  <AbsDimension x="236" y="256"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="BOTTOMLEFT">
+                     <Offset>
+                        <AbsDimension x="256" y="0"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </Texture>
+            <Texture file="Interface\HelpFrame\HelpFrame-BotLeft">
+               <Size>
+                  <AbsDimension x="256" y="256"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="BOTTOMLEFT"/>
+               </Anchors>
+            </Texture>
+            <Texture file="Interface\HelpFrame\HelpFrame-BotRight">
+               <Size>
+                  <AbsDimension x="128" y="256"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="BOTTOMRIGHT"/>
+               </Anchors>
+            </Texture>
+         </Layer>
+
+         <!-- The literal text 'Connections' -->
+         <Layer level="ARTWORK">
+            <FontString name="FP_UIStaticConnections" inherits="GameFontNormal" justifyH="LEFT">
+               <Size>
+                  <AbsDimension x="280" y="0"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOPLEFT">
+                     <Offset>
+                        <AbsDimension x="260" y="-100"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </FontString>
+         </Layer>
+
+         <!-- The literal text 'Zone' -->
+         <Layer level="ARTWORK">
+            <FontString name="FP_UIStaticZone" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size>
+                  <AbsDimension x="50" y="0"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOPLEFT">
+                     <Offset>
+                        <AbsDimension x="95" y="-65"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </FontString>
+         </Layer>
+         
+         <!-- A big text window in the middle of the dialog for error and informational messages -->
+         <Layer level="ARTWORK">
+            <FontString name="FP_UIErrorText" inherits="GameFontNormal" justifyH="CENTER">
+               <Size>
+                  <AbsDimension x="525" y="380"/>
+               </Size>
+               <Anchors>
+                  <Anchor point="TOPLEFT">
+                     <Offset>
+                        <AbsDimension x="25" y="0"/>
+                     </Offset>
+                  </Anchor>
+               </Anchors>
+            </FontString>
+         </Layer>
+
+         <!-- The connection text column (buttons defined lower down will overlay each text element) -->
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection1" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="100" y="-130"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection2" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection1"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection3" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection2"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="OVERLAY">
+            <FontString name="FP_Connection4" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection3"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection5" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection4"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection6" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection5"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection7" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection6"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection8" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection7"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection9" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection8"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection10" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection9"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection11" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection10"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection12" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection11"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection13" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection12"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection14" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection13"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection15" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection14"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_Connection16" inherits="GameFontNormal" justifyH="LEFT">
+               <Size><AbsDimension x="350" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection15"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+
+         <!-- The cost and duration columns -->
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost1" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPRIGHT"><Offset><AbsDimension x="-150" y="-130"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost2" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost1"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost3" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost2"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="OVERLAY">
+            <FontString name="FP_ConnectionCost4" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost3"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost5" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost4"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost6" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost5"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost7" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost6"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost8" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost7"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost9" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost8"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost10" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost9"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost11" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost10"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost12" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost11"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost13" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost12"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost14" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost13"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost15" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost14"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+         <Layer level="ARTWORK">
+            <FontString name="FP_ConnectionCost16" inherits="GameFontNormal" justifyH="RIGHT">
+               <Size><AbsDimension x="100" y="12"/></Size>
+               <Anchors><Anchor point="TOPLEFT" relativeTo="FP_ConnectionCost15"><Offset><AbsDimension x="0" y="-20"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+
+      </Layers>
+
+      <Frames>
+
+         <!-- The 'x' button in the upper right corner -->
+         <Button name="FP_UICancelButton" inherits="UIPanelCloseButton">
+            <Anchors>
+               <Anchor point="TOPRIGHT">
+                  <Offset>
+                     <AbsDimension x="-42" y="-3"/>
+                  </Offset>
+               </Anchor>
+            </Anchors>
+         </Button>
+
+         <!-- The close button -->
+         <Button name="FP_UICloseButton" inherits="GameMenuButtonTemplate" text="Close">
+            <Anchors>
+               <Anchor point="BOTTOMRIGHT">
+                  <Offset>
+                     <AbsDimension x="-53" y="21"/>
+                  </Offset>
+               </Anchor>
+            </Anchors>
+            <Scripts>
+               <OnClick>HideUIPanel(FP_UIFrame);</OnClick>
+            </Scripts>
+         </Button>
+
+         <!-- The drop down flight master selector -->
+
+         <Frame name="FP_UIZoneDropDown" inherits="UIDropDownMenuTemplate">
+            <Anchors>
+               <Anchor point="TOPLEFT">
+                  <Offset>
+                     <AbsDimension x="145" y="-60"/>
+                  </Offset>
+               </Anchor>
+            </Anchors>
+            <Scripts>
+               <OnLoad>UIDropDownMenu_SetWidth(256);</OnLoad>
+               <OnShow>UIDropDownMenu_Initialize(this, FP_UIZoneDropDown_Initialize);</OnShow>
+            </Scripts>
+         </Frame>
+
+         <!-- These buttons overlay the departure text, cost, and duration columns to enable clicking on the text -->
+         <Button name="1101">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection1"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1102">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection2"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1103">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection3"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1104">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection4"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1105">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection5"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1106">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection6"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1107">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection7"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1108">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection8"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1109">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection9"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1110">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection10"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1111">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection11"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+         <Button name="1112">
+            <Size><AbsDimension x="350" y="12"/></Size>
+            <Anchors><Anchor point="TOPLEFT" relativeTo="FP_Connection12"></Anchor></Anchors>
+            <Scripts>
+               <OnLoad>this:RegisterForClicks("LeftButtonUp","RightButtonUp");</OnLoad>
+               <OnClick>FP_Clicked(arg1,this:GetName());</OnClick>
+            </Scripts>
+         </Button>
+
+         <!-- The close button -->
+         <Button name="FP_UICancelButton" inherits="GameMenuButtonTemplate" text="Close">
+            <Anchors>
+               <Anchor point="BOTTOMRIGHT">
+                  <Offset>
+                     <AbsDimension x="-53" y="21"/>
+                  </Offset>
+               </Anchor>
+            </Anchors>
+            <Scripts>
+               <OnClick>HideUIPanel(FP_UIFrame);</OnClick>
+            </Scripts>
+         </Button>
+
+      </Frames>
+   </Frame>
+
+   <!-- ========================================================================================== -->
+   <!--          Frames used by the world/continent/zone map flight path indicators                -->
+   <!-- ========================================================================================== -->
+
+   <!-- The POI buttons for the world map -->
+   <Button name="FP_POI" inherits="WorldMapUnitTemplate" virtual="true">
+      <Scripts>
+         <OnEnter>FP_POIOnEnter();</OnEnter>
+         <OnLeave>FP_POIOnLeave();</OnLeave>
+      </Scripts>
+   </Button>
+
+   <Frame name="FP_MapFrame" hidden="false" parent="WorldMapButton" enableMouse="true">
+      <Frames>
+         <!-- 48 buttons should be enough to display all known flight paths for a given faction on the world map (as there are only 46 zones) -->
+         <Button name="FP_POI1" inherits="FP_POI" id="1301" hidden="true"/>
+         <Button name="FP_POI2" inherits="FP_POI" id="1302" hidden="true"/>
+         <Button name="FP_POI3" inherits="FP_POI" id="1303" hidden="true"/>
+         <Button name="FP_POI4" inherits="FP_POI" id="1304" hidden="true"/>
+         <Button name="FP_POI5" inherits="FP_POI" id="1305" hidden="true"/>
+         <Button name="FP_POI6" inherits="FP_POI" id="1306" hidden="true"/>
+         <Button name="FP_POI7" inherits="FP_POI" id="1307" hidden="true"/>
+         <Button name="FP_POI8" inherits="FP_POI" id="1308" hidden="true"/>
+         <Button name="FP_POI9" inherits="FP_POI" id="1309" hidden="true"/>
+         <Button name="FP_POI10" inherits="FP_POI" id="1310" hidden="true"/>
+         <Button name="FP_POI11" inherits="FP_POI" id="1311" hidden="true"/>
+         <Button name="FP_POI12" inherits="FP_POI" id="1312" hidden="true"/>
+         <Button name="FP_POI13" inherits="FP_POI" id="1313" hidden="true"/>
+         <Button name="FP_POI14" inherits="FP_POI" id="1314" hidden="true"/>
+         <Button name="FP_POI15" inherits="FP_POI" id="1315" hidden="true"/>
+         <Button name="FP_POI16" inherits="FP_POI" id="1316" hidden="true"/>
+         <Button name="FP_POI17" inherits="FP_POI" id="1317" hidden="true"/>
+         <Button name="FP_POI18" inherits="FP_POI" id="1318" hidden="true"/>
+         <Button name="FP_POI19" inherits="FP_POI" id="1319" hidden="true"/>
+         <Button name="FP_POI20" inherits="FP_POI" id="1320" hidden="true"/>
+         <Button name="FP_POI21" inherits="FP_POI" id="1321" hidden="true"/>
+         <Button name="FP_POI22" inherits="FP_POI" id="1322" hidden="true"/>
+         <Button name="FP_POI23" inherits="FP_POI" id="1323" hidden="true"/>
+         <Button name="FP_POI24" inherits="FP_POI" id="1324" hidden="true"/>
+         <Button name="FP_POI25" inherits="FP_POI" id="1325" hidden="true"/>
+         <Button name="FP_POI26" inherits="FP_POI" id="1326" hidden="true"/>
+         <Button name="FP_POI27" inherits="FP_POI" id="1327" hidden="true"/>
+         <Button name="FP_POI28" inherits="FP_POI" id="1328" hidden="true"/>
+         <Button name="FP_POI29" inherits="FP_POI" id="1329" hidden="true"/>
+         <Button name="FP_POI30" inherits="FP_POI" id="1330" hidden="true"/>
+         <Button name="FP_POI31" inherits="FP_POI" id="1331" hidden="true"/>
+         <Button name="FP_POI32" inherits="FP_POI" id="1332" hidden="true"/>
+         <Button name="FP_POI33" inherits="FP_POI" id="1333" hidden="true"/>
+         <Button name="FP_POI34" inherits="FP_POI" id="1334" hidden="true"/>
+         <Button name="FP_POI35" inherits="FP_POI" id="1335" hidden="true"/>
+         <Button name="FP_POI36" inherits="FP_POI" id="1336" hidden="true"/>
+         <Button name="FP_POI37" inherits="FP_POI" id="1337" hidden="true"/>
+         <Button name="FP_POI38" inherits="FP_POI" id="1338" hidden="true"/>
+         <Button name="FP_POI39" inherits="FP_POI" id="1339" hidden="true"/>
+         <Button name="FP_POI40" inherits="FP_POI" id="1340" hidden="true"/>
+         <Button name="FP_POI41" inherits="FP_POI" id="1341" hidden="true"/>
+         <Button name="FP_POI42" inherits="FP_POI" id="1342" hidden="true"/>
+         <Button name="FP_POI43" inherits="FP_POI" id="1343" hidden="true"/>
+         <Button name="FP_POI44" inherits="FP_POI" id="1344" hidden="true"/>
+         <Button name="FP_POI45" inherits="FP_POI" id="1345" hidden="true"/>
+         <Button name="FP_POI46" inherits="FP_POI" id="1346" hidden="true"/>
+         <Button name="FP_POI47" inherits="FP_POI" id="1347" hidden="true"/>
+         <Button name="FP_POI48" inherits="FP_POI" id="1348" hidden="true"/>
+      </Frames>
+      <Scripts>
+         <OnLoad>
+            this:RegisterEvent("VARIABLES_LOADED");
+         </OnLoad>
+      </Scripts>
+   </Frame>
+
+   <!-- ========================================================================================== -->
+   <!--                                  Flight countdown timer                                    -->
+   <!-- ========================================================================================== -->
+
+   <Frame name="FP_CountdownTimer" setAllPoints="true" hidden="false" parent="UIParent">
+      <Layers>
+         <Layer level="ARTWORK">
+            <FontString name="$parentCity" inherits="GameFontNormal" justifyH="CENTER">
+               <Size><AbsDimension x="300" y="10"/></Size>
+               <Anchors><Anchor point="CENTER"><Offset><AbsDimension x="0" y="-60"/></Offset></Anchor></Anchors>
+            </FontString>
+            <FontString name="$parentRemaining" inherits="GameFontNormal" justifyH="CENTER">
+               <Size><AbsDimension x="200" y="12"/></Size>
+               <Anchors><Anchor point="TOP" relativeTo="$parentCity"><Offset><AbsDimension x="0" y="-14"/></Offset></Anchor></Anchors>
+            </FontString>
+         </Layer>
+      </Layers>
+   </Frame>
+
+   <!-- ========================================================================================== -->
+   <!--                                  End of FlightPath frames                                  -->
+   <!-- ========================================================================================== -->
+
+</UI>

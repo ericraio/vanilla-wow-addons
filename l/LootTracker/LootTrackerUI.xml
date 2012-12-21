@@ -1,0 +1,258 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+    <Script file="LootTrackerUI.lua"/>
+    
+
+    <Frame name="LT_LabelTemplate" virtual="true">
+        <Size x="140" y="13"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <FontString name="$parentText" inherits="GameFontHighlight" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TopLEFT">
+                            <Offset x="5" y="0"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnShow>
+                local text = getglobal(this:GetName() .. "Text");
+                local fadeLength = 20;
+                --text:SetAlphaGradient(this:GetWidth() - fadeLength, fadeLength);
+                text:SetAlphaGradient(35, fadeLength);
+            </OnShow>
+        </Scripts>
+    </Frame>
+    
+    
+    <Frame name="LT_SubLabelTemplate" virtual="true">
+        <Size x="140" y="13"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="BottomLEFT">
+                            <Offset x="5" y="0"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnShow>
+                local text = getglobal(this:GetName() .. "Text");
+                local fadeLength = 20;
+                --text:SetAlphaGradient(this:GetWidth() - fadeLength, fadeLength);
+                text:SetAlphaGradient(35, fadeLength);
+            </OnShow>
+        </Scripts>
+    </Frame>
+    
+    
+    <Button name="LT_DetailsButtonTemplate" virtual="true">
+        <Size x="170" y="14"/>
+        <Layers>
+            <Layer level="BORDER">
+                <FontString name="$parentText" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT"/>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnShow>
+                local text = getglobal(this:GetName() .. "Text");
+                local fadeLength = 10;
+                text:SetAlphaGradient(22, fadeLength);
+            </OnShow>
+        </Scripts>
+    </Button>
+    
+    <ScrollFrame name="LT_DetailsScrollerTemplate" virtual="true" inherits="FauxScrollFrameTemplate">
+        <Size x="165" y="65"/>
+        <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" 
+                  edgeFile="Interface\Tooltips\UI-Tooltip-Border" 
+                  tile="true">
+            <EdgeSize>
+                <AbsValue val="8"/>
+            </EdgeSize>
+            <TileSize>
+                <AbsValue val="8"/>
+            </TileSize>
+            <BackgroundInsets>
+                <AbsInset left="0" right="0" top="0" bottom="0"/>
+            </BackgroundInsets>
+        </Backdrop>
+        <Scripts>
+            <OnVerticalScroll>
+                FauxScrollFrame_OnVerticalScroll(this.ItemHeight, LT_UpdateGenericScroller)
+            </OnVerticalScroll>
+            <OnShow>
+                this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+                this:SetBackdropColor(0.15, 0.15, 0.15);
+                LT_UpdateGenericScroller(this);
+            </OnShow>
+        </Scripts>
+    </ScrollFrame>
+
+
+    <Frame name="LT_SettingsUI" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+        <Size x="660" y="610"/>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" 
+                  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" 
+                  tile="true">
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>    
+                <Size x="128" y="17"/>
+            </BackgroundInsets>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+        </Backdrop>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="LTFrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+                    <Size x="276" y="64"/>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset x="0" y="12"/>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="LTFrameTitleText" inherits="GameFontNormal" text="LootTracker">
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="LT_SettingsUI">
+                            <Offset x="0" y="-3"/>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>                
+        
+        <Frames>
+        
+            <!-- Settings -->
+
+            <Frame name="LT_SettingsFrame" inherits="LT_SettingsFrameTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativeTo="$parent" relativePoint="TopLEFT"><Offset x="15" y="-24"/></Anchor>
+                </Anchors>
+                <OnShow>
+                    LT_DebugMessage(1, "Showing LT_SettingsFrame");
+                    LT_ItemDetails:Hide();
+                    LT_PlayerDetails:Hide();
+                    LT_KillDetails:Hide();
+                </OnShow>
+            </Frame>
+            
+            <!-- Item details -->
+            
+            <Frame name="LT_ItemDetails" inherits="LT_ItemDetailsTemplate" hidden="true">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativeTo="$parent" relativePoint="TopLEFT"><Offset x="15" y="-39"/></Anchor>
+                </Anchors>
+            </Frame>
+            
+            <!-- Player details -->
+            
+            <Frame name="LT_PlayerDetails" inherits="LT_PlayerDetailsTemplate" hidden="true">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativeTo="$parent" relativePoint="TopLEFT"><Offset x="15" y="-39"/></Anchor>
+                </Anchors>
+            </Frame>
+            
+            <!-- Kill details -->
+            
+            <Frame name="LT_KillDetails" inherits="LT_KillDetailsTemplate" hidden="true">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativeTo="$parent" relativePoint="TopLEFT"><Offset x="15" y="-39"/></Anchor>
+                </Anchors>
+            </Frame>
+            
+            
+            <!-- Current session summary -->
+            
+            <Frame name="LT_CurrentSessionFrameLabel" inherits="LT_LabelTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="TopRIGHT" relativeTo="LT_SettingsFrame"><Offset x="0" y="-15"/></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>LT_CurrentSessionFrameLabelText:SetText(LT_LABEL_CURRENTSESSION);</OnShow>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="LT_CurrentSessionTextFrame" inherits="OptionFrameBoxTemplate">
+                <Size x="420" y="55"/>
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_CurrentSessionFrameLabel"><Offset x="0" y="-2"/></Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <FontString name="LT_CurrentSessionText" inherits="GameFontNormal" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="TopLEFT">
+                                    <Offset x="15" y="-10"/>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+                        
+            
+            <!-- Query -->
+            
+            <Frame name="LT_QueryFrameLabel" inherits="LT_LabelTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_CurrentSessionTextFrame"><Offset x="0" y="-6"/></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>LT_QueryFrameLabelText:SetText(LT_LABEL_QUERY);</OnShow>
+                </Scripts>
+            </Frame>
+            
+            <Frame name="LT_QueryFrame" inherits="LT_QueryFrameTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativeTo="LT_QueryFrameLabel" relativePoint="BottomLEFT"><Offset x="0" y="-2"/></Anchor>
+                </Anchors>
+            </Frame>
+            
+            
+            <!-- Close Button -->
+            <!-- TODO: Use UIPanelCloseButton -->
+            <Button name="LT_CloseButton" inherits="OptionsButtonTemplate">
+                <Anchors>
+                    <Anchor point="BottomRIGHT" relativePoint="BottomRIGHT" relativeTo="LT_SettingsUI">
+                        <Offset x="-20" y="20"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        HideUIPanel(LT_SettingsUI);
+                    </OnClick>
+                    <OnShow>
+                        this:SetText(LT_BUTTON_EXIT);
+                    </OnShow>
+                </Scripts>
+            </Button>
+
+        </Frames>
+        <Scripts>
+            <OnShow>
+                LT_AddListener(LT_UpdateUI);
+                LT_UpdateUI();
+            </OnShow>
+            <OnHide>
+                LT_RemoveListener(LT_UpdateUI);
+            </OnHide>
+        </Scripts>
+    </Frame>
+
+</Ui>

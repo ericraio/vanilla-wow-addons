@@ -1,0 +1,1472 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML/UI.xsd">
+	
+	<Script file="EventDatabase.lua"/>
+	<Script file="CalendarNetwork.lua"/>
+	<Script file="CalendarDisplay.lua"/>
+	<Script file="GroupCalendarMD5.lua"/>
+	<Script file="CalendarGroupInvites.lua"/>
+	<Script file="GroupCalendar.lua"/>
+	
+	<CheckButton name="GroupCalendarDayFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentName" inherits="GameFontHighlightSmallOutline">
+					<Size>
+						<AbsDimension x="36" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-12" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentOverlayIcon" hidden="true">
+					<Size>
+						<AbsDimension x="38" y="38"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="-1" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentDogEarIcon" hidden="true" file="Interface\Addons\GroupCalendar\Textures\CooldownIcons">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+					<TexCoords left="0.25" right="0.5" top="0.25" bottom="0.5"/>
+				</Texture>
+				<Texture name="$parentCircledDate" hidden="true" file="Interface\Addons\GroupCalendar\Textures\CircledDate">
+					<Size>
+						<AbsDimension x="26" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentSlotIcon" file="Interface\Buttons\UI-EmptySlot-Disabled">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentIcon">
+			<Size>
+				<AbsDimension x="38" y="38"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="-1" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."CircledDate"):SetVertexColor(0.41, 0.61, 0.75, 0.4);
+			</OnLoad>
+		</Scripts>
+	</CheckButton>
+	
+	<CheckButton name="GroupCalendarDayTemplate" inherits="GroupCalendarDayFrameTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOptionCheckBoxOn");
+				Calendar_SetSelectedDateIndexWithToggle(this:GetID());
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	
+	<Frame name="GroupCalendarUpdateFrame" toplevel="true" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnUpdate>GroupCalendar_Update(arg1);</OnUpdate>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="GroupCalendarFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="349" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="34" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\AddOns\GroupCalendar\Textures\CalendarIcon">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\AddOns\GroupCalendar\Textures\CalendarFrame-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-256"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\AddOns\GroupCalendar\Textures\CalendarFrame-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="-256"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="GroupCalendarTitleText" text="GroupCalendar_cTitle" inherits="GameFontHighlight">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="17" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="GroupCalendarCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="GroupCalendarFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Frame name="GroupCalendarCalendarFrame" hidden="true" setAllPoints="true">
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="GroupCalendarMonthYearText" inherits="GameFontNormalLarge">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="17" y="-48"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel0" text="GroupCalendar_cSun" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="48" y="-85"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel1" text="GroupCalendar_cMon" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="WeekdayLabel0" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="44" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel2" text="GroupCalendar_cTue" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="WeekdayLabel1" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="44" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel3" text="GroupCalendar_cWed" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="WeekdayLabel2" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="44" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel4" text="GroupCalendar_cThu" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="WeekdayLabel3" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="44" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel5" text="GroupCalendar_cFri" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="WeekdayLabel4" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="44" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="WeekdayLabel6" text="GroupCalendar_cSat" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="WeekdayLabel5" relativePoint="CENTER">
+									<Offset>
+										<AbsDimension x="44" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="GroupCalendarPreviousMonthButton" hidden="false">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="GroupCalendarMonthYearText" relativePoint="CENTER">
+								<Offset>
+									<AbsDimension x="-100" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								Calendar_PreviousMonth();
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+					<Button name="GroupCalendarNextMonthButton" hidden="false">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="GroupCalendarMonthYearText" relativePoint="CENTER">
+								<Offset>
+									<AbsDimension x="100" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								Calendar_NextMonth();
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+					<Button name="GroupCalendarTodayButton" hidden="false">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="GroupCalendarNextMonthButton" relativePoint="CENTER">
+								<Offset>
+									<AbsDimension x="30" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								Calendar_Today();
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Addons\GroupCalendar\Textures\TodayIcon-Up"/>
+						<PushedTexture file="Interface\Addons\GroupCalendar\Textures\TodayIcon-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+					<CheckButton name="GroupCalendarDay0" inherits="GroupCalendarDayTemplate" id="0">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="31" y="-98"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay1" inherits="GroupCalendarDayTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay0" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="8" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay2" inherits="GroupCalendarDayTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="8" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay3" inherits="GroupCalendarDayTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay2" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="8" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay4" inherits="GroupCalendarDayTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay3" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="8" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay5" inherits="GroupCalendarDayTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay4" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="8" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay6" inherits="GroupCalendarDayTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay5" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="8" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay7" inherits="GroupCalendarDayTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay0" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay8" inherits="GroupCalendarDayTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay9" inherits="GroupCalendarDayTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay10" inherits="GroupCalendarDayTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay11" inherits="GroupCalendarDayTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay12" inherits="GroupCalendarDayTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay13" inherits="GroupCalendarDayTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay6" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay14" inherits="GroupCalendarDayTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay7" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay15" inherits="GroupCalendarDayTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay8" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay16" inherits="GroupCalendarDayTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay9" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay17" inherits="GroupCalendarDayTemplate" id="17">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay18" inherits="GroupCalendarDayTemplate" id="18">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay19" inherits="GroupCalendarDayTemplate" id="19">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay12" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay20" inherits="GroupCalendarDayTemplate" id="20">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay13" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay21" inherits="GroupCalendarDayTemplate" id="21">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay14" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay22" inherits="GroupCalendarDayTemplate" id="22">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay15" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay23" inherits="GroupCalendarDayTemplate" id="23">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay16" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay24" inherits="GroupCalendarDayTemplate" id="24">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay17" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay25" inherits="GroupCalendarDayTemplate" id="25">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay18" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay26" inherits="GroupCalendarDayTemplate" id="26">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay19" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay27" inherits="GroupCalendarDayTemplate" id="27">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay20" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay28" inherits="GroupCalendarDayTemplate" id="28">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay21" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay29" inherits="GroupCalendarDayTemplate" id="29">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay22" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay30" inherits="GroupCalendarDayTemplate" id="30">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay23" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay31" inherits="GroupCalendarDayTemplate" id="31">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay24" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay32" inherits="GroupCalendarDayTemplate" id="32">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay25" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay33" inherits="GroupCalendarDayTemplate" id="33">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay26" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay34" inherits="GroupCalendarDayTemplate" id="34">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay27" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay35" inherits="GroupCalendarDayTemplate" id="35">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay28" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarDay36" inherits="GroupCalendarDayTemplate" id="36">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarDay29" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="GroupCalendarUseServerTime" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="GroupCalendarDay36" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="30" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(GroupCalendar_cUseServerDateTime);
+							</OnLoad>
+							<OnClick>
+								GroupCalendar_SetUseServerDateTime(this:GetChecked());
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cUseServerDateTime, 1.0, 1.0, 1.0, GroupCalendar_cUseServerDateTimeDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<Model name="GroupCalendarTodayHighlight" file="Interface\Buttons\UI-AutoCastButton.mdx" scale="1.4" hidden="false">
+						<Size>
+							<AbsDimension x="36" y="36"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="GroupCalendarDay20" relativePoint="CENTER">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetSequence(0);
+								this:SetSequenceTime(0, 0);
+							</OnLoad>
+						</Scripts>
+					</Model>
+				</Frames>
+			</Frame>
+
+			<Frame name="GroupCalendarChannelFrame" hidden="true" setAllPoints="true">
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString text="GroupCalendar_cChannelConfigTitle" inherits="GameFontNormalLarge">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="17" y="-48"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString text="GroupCalendar_cChannelConfigDescription" inherits="GameFontNormalSmall">
+							<Size>
+								<AbsDimension x="290" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="35" y="-75"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarChannelStatus" inherits="GameFontNormalSmall" text="" justifyH="CENTER" justifyV="MIDDLE">
+							<Size>
+								<AbsDimension x="290" y="25"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="70"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton name="GroupCalendarAutoChannelConfig" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="60" y="-140"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(GroupCalendar_cAutoChannelConfig);
+							</OnLoad>
+							<OnClick>
+								GroupCalendar_SetAutoChannelConfig(true);
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cAutoChannelConfig, 1.0, 1.0, 1.0, GroupCalendar_cAutoConfigTipDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="GroupCalendarManualChannelConfig" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarAutoChannelConfig" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(GroupCalendar_cManualChannelConfig);
+							</OnLoad>
+							<OnClick>
+								GroupCalendar_SetAutoChannelConfig(false);
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cManualChannelConfig, 1.0, 1.0, 1.0, GroupCalendar_cManualConfigTipDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<EditBox name="GroupCalendarChannelName" letters="10" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="120" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarManualChannelConfig" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="120" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="GroupCalendar_cChannelNameLabel" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnTextChanged>
+								GroupCalendar_UpdateEnabledControls();
+							</OnTextChanged>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cChannelNameTipTitle, 1.0, 1.0, 1.0, GroupCalendar_cChannelNameTipDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</EditBox>
+					<EditBox name="GroupCalendarChannelPassword" letters="6" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="120" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarChannelName" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="GroupCalendar_cPasswordLabel" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnTextChanged>
+								GroupCalendar_UpdateEnabledControls();
+							</OnTextChanged>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+					<CheckButton name="GroupCalendarStoreAutoConfig" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarManualChannelConfig" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-50"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(GroupCalendar_cStoreAutoConfig);
+								getglobal(this:GetName().."Text"):SetWidth(200);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+							</OnLoad>
+							<OnClick>
+								GroupCalendar_EnableAutoConfigPlayer(this:GetChecked());
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cStoreAutoConfig, 1.0, 1.0, 1.0, GroupCalendar_cStoreAutoConfigTipDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<EditBox name="GroupCalendarAutoConfigPlayer" letters="25" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="120" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarStoreAutoConfig" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="120" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="GroupCalendar_cAutoConfigPlayer" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnChar>
+								Calendar_AutoCompletePlayerName(this);
+							</OnChar>
+							<OnTextChanged>
+								GroupCalendar_UpdateEnabledControls();
+							</OnTextChanged>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cAutoConfigPlayer, 1.0, 1.0, 1.0, GroupCalendar_cAutoConfigPlayerTipDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</EditBox>
+					
+					<Button name="GroupCalendarConnectChannelButton" inherits="UIPanelButtonTemplate" text="GroupCalendar_cConnectChannel">
+						<Size>
+							<AbsDimension x="135" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="34" y="45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								GroupCalendar_ToggleChannelConnection();
+							</OnClick>
+						</Scripts>
+					</Button>
+					
+					<Button name="GroupCalendarApplyChannelButton" inherits="UIPanelButtonTemplate" text="GroupCalendar_cApplyChannelChanges">
+						<Size>
+							<AbsDimension x="135" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-26" y="45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								GroupCalendar_SavePanel(gGroupCalendar_CurrentPanel);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			
+			<Frame name="GroupCalendarTrustFrame" hidden="true" setAllPoints="true">
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString text="GroupCalendar_cTrustConfigTitle" inherits="GameFontNormalLarge">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="17" y="-48"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString text="GroupCalendar_cTrustConfigDescription" inherits="GameFontNormalSmall">
+							<Size>
+								<AbsDimension x="290" y="50"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="35" y="-80"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarTrustedPlayersLabel" text="GroupCalendar_cTrustedPlayers" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-202"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString text="GroupCalendar_cExcludedPlayers" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="GroupCalendarTrustedPlayersLabel" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="150" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="GroupCalendarTrustGroup" inherits="CalendarDropDownTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="70" y="-135"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								GroupCalendarTrustGroupTitle:SetText(GroupCalendar_cTrustGroupLabel);
+								CalendarTrustGroup_OnLoad();
+							</OnLoad>
+							<OnShow>
+								CalendarTrustGroup_OnLoad();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="GroupCalendarTrustMinRank" inherits="CalendarDropDownTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="GroupCalendarTrustGroup">
+								<Offset>
+									<AbsDimension x="120" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								GroupCalendarTrustMinRankTitle:SetText(GroupCalendar_cTrustMinRank);
+								CalendarGuildRank_OnLoad();
+							</OnLoad>
+							<OnShow>
+								CalendarGuildRank_OnLoad();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="CalendarTrustedPlayersList" inherits="CalendarPlayerListControl">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarTrustGroup" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-30" y="-86"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								CalendarPlayerList_SetColor(this, 0.25, 1.0, 0.25);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="CalendarExcludedPlayersList" inherits="CalendarPlayerListControl">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarTrustedPlayersList" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								CalendarPlayerList_SetColor(this, 1.0, 0.25, 0.25);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<EditBox name="CalendarTrustedPlayerName" letters="12" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="205" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarTrustedPlayersList" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="80" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="GroupCalendar_cPlayerName" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-12" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+					<Button name="GroupCalendarRemoveTrusted" inherits="UIPanelButtonTemplate" text="GroupCalendar_cRemoveTrusted">
+						<Size>
+							<AbsDimension x="95" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="CalendarTrustedPlayersList" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="140" y="-33"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								GroupCalendar_RemoveTrustedPlayer(CalendarTrustedPlayerName:GetText());
+								CalendarTrustedPlayerName:HighlightText();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="GroupCalendarAddTrusted" inherits="UIPanelButtonTemplate" text="GroupCalendar_cAddTrusted">
+						<Size>
+							<AbsDimension x="95" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="GroupCalendarRemoveTrusted" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								GroupCalendar_AddTrustedPlayer(CalendarTrustedPlayerName:GetText());
+								CalendarTrustedPlayerName:HighlightText();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="GroupCalendarAddExcluded" inherits="UIPanelButtonTemplate" text="GroupCalendar_cAddExcluded">
+						<Size>
+							<AbsDimension x="95" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GroupCalendarRemoveTrusted" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								GroupCalendar_AddExcludedPlayer(CalendarTrustedPlayerName:GetText());
+								CalendarTrustedPlayerName:HighlightText();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<Frame name="GroupCalendarAboutFrame" hidden="true" setAllPoints="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\Addons\GroupCalendar\Textures\GuildLogo">
+							<Size>
+								<AbsDimension x="256" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="7" y="-25"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<FontString text="GroupCalendar_cAboutTitle" inherits="GameFontNormalLarge">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="17" y="-48"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarAboutTitleVersion" text="GroupCalendar_cTitleVersion" inherits="GameFontNormalLarge">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="7" y="-82"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarAboutAuthor" text="GroupCalendar_cAuthor" inherits="GameFontHighlight">
+							<Size>
+								<AbsDimension x="310"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="GroupCalendarAboutTitleVersion" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarTestersTitle" text="GroupCalendar_cTestersTitle" inherits="GameFontNormal">
+							<Size>
+								<AbsDimension x="310"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="GroupCalendarAboutTitleVersion" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-50"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarTestersNames" text="GroupCalendar_cTestersNames" inherits="GameFontHighlightSmall">
+							<Size>
+								<AbsDimension x="310"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="GroupCalendarTestersTitle" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarGuildURL" text="GroupCalendar_cGuildURL" inherits="GameFontHighlightSmall">
+							<Size>
+								<AbsDimension x="310" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="68"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarChineseTranslation" text="GroupCalendar_cChineseTranslation" inherits="GameFontHighlightSmall">
+							<Size>
+								<AbsDimension x="310" y="11"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="GroupCalendarGuildURL" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarGermanTranslation" text="GroupCalendar_cGermanTranslation" inherits="GameFontHighlightSmall">
+							<Size>
+								<AbsDimension x="310" y="11"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="GroupCalendarChineseTranslation" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarFrenchTranslation" text="GroupCalendar_cFrenchTranslation" inherits="GameFontHighlightSmall">
+							<Size>
+								<AbsDimension x="310" y="11"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="GroupCalendarGermanTranslation" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarSpecialThanksTitle" text="GroupCalendar_cSpecialThanksTitle" inherits="GameFontNormal">
+							<Size>
+								<AbsDimension x="310"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="GroupCalendarFrenchTranslation" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="65"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="GroupCalendarSpecialThanksNames" text="GroupCalendar_cSpecialThanksNames" inherits="GameFontHighlight">
+							<Size>
+								<AbsDimension x="310"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="GroupCalendarSpecialThanksTitle" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="GroupCalendarRebuildButton" inherits="UIPanelButtonTemplate" text="GroupCalendar_cRebuildDatabase">
+						<Size>
+							<AbsDimension x="250" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								PlaySound("igMainMenuOptionCheckBoxOn");
+								EventDatabase_RebuildPlayerDatabases();
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(GroupCalendar_cRebuildDatabase, 1.0, 1.0, 1.0, GroupCalendar_cRebuildDatabaseDescription, 1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			
+			<Button name="GroupCalendarFrameTab1" inherits="CalendarFrameTabTemplate" id="1" text="GroupCalendar_cCalendar">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GroupCalendarFrameTab2" inherits="CalendarFrameTabTemplate" id="2" text="GroupCalendar_cChannel">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GroupCalendarFrameTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GroupCalendarFrameTab3" inherits="CalendarFrameTabTemplate" id="3" text="GroupCalendar_cTrust">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GroupCalendarFrameTab2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="GroupCalendarFrameTab4" inherits="CalendarFrameTabTemplate" id="4" text="GroupCalendar_cAbout">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GroupCalendarFrameTab3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				GroupCalendar_OnLoad();
+			</OnLoad>
+			<OnShow>
+				GroupCalendar_OnShow();
+			</OnShow>
+			<OnHide>
+				GroupCalendarFrame:StopMovingOrSizing();
+				GroupCalendar_OnHide();
+			</OnHide>
+			<OnEvent>
+				GroupCalendar_OnEvent(event);
+			</OnEvent>
+			<OnDragStart>
+				if arg1 == "LeftButton" then
+					GroupCalendar_StartMoving();
+				end
+			</OnDragStart>
+			<OnDragStop>
+				GroupCalendarFrame:StopMovingOrSizing();
+			</OnDragStop>
+			<OnMouseUp>
+				GroupCalendarFrame:StopMovingOrSizing();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+	
+	<Button name="GroupCalendarButton" parent="GameTimeFrame">
+		<Size>
+			<AbsDimension x="50" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="6" right="0" top="5" bottom="10"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() + 3);
+			</OnLoad>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT");
+				GroupCalendar_UpdateTimeTooltip();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnClick>
+				GroupCalendar_ToggleCalendarDisplay();
+			</OnClick>
+		</Scripts>
+		<NormalTexture file="Interface\Addons\GroupCalendar\Textures\CalendarButton-Icon">
+			<TexCoords left="0" right="0.78125" top="0" bottom="0.78125"/>
+		</NormalTexture>
+		<PushedTexture file="Interface\Addons\GroupCalendar\Textures\CalendarButton-PressedIcon">
+			<TexCoords left="0" right="0.78125" top="0" bottom="0.78125"/>
+		</PushedTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Addons\GroupCalendar\Textures\CalendarButton-Hilight">
+			<TexCoords left="0" right="0.78125" top="0" bottom="0.78125"/>
+		</HighlightTexture>
+	</Button>
+</UI>

@@ -1,0 +1,520 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Frame name="GB_Action_Options" hidden="true" frameStrata="high" parent="GB_BarOptions">
+	<Size><AbsDimension x="320" y="415"/></Size>
+	<Frames>
+		<Button name="$parent_Close" hidden="false">
+			<Size><AbsDimension x="35" y="35"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT">
+					<Offset><AbsDimension x="5" y="5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+			<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+			<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+			<Scripts>
+				<OnClick>
+					GB_Action_Options:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Cast_Button" inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="130" y="26"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="20" y="-30"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(GB_TEXT.CastOptions);
+				</OnLoad>
+				<OnClick>
+					GB_Action_Options_Cast:Show();
+					GB_Action_Options_Display:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Display_Button" inherits="UIPanelButtonTemplate">
+			<Size><AbsDimension x="130" y="26"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Cast_Button" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(GB_TEXT.DisplayOptions);
+				</OnLoad>
+				<OnClick>
+					GB_Action_Options_Cast:Hide();
+					GB_Action_Options_Display:Show();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture>
+				<Size><AbsDimension x="1" y="1"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Color r="0" g="0" b="0"/>
+			</Texture>
+		</Layer>
+		<Layer level="BORDER">
+			<Texture>
+				<Size><AbsDimension x="1" y="1"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMLEFT"/>
+				</Anchors>
+				<Color r=".9" g=".9" b=".9"/>
+			</Texture>
+			<Texture>
+				<Size><AbsDimension x="1" y="1"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Color r=".9" g=".9" b=".9"/>
+			</Texture>
+			<Texture>
+				<Size><AbsDimension x="1" y="1"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="TOPRIGHT"/>
+				</Anchors>
+				<Color r=".9" g=".9" b=".9"/>
+			</Texture>
+			<Texture>
+				<Size><AbsDimension x="1" y="1"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT"/>
+					<Anchor point="BOTTOMLEFT"/>
+				</Anchors>
+				<Color r=".9" g=".9" b=".9"/>
+			</Texture>
+		</Layer>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Name" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset><AbsDimension x="0" y="-10"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Color r="0" g="1" b="0"/>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0.0, 0.0, 0.0);
+		</OnLoad>
+	</Scripts>
+</Frame>
+
+<Frame name="GB_Action_Options_Cast" parent="GB_Action_Options" hidden="false">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="GB_Action_Options_Cast_Button" relativePoint="BOTTOMLEFT">
+			<Offset><AbsDimension x="0" y="-5"/></Offset>
+		</Anchor>
+	</Anchors>
+	<Frames>
+		<CheckButton name="$parent_Assist" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "assist";
+					GB_Set_Label(GB_TEXT.Assist);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Announce" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Assist" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "announce";
+					GB_Set_Label(GB_TEXT.Announce);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Frame name="$parent_AnnounceNum" inherits="GB_MenuControlTemplate">
+			<Size><AbsDimension x="50" y="26"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "GB_Menu_Announce";
+					GB_Set_Label(GB_TEXT.AnnounceNum);
+					GB_Set_Anchor("_Announce", 20, 0);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<CheckButton name="$parent_AutoUpdate" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Announce" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="-30"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "autoUpdate";
+					GB_Set_Label(GB_TEXT.AutoUpdate);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_PreventRebuff" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_AutoUpdate" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "preventRebuff";
+					GB_Set_Label(GB_TEXT.PreventRebuff);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_ScaleRank" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_PreventRebuff" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "scaleRank";
+					GB_Set_Label(GB_TEXT.ScaleRank);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_PreventOverhealing" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_ScaleRank" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "preventOverhealing";
+					GB_Set_Label(GB_TEXT.PreventOverhealing);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_MatchSpellName" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_PreventOverhealing" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="20" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "matchSpellName";
+					GB_Set_Label(GB_TEXT.MatchSpellName);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_MatchCastingTime" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_MatchSpellName" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "matchCastingTime";
+					GB_Set_Label(GB_TEXT.MatchCastingTime);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_PreventOverkill" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_MatchCastingTime" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="-20" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "preventOverkill";
+					GB_Set_Label(GB_TEXT.PreventOverkill);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_LowManaRank" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_PreventOverkill" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "lowManaRank";
+					GB_Set_Label(GB_TEXT.LowManaRank);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_CancelHeal" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_LowManaRank" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "cancelHeal";
+					GB_Set_Label(GB_TEXT.CancelHeal);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+	</Frames>
+</Frame>
+
+<Frame name="GB_Action_Options_Display" parent="GB_Action_Options" hidden="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="GB_Action_Options_Cast_Button" relativePoint="BOTTOMLEFT">
+			<Offset><AbsDimension x="0" y="-5"/></Offset>
+		</Anchor>
+	</Anchors>
+	<Frames>
+		<Frame name="$parent_Context" inherits="GB_MenuControlTemplate">
+			<Size><AbsDimension x="203" y="26"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "GB_Menu_Contexts";
+					GB_Set_Label(GB_TEXT.ShowWhen);
+					GB_Set_Anchor("", 0, 10);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="$parent_Form" inherits="GB_MenuControlTemplate">
+			<Size><AbsDimension x="120" y="26"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "GB_Menu_Forms";
+					GB_Set_Label(GB_TEXT.ShowForForm);
+					GB_Set_Anchor("", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="$parent_OutOfContext" inherits="GB_MenuControlTemplate">
+			<Size><AbsDimension x="120" y="26"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "GB_Menu_OutOfContext";
+					GB_Set_Label(GB_TEXT.WhenOOC);
+					GB_Set_Anchor("", 0, -40);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<CheckButton name="$parent_HideButton" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-80"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "hide";
+					GB_Set_Label(GB_TEXT.HideButton);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_FlashInContext" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_HideButton" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "flashInContext";
+					GB_Set_Label(GB_TEXT.FlashInContext);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_InCombat" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_FlashInContext" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "inCombat";
+					GB_Set_Label(GB_TEXT.ShowInCombat);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_NotInCombat" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_InCombat" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "notInCombat";
+					GB_Set_Label(GB_TEXT.ShowNotInCombat);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_ValidTarget" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_NotInCombat" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "validTarget";
+					GB_Set_Label(GB_TEXT.ShowIfValidTarget);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_PlayerOnly" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_ValidTarget" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="3"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "playerOnly";
+					GB_Set_Label(GB_TEXT.PlayerOnly);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Frame name="$parent_ShowForClass">
+			<Size><AbsDimension x="10" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_PlayerOnly" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Label" inherits="GameFontNormal">
+						<Anchors>
+							<Anchor point="LEFT"/>
+						</Anchors>
+						<Color r="1" g="1" b="1"/>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					GB_Set_Label(GB_TEXT.ShowForClass);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<CheckButton name="$parent_Druid" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_ShowForClass" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Druid;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Hunter" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Druid" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Hunter;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Mage" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Hunter" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Mage;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Paladin" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Mage" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Paladin;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Priest" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Paladin" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Priest;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Rogue" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Druid" relativePoint="RIGHT">
+					<Offset><AbsDimension x="100" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Rogue;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Shaman" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Rogue" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Shaman;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Warlock" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Shaman" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Warlock;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Warrior" inherits="GB_CheckBoxTemplate2">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_Warlock" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "classes";
+					this.index2 = GB_TEXT.Warrior;
+					GB_Set_Label(this.index2);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+	</Frames>
+</Frame>
+
+</Ui>

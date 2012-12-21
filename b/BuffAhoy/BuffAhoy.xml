@@ -1,0 +1,2751 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+   <Script file="BAlocalization.lua"/>
+   <Script file="BuffAhoy.lua"/>
+   <Script file="BuffAhoyConfig.lua"/>
+
+
+<!-- Templates -->
+	<!-- Button Template -->
+
+	<CheckButton name="BuffAhoyButtonTemplate" inherits="ActionButtonTemplate" virtual="true" >
+		<Scripts>
+			<OnLoad>
+				BuffAhoy_ButtonLoad();
+			</OnLoad>
+			<OnShow>
+				BuffAhoyButton_Update() <!-- (this); -->
+			</OnShow>
+			<OnDragStart>
+				PickupAction(BuffAhoyButton_GetID(this));
+				BuffAhoyButton_UpdateState();
+
+			</OnDragStart>
+			<OnReceiveDrag>
+				PlaceAction(BuffAhoyButton_GetID(this));
+				BuffAhoyButton_UpdateState();
+
+			</OnReceiveDrag>
+			<OnClick>
+				PickupAction(BuffAhoyButton_GetID(this));
+				BuffAhoyButton_UpdateState();
+
+			</OnClick>
+			<OnEnter>
+				BuffAhoy_SetTooltip();
+			</OnEnter>
+			<OnLeave>
+				BuffAhoy_VerboseButtonLeave()
+			</OnLeave>
+
+			<OnEvent>
+				BuffAhoy_ButtonEvent(event);
+			</OnEvent>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton name="BuffAhoyCheckButtonTemplate" hidden="false" virtual="true">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="32" y="32" />
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentCheckbuttonBackground" setAllPoints="true">
+					<Color r="0" g="0" b="1" a="0.0" />
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+		<CheckedDisabledTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		<DisabledTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		<Scripts>
+			<OnClick>
+				BuffAhoy_CheckToggle(this:GetID(), this:GetChecked());
+			</OnClick>
+			<OnEnter>
+				BuffAhoy_CheckButtonEnter();
+			</OnEnter>
+			<OnLeave>
+				BuffAhoy_CheckButtonLeave();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton name="BuffAhoyVerboseButtonTemplate" hidden="false" virtual="true">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="32" y="32" />
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentCheckbuttonBackground" setAllPoints="true">
+					<Color r="0" g="0" b="1" a="0.0" />
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+		<CheckedDisabledTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		<DisabledTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		<Scripts>
+			<OnClick>
+				BuffAhoy_VerboseToggle(this:GetID(), this:GetChecked());
+			</OnClick>
+			<OnEnter>
+				BuffAhoy_VerboseButtonEnter();
+			</OnEnter>
+			<OnLeave>
+				BuffAhoy_VerboseButtonLeave();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton name="BuffAhoyOptionsButtonTemplate" hidden="false" virtual="true">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="32" y="32" />
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentCheckbuttonBackground" setAllPoints="true">
+					<Color r="0" g="0" b="1" a="0.0" />
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+		<CheckedDisabledTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		<DisabledTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+		<Scripts>
+			<OnClick>
+				BuffAhoy_OptionsToggle(this:GetID(), this:GetChecked());
+			</OnClick>
+			<OnEnter>
+				BuffAhoy_OptionsButtonEnter();
+			</OnEnter>
+			<OnLeave>
+				BuffAhoy_OptionsButtonLeave();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+	<!-- Frame Bar Template -->
+
+	<Frame name="BuffAhoyOptionsTemplate" virtual="true" id="10">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+
+			<Frame name="BuffAhoyMasterDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="160" y="-42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						BuffAhoyMasterDropdown_OnLoad();
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText("Click to navigate the functions of BuffAhoy", nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>  
+
+			<Frame name="VerboseTypeDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="20" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Verbosity Mode">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						VerboseTypeDropdown_OnLoad();
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText("Click to change verbosity mode", nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>  
+			<Frame name="BuffTypeDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="165" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Buffing Mode">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						BuffTypeDropdown_OnLoad();
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText("Click to change buffing mode", nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Text Labels -->
+				<FontString name="$parentMasterText" inherits="GameFontHighlight" text="BuffAhoy Navigation">
+					<Size>
+						<AbsDimension x="185" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="5" y="-37"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>		
+		
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="BuffAhoyOptionsFrameTemplate" virtual="true" id="10">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="PPTENABLE" inherits="BuffAhoyOptionsButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="25" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="SCENABLE" inherits="BuffAhoyOptionsButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PPTENABLE" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<Frame name="SCTypeDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SCENABLE" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="145" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="SmartCast Key">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						SCTypeDropdown_OnLoad();
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText("Click to select the selfcast button", nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="BuffManaCheck" inherits="BuffAhoyOptionsButtonTemplate" id="3" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SCENABLE" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>  
+			<CheckButton name="AnnOpt" inherits="BuffAhoyOptionsButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="BuffManaCheck" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="StatusTextOpt" inherits="BuffAhoyOptionsButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="AnnOpt" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="LoudEventsOpt" inherits="BuffAhoyOptionsButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="StatusTextOpt" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="ForcePartyOpt" inherits="BuffAhoyOptionsButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="LoudEventsOpt" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="PPTFrameOpt" inherits="BuffAhoyOptionsButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ForcePartyOpt" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Text Labels -->
+	
+				<FontString name="$parentPPTText" inherits="GameFontHighlight" text="PPT Enabled" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="62" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>		
+		
+				<FontString name="$parentSCText" inherits="GameFontHighlight" text="SmartCast Enabled" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentPPTText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+
+				<FontString name="$parentRCText" inherits="GameFontHighlight" text="Wait on Mana/Range when Buffing" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSCText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAnnTextOpt" inherits="GameFontHighlight" text="Buff /say Announcement" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentRCText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentStatusTextText" inherits="GameFontHighlight" text="Enable Status Messages" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentAnnTextOpt" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>	
+				<FontString name="$parentLoudEventsText" inherits="GameFontHighlight" text="Enable Failure/Interruption Messages" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentStatusTextText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>	
+				<FontString name="$parentForcePartyText" inherits="GameFontHighlight" text="Force Class-Based Buffing to ignore Raid" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLoudEventsText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>	
+				<FontString name="$parentPPTText" inherits="GameFontHighlight" text="Show PPT Frame" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="260" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentForcePartyText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="MultiCastOptionsTemplate" virtual="true" id="10">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="PPTENABLE2" inherits="BuffAhoyOptionsButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="25" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="SCENABLE2" inherits="BuffAhoyOptionsButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="165" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="WhoVarRaidToggle2" inherits="BuffAhoyOptionsButtonTemplate" id="10" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="25" y="-65" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>  
+			<CheckButton name="UtilMultiTog" inherits="BuffAhoyCheckButtonTemplate" id="2" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="200" y="-65" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>  
+
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Text Labels -->
+			
+				<FontString name="$parentPPTText" inherits="GameFontHighlight" text="PPT Enabled">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="42" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				<FontString name="$parentSCText" inherits="GameFontHighlight" text="SmartCast Enabled">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="180" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Verbose State: Raid">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="42" y="-65"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentUMText" inherits="GameFontHighlight" text="View Util Pane">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="200" y="-65"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="BuffAhoySetTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="37">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="80" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="38">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="BuffAhoyButtonTemplate" id ="39">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="BuffAhoyButtonTemplate" id ="40">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent5" inherits="BuffAhoyButtonTemplate" id ="41">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="$parent6" inherits="BuffAhoyButtonTemplate" id="42" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Buffs">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="45"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Seq. 1">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPlayerText" inherits="GameFontHighlight" text="Self">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-94" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty1Text" inherits="GameFontHighlight" text="Party1">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentPlayerText" relativePoint="CENTER" >
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty2Text" inherits="GameFontHighlight" text="Party2">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty1Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty3Text" inherits="GameFontHighlight" text="Party3">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty2Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty4Text" inherits="GameFontHighlight" text="Party4">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty3Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPetText" inherits="GameFontHighlight" text="Pets">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty4Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="RaidCastSetTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="37">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="80" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="38">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="BuffAhoyButtonTemplate" id ="39">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="BuffAhoyButtonTemplate" id ="40">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent5" inherits="BuffAhoyButtonTemplate" id ="41">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Buffs">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Class">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="$parentPlayerText" inherits="GameFontHighlight" text="Paladin">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-94" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty1Text" inherits="GameFontHighlight" text="Warrior">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentPlayerText" relativePoint="CENTER" >
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty2Text" inherits="GameFontHighlight" text="Mage">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty1Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty3Text" inherits="GameFontHighlight" text="Priest">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty2Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty4Text" inherits="GameFontHighlight" text="Pets">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty3Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="MultiCastSetTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="37">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="80" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="38">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="BuffAhoyButtonTemplate" id ="39">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="BuffAhoyButtonTemplate" id ="40">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent5" inherits="BuffAhoyButtonTemplate" id ="41">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="$parent6" inherits="BuffAhoyButtonTemplate" id="42" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="MultiSC" inherits="BuffAhoyOptionsButtonTemplate" id="43">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="160" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="MultiCast">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="60" y="47"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Set 1">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPlayerText" inherits="GameFontHighlight" text="1">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-94" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty1Text" inherits="GameFontHighlight" text="2">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentPlayerText" relativePoint="CENTER" >
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty2Text" inherits="GameFontHighlight" text="3">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty1Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty3Text" inherits="GameFontHighlight" text="4">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty2Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty4Text" inherits="GameFontHighlight" text="5">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty3Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPetText" inherits="GameFontHighlight" text="6">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty4Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="44" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMCText" inherits="GameFontHighlight" text="Verbose Multicasting">
+					<Size>
+						<AbsDimension x="200" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="160" y="30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>	
+			</Layer>
+		</Layers>
+	</Frame>
+
+
+	<Frame name="BuffAhoySideTemplate" virtual="true" id="1">
+				<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="43">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="80" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="44">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="BuffAhoyButtonTemplate" id ="45">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="BuffAhoyButtonTemplate" id ="46">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent5" inherits="BuffAhoyButtonTemplate" id ="47">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="$parent6" inherits="BuffAhoyButtonTemplate" id="48" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="BuffCastVerbose" inherits="BuffAhoyVerboseButtonTemplate" id="70">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="60" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="BuffCastQuiet" inherits="BuffAhoyVerboseButtonTemplate" id="71">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="210" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+<!--			<CheckButton name="BuffCastAnnounce" inherits="BuffAhoyVerboseButtonTemplate" id="72">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="150" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+-->			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Side">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameVerboseText" inherits="GameFontHighlight" text="Verbose Buffing">
+					<Size>
+						<AbsDimension x="100" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="90" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameQuietText" inherits="GameFontHighlight" text="Quiet Buffing">
+					<Size>
+						<AbsDimension x="100" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="230" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+<!--				<FontString name="$parentNameAnnounceText" inherits="GameFontHighlight" text="Announce Sequence">
+					<Size>
+						<AbsDimension x="100" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="170" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+-->
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="RaidCastSideTemplate" virtual="true" id="1">
+				<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="43">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="80" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="44">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="BuffAhoyButtonTemplate" id ="45">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="BuffAhoyButtonTemplate" id ="46">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+<!--			<CheckButton name="$parent5" inherits="BuffAhoyButtonTemplate" id ="47">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="18" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+-->			
+
+			<CheckButton name="BuffCastVerbose2" inherits="BuffAhoyVerboseButtonTemplate" id="70">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="60" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="BuffCastQuiet2" inherits="BuffAhoyVerboseButtonTemplate" id="71">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="210" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				
+				<FontString name="$parentPlayerText" inherits="GameFontHighlight" text="Warlock">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-94" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty1Text" inherits="GameFontHighlight" text="Rogue">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentPlayerText" relativePoint="CENTER" >
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty2Text" inherits="GameFontHighlight" text="Hunter">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty1Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentParty3Text" inherits="GameFontHighlight" text="Druid">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentParty2Text" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="54" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameVerboseText" inherits="GameFontHighlight" text="Verbose Buffing">
+					<Size>
+						<AbsDimension x="100" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="90" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameQuietText" inherits="GameFontHighlight" text="Quiet Buffing">
+					<Size>
+						<AbsDimension x="100" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="230" y="-15"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="MultiCastSideTemplate" virtual="true" id="1">
+				<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="43">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="80" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="44">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="BuffAhoyButtonTemplate" id ="45">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="BuffAhoyButtonTemplate" id ="46">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent5" inherits="BuffAhoyButtonTemplate" id ="47">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+			<CheckButton name="$parent6" inherits="BuffAhoyButtonTemplate" id="48" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Set 2">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="50" y="20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="BuffAhoySinglesTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="37">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="135" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="BuffAhoyButtonTemplate" id ="38">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="50" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+						
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				<FontString name="$parentHelpText" inherits="GameFontHighlight" text="Placeholder">
+					<Size>
+						<AbsDimension x="300" y="80"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="180" y="85"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				<FontString name="$parentSeq3Text" inherits="GameFontHighlight" text="Seq. 2">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-40" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSeq4Text" inherits="GameFontHighlight" text="Seq. 3">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="45" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="BuffAhoyHealTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="46">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentVerbose" inherits="BuffAhoyVerboseButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="100" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentSC" inherits="BuffAhoyCheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="160" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Heal">
+					<Size>
+						<AbsDimension x="60" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="70" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameVerboseText" inherits="GameFontHighlight" text="Verbose">
+					<Size>
+						<AbsDimension x="190" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="20" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameSCText" inherits="GameFontHighlight" text="SelfCast">
+					<Size>
+						<AbsDimension x="190" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="BuffAhoySCTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="BuffAhoyButtonTemplate" id ="46">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentVerbose" inherits="BuffAhoyVerboseButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="100" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parentSC" inherits="BuffAhoyCheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="160" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				
+				<FontString name="$parentNameText" inherits="GameFontHighlight" text="Heal">
+					<Size>
+						<AbsDimension x="80" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameVerboseText" inherits="GameFontHighlight" text="Verbose">
+					<Size>
+						<AbsDimension x="190" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="20" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentNameSCText" inherits="GameFontHighlight" text="SelfCast">
+					<Size>
+						<AbsDimension x="190" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="BuffAhoyGroupTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="GroupOne" inherits="BuffAhoyOptionsButtonTemplate" id="81">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="55" y="-110" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupThree" inherits="BuffAhoyOptionsButtonTemplate" id="83">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="55" y="-140" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupFive" inherits="BuffAhoyOptionsButtonTemplate" id="85">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="55" y="-170" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupSeven" inherits="BuffAhoyOptionsButtonTemplate" id="87">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="55" y="-200" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupTwo" inherits="BuffAhoyOptionsButtonTemplate" id="82">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="160" y="-110" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupFour" inherits="BuffAhoyOptionsButtonTemplate" id="84">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="160" y="-140" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupSix" inherits="BuffAhoyOptionsButtonTemplate" id="86">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="160" y="-170" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="GroupEight" inherits="BuffAhoyOptionsButtonTemplate" id="88">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="160" y="-200" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+
+				<Fontstring name="$parentHelpText" inherits="GameFontHighlight" text="Empty">
+					<Size>
+						<AbsDimension x="280" y="65"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="50" y="-50"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Fontstring>
+				<FontString name="$parent1Text" inherits="GameFontHighlight" text="Group 1">
+					<Size>
+						<AbsDimension x="220" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="-110"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent3Text" inherits="GameFontHighlight" text="Group 3">
+					<Size>
+						<AbsDimension x="220" y="-30"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent5Text" inherits="GameFontHighlight" text="Group 5">
+					<Size>
+						<AbsDimension x="220" y="-60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="-170"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent7Text" inherits="GameFontHighlight" text="Group 7">
+					<Size>
+						<AbsDimension x="220" y="-90"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="-200"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent2Text" inherits="GameFontHighlight" text="Group 2">
+					<Size>
+						<AbsDimension x="220" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="110" y="-110"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent4Text" inherits="GameFontHighlight" text="Group 4">
+					<Size>
+						<AbsDimension x="220" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="110" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent6Text" inherits="GameFontHighlight" text="Group 6">
+					<Size>
+						<AbsDimension x="220" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="110" y="-170"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parent8Text" inherits="GameFontHighlight" text="Group 8">
+					<Size>
+						<AbsDimension x="220" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="110" y="-200"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+<!-- Real Frames -->
+
+	<Frame name="BuffAhoyFrame" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="400" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentMainIcon" file="Interface\QuestFrame\UI-QuestLog-BookIcon">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTopLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentTopRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBotLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBotRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-BotRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitleText" inherits="GameFontHighlight" text="BuffAhoy Config">
+					<Size>
+						<AbsDimension x="300" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="BuffAhoyFrameHelpText" inherits="CombatLogFont">
+					<Size>
+						<AbsDimension x="260" y="50"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="20" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0.6" g="0.6" b="0.8"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentExitButton" inherits="UIPanelButtonTemplate" text="Exit">
+				<Size>
+					<AbsDimension x="77" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-43" y="81"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parentVersion">
+				<Size>
+					<AbsDimension x="70" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="63" y="-420"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+						<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="RIGHT"/>
+					</Layer>	
+				</Layers>
+			</Frame>
+
+
+			<Frame name="BuffAhoyOptions" inherits="BuffAhoyOptionsTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("10");
+					</OnLoad>
+				</Scripts>
+
+
+			</Frame>
+
+			<Frame name="BuffAhoyOptionsFrame" inherits="BuffAhoyOptionsFrameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-130"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("10");
+					</OnLoad>
+				</Scripts>
+
+			</Frame>
+			<Frame name="BuffAhoyGroupFrame" inherits="BuffAhoyGroupTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-130"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("80");
+						BuffAhoyGroupFrameHelpText:SetText(BUFFAHOY_GROUP_HELP)
+					</OnLoad>
+				</Scripts>
+
+			</Frame>
+
+			<Frame name="BuffAhoySetOne" inherits="BuffAhoySetTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-180"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("1");
+						BuffAhoySetOne1:SetID(BCS1[1]);
+						BuffAhoySetOne2:SetID(BCS1[2]);
+						BuffAhoySetOne3:SetID(BCS1[3]);
+						BuffAhoySetOne4:SetID(BCS1[4]);
+						BuffAhoySetOne5:SetID(BCS1[5]);
+						BuffAhoySetOne6:SetID(BCS1[6]);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="BuffAhoySetTwo" inherits="BuffAhoySideTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-235"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("2");
+						BuffAhoySetTwo1:SetID(BCS2[1]);
+						BuffAhoySetTwo2:SetID(BCS2[2]);
+						BuffAhoySetTwo3:SetID(BCS2[3]);
+						BuffAhoySetTwo4:SetID(BCS2[4]);
+						BuffAhoySetTwo5:SetID(BCS2[5]);
+						BuffAhoySetTwo6:SetID(BCS2[6]);
+						BuffCastVerbose:SetID("70");
+						BuffCastQuiet:SetID("71");
+
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="RaidSetOne" inherits="RaidCastSetTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-180"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("1");
+						RaidSetOne1:SetID(RCPalSha);
+						RaidSetOnePlayerText:SetText(PalShaVar);
+						RaidSetOne2:SetID(RCWarrior);
+						RaidSetOne3:SetID(RCMage);
+						RaidSetOne4:SetID(RCPriest);
+						RaidSetOne5:SetID(RCPet1);
+
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="RaidSetTwo" inherits="RaidCastSideTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-235"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("2");
+						RaidSetTwo1:SetID(RCWarlock);
+						RaidSetTwo2:SetID(RCRogue);
+						RaidSetTwo3:SetID(RCHunter);
+						RaidSetTwo4:SetID(RCDruid);
+						BuffCastVerbose2:SetID("70");
+						BuffCastQuiet2:SetID("71");
+
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="BuffAhoySetThreeFour" inherits="BuffAhoySinglesTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-365"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("3");
+						BuffAhoySetThreeFour1:SetID(BCS3);
+						BuffAhoySetThreeFour2:SetID(BCS4);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="RaidSetThreeFour" inherits="BuffAhoySinglesTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-365"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("4");
+						RaidSetThreeFour1:SetID(RCS2);
+						RaidSetThreeFour2:SetID(RCS3);
+						RaidSetThreeFourSeq3Text:SetText("Seq. 2")
+						RaidSetThreeFourSeq4Text:SetText("Seq. 3")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Button name="$parentResetButton" inherits="UIPanelButtonTemplate" text="Reset">
+				<Size>
+					<AbsDimension x="77" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-124" y="81"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						BuffAhoy_Reset();
+						BuffAhoy_OnShow();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="BuffAhoyHealOne" inherits="BuffAhoyHealTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-185"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						BuffAhoyHealOneVerbose:SetID("11");
+						BuffAhoyHealOne1:SetID(HZR1)
+						BuffAhoyHealOneNameText:SetText("Heal 1")
+						BuffAhoyHealOneSC:SetID("11")
+
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="BuffAhoyHealTwo" inherits="BuffAhoyHealTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="140" y="-185"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						BuffAhoyHealTwoVerbose:SetID("12");
+						BuffAhoyHealTwo1:SetID(HZR2);
+						BuffAhoyHealTwoNameText:SetText("Heal 2")
+						BuffAhoyHealTwoSC:SetID("12")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="BuffAhoyHealThree" inherits="BuffAhoyHealTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-245"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						BuffAhoyHealThreeVerbose:SetID("13");
+						BuffAhoyHealThreeNameText:SetText("Heal 3")
+						BuffAhoyHealThree1:SetID(HZR3);
+						BuffAhoyHealThreeSC:SetID("13")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="BuffAhoyProtect" inherits="BuffAhoyHealTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="140" y="-245"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						BuffAhoyProtectVerbose:SetID("14");
+						BuffAhoyProtectNameText:SetText("Protect")
+						BuffAhoyProtect1:SetID(PZR1);
+						BuffAhoyProtectSC:SetID("14")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="BuffAhoyCleanseOne" inherits="BuffAhoyHealTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-305"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						BuffAhoyCleanseOneVerbose:SetID("15");
+						BuffAhoyCleanseOneNameText:SetText("Cleanse 1")
+						BuffAhoyCleanseOne1:SetID(CZR1);
+						BuffAhoyCleanseOneSC:SetID("15")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="BuffAhoyCleanseTwo" inherits="BuffAhoyHealTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="140" y="-305"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						BuffAhoyCleanseTwoVerbose:SetID("16");
+						BuffAhoyCleanseTwoNameText:SetText("Cleanse 2")
+						BuffAhoyCleanseTwo1:SetID(CZR2);
+						BuffAhoyCleanseTwoSC:SetID("16")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+
+			<Frame name="MultiCastSetOne" inherits="MultiCastSetTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-180"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("11");
+						MultiCastSetOne1:SetID(MCS1[1]);
+						MultiCastSetOne2:SetID(MCS1[2]);
+						MultiCastSetOne3:SetID(MCS1[3]);
+						MultiCastSetOne4:SetID(MCS1[4]);
+						MultiCastSetOne5:SetID(MCS1[5]);
+						MultiCastSetOne6:SetID(MCS1[6]);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+
+			<Frame name="MultiCastSetTwo" inherits="MultiCastSideTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-5" y="-225"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetID("12");
+						MultiCastSetTwo1:SetID(MCS2[1]);
+						MultiCastSetTwo2:SetID(MCS2[2]);
+						MultiCastSetTwo3:SetID(MCS2[3]);
+						MultiCastSetTwo4:SetID(MCS2[4]);
+						MultiCastSetTwo5:SetID(MCS2[5]);
+						MultiCastSetTwo6:SetID(MCS2[6]);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="ShoutCastOne" inherits="BuffAhoySCTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-284"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						ShoutCastOneVerbose:SetID("21");
+						ShoutCastOne1:SetID(SCT1)
+						ShoutCastOneNameText:SetText("Shoutcast 1")
+						ShoutCastOneSC:SetID("21")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="ShoutCastTwo" inherits="BuffAhoySCTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="140" y="-284"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						ShoutCastTwoVerbose:SetID("22");
+						ShoutCastTwo1:SetID(SCT2);
+						ShoutCastTwoNameText:SetText("Shoutcast 2")
+						ShoutCastTwoSC:SetID("22")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="ShoutCastThree" inherits="BuffAhoySCTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-345"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						ShoutCastThreeVerbose:SetID("23");
+						ShoutCastThreeNameText:SetText("Shoutcast 3")
+						ShoutCastThree1:SetID(SCT3);
+						ShoutCastThreeSC:SetID("23")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="ShoutCastFour" inherits="BuffAhoySCTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="BuffAhoyFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="140" y="-345"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						ShoutCastFourVerbose:SetID("24");
+						ShoutCastFourNameText:SetText("Shoutcast 4")
+						ShoutCastFour1:SetID(SCT4);
+						ShoutCastFourSC:SetID("24")
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."VersionLabel"):SetText("Version ");
+				getglobal(this:GetName().."VersionText"):SetText(BA_VERSION);
+				BuffAhoy_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				BuffAhoy_OnEvent(event);
+			</OnEvent>
+			<OnShow>
+				BuffAhoy_OnShow();
+			</OnShow>
+			<OnDragStart>
+				BuffAhoyFrame:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				BuffAhoyFrame:StopMovingOrSizing();
+			</OnDragStop>
+			<OnMouseUp>
+				BuffAhoyFrame:StopMovingOrSizing();
+			</OnMouseUp>
+
+
+		</Scripts>
+
+	</Frame>
+
+    <Frame name="PPTFrame" frameStrata="LOW" toplevel="false" enableMouse="true" movable="true" parent="UIParent" hidden="false">
+	<Size>
+		<AbsDimension x="120" y="34"/>
+	</Size>
+	<Anchors>
+		<Anchor point="BOTTOMLEFT">
+			<Offset>
+				<AbsDimension x="400" y="600"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Frames>
+
+
+	<Frame name="PPTBackdropFrame" parent="PPTFrame">
+		<Size>
+			<AbsDimension x="120" y="34"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop name="PPTBackground"
+				bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+				edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			  <TileSize>
+	  			<AbsValue val="12"/>
+			  </TileSize>
+			  <EdgeSize>
+			  	<AbsValue val="12"/>
+			  </EdgeSize>
+			  <BackgroundInsets>
+			  	<AbsInset left="2" right="2" top="2" bottom="2"/>
+			  </BackgroundInsets>
+		</Backdrop>
+		<Layers>
+      		<Layer level="ARTWORK">
+		<FontString name="PPTText" inherits="GameFontNormal" text="PartyTarget" justifyH="LEFT" toplevel="true">
+			<Size>
+				<AbsDimension x="110" y="10"/>
+			</Size>
+			<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="5" y="-11"/>
+				</Offset>
+			</Anchor>
+			</Anchors>
+        	</FontString>
+<!--        	<FontString name="Time1" inherits="GameFontNormal" text="" justifyH="LEFT" toplevel="true">
+			<Size>
+				<AbsDimension x="110" y="34"/>
+			</Size>
+			<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="10" y="-5"/>
+				</Offset>
+			</Anchor>
+			</Anchors>
+        	</FontString>
+-->
+      		</Layer>
+    		</Layers>
+	</Frame>
+		<Button name="PPTCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="PPTFrame" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="1" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					PPT_CloseButton();
+				</OnClick>
+			</Scripts>
+		</Button>
+     	</Frames>
+
+    <Scripts>
+      	<OnLoad>
+        	PPTFrame_OnLoad();
+      	</OnLoad>
+      	<OnUpdate>
+        	PPTFrame_OnUpdate(arg1);
+      	</OnUpdate>
+	<OnMouseDown>
+		PPTFrame_OnMouseDown(arg1);
+	</OnMouseDown>
+	<OnMouseUp>
+		PPTFrame_OnMouseUp(arg1);
+	</OnMouseUp>
+    </Scripts>
+  </Frame>
+
+	<GameTooltip name="BA_Tooltip" inherits="GameTooltipTemplate">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(BuffAhoyFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+</Ui>

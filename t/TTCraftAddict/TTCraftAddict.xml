@@ -1,0 +1,628 @@
+<!--
+
+	TTCraftAddict
+	Copyright (c) Matthew Johnson.  All rights reserved.
+
+	This work may be freely adapted and distributed as long as this notice remains intact.
+	This work may NOT be (re)sold or included in any compilations that are (re)sold.
+
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<!-- Localization. -->
+	<Script file="localization.lua"/>
+
+	<!-- Link the main code files. -->
+	<Script file="TTCraftAddict.lua"/>
+
+	<!-- Templates. -->
+	<Button name="TTCA_ListItemTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="22"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parent_Indent">
+					<Size>
+						<AbsDimension x="1" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parent_Texture">
+					<Size>
+						<AbsDimension x="20" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent_Indent" relativePoint="RIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parent_TooltipTriggerFrame">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Texture" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						TTCA_ListItem_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						TTCA_ListItem_OnLeave();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<NormalText inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Texture" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText inherits="GameFontHighlight" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Texture" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText inherits="GameFontDisable" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Texture" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+		<Scripts>
+			<OnClick>
+				TTCA_ListItem_OnClick(arg1);
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<!-- The button to expand the trade skill tree. -->
+	<Button name="TTCA_Button_ShowBuildTree" toplevel="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="TradeSkillFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-37" y="-9"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				TTCA_ShowBuildTree(true);
+			</OnClick>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+		<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+	</Button>
+
+	<!-- The main trade skill tree frame. -->
+	<Frame name="TTCA_MainFrame" toplevel="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="337" y="421"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="TradeSkillFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-35" y="-13"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Addons\TTCraftAddict\UI-TTCA-MainFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-12" y="13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\TTCraftAddict\UI-TTCA-MainFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="244" y="13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\TTCraftAddict\UI-TTCA-MainFrame-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-12" y="-243"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Addons\TTCraftAddict\UI-TTCA-MainFrame-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="244" y="-243"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString inherits="GameFontNormal" text="TTCA_TEXT_CRAFTADDICT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="120" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="TTCA_Tab_BuildTree" inherits="TabButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_Tab_OnClick(TTCA_TAB_BUILDTREE);
+					</OnClick>
+					<OnLoad>
+						this:SetText(TTCA_TEXT_TAB_BUILDTREE_BUTTON);
+					</OnLoad>
+					<OnShow>
+						PanelTemplates_TabResize(0);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 31);
+					</OnShow>
+				</Scripts>
+			</Button>
+			<Button name="TTCA_Tab_Materials" inherits="TabButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_Tab_BuildTree" relativePoint="TOPRIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_Tab_OnClick(TTCA_TAB_MATERIALS);
+					</OnClick>
+					<OnLoad>
+						this:SetText(TTCA_TEXT_TAB_MATERIALS_BUTTON);
+					</OnLoad>
+					<OnShow>
+						PanelTemplates_TabResize(0);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 31);
+					</OnShow>
+				</Scripts>
+			</Button>
+			<Frame name="TTCA_ListItem_HighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="300" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="TTCA_ListItem_Highlight" file="Interface\Buttons\UI-Listbox-Highlight2">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Button name="TTCA_ListItem1" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_MainFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-66"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem2" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem3" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem4" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem5" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem6" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem7" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem8" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem9" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem10" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem11" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem10" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem12" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem11" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem13" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem12" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem14" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem13" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="TTCA_ListItem15" inherits="TTCA_ListItemTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_ListItem14" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<ScrollFrame name="TTCA_List_ScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="298" y="335"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="TTCA_MainFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-31" y="-61"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+							<Size>
+								<AbsDimension x="30" y="120"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.9609375"/>
+						</Texture>
+						<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+							<Size>
+								<AbsDimension x="30" y="100"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="-118"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.46875" top="0.25" bottom="0.8"/>
+						</Texture>
+						<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+							<Size>
+								<AbsDimension x="30" y="123"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+						</Texture>
+					</Layer>
+<!--
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="30" y="256"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+									<Offset>
+										<AbsDimension x="0" y="5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+							<Size>
+								<AbsDimension x="30" y="106"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+									<Offset>
+										<AbsDimension x="0" y="-2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+						</Texture>
+					</Layer>
+-->
+				</Layers>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(TTCA_LISTITEM_HEIGHT, TTCA_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<Button name="TTCA_Button_Close" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="TTCA_MainFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="6" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_ShowBuildTree(false);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="TTCA_Button_CreateAllTree" inherits="UIPanelButtonTemplate" text="CREATE_ALL">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="TTCA_MainFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="6" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_CreateTree_OnClick(true);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<EditBox name="TTCA_InputBox_Quantity" letters="3" historyLines="0" numeric="true" autoFocus="false">
+				<Size>
+					<AbsDimension x="30" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="TTCA_MainFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="117" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						if (this:GetText() == "0") then
+							this:SetText("1");
+						end
+						TTCA_Update();
+					</OnTextChanged>
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						this:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="TTCA_Button_DecrementQuantity">
+				<Size>
+					<AbsDimension x="23" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="TTCA_InputBox_Quantity" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-4" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_IncrementQuantity_OnClick(-1);
+						TTCA_InputBox_Quantity:ClearFocus();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="TTCA_Button_IncrementQuantity">
+				<Size>
+					<AbsDimension x="23" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="TTCA_InputBox_Quantity" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_IncrementQuantity_OnClick(1);
+						TTCA_InputBox_Quantity:ClearFocus();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="TTCA_Button_CreateTree" inherits="UIPanelButtonTemplate" text="CREATE">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="TTCA_MainFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-86" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_CreateTree_OnClick(false);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="TTCA_Button_Exit" inherits="UIPanelButtonTemplate" text="EXIT">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="TTCA_MainFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						TTCA_ShowBuildTree(false);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				TTCA_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				TTCA_OnEvent();
+			</OnEvent>
+			<OnMouseWheel>
+				return;
+			</OnMouseWheel>
+		</Scripts>
+	</Frame>
+
+</Ui>
+

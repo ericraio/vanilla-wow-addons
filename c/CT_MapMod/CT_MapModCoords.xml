@@ -1,0 +1,219 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_MapModCoords.lua"/>
+	<Frame name="CT_CoordModFrame" parent="WorldMapFrame" hidden="false">
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="CT_CoordX" hidden="false" justifyH="LEFT" inherits="GameFontNormal" text="X">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="WorldMapFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-54"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_CoordY" hidden="false" justifyH="LEFT" inherits="GameFontNormal" text="Y">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="WorldMapFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-66"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_NumNotes" hidden="false" justifyH="LEFT" inherits="GameFontNormal" text="Map Notes: |c00FFFFFF0|r/|c00FFFFFF250|r">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="WorldMapFrame" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-78"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_FilterNotesText" hidden="false" inherits="GameFontNormal" text="Filter Notes:">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="WorldMapPositioningGuide" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="20" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_FilterNotesCurrFilterText" hidden="true" inherits="ChatFontNormal" text="">
+					<Anchors>
+					<Anchor point="LEFT" relativeTo="CT_FilterNotesText" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_AutoGatherText" hidden="false" inherits="GameFontNormal" text="Auto Gather Herbs/Veins">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeTo="WorldMapPositioningGuide" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-20" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="CT_FilterNotesButton" inherits="UIPanelButtonTemplate" text="Show filter">
+				<Size>
+					<AbsDimension x="110" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CT_FilterNotesText" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="130" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( CT_FilterNotesEB:IsVisible() ) then
+							CT_FilterNotesCurrFilterText:SetText(CT_FilterNotesEB:GetText() or "");
+							CT_FilterNotesCurrFilterText:Show();
+							CT_FilterNotesEB:Hide();
+							CT_MapMod_ExecuteFilter(CT_FilterNotesEB:GetText());
+							this:SetText("Show filter");
+						else
+							CT_FilterNotesCurrFilterText:Hide();
+							CT_FilterNotesEB:Show();
+							CT_FilterNotesEB:SetText(CT_MapMod_Filter or "");
+							CT_FilterNotesEB:HighlightText();
+							this:SetText("Set filter");
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="CT_GatherNotesButton" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="CT_AutoGatherText" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_MapMod_Options[UnitName("player") .. "@" .. GetCVar("realmName")].autoGather = this:GetChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Frame name="CT_GroupSelectDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+				<Size>
+					<AbsDimension x="128" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="WorldMapPositioningGuide" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="10" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_GroupSelectDropDownText:SetText("Display Groups");
+						CT_MapModSelectDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnUpdate>
+				CT_CoordMod_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<EditBox name="CT_FilterNotesEB" parent="WorldMapPositioningGuide" historyLines="0" hidden="true" letters="250">
+		<Size>
+			<AbsDimension x="100" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="CT_FilterNotesText" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="10" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+					<Size>
+						<AbsDimension x="65" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+					<Size>
+						<AbsDimension x="25" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+					<Size>
+						<AbsDimension x="5" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>
+				this:SetFocus();
+			</OnShow>
+			<OnEnterPressed>
+				this:Hide();
+				CT_MapMod_ExecuteFilter(this:GetText() or "");
+				CT_FilterNotesCurrFilterText:SetText(this:GetText() or "");
+				CT_FilterNotesCurrFilterText:Show();
+				CT_FilterNotesButton:SetText("Show filter");
+			</OnEnterPressed>
+			<OnEscapePressed>
+				this:Hide();
+				CT_FilterNotesCurrFilterText:Show();
+				CT_FilterNotesButton:SetText("Show filter");
+			</OnEscapePressed>
+		</Scripts>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+</Ui>

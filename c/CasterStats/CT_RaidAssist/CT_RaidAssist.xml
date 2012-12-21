@@ -1,0 +1,2022 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RAClassSpells.lua"/>
+	<Script file="CT_RaidAssist.lua"/>
+	<Button name="CT_RAGroupMemberBuffButtonTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="9" y="9"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parentIcon"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				CT_RA_BuffButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnClick>
+				if ( IsShiftKeyDown() ) then
+					CT_RA_RecastBuffButton()
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Frame name="CT_RAGroupDragTemplate" virtual="true" movable="true" hidden="false">
+		<Size>
+			<AbsDimension x="100" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				CT_RA_Drag_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					if ( IsShiftKeyDown() and strsub(this:GetName(), 1, 7) ~= "CT_RAMT" ) then
+						CT_RA_DragAllWindows(1);
+						this.dragall = 1;
+					end
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					if ( this.dragall ) then
+						CT_RA_DragAllWindows(nil);
+						this.dragall = nil;
+					end
+					this:StopMovingOrSizing();
+					CT_RAMenu_SaveWindowPositions();
+				end
+			</OnMouseUp>					
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAGroupMemberTemplate" frameStrata="LOW" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="90" y="40"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<StatusBar name="$parentHPBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="70" y="6"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0, 100);
+						this:SetValue(100);
+					</OnLoad>
+				</Scripts>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="1" b="0"/>
+			</StatusBar>
+			<StatusBar name="$parentMPBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="70" y="6"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0, 100);
+						this:SetValue(100);
+					</OnLoad>
+				</Scripts>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="0" b="1"/>
+			</StatusBar>
+			<Frame name="$parentCast" setAllPoints="true">
+				<Frames>
+					<Button name="$parentFrame" hidden="false">
+						<Size>
+							<AbsDimension x="90" y="40"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Scripts>
+							<OnEnter>
+								CT_RA_MemberFrame_OnEnter();
+							</OnEnter>
+							<OnLeave>
+								if ( SpellIsTargeting() ) then
+									SetCursor("CAST_ERROR_CURSOR");
+								end
+								this.cursor = nil;
+								GameTooltip:Hide();
+							</OnLeave>
+							<OnUpdate>
+								CT_RA_MemberFrame_OnUpdate(arg1);
+							</OnUpdate>
+							<OnLoad>
+								this.update = 0.1;
+								this:RegisterForClicks('LeftButtonDown', 'RightButtonDown', 'MiddleButtonDown', 'Button4Down', 'Button5Down');
+							</OnLoad>
+							<OnClick>
+								CT_RA_MemberFrame_OnClick(arg1);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame setAllPoints="true">
+				<Frames>
+					<Frame setAllPoints="true">
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentPercent" hidden="true" inherits="GameFontNormalSmall">
+									<Color r="1.0" g="1.0" b="1.0"/>
+									<Anchors>
+										<Anchor relativePoint="TOPLEFT" point="TOP">
+											<Offset>
+												<AbsDimension x="47" y="-18"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Button name="$parentBuffButton1" inherits="CT_RAGroupMemberBuffButtonTemplate" hidden="true" id="1">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-5" y="-5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.type = "BUFF";
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentBuffButton2" inherits="CT_RAGroupMemberBuffButtonTemplate" hidden="true" id="2">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentBuffButton1">
+										<Offset>
+											<AbsDimension x="0" y="1"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.type = "BUFF";
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentBuffButton3" inherits="CT_RAGroupMemberBuffButtonTemplate" hidden="true" id="3">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBuffButton1">
+										<Offset>
+											<AbsDimension x="-1" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.type = "BUFF";
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentBuffButton4" inherits="CT_RAGroupMemberBuffButtonTemplate" hidden="true" id="3">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBuffButton2">
+										<Offset>
+											<AbsDimension x="-1" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.type = "BUFF";
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentDebuffButton1" inherits="CT_RAGroupMemberBuffButtonTemplate" hidden="true" id="1">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-5" y="-5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.type = "DEBUFF";
+									</OnLoad>
+								</Scripts>
+							</Button>
+							<Button name="$parentDebuffButton2" inherits="CT_RAGroupMemberBuffButtonTemplate" hidden="true" id="2">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentDebuffButton1">
+										<Offset>
+											<AbsDimension x="-1" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this.type = "DEBUFF";
+									</OnLoad>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentName" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+					<Size>
+						<AbsDimension x="80" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentStatus" hidden="false" inherits="GameFontNormalSmall" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentHPBG" file="Interface\TargetingFrame\UI-StatusBar">
+					<Size>
+						<AbsDimension x="70" y="6"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentMPBG" file="Interface\TargetingFrame\UI-StatusBar">
+					<Size>
+						<AbsDimension x="70" y="6"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="10" y="6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "HPBG"):SetVertexColor(0, 1, 0, 0.2);
+				getglobal(this:GetName() .. "MPBG"):SetVertexColor(0, 0, 1, 0.2);
+				this:SetBackdropColor(0, 0.1, 0.9, 0.5);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAMTMemberTemplate" virtual="true" inherits="CT_RAGroupMemberTemplate">
+		<Frames>
+			<Frame name="$parentMTTT" hidden="false">
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "HPBG"):SetVertexColor(0, 1, 0, 0.2);
+						getglobal(this:GetName() .. "MPBG"):SetVertexColor(0, 0, 1, 0.2);
+					</OnLoad>
+				</Scripts>
+				<Size>
+					<AbsDimension x="70" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="75" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentName" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="82" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="9" y="-7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentStatus" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="10" y="-18"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentHPBG" file="Interface\TargetingFrame\UI-StatusBar">
+							<Size>
+								<AbsDimension x="70" y="6"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="10" y="-22"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentMPBG" file="Interface\TargetingFrame\UI-StatusBar">
+							<Size>
+								<AbsDimension x="70" y="6"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="10" y="6"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<StatusBar name="$parentHPBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="70" y="6"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-22"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(0, 100);
+								this:SetValue(100);
+							</OnLoad>
+						</Scripts>
+						<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="1" b="0"/>
+					</StatusBar>
+					<StatusBar name="$parentMPBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="70" y="6"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(0, 100);
+								this:SetValue(100);
+							</OnLoad>
+						</Scripts>
+						<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0" g="0" b="1"/>
+					</StatusBar>
+					<Frame name="$parentCast" setAllPoints="true">
+						<Frames>
+							<Button name="$parentFrame" hidden="false">
+								<Size>
+									<AbsDimension x="90" y="40"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										this:RegisterForClicks('LeftButtonDown', 'RightButtonDown');
+									</OnLoad>
+									<OnClick>
+										CT_RA_AssistMTTT();
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+					<Frame setAllPoints="true">
+						<Frames>
+							<Frame setAllPoints="true">
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentPercent" hidden="true" inherits="GameFontNormalSmall">
+											<Color r="1.0" g="1.0" b="1.0"/>
+											<Anchors>
+												<Anchor relativePoint="TOPLEFT" point="TOP">
+													<Offset>
+														<AbsDimension x="47" y="-18"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="CT_RAGroupTemplate" frameStrata="LOW" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="90" y="220"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentGroupName" hidden="false" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="CT_RAFrame" hidden="false" parent="RaidFrame">
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Frames>
+			<Frame name="CT_RAMember1" id="1" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember2" id="2" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember3" id="3" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember4" id="4" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember5" id="5" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember6" id="6" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember7" id="7" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember8" id="8" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember9" id="9" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember10" id="10" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember11" id="11" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember12" id="12" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember13" id="13" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember14" id="14" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember15" id="15" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember16" id="16" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember17" id="17" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember18" id="18" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember19" id="19" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember20" id="20" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember21" id="21" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember22" id="22" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember23" id="23" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember24" id="24" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember25" id="25" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember26" id="26" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember27" id="27" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember28" id="28" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember29" id="29" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember30" id="30" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember31" id="31" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember32" id="32" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember33" id="33" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember34" id="34" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember35" id="35" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember36" id="36" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember37" id="37" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember38" id="38" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember39" id="39" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+			<Frame name="CT_RAMember40" id="40" parent="UIParent" inherits="CT_RAGroupMemberTemplate" hidden="true"/>
+
+			<Frame name="CT_RAGroup1" inherits="CT_RAGroupTemplate" parent="UIParent" id="1" hidden="true"/>
+			<Frame name="CT_RAGroup2" inherits="CT_RAGroupTemplate" parent="UIParent" id="2" hidden="true"/>
+			<Frame name="CT_RAGroup3" inherits="CT_RAGroupTemplate" parent="UIParent" id="3" hidden="true"/>
+			<Frame name="CT_RAGroup4" inherits="CT_RAGroupTemplate" parent="UIParent" id="4" hidden="true"/>
+			<Frame name="CT_RAGroup5" inherits="CT_RAGroupTemplate" parent="UIParent" id="5" hidden="true"/>
+			<Frame name="CT_RAGroup6" inherits="CT_RAGroupTemplate" parent="UIParent" id="6" hidden="true"/>
+			<Frame name="CT_RAGroup7" inherits="CT_RAGroupTemplate" parent="UIParent" id="7" hidden="true"/>
+			<Frame name="CT_RAGroup8" inherits="CT_RAGroupTemplate" parent="UIParent" id="8" hidden="true"/>
+			<Frame name="CT_RAMTGroup" inherits="CT_RAGroupTemplate" parent="UIParent" id="9" hidden="true"/>
+			<Frame name="CT_RAMTGroupMember1" id="1" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_RAMTGroup">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember2" id="2" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember1">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember3" id="3" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember2">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember4" id="4" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember3">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember5" id="5" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember4">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember6" id="6" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember5">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember7" id="7" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember6">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember8" id="8" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember7">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember9" id="9" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember8">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAMTGroupMember10" id="10" parent="CT_RAMTGroup" inherits="CT_RAMTMemberTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CT_RAMTGroupMember9">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="CT_RAGroupDrag1" inherits="CT_RAGroupDragTemplate" id="1" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="950" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup1, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag2" inherits="CT_RAGroupDragTemplate" id="2" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="950" y="-275"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup2, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag3" inherits="CT_RAGroupDragTemplate" id="3" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="855" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup3, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag4" inherits="CT_RAGroupDragTemplate" id="4" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="855" y="-275"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup4, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag5" inherits="CT_RAGroupDragTemplate" id="5" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="760" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup5, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag6" inherits="CT_RAGroupDragTemplate" id="6" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="760" y="-275"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup6, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag7" inherits="CT_RAGroupDragTemplate" id="7" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="665" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup7, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAGroupDrag8" inherits="CT_RAGroupDragTemplate" id="8" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="665" y="-275"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAGroup8, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAMTGroupDrag" inherits="CT_RAGroupDragTemplate" id="9" parent="UIParent" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="570" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_LinkDrag(CT_RAMTGroup, this, "TOP", "TOP", 0, 10);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("UNIT_HEALTH");
+				this:RegisterEvent("UNIT_MAXHEALTH");
+				this:RegisterEvent("UNIT_MANA");
+				this:RegisterEvent("UNIT_MAXMANA");
+				this:RegisterEvent("UNIT_RAGE");
+				this:RegisterEvent("UNIT_MAXRAGE");
+				this:RegisterEvent("UNIT_ENERGY");
+				this:RegisterEvent("UNIT_MAXENERGY");
+				this:RegisterEvent("UNIT_AURA");
+				this:RegisterEvent("PLAYER_AURAS_CHANGED");
+
+				this:RegisterEvent("PLAYER_TARGET_CHANGED");
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+				this:RegisterEvent("PLAYER_DEAD");
+				this:RegisterEvent("PLAYER_ALIVE");
+
+				this:RegisterEvent("RAID_ROSTER_UPDATE");
+				this:RegisterEvent("PARTY_MEMBERS_CHANGED");
+
+				this:RegisterEvent("VARIABLES_LOADED");
+				this:RegisterEvent("UNIT_NAME_UPDATE");
+
+				this:RegisterEvent("UI_ERROR_MESSAGE");
+				this:RegisterEvent("UI_INFO_MESSAGE");
+				this:RegisterEvent("SPELLCAST_STOP");
+				this:RegisterEvent("SPELLCAST_START");
+				this:RegisterEvent("SPELLCAST_FAILED");
+				this:RegisterEvent("SPELLCAST_INTERRUPTED");
+				CT_RA_UpdateRaidGroup();
+			</OnLoad>
+			<OnEvent>
+				CT_RA_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<MessageFrame name="CT_RAMessageFrame" insertMode="TOP" parent="UIParent" frameStrata="HIGH" toplevel="true">
+		<Size>
+			<AbsDimension x="512" y="100"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="175"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<FontString inherits="ErrorFont" justifyH="CENTER"/>
+	</MessageFrame>
+	<MessageFrame name="CT_RA_WarningFrame" insertMode="BOTTOM" parent="UIParent" frameStrata="HIGH" toplevel="true">
+		<Size>
+			<AbsDimension x="512" y="200"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<FontString inherits="ErrorFont" justifyH="CENTER"/>
+	</MessageFrame>
+	<GameTooltip name="CT_RATooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+	<GameTooltip name="CT_RADurationTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="false"/>
+	<Frame name="CT_RA_UpdateFrame" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				CT_RA_UpdateFrame_OnUpdate(arg1);
+			</OnUpdate>
+			<OnLoad>
+				this:RegisterEvent("PARTY_MEMBERS_CHANGED");
+				this:RegisterEvent("SPELLS_CHANGED");
+				this:RegisterEvent("CHAT_MSG_SYSTEM");
+				CT_RA_GetClassSpells();
+				this.update = 0;
+				this.updateMT = 0.5;
+				this.time = 6;
+				this.updateAFK = 0;
+			</OnLoad>
+			<OnEvent>
+				CT_RA_UpdateFrame_OnEvent(event);
+				CT_RA_ClassSpells_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_ParseFrame" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("CHAT_MSG_RAID");
+				this:RegisterEvent("CHAT_MSG_WHISPER");
+				this:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
+				this:RegisterEvent("CHAT_MSG_SYSTEM");
+				this:RegisterEvent("CHAT_MSG_CHANNEL");
+				this:RegisterEvent("CHAT_MSG_PARTY");
+				this.elapsed = 1;
+				this.numMessagesSent = 0;
+				this.flush = 0;
+			</OnLoad>
+			<OnEvent>
+				CT_RA_ParseEvent(event);
+			</OnEvent>
+			<OnUpdate>
+				CT_RA_ProcessMessages(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CT_RA_EmergencyTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="150" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentName" justifyH="RIGHT" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="-5" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDeficit" justifyH="LEFT" inherits="ChatFontNormal">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentHPBG" file="Interface\TargetingFrame\UI-StatusBar">
+					<Size>
+						<AbsDimension x="150" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<StatusBar name="$parentHPBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="150" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0, 100);
+					</OnLoad>
+				</Scripts>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="1" b="0"/>
+			</StatusBar>
+			<Frame name="$parentClick" setAllPoints="true">
+				<Size>
+					<AbsDimension x="200" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Frames>
+					<Button name="$parentFrame">
+						<Size>
+							<AbsDimension x="200" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.update = 0.1;
+								this:RegisterForClicks("LeftButtonDown", "RightButtonDown", "MiddleButtonDown", "Button4Down", "Button5Down");
+							</OnLoad>
+							<OnEnter>
+								CT_RA_Emergency_OnEnter();
+							</OnEnter>
+							<OnLeave>
+								if ( SpellIsTargeting() ) then
+									SetCursor("CAST_ERROR_CURSOR");
+								end
+								GameTooltip:Hide();
+							</OnLeave>
+							<OnUpdate>
+								CT_RA_Emergency_OnUpdate(arg1);
+							</OnUpdate>
+							<OnClick>
+								local stopDefaultBehaviour;
+								if ( type(CT_RA_CustomOnClickFunction) == "function" ) then
+									stopDefaultBehaviour = CT_RA_CustomOnClickFunction(arg1, this.unitid);
+								end
+								if ( not stopDefaultBehaviour ) then
+									if ( SpellIsTargeting() ) then
+										SpellTargetUnit(this.unitid);
+									else
+										TargetUnit(this.unitid);
+									end
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "HPBG"):SetVertexColor(0, 1, 0, 0.2);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_EmergencyFrame" parent="UIParent" hidden="false">
+		<Size>
+			<AbsDimension x="300" y="170"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" setAllPoints="true" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentTitle" inherits="GameFontNormalSmall" hidden="true" text="Emergency Monitor">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="125" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="70" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_Emergency_DropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parent1" inherits="CT_RA_EmergencyTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent2" inherits="CT_RA_EmergencyTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent1">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent3" inherits="CT_RA_EmergencyTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent2">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent4" inherits="CT_RA_EmergencyTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent3">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent5" inherits="CT_RA_EmergencyTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent4">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0, 0, 1, 0);
+				this:SetBackdropBorderColor(1, 1, 1, 0);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_EmergencyFrameDrag" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="125" y="15"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Scripts>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" and not CT_RAMenu_Options["temp"]["LockGroups"] ) then
+					this:StartMoving();
+				elseif ( arg1 == "RightButton" and CT_RA_EmergencyFrameTitle:IsVisible() ) then
+					CT_RA_Emergency_ToggleDropDown();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing();
+				CT_RAMenu_SaveWindowPositions();
+			</OnMouseUp>
+			<OnEnter>
+				CT_RAMenuHelp_SetTooltip();
+				if ( not CT_RAMenu_Options["temp"]["LockGroups"] ) then
+					GameTooltip:SetText("Left-click to drag\nRight-click to open menu");
+				else
+					GameTooltip:SetText("Right-click to open menu");
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnLoad>
+				CT_RA_LinkDrag(CT_RA_EmergencyFrame, this, "TOP", "TOP", 0, 2);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_ResFrame" parent="UIParent" movable="true" hidden="true">
+		<Size>
+			<AbsDimension x="175" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle" inherits="GameFontNormal" hidden="false" text="Resurrection Monitor">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText" justifyH="LEFT" inherits="ChatFontNormal" hidden="false" text="No current resurrections">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" setAllPoints="true" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="70" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RA_ResFrame_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0, 0, 1, 0.5);
+			</OnLoad>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" and not CT_RAMenu_Options["temp"]["LockMonitor"] ) then
+					this:StartMoving();
+				elseif ( arg1 == "RightButton" ) then
+					ToggleDropDownMenu(1, nil, getglobal(this:GetName() .. "DropDown"), this:GetName(), 47, 15);
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_ReadyFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="325" y="125"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="Are you ready?">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal">
+					<Size>
+						<AbsDimension x="350" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="Ready">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="-10" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_SendReady();
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentNotReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="Not Ready">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="10" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_SendNotReady();
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+				this.hide = 30;
+				getglobal(this:GetName() .. "Info"):SetText("'|c00FFFFFF" .. CT_RA_CheckReady_Person .. "|r' has requested a ready check.\nPress ready if you are ready.");
+			</OnShow>
+			<OnHide>
+				this.hide = nil;
+				PlaySound("UChatScrollButton");
+			</OnHide>
+			<OnUpdate>
+				CT_RA_ReadyFrame_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_RlyFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="325" y="125"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentInfo" justifyV="top" inherits="GameFontNormal">
+					<Size>
+						<AbsDimension x="350" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="YA RLY">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="-10" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_SendRly();
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentNotReadyButton" hidden="false" inherits="GameMenuButtonTemplate" text="NO RLY">
+				<Size>
+					<AbsDimension x="125" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="10" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RA_SendNoRly();
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+				this.hide = 30;
+				getglobal(this:GetName() .. "Info"):SetText("O RLY?");
+			</OnShow>
+			<OnHide>
+				this.hide = nil;
+				PlaySound("UChatScrollButton");
+			</OnHide>
+			<OnUpdate>
+				CT_RA_ReadyFrame_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Button name="CT_RA_DurabilityTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="260" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentResist1" hidden="true" justifyH="CENTER" justifyV="CENTER" inherits="GameFontNormalSmall">
+					<Size>
+						<AbsDimension x="28" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="127" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="0" b="0"/>
+				</FontString>
+				<FontString name="$parentResist2" hidden="true" justifyH="CENTER" justifyV="CENTER" inherits="GameFontNormalSmall">
+					<Size>
+						<AbsDimension x="28" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResist1"/>
+					</Anchors>
+					<Color r="0" g="1" b="0"/>
+				</FontString>
+				<FontString name="$parentResist3" hidden="true" justifyH="CENTER" justifyV="CENTER" inherits="GameFontNormalSmall">
+					<Size>
+						<AbsDimension x="28" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResist2"/>
+					</Anchors>
+					<Color r="0" g="0" b="1"/>
+				</FontString>
+				<FontString name="$parentResist4" hidden="true" justifyH="CENTER" justifyV="CENTER" inherits="GameFontNormalSmall">
+					<Size>
+						<AbsDimension x="28" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResist3"/>
+					</Anchors>
+					<Color r="0.7" g="0" b="1"/>
+				</FontString>
+				<FontString name="$parentResist5" hidden="true" justifyH="CENTER" justifyV="CENTER" inherits="GameFontNormalSmall">
+					<Size>
+						<AbsDimension x="28" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResist4"/>
+					</Anchors>
+					<Color r="0.7" g="0.7" b="0.7"/>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentMO" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.25"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName() .. "MO"):Show();
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "MO"):Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Frame name="CT_RA_DurabilityFrame" movable="true" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="300" y="485"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="300" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Durability Check">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDrag">
+				<Size>
+					<AbsDimension x="150" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-12" y="12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StartMoving();
+						elseif ( arg1 == "RightButton" ) then
+							this:GetParent():ClearAllPoints();
+							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+					</OnMouseUp>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Left-click to drag\nRight-click to reset");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Button name="$parentNameTab">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="12" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="135" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(3);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall" text="Player Name">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="8" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentValueTab">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentNameTab"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="141" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(4);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="8" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentResistTab1" text="FR" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentNameTab"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="28" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(4);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="1" g="0" b="0"/>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentResistTab2" text="NR" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResistTab1"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="28" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(5);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="0" g="1" b="0"/>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentResistTab3" text="FR" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResistTab2"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="28" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(6);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="0" g="0" b="1"/>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentResistTab4" text="SR" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResistTab3"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="28" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(7);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="1" g="0" b="1"/>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentResistTab5" text="AR" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentResistTab4"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="28" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RADurability_Sort(8);
+						PlaySound("igMainMenuOptionCheckBoxOn");
+					</OnClick>
+				</Scripts>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<NormalText inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="0.7" g="0.7" b="0.7"/>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLoad>
+					<OnEnter>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentPlayer1" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer2" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer3" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer4" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer5" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer6" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer7" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer8" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer9" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer10" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer11" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer10" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer12" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer11" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer13" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer12" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer14" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer13" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer15" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer14" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer16" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer15" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer17" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer16" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer18" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer17" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentPlayer19" inherits="CT_RA_DurabilityTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPlayer18" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="245" y="400"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="19" y="-32"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(19, CT_RADurability_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<Button name="$parentCloseButton" hidden="false" inherits="GameMenuButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="10" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentRefreshButton" hidden="false" inherits="GameMenuButtonTemplate" text="Refresh">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-10" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SlashCmdList[this:GetParent().type](this:GetParent().arg);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

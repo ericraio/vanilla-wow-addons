@@ -1,0 +1,508 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML/UI.xsd">
+	<Script file="CastProgress.lua"/>
+	<Script file="AddonMenu.lua"/>
+	<Script file="localisation.lua"/>
+
+	<FontString name="CastProgressFont" inherits="MasterFont" font="Fonts\FRIZQT__.TTF" virtual="true">
+		<FontHeight>
+			<AbsValue val="20"/>
+		</FontHeight>
+		<Color r="1.0" g="0.82" b="0"/>
+	</FontString>
+
+	<Frame name="CastProgressUpdateFrame" frameStrata="LOW" toplevel="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="1" y="1"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT"/>
+		</Anchors>
+		<Scripts>
+			<OnUpdate>
+				CastProgress:OnUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CastProgressDragTabTemplate" hidden="true" frameStrata="DIALOG" virtual="true">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+		</Backdrop>
+		<Size>
+			<AbsDimension x="50" y="12"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall" justifyh="CENTER">
+					<Size>
+						<AbsDimension x="50" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>			
+		</Layers>	
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(20)
+			</OnLoad>
+			<OnMouseDown>
+				if (arg1 == "LeftButton") and this:IsVisible() then
+					local f = this:GetParent()
+					f:ClearAllPoints()
+					f:StartMoving()
+					CastProgress.moving = f
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				CastProgress:MouseUp()
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CastProgressTitleFrame" frameStrata="HIGH" hidden="false" movable="true" parent="UIParent">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+		</Backdrop>
+		<Size>
+			<AbsDimension x="200" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativeTo="UIParent" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-40"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="CastProgressTitle">
+				<Size>
+					<AbsDimension x="200" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="GameFontNormal">
+							<Size>
+								<AbsDimension x="200" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="CastProgressTitleDragTab" inherits="CastProgressDragTabTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="CastProgressTitleFrame" relativePoint="TOP"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="CastProgressProgressFrame" frameStrata="HIGH" hidden="false" movable="true" parent="UIParent">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+		</Backdrop>
+		<Size>
+			<AbsDimension x="125" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativeTo="CastProgressTitleFrame" relativePoint="BOTTOM">
+				<Offset>
+					<AbsDimension x="0" y="-40"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="CastProgressProgress">
+				<Size>
+					<AbsDimension x="125" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="CastProgressFont">
+							<Size>
+								<AbsDimension x="125" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP"/>
+						</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						CastProgress:OnLoad()
+					</OnLoad>
+					<OnEvent>
+						CastProgress:OnEvent(event)
+					</OnEvent>
+				</Scripts>
+			</Frame>
+			<Frame name="CastProgressProgressDragTab" inherits="CastProgressDragTabTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CastProgressProgressFrame" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="CastProgressBarFrame" frameStrata="MEDIUM" hidden="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="200" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOM">
+				<Offset>
+					<AbsDimension x="0" y="60"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<StatusBar name="CastProgressBar">
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<Size>
+					<AbsDimension x="190" y="11"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parentSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentBorder">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+						<Size>
+							<AbsDimension x="200" y="20"/>
+						</Size>
+					</Frame>
+				</Frames>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="1.0" g="0.7" b="0.0"/>
+			</StatusBar>
+			<Frame name="$parentDragTab" inherits="CastProgressDragTabTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="CastProgressOptions" frameStrata="HIGH" toplevel="true" parent="UIParent" hidden="true">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="1"/>
+			</EdgeSize>
+		</Backdrop>
+		<Size>
+				<AbsDimension x="450" y="200"/>
+		</Size>
+		<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+		</Anchors>
+		<Frames>
+			<Slider name="CastProgressTitleScaleSlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			<Slider name="CastProgressProgressScaleSlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CastProgressTitleScaleSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			<Slider name="CastProgressCastingBarScaleSlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CastProgressProgressScaleSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+
+			<Slider name="CastProgressOpacitySlider" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="5" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+
+			<CheckButton name="CastProgressUIScaleCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressCastingBarScaleSlider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:UIScale()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="CastProgressSameScaleCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressUIScaleCheckButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:SameScale()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="CastProgressAddonMenuCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressSameScaleCheckButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:AddonMenu()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="CastProgressProgressCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressOpacitySlider" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:ShowProgress()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="CastProgressTitleCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressProgressCheckButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:ShowTitle()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="CastProgressCastingBarCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressTitleCheckButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:CastingBar()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="CastProgressCastTimeCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressCastingBarCheckButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:CastTime()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Frame name="CastProgressTitleJustifyDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-120" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame name="CastProgressProgressJustifyDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="CastProgressTitleJustifyDropDown" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<CheckButton name="CastProgressStickyCheckButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CastProgressProgressJustifyDropDown" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:StickyFrames()
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="CastProgressOptionsCloseButton" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="48" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress:CloseOptions()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="CastProgressHomeButton" inherits="GameMenuButtonTemplate">
+				<Size>
+					<AbsDimension x="48" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="CastProgressOptionsCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CastProgress.SlashCommands("home")
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="CastProgressOptionsVersionString" inherits="GameFontNormal" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="200" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="2" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnUpdate>
+				CastProgress:OnOptionsUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

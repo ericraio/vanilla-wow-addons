@@ -1,0 +1,363 @@
+-- Constants
+TITAN_PANEL_UPDATE_BUTTON = 1;
+TITAN_PANEL_UDPATE_TOOLTIP = 2;
+TITAN_PANEL_UPDATE_ALL = 3;
+TITAN_PANEL_LABEL_SEPARATOR = "  "
+
+TITAN_PANEL_BUTTON_TYPE_TEXT = 1;
+TITAN_PANEL_BUTTON_TYPE_ICON = 2;
+TITAN_PANEL_BUTTON_TYPE_COMBO = 3;
+TITAN_PANEL_BUTTON_TYPE_CUSTOM = 4;
+
+TITAN_ATLAS_ID = "Atlas";
+TITAN_ATLAS_FREQUENCY = 1;
+
+ATLAS_INDEX = 0;
+
+local Atlas_Initialized = false;
+
+AtlasOptions = {};
+
+ATLAS_DROPDOWN_LIST = {
+	"BlackfathomDeeps",
+	"BlackrockDepths",
+	"BlackrockSpireLower",
+	"BlackrockSpireUpper",
+	"TheDeadmines",
+	"DireMaulEast",
+	"DireMaulNorth",
+	"DireMaulWest",
+	"Gnomeregan",
+	"Maraudon",
+	"MoltenCore",
+	"OnyxiasLair",
+	"RagefireChasm",
+	"RazorfenDowns",
+	"RazorfenKraul",
+	"ScarletMonastery",
+	"Scholomance",
+	"ShadowfangKeep",
+	"TheStockades",
+	"Stratholme",
+	"TheSunkenTemple",
+	"Uldaman",
+	"WailingCaverns",
+	"ZulFarrak",
+	"ZulGurub"
+};
+
+function TitanOptionSlider_TooltipText(text, value) 
+	return text .. GREEN_FONT_COLOR_CODE .. value .. FONT_COLOR_CODE_CLOSE;
+end
+
+function TitanPanelAtlasButton_OnLoad()
+	-- register plugin
+	this.registry = { 
+		id = TITAN_ATLAS_ID,
+		menuText = ATLAS_LOCALE["menu"],
+		buttonTextFunction = "TitanPanelAtlasButton_GetButtonText",
+		tooltipTitle = ATLAS_LOCALE["tooltip"],
+		tooltipTextFunction = "TitanPanelAtlasButton_GetTooltipText",
+		frequency = TITAN_ATLAS_FREQUENCY, 
+		icon = "Interface\\AddOns\\TitanAtlas\\Images\\TitanAtlas",
+		iconWidth = 16,
+		savedVariables = {
+			ShowIcon = 1,
+			ShowLabelText = 1,
+			ShowColoredText = TITAN_NIL
+		}
+	};
+	this:RegisterEvent("VARIABLES_LOADED");
+	this:RegisterEvent("ZONE_CHANGED");
+	this:RegisterEvent("ZONE_CHANGED_INDOORS");
+	this:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+	this:RegisterEvent("MINIMAP_ZONE_CHANGED");
+	this:RegisterEvent("PLAYER_ENTERING_WORLD");
+end
+
+function TitanPanelAtlasButton_OnEvent()
+	if(event == "VARIABLES_LOADED") then
+		if (AtlasOptions.AtlasZone == nil) then
+			AtlasOptions.AtlasZone = 1;
+		end
+		if (AtlasOptions.AtlasAlpha == nil) then
+			AtlasOptions.AtlasAlpha = 1.0;
+		end
+		if (AtlasOptions.AtlasLocked == nil) then
+			AtlasOptions.AtlasLocked = false;
+		end
+		if (AtlasOptions.AtlasMapName == nil) then
+			AtlasOptions.AtlasMapName = true;
+		end
+		if (AtlasOptions.AtlasAutoSelect == nil) then
+			AtlasOptions.AtlasAutoSelect = true;
+		end
+		Atlas_Initialized = true;
+	end
+	if(event == "ZONE_CHANGED") then
+			Atlas_OnShow();
+	end
+	this.zoneText = GetZoneText();
+	this.subZoneText = GetSubZoneText();
+end
+
+function TitanPanelAtlasButton_GetButtonText(id)
+	local retstr = "";
+	if (AtlasOptions.AtlasMapName) then
+		if (TitanGetVar(TITAN_ATLAS_ID, "ShowColoredText")) then	
+			retstr = TitanUtils_GetGreenText(ATLAS_DROPDOWN_LIST[AtlasOptions.AtlasZone]);
+		else
+			retstr = TitanUtils_GetNormalText(ATLAS_DROPDOWN_LIST[AtlasOptions.AtlasZone]);
+		end
+	else
+		retstr = " ";	
+	end
+
+	-- supports turning off labels
+	if (TitanGetVar(TITAN_ATLAS_ID, "ShowLabelText")) then	
+		retstr = ATLAS_LOCALE["button"] .. retstr
+	end
+
+	return retstr;
+end
+
+function TitanPanelAtlasButton_GetTooltipText()
+	local retstr = "You are currently in " .. this.zoneText .. " (" .. this.subZoneText .. ")\n";
+	retstr = retstr .. TitanUtils_GetGreenText(ATLAS_HINT);
+	return retstr;
+end
+
+function TitanPanelRightClickMenu_PrepareAtlasMenu()
+	TitanPanelRightClickMenu_AddTitle(TitanPlugins[TITAN_ATLAS_ID].menuText);
+	
+	TitanPanelRightClickMenu_AddSpacer();	
+
+	info = {};
+	info.text = ATLAS_OPTIONS_AUTOSEL;
+	info.func = AtlasOptions_AutoSelectToggle;
+	info.value = ATLAS_OPTIONS_AUTOSEL;
+	info.checked = AtlasOptions.AtlasAutoSelect;
+	UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+
+	info = {};
+	info.text = ATLAS_OPTIONS_SHOWMAPNAME;
+	info.func = AtlasOptions_MapNameToggle;
+	info.value = ATLAS_OPTIONS_SHOWMAPNAME;
+	info.checked = AtlasOptions.AtlasMapName;
+	UIDropDownMenu_AddButton(info, UIDROPDOWNMENU_MENU_LEVEL);
+	info = {};
+
+	TitanPanelRightClickMenu_AddSpacer();	
+
+	TitanPanelRightClickMenu_AddToggleIcon(TITAN_ATLAS_ID);
+	TitanPanelRightClickMenu_AddToggleLabelText(TITAN_ATLAS_ID);
+	TitanPanelRightClickMenu_AddToggleColoredText(TITAN_ATLAS_ID);
+	
+	TitanPanelRightClickMenu_AddSpacer();	
+	TitanPanelRightClickMenu_AddCommand(TITAN_PANEL_MENU_HIDE, TITAN_ATLAS_ID, TITAN_PANEL_MENU_FUNC_HIDE);
+end
+
+function TitalPanelAtlasButton_OnClick(button)
+	if ( button == "LeftButton" ) then
+		Atlas_Toggle();
+	end
+end
+
+function Atlas_OnLoad()
+	this:RegisterEvent("VARIABLES_LOADED");
+	tinsert(UISpecialFrames, "AtlasFrame");
+	UIPanelWindows["AtlasFrame"] = nil;
+	AtlasFrame:RegisterForDrag("LeftButton");
+	SLASH_ATLAS1 = ATLAS_SLASH;
+	SlashCmdList["ATLAS"] = function(msg)
+		Atlas_SlashCommand(msg);
+	end
+end
+
+function Atlas_OnShow()
+	if(AtlasOptions.AtlasAutoSelect) then
+		local currentZone = GetRealZoneText();
+		local currentMap = AtlasText[ATLAS_DROPDOWN_LIST[UIDropDownMenu_GetSelectedID(AtlasFrameDropDown)]]["ZoneName"];
+		if(currentZone ~= currentMap) then
+			for i = 1, getn(ATLAS_DROPDOWN_LIST), 1 do
+				local mapName = AtlasText[ATLAS_DROPDOWN_LIST[i]]["ZoneName"];
+				if(currentZone == mapName) then
+					UIDropDownMenu_Initialize(AtlasFrameDropDown, AtlasFrameDropDown_Initialize);
+					UIDropDownMenu_SetSelectedID(AtlasFrameDropDown, i);
+					Atlas_Refresh();
+				end
+			end
+		end
+	end
+end
+
+function Atlas_OnEvent()
+	if(event == "VARIABLES_LOADED") then
+		Atlas_Refresh();
+		AtlasOptions_Init();
+		Atlas_UpdateLock();
+		Atlas_UpdateAlpha();
+	end
+end
+
+function Atlas_StartMoving()
+	if(not AtlasOptions.AtlasLocked) then
+		AtlasFrame:StartMoving();
+	end
+end
+
+function Atlas_SlashCommand(msg)
+	if(msg == ATLAS_SLASH_OPTIONS) then
+		AtlasOptions_Toggle();
+	else
+		Atlas_Toggle();
+	end
+end
+
+function Atlas_UpdateAlpha()
+	AtlasFrame:SetAlpha(AtlasOptions.AtlasAlpha);
+end
+
+function Atlas_Toggle()
+	if(AtlasFrame:IsVisible()) then
+		HideUIPanel(AtlasFrame);
+	else
+		ShowUIPanel(AtlasFrame);
+	end
+end
+
+function Atlas_ToggleLock()
+	if(AtlasOptions.AtlasLocked) then
+		AtlasOptions.AtlasLocked = false;
+		Atlas_UpdateLock();
+	else
+		AtlasOptions.AtlasLocked = true;
+		Atlas_UpdateLock();
+	end
+end
+
+function Atlas_UpdateLock()
+	if(AtlasOptions.AtlasLocked) then
+		AtlasLockNorm:SetTexture("Interface\\AddOns\\TitanAtlas\\Images\\LockButton-Locked-Up");
+		AtlasLockPush:SetTexture("Interface\\AddOns\\TitanAtlas\\Images\\LockButton-Locked-Down");
+	else
+		AtlasLockNorm:SetTexture("Interface\\AddOns\\TitanAtlas\\Images\\LockButton-Unlocked-Up");
+		AtlasLockPush:SetTexture("Interface\\AddOns\\TitanAtlas\\Images\\LockButton-Unlocked-Down");
+	end
+end
+
+function Atlas_Refresh()
+	AtlasOptions.AtlasZone = UIDropDownMenu_GetSelectedID(AtlasFrameDropDown);
+	local zoneID = ATLAS_DROPDOWN_LIST[AtlasOptions.AtlasZone];
+
+	AtlasMap:ClearAllPoints();
+	AtlasMap:SetWidth(512);
+	AtlasMap:SetHeight(512);
+	AtlasMap:SetPoint("TOPLEFT", "AtlasFrame", "TOPLEFT", 14, -71);
+	AtlasMap:SetTexture("Interface\\AddOns\\TitanAtlas\\Images\\"..zoneID);
+	AtlasText_ZoneName:SetText(AtlasText[zoneID]["ZoneName"]);
+	AtlasText_Location:SetText(ATLAS_STRING_LOCATION..": "..AtlasText[zoneID]["Location"]);
+	AtlasText_LevelRange:SetText(ATLAS_STRING_LEVELRANGE..": "..AtlasText[zoneID]["LevelRange"]);
+	AtlasText_PlayerLimit:SetText(ATLAS_STRING_PLAYERLIMIT..": "..AtlasText[zoneID]["PlayerLimit"]);
+	for i = 1, 28, 1 do
+		getglobal("AtlasText_"..i):SetText(AtlasText[zoneID][i]);
+	end
+end
+
+function Atlas_SlashCommand(msg)
+	if(msg == ATLAS_SLASH_OPTIONS) then
+		AtlasOptions_Toggle();
+	else
+		Atlas_Toggle();
+	end
+end
+
+function AtlasFrameDropDown_Initialize()
+	local info;
+	for i = 1, getn(ATLAS_DROPDOWN_LIST), 1 do
+		info = {
+			text = AtlasText[ATLAS_DROPDOWN_LIST[i]]["ZoneName"];
+			func = AtlasFrameDropDownButton_OnClick;
+		};
+		UIDropDownMenu_AddButton(info);
+	end
+end
+
+function AtlasFrameDropDown_OnLoad()
+	this:RegisterEvent("VARIABLES_LOADED");
+end
+
+function AtlasFrameDropDown_OnEvent()
+	if(event == "VARIABLES_LOADED") then
+		UIDropDownMenu_Initialize(AtlasFrameDropDown, AtlasFrameDropDown_Initialize);
+		UIDropDownMenu_SetSelectedID(AtlasFrameDropDown, AtlasOptions.AtlasZone);
+		UIDropDownMenu_SetWidth(175);
+	end
+end
+
+function AtlasFrameDropDownButton_OnClick()
+	local oldID = UIDropDownMenu_GetSelectedID(AtlasFrameDropDown);
+	UIDropDownMenu_SetSelectedID(AtlasFrameDropDown, this:GetID());
+	if(oldID ~= this:GetID()) then
+		Atlas_Refresh();
+	end
+end
+
+function AtlasOptions_Toggle()
+	if(AtlasOptionsFrame:IsVisible()) then
+		AtlasOptionsFrame:Hide();
+	else
+		AtlasOptionsFrame:Show();
+	end
+end
+
+function AtlasOptions_AutoSelectToggle()
+	if(AtlasOptions.AtlasAutoSelect) then
+		AtlasOptions.AtlasAutoSelect = false;
+	else
+		AtlasOptions.AtlasAutoSelect = true;
+	end
+end
+
+function AtlasOptions_MapNameToggle()
+	if(AtlasOptions.AtlasMapName) then
+		AtlasOptions.AtlasMapName = false;
+	else
+		AtlasOptions.AtlasMapName = true;
+	end
+end
+
+function AtlasOptions_Init()
+	SliderAlpha:SetValue(AtlasOptions.AtlasAlpha);
+end
+
+function AtlasOptions_OnLoad()
+	UIPanelWindows['AtlasOptionsFrame'] = {area = 'center', pushable = 0};
+end
+
+function AtlasOptions_OnHide()
+	if(MYADDONS_ACTIVE_OPTIONSFRAME == this) then
+		ShowUIPanel(myAddOnsFrame);
+	end
+end
+
+function DebugReport(msg, color, bSecondChatWindow)
+	local r = 0.50;
+	local g = 0.50;
+	local b = 1.00;
+
+	if (color) then
+		r = color.r;
+		g = color.g;
+		b = color.b;
+	end
+
+	local frame = DEFAULT_CHAT_FRAME;
+	if (bSecondChatWindow) then
+		frame = ChatFrame2;
+	end
+
+	if (frame) then
+		frame:AddMessage(msg,r,g,b);
+	end
+end

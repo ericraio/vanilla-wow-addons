@@ -1,0 +1,195 @@
+OLDER PATCH NOTES and Description Text
+
+
+	Assumptions:		Title of quest in QuestFrameRewardPanel is the same as the title that
+						displays in the QuestLog
+							- If this assumption is wrong, the quest will not be marked
+							  completed and instead, a new quest will be logged.
+
+						A quest cannot be accepted again after it has been successfully
+						completed
+							- This assumption is not correct for all quests. QuestHistory uses
+							  the quest title and description to distinguish between different
+							  quests. If the same quest is accepted again, the addon will not
+							  recognize it as new and will instead just update the data for
+							  the old instance of the quest. This problem will not affect
+							  quests that are never actually accepted (i.e. ones that never
+							  show up in the game's Quest Log).
+
+						The QuestRewardCompleteButton_OnClick function is always called when a
+						quest is completed - player must click on Complete button or game does
+						not register quest as complete
+							- If this assumption is wrong, some quests may be completed that
+							  the addon will not catch. This would mean that the quests would
+							  not be marked completed.
+
+						Only one quest can be fully completed at a time (i.e. clicking one
+						time on the Complete button will never complete 2 quests)
+							- QuestHistory only keeps track of the last quest that was completed
+							  for purposes of updating completion data such as XP reward,
+							  completed location, etc. If two quests can be completed at once,
+							  QuestHistory will only update one of them.
+
+						The NPC that gives or completes a quest is always targeted when the
+						player accepts/completes a quest
+							- If this assumption is wrong, then the data stored for Quest Giver
+							  and Quest Completer could be wrong.
+
+						Description of quest when accepted is the same as description shown in
+						QuestLog
+							- If this assumption is wrong, QuestHistory will not always
+							  recognize which quest was the most recently accepted. Thus some
+							  accepted data will not be recorded (i.e. Quest Giver, accepted
+							  time, etc.).
+
+
+	Version History:
+		2.71	- Removed the 0,0 traps, as I've only received reports of 0,0's inside instances since adding the traps.
+				  Since instances are ALWAYS going to be 0,0, we are going to assume that things are kosher at the moment.
+					
+		2.7	- Changed Unknown Entity search string to global (so all languages should be covered) [Thanks, Asjaskan]
+				- Now strips any third-party quest level-adding addon text from the titles [Thanks, Asjaskan]
+				- Added new trap for 0,0 coordinate bug. Please report any codes you might see!
+				- Added possible 0,0 fix, using a WorldMap show/hide cycler.
+				- Finally fixed the delay on subsequent accepted quests (speed-accept bug).
+				- Fixed errors that occurred upon login if you weren't an existing QH user.
+				- Updated to TOC 1800.
+				
+		2.6     - Fixed Unknown Entity bug, and updated for Patch 1700 (by Dsanai)
+				  If this version doesn't work, don't blame Jasters.
+				
+		2.52	- Changed some code so that the LogCurrentQuests function is allowed to run
+				  more frequently. This should resolve the problem where some data wasn't
+				  being recorded.
+
+				- Fixed the US version from loading the French localization.
+
+		2.51	- Fixed a problem where some old data was not being upgraded to the new format.
+				  This should resolve the errors with the repair function as well.
+
+				- Added some checks to the repair function so that it won't fail if it
+				  encounters unknown data.
+
+				- Added some new strings to the French and German localizations. (Thanks Juki
+				  and Maischter!)
+
+		2.50	- Updated to work with the 1.3.1 WoW patch (1300).
+
+				- Changed the way data is stored to reduce the size of QuestHistory's portion
+				  of SavedVariables.lua.
+
+				- Added the ability to view the quests for characters other than the currently
+				  logged-in one.
+
+				- Changed the colors of the displayed quests so that current quests will show
+				  the difficulty color and added the ability to select colors for abandoned
+				  and completed quests.
+
+				- Added the ability to edit and delete quests. By default, these abilities are
+				  inactive, but they can be turned on in the Options window. Then right-clicking
+				  on a quest will edit it and shift-right-clicking on a quest will delete it.
+
+				- Added the ability to manually add a quest.
+
+				- Added a delete character button that will completely remove a character's
+				  history. This cannot be used on the currently logged-in character.
+
+				- Added a repair function that will attempt to repair quest data. This can
+				  sometimes resolve "nil" errors. Also, this can be used to remove duplicate
+				  quests and "Port to Auberdine/Menethil" quests.
+
+				- Added an option to stop logging "Port to Auberdine/Menethil" quests. This
+				  option is enabled by default.
+
+				- Modified the hooked version of the QuestRewardCompleteButton_OnClick function
+				  so that duplicate quests should not be recorded.
+
+				- Added French and German translations from Juki and Tenvans. Thanks!
+
+				- Fixed the anchoring of the "Next" button in QuestHistoryDetailFrame.
+
+		2.0.2	- Updated to work with the 1.2.3 WoW patch (4211).
+
+		2.0.1	- Modified the hooked version of the QuestRewardCompleteButton_OnClick function
+				  to get the time completed before calling the original function. This should
+				  ensure that the time completed is recorded correctly without causing a nil
+				  error.
+
+				- Fixed a bug that would sometimes prevent quest XP from being recorded.
+
+		2.0		- Added code to prevent logging function from being run too many times
+				  in a short period of time. This should resolve the lockup issue.
+
+				- Added an options window that gives the user control over which types
+				  of quests are displayed (abandoned, completed or current) in the list.
+
+				- Added options for choosing what quest data is logged. This can be used
+				  to reduce the size of QuestHistory's portion of SavedVariables.lua.
+
+				- Added some hooks to MapNotes to allow creation of map notes for quest NPC
+				  locations. This additional functionality only works if MapNotes is also
+				  installed, but MapNotes is in no way necessary for the rest of the addon
+				  to work as expected.
+
+				- Added some simple search functionality to filter quests by inputted text.
+
+				- Changed the way the sort by completed order works so that abandoned
+				  quests are grouped together.
+
+				- Changed some of the displays to work better with 1024x768 resolutions.
+
+				- Added code to resolve the known nil errors. Also added more code to
+				  hopefully prevent future ones from occurring.
+
+				- Reworked some of the functions and added more commenting.
+
+				- Rewrote much of the XML code and broke it up into separate files.
+
+
+		1.2.1	- Fixed annoying bug preventing QuestHistory from loading when using a
+				  character that had no prior quest history from a previous version.
+
+
+		1.2		- Fixed spell rewards not displaying correctly. The spell name and
+				  texture now show correctly but the tooltip is still not working.
+				  This is because the GetQuestItemLink() function does not seem to
+				  work with spell rewards.
+
+				- Changed how failed quests are determined. Hopefully, this will fix
+				  the problem of quests not being marked failed.
+
+				- Added logging of played time when quest is accepted/completed.
+
+				- Added tooltips to display quest notes when hovering over quests in list.
+
+				- Rewrote and reorganized some functions to streamline processing and make
+				  the code simpler.
+
+
+		1.1.1	- Updated to work with the 1.2.1 WoW patch (4150).
+
+
+		1.1		- Fixed display of objectives in detail view so that they still show
+			  	  as completed after the quest is completed.
+
+				- Fixed some of the sort functions which were not working correctly.
+
+				- Fixed an error that could occur if a quest was completed without
+				  ever having been accepted. This could occur if the quest giver and
+				  quest completer were the same and the player had already completed
+				  all the objectives before first talking to the NPC.
+
+				- Rewrote the function hooks so that if an error occurs in the
+				  QuestHistory script, the game will still continue.
+
+				- Added more error-checking to functions to eliminate some if not all
+				  nil errors.
+
+
+		1.0		Initial Release
+
+
+
+	Please report any PRAISE to jasters@pacbell.net (he's the original author)
+	Please report any BUGS to dsanai_eo@yahoo.com
+	

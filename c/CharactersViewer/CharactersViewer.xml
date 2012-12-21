@@ -1,0 +1,1288 @@
+<!-- 
+	Version: $Rev: 3736 $
+	Last Changed by: $LastChangedBy: Flisher $
+	Date: $Date: 2006-07-01 19:55:18 -0400 (sam., 01 juil. 2006) $
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.kr.lua"/>
+	<Script file="CharactersViewer.lua"/>
+
+	<Button name="CharactersViewerItemButtonGenericTemplate" inherits="ItemButtonTemplate" virtual="true">
+		<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				</OnLoad>
+				<OnEnter>
+					CharactersViewerItemButton_OnEnter();
+				</OnEnter>
+				<OnLeave>
+					 GameTooltip:Hide();
+					 ResetCursor();
+				</OnLeave>
+				<OnClick>
+					CharactersViewerItemButton_OnClick(arg1);
+				</OnClick>			
+		</Scripts>
+	</Button>
+
+	<Frame name="CharactersViewerMagicResistanceFrameTemplate" virtual="true">
+		  <Size>
+				<AbsDimension x="32" y="29"/>
+		  </Size>
+		<Scripts>
+			<OnEnter>
+				CharactersViewerMagicResistanceFrame_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+				ResetCursor();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="CharactersViewer_Frame" toplevel="true" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size> 
+			<AbsDimension x="384" y="512"/> 
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset> 
+					<AbsDimension x="0" y="-104"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="70"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+
+				<Texture name="CharactersViewer_PortraitTexure">
+					<Size>
+						<AbsDimension x="60" y="60"/> 
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="CharactersViewer_CharactersBgTextureTL" file="Interface\PaperdollInfoFrame\UI-Character-CharacterTab-L1.blp">
+					<Size> 
+						<AbsDimension x="256" y="256"/> 
+					</Size>
+					<Anchors> 
+						<Anchor point="TOPLEFT"/> 
+					</Anchors>
+				</Texture>
+				<Texture name="CharactersViewer_CharactersBgTextureTR" file="Interface\PaperdollInfoFrame\UI-Character-CharacterTab-R1.blp">
+					<Size>  
+						<AbsDimension x="128" y="256"/> 
+ 					</Size>
+					<Anchors> 
+ 						<Anchor point="TOPRIGHT"/> 
+					</Anchors>
+				</Texture>
+				<Texture name="CharactersViewer_CharactersBgTextureBL" file="Interface\PaperdollInfoFrame\UI-Character-CharacterTab-BottomLeft.blp">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors> 
+						<Anchor point="BOTTOMLEFT"/> 
+					</Anchors>
+				</Texture>
+				<Texture name="CharactersViewer_CharactersBgTextureBR" file="Interface\PaperdollInfoFrame\UI-Character-CharacterTab-BottomRight.blp">
+					<Size> 
+						<AbsDimension x="128" y="256"/> 
+					</Size>
+					<Anchors> 
+						<Anchor point="BOTTOMRIGHT"/> 
+					</Anchors>
+				</Texture>
+				<FontString name="CharactersViewer_FrameTitleText" inherits="GameFontHighlight" text="CharactersViewer">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset> 
+								<AbsDimension x="0" y="232"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameTopText1" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="CharactersViewer_FrameTitleText">
+							<Offset>
+								 <AbsDimension x="0" y="-18"/>
+							 </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameTopText2" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="CharactersViewer_FrameTopText1">
+							<Offset>
+								 <AbsDimension x="0" y="-12"/>
+							 </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameTopText3" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="CharactersViewer_FrameTopText2">
+							<Offset> 
+								<AbsDimension x="0" y="-12"/>
+							 </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="CharactersViewer_FrameDetailTitle0" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="70" y="-80"/>
+							 </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText0" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle0" relativePoint="TOPRIGHT">
+							<Offset>
+								 <AbsDimension x="35" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle1" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle0" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText1" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle1" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle2" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle1" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText2" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle2" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle3" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle2" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText3" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle3" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle4" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle3" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText4" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle4" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle5" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle4" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText5" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle5" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle6" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle5" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/>
+							 </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText6" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle6" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle7" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle6" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText7" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle7" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailTitle8" inherits="GameFontNormalSmall" Justity="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameDetailTitle7" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameDetailText8" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameDetailTitle8" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsTitle1" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="73" y="-295"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsTitle2" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameStatsTitle1" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsTitle3" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameStatsTitle2" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsTitle4" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameStatsTitle3" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsTitle5" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameStatsTitle4" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-2"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsTitle6" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameStatsTitle5" relativePoint="BOTTOMLEFT">
+							<Offset> 
+								<AbsDimension x="0" y="-3"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="CharactersViewer_FrameStatsText1" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameStatsTitle1" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="104" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsText2" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameStatsTitle2" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsText3" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameStatsTitle3" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="104" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsText4" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameStatsTitle4" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsText5" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameStatsTitle5" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="104" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CharactersViewer_FrameStatsText6" inherits="GameFontNormalSmall" Justity="RIGHT">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameStatsTitle6" relativePoint="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="105" y="0"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="CharactersViewer_CloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="CharactersViewer_Frame" relativePoint="TOPRIGHT">
+						<Offset> 
+							<AbsDimension x="-44" y="-26"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CharactersViewer.Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentItem1" inherits="CharactersViewerItemButtonGenericTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset> 
+							<AbsDimension x="21" y="-74"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem2" inherits="CharactersViewerItemButtonGenericTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem1" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem3" inherits="CharactersViewerItemButtonGenericTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem2" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem15" inherits="CharactersViewerItemButtonGenericTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem3" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem5" inherits="CharactersViewerItemButtonGenericTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem15" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem4" inherits="CharactersViewerItemButtonGenericTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem5" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem19" inherits="CharactersViewerItemButtonGenericTemplate" id="19">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem4" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem9" inherits="CharactersViewerItemButtonGenericTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem19" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem10" inherits="CharactersViewerItemButtonGenericTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset> 
+							<AbsDimension x="-79" y="-74"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem6" inherits="CharactersViewerItemButtonGenericTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem10" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button><Button name="$parentItem7" inherits="CharactersViewerItemButtonGenericTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem6" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button><Button name="$parentItem8" inherits="CharactersViewerItemButtonGenericTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem7" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem11" inherits="CharactersViewerItemButtonGenericTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem8" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+					</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem12" inherits="CharactersViewerItemButtonGenericTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem11" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem13" inherits="CharactersViewerItemButtonGenericTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem12" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem14" inherits="CharactersViewerItemButtonGenericTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem13" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="-4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem16" inherits="CharactersViewerItemButtonGenericTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem19" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="101" y="-28"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem17" inherits="CharactersViewerItemButtonGenericTemplate" id="17">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem16" relativePoint="TOPRIGHT">
+						<Offset> 
+							<AbsDimension x="5" y="0"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem18" inherits="CharactersViewerItemButtonGenericTemplate" id="18">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem17" relativePoint="TOPRIGHT">
+						<Offset> 
+							<AbsDimension x="5" y="0"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+<!--
+			<Button name="$parentItem0" inherits="CharactersViewerItemButtonGenericTemplate" id="0">
+				<Size> 
+					<AbsDimension x="27" y="27"/> 
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="CharactersViewer_FrameItem18" relativePoint="RIGHT">
+						<Offset> 
+							<AbsDimension x="15" y="0"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<TexCoords left="0" right="0.640625" top="0" bottom="0.640625"/>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\PaperdollInfoFrame\UI-Character-AmmoSlot">
+							<Size> 
+								<AbsDimension x="41" y="41"/> 
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset> 
+										<AbsDimension x="0" y="0"/> 
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.640625" top="0" bottom="0.640625"/>
+						</Texture>
+						<Texture file="Interface\PaperdollInfoFrame\UI-Character-AmmoSlot">
+							<Size> 
+								<AbsDimension x="23" y="41"/> 
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset> 
+										<AbsDimension x="-22" y="0"/> 
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.640625" right="1.0" top="0" bottom="0.640625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+-->
+
+			<Button name="CharactersViewer_Bag_Toggle_Button" inherits="ItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="CharactersViewer_FrameItem14" relativePoint="TOPLEFT">
+						<Offset> 
+							<AbsDimension x="-5" y="4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\Button-Backpack-Up"/>
+				<PushedTexture file="Interface\Buttons\Button-Backpack-Up"/>
+				<Scripts>
+					<OnEnter>
+						CharactersViewer.Bag.Toggle_Button_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						 GameTooltip:Hide();
+						 ResetCursor();
+					</OnLeave>
+					<OnClick>
+						CharactersViewer.Bag.ToggleButton_OnClick(arg1);
+					</OnClick>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="CharactersViewer_MailFrame" inherits="ItemButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="CharactersViewer_Bag_Toggle_Button" relativePoint="TOPLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						CharactersViewer.Mail.OnEnter();
+					</OnEnter>
+					<OnClick>
+						CharactersViewer.Mail.OnClick(arg1);
+					</OnClick>
+					<OnLeave>
+						 GameTooltip:Hide();
+						 ResetCursor();
+					</OnLeave>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+						getglobal(this:GetName().."IconTexture"):SetTexture("Interface\\Icons\\INV_Letter_15");
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="CharactersViewer_BankToggle" inherits="ItemButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="CharactersViewer_MailFrame" relativePoint="TOPLEFT">
+						<Offset> 
+							<AbsDimension x="0" y="4"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						CharactersViewer.Bank.OnEnter();
+					</OnEnter>
+					<OnClick>
+						CharactersViewer.Bank.OnClick(arg1);
+					</OnClick>
+					<OnLeave>
+						 GameTooltip:Hide();
+						 ResetCursor();
+					</OnLeave>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+						getglobal(this:GetName().."IconTexture"):SetTexture("Interface\\Icons\\INV_Misc_OrnateBox.blp");
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Frame name="CharactersViewerDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CharactersViewer_FrameItem9" relativePoint="BOTTOMLEFT">
+						<Offset> 
+							<AbsDimension x="-19" y="-3"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CharactersViewerDropDown_OnLoad();
+					</OnLoad>
+					<OnShow>
+						CharactersViewerDropDown_OnLoad();
+					</OnShow>
+					<OnEnter>
+						CharactersViewerDropDown_OnEnter();
+					</OnEnter>
+				</Scripts>
+			</Frame>
+
+					<Frame name="CharactersViewer_RestedFrame" >
+						<Size> 
+							<AbsDimension x="33" y="33"/> 
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="CharactersViewer_PortraitTexure" relativePoint="BOTTOMRIGHT">
+								<Offset> 
+									<AbsDimension x="-10" y="5"/> 
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="CharactersViewer_RestedIcon" file="Interface\CharacterFrame\UI-StateIcon">
+									<Size> 
+										<AbsDimension x="32" y="32"/> 
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset> 
+												<AbsDimension x="0" y="0"/> 
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.5" top="0" bottom="0.5"/>
+								</Texture>
+							</Layer>
+							<Layer level="OVERLAY">
+								<Texture file="Interface\CharacterFrame\UI-StateIcon" hidden="false" alphaMode="ADD">
+									<Size> 
+										<AbsDimension x="32" y="32"/> 
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+									<TexCoords left="0" right="0.5" top=".5" bottom="1"/>
+								</Texture>
+							</Layer>
+
+						</Layers>
+						<Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CHARACTERSVIEWER_RESTING);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Frame>
+
+			<Frame name="CharactersViewerResistanceFrame">
+					 <Size> 
+						<AbsDimension x="32" y="160"/>
+					 </Size>
+					 <Anchors>
+						  <Anchor point="TOPRIGHT" relativeTo="CharactersViewer_Frame" relativePoint="TOPLEFT">
+								<Offset> 
+									<AbsDimension x="297" y="-77"/> 
+								</Offset>
+						  </Anchor>
+					 </Anchors>
+					 <Frames>
+						  <Frame name="CharactersViewerMagicResFrame6" inherits="CharactersViewerMagicResistanceFrameTemplate" id="6">
+								<Anchors>
+									 <Anchor point="TOP" relativeTo="CharactersViewerResistanceFrame" relativePoint="TOP"/>
+								</Anchors>
+								<Layers>
+									 <Layer level="BACKGROUND">
+										  <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+												<TexCoords left="0" right="1.0" top="0.2265625" bottom="0.33984375"/>
+										  </Texture>
+										  <FontString name="CharactersViewerMagicResText6" inherits="GameFontHighlightSmall" text="X">
+												<Anchors>
+													 <Anchor point="BOTTOM">
+														<Offset> 
+															<AbsDimension x="0" y="3"/> 
+														</Offset>
+													 </Anchor>
+												</Anchors>
+										  </FontString>
+									 </Layer>
+								</Layers>
+						  </Frame>
+						  <Frame name="CharactersViewerMagicResFrame2" inherits="CharactersViewerMagicResistanceFrameTemplate" id="2">
+								<Anchors>
+									 <Anchor point="TOP" relativeTo="CharactersViewerMagicResFrame6" relativePoint="BOTTOM"/>
+								</Anchors>
+								<Layers>
+									 <Layer level="BACKGROUND">
+										  <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+												<TexCoords left="0" right="1.0" top="0" bottom="0.11328125"/>
+										  </Texture>
+										  <FontString name="CharactersViewerMagicResText2" inherits="GameFontHighlightSmall" text="X">
+												<Anchors>
+													 <Anchor point="BOTTOM">
+														  	<Offset> 
+																<AbsDimension x="0" y="3"/> 
+															</Offset>
+													 </Anchor>
+												</Anchors>
+										  </FontString>
+									 </Layer>
+								</Layers>
+						  </Frame>
+						  <Frame name="CharactersViewerMagicResFrame3" inherits="CharactersViewerMagicResistanceFrameTemplate" id="3">
+								<Anchors>
+									 <Anchor point="TOP" relativeTo="CharactersViewerMagicResFrame2" relativePoint="BOTTOM"/>
+								</Anchors>
+								<Layers>
+									 <Layer level="BACKGROUND">
+										  <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+												<TexCoords left="0" right="1.0" top="0.11328125" bottom="0.2265625"/>
+										  </Texture>
+										  <FontString name="CharactersViewerMagicResText3" inherits="GameFontHighlightSmall" text="X">
+												<Anchors>
+													 <Anchor point="BOTTOM">
+														  	<Offset> 
+																<AbsDimension x="0" y="3"/> 
+															</Offset>
+													 </Anchor>
+												</Anchors>
+										  </FontString>
+									 </Layer>
+								</Layers>
+						  </Frame>
+						  <Frame name="CharactersViewerMagicResFrame4" inherits="CharactersViewerMagicResistanceFrameTemplate" id="4">
+								<Anchors>
+									 <Anchor point="TOP" relativeTo="CharactersViewerMagicResFrame3" relativePoint="BOTTOM"/>
+								</Anchors>
+								<Layers>
+									 <Layer level="BACKGROUND">
+										  <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+												<TexCoords left="0" right="1.0" top="0.33984375" bottom="0.453125"/>
+										  </Texture>
+										  <FontString name="CharactersViewerMagicResText4" inherits="GameFontHighlightSmall" text="X">
+												<Anchors>
+													 <Anchor point="BOTTOM">
+														  	<Offset> 
+																<AbsDimension x="0" y="3"/> 
+															</Offset>
+													 </Anchor>
+												</Anchors>
+										  </FontString>
+									 </Layer>
+								</Layers>
+						  </Frame>
+						  <Frame name="CharactersViewerMagicResFrame5" inherits="CharactersViewerMagicResistanceFrameTemplate" id="5">
+								<Anchors>
+									 <Anchor point="TOP" relativeTo="CharactersViewerMagicResFrame4" relativePoint="BOTTOM"/>
+								</Anchors>
+								<Layers>
+									 <Layer level="BACKGROUND">
+										  <Texture file="Interface\PaperDollInfoFrame\UI-Character-ResistanceIcons">
+												<TexCoords left="0" right="1.0" top="0.453125" bottom="0.56640625"/>
+										  </Texture>
+										  <FontString name="CharactersViewerMagicResText5" inherits="GameFontHighlightSmall" text="X">
+												<Anchors>
+													 <Anchor point="BOTTOM">
+														  	<Offset> 
+																<AbsDimension x="0" y="3"/> 
+															</Offset>
+													 </Anchor>
+												</Anchors>
+										  </FontString>
+									 </Layer>
+								</Layers>
+						  </Frame>
+					 </Frames>
+				</Frame>
+				
+			<!-- CV Money Frame -->
+						<Frame name="CharactersViewer_MoneyFrame" inherits="SmallMoneyFrameTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="CharactersViewer_Frame" relativePoint="BOTTOMRIGHT">
+						<Offset> 
+							<AbsDimension x="-29" y="91"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					 <OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("igMainMenuOpen");
+			</OnShow>
+			<OnHide>
+				CharactersViewer_Frame:StopMovingOrSizing();
+				CharactersViewer.Hide();
+			</OnHide>
+			<OnLoad>
+				CharactersViewer.onLoad();
+			</OnLoad>
+			<OnEvent>
+				CharactersViewer_OnEvent(event, arg1);
+			</OnEvent>			
+			<OnDragStart>
+				if(arg1 == "LeftButton" ) then
+					CharactersViewer_Frame:StartMoving();
+				end
+			</OnDragStart>
+			<OnDragStop>
+				CharactersViewer_Frame:StopMovingOrSizing();
+			</OnDragStop>
+			<OnMouseUp>
+				CharactersViewer_Frame:StopMovingOrSizing();
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+
+<Frame name="CharactersViewer_ContainerFrameTemplate" frameStrata="MEDIUM" toplevel="true" movable="true" enableMouse="true" hidden="true" virtual="true">
+		<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="256" y="256"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentPortrait">
+					<Size> 
+						<AbsDimension x="40" y="40"/> 
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset> 
+								<AbsDimension x="7" y="-5"/> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentBackgroundTop" file="Interface\ContainerFrame\UI-Bag-Components">
+					<Size>
+						<AbsDimension x="256" y="512"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parent">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBackgroundMiddle1" file="Interface\ContainerFrame\UI-Bag-Components">
+					<Size>
+						<AbsDimension x="256" y="512"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentBackgroundTop" relativePoint="BOTTOM"/>
+					</Anchors>
+					<TexCoords left="0" right="1" top="0.3515625" bottom="0.8515625"/>
+				</Texture>
+				<Texture name="$parentBackgroundMiddle2" file="Interface\ContainerFrame\UI-Bag-Components" hidden="true">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentBackgroundMiddle1" relativePoint="BOTTOM"/>
+					</Anchors>
+					<TexCoords left="0" right="1" top="0.353515625" bottom="0.8515625"/>
+				</Texture>
+				<Texture name="$parentBackgroundBottom" file="Interface\ContainerFrame\UI-Bag-Components">
+					<Size>
+						<AbsDimension x="256" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentBackgroundMiddle1" relativePoint="BOTTOM"/>
+					</Anchors>
+					<TexCoords left="0" right="1" top="0.330078125" bottom="0.349609375"/>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontHighlight">
+					<Size>
+						<AbsDimension x="112" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="47" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentItem1" inherits="CharactersViewerItemButtonGenericTemplate" id="1"/>
+			<Button name="$parentItem2" inherits="CharactersViewerItemButtonGenericTemplate" id="2"/>
+			<Button name="$parentItem3" inherits="CharactersViewerItemButtonGenericTemplate" id="3"/>
+			<Button name="$parentItem4" inherits="CharactersViewerItemButtonGenericTemplate" id="4"/>
+			<Button name="$parentItem5" inherits="CharactersViewerItemButtonGenericTemplate" id="5"/>
+			<Button name="$parentItem6" inherits="CharactersViewerItemButtonGenericTemplate" id="6"/>
+			<Button name="$parentItem7" inherits="CharactersViewerItemButtonGenericTemplate" id="7"/>
+			<Button name="$parentItem8" inherits="CharactersViewerItemButtonGenericTemplate" id="8"/>
+			<Button name="$parentItem9" inherits="CharactersViewerItemButtonGenericTemplate" id="9"/>
+			<Button name="$parentItem10" inherits="CharactersViewerItemButtonGenericTemplate" id="10"/>
+			<Button name="$parentItem11" inherits="CharactersViewerItemButtonGenericTemplate" id="12"/>
+			<Button name="$parentItem12" inherits="CharactersViewerItemButtonGenericTemplate" id="12"/>
+			<Button name="$parentItem13" inherits="CharactersViewerItemButtonGenericTemplate" id="13"/>
+			<Button name="$parentItem14" inherits="CharactersViewerItemButtonGenericTemplate" id="14"/>
+			<Button name="$parentItem15" inherits="CharactersViewerItemButtonGenericTemplate" id="15"/>
+			<Button name="$parentItem16" inherits="CharactersViewerItemButtonGenericTemplate" id="16"/>
+			<Button name="$parentItem17" inherits="CharactersViewerItemButtonGenericTemplate" id="17"/>
+			<Button name="$parentItem18" inherits="CharactersViewerItemButtonGenericTemplate" id="18"/>
+			<Button name="$parentItem19" inherits="CharactersViewerItemButtonGenericTemplate" id="19"/>
+			<Button name="$parentItem20" inherits="CharactersViewerItemButtonGenericTemplate" id="20"/>
+			<Button name="$parentItem21" inherits="CharactersViewerItemButtonGenericTemplate" id="21"/>
+			<Button name="$parentItem22" inherits="CharactersViewerItemButtonGenericTemplate" id="22"/>
+			<Button name="$parentItem23" inherits="CharactersViewerItemButtonGenericTemplate" id="23"/>
+			<Button name="$parentItem24" inherits="CharactersViewerItemButtonGenericTemplate" id="24"/>
+			<Button name="$parentItem25" inherits="CharactersViewerItemButtonGenericTemplate" id="25"/>
+			<Button name="$parentItem26" inherits="CharactersViewerItemButtonGenericTemplate" id="26"/>
+			<Button name="$parentItem27" inherits="CharactersViewerItemButtonGenericTemplate" id="27"/>
+			<Button name="$parentItem28" inherits="CharactersViewerItemButtonGenericTemplate" id="28"/>
+			<Button name="$parentItem29" inherits="CharactersViewerItemButtonGenericTemplate" id="29"/>
+			<Button name="$parentItem30" inherits="CharactersViewerItemButtonGenericTemplate" id="30"/>
+			<Button name="$parentItem31" inherits="CharactersViewerItemButtonGenericTemplate" id="31"/>
+			<Button name="$parentItem32" inherits="CharactersViewerItemButtonGenericTemplate" id="32"/>
+			<Button name="$parentItem33" inherits="CharactersViewerItemButtonGenericTemplate" id="33"/>
+			<Button name="$parentItem34" inherits="CharactersViewerItemButtonGenericTemplate" id="34"/>
+			<Button name="$parentItem35" inherits="CharactersViewerItemButtonGenericTemplate" id="35"/>
+			<Button name="$parentItem36" inherits="CharactersViewerItemButtonGenericTemplate" id="36"/>
+			<Button name="$parentPortraitButton">
+				<Size> 
+					<AbsDimension x="40" y="40"/> 
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset> 
+							<AbsDimension x="7" y="-5"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset> 
+							<AbsDimension x="0" y="-1"/> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<Frame name="CharactersViewer_ContainerFrame0" inherits="CharactersViewer_ContainerFrameTemplate" parent="CharactersViewer_Frame" id="5" hidden="true"></Frame>
+	<Frame name="CharactersViewer_ContainerFrame1" inherits="CharactersViewer_ContainerFrameTemplate" parent="CharactersViewer_Frame" id="6" hidden="true"></Frame>
+	<Frame name="CharactersViewer_ContainerFrame2" inherits="CharactersViewer_ContainerFrameTemplate" parent="CharactersViewer_Frame" id="7" hidden="true"></Frame>
+	<Frame name="CharactersViewer_ContainerFrame3" inherits="CharactersViewer_ContainerFrameTemplate" parent="CharactersViewer_Frame" id="8" hidden="true"></Frame>
+	<Frame name="CharactersViewer_ContainerFrame4" inherits="CharactersViewer_ContainerFrameTemplate" parent="CharactersViewer_Frame" id="9" hidden="true"></Frame>
+	<Frame name="CharactersViewer_KeyringContainerFrame" inherits="CharactersViewer_ContainerFrameTemplate" parent="CharactersViewer_Frame" id="KEYRING_CONTAINER" hidden="true"></Frame>
+
+	<GameTooltip name="CharactersVTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(UIParent, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+	<Frame name="CharactersViewerDropDown2" inherits="UIDropDownMenuTemplate" enableMouse="true" parent="PaperDollFrame" hidden="true">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="CharacterWristSlot"	relativePoint="BOTTOMLEFT">
+				<Offset> 
+					<AbsDimension x="-19" y="-3"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				CharactersViewerDropDown_OnLoad();
+			</OnLoad>
+			<OnShow>
+				CharactersViewerDropDown_OnLoad();
+			</OnShow>
+			<OnEnter>
+				CharactersViewerDropDown_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+				ResetCursor();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	
+<!-- GUILD NOTES -->
+	<Button name="CharactersViewerNoteButtonTemplate" virtual="true" hidden="true">
+		<Size> 
+			<AbsDimension x="14" y="14"/> 
+		</Size>
+		<Scripts>
+			<OnClick>
+				CharactersViewer.Note.Guild_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				CharactersViewer.Note.Guild_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\Button-Backpack-Up"/>
+		<DisabledTexture file="Interface\Buttons\Button-Backpack-Up"/>
+		<HighlightTexture file="Interface\Buttons\Button-Backpack-Up" alphaMode="ADD"/>
+	</Button>
+
+<!-- GUILD NOTES -->
+	<Button name="CharactersViewerGuildFrameNoteButton1" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton1" id="1">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton1Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton2" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton2" id="2">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton2Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton3" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton3" id="3">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton3Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton4" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton4" id="4">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton4Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton5" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton5" id="5">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton5Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton6" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton6" id="6">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton6Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton7" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton7" id="7">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton7Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton8" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton8" id="8">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton8Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton9" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton9" id="9">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton9Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton10" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton10" id="10">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton10Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton11" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton11" id="11">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton11Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton12" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton12" id="12">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton12Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CharactersViewerGuildFrameNoteButton13" inherits="CharactersViewerNoteButtonTemplate" parent="GuildFrameButton13" id="13">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GuildFrameButton13Name" relativePoint="TOPRIGHT">
+				<Offset> 
+					<AbsDimension x="-6" y="0"/> 
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+</Ui>

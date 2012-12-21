@@ -1,0 +1,48 @@
+This is new in R16, when the coding style was upgraded.
+
+Instead of having all the global variables having names like 'KLHTM_MasterTarget', the entire mod is now contained in the global variable 'klhtm', and the variables are entries in this table. The variables in each file are contained in a subtable of klhtm. For example, the variables in KTM_Combat.lua are entries in the table 'klhtm.combat', the variables in KTM_Bosses.lua are stored in 'klhtm.boss'. 
+
+At the top of each file, there will be code like
+
+	local mod = klhtm
+	local me = { }
+	mod.combat = me
+
+This is adding the 'combat' module to the mod. Also, me.xyz is a variable in the file, and mod.abc.xyz is the variable 'xyz' in the module 'abc'. Everything is in lower case, and will stay so until there is an IDE which will can automatically figure out the capitals as i type, which is likely to be forever. The advantages of this new style are
+--> It's easy to find a method outside a file. If you see "mod.combat.dosomething()", you know the dosomething() function will be in KTM_Combat.lua, as opposed to KLHTM_DoSomething(), which could be anywhere.
+--> Stops me getting RSI. Banging the shift key up and down is really annoying.
+--> Makes the mod easily portable. In any file, the only references are to 'mod.' and 'me.', so you can practically copy-paste whole modules.
+
+
+
+There's one special module, KTM_Core.lua, that handles all the onupdate, onevent, and onload stuff, and makes it really easy for other modules. Each individual module simply creates a method called 'onupdate', and the Core module will call it automatically. Similarly, each module optionally defines a method 'onevent' and a list of event names 'myevents', and those events will be called for you. e.g. you might have
+
+me.myevents = { "CHAT_MSG_SPELL_SELF_BUFF", "CHAT_MSG_SPELL_SELF_DAMAGE" }
+
+me.event = function()
+
+	message(string.format("Received the event %s.", event))
+
+end
+
+
+
+The only requirement for file loading is that KTM_Core.lua is loaded before every other file, because it defines the variable 'klhtm', and all the other modules reference it up the top. Variables that reference other modules' static variables should be defined in the onload() method, to make sure they exist. e.g. In KTM_Data.lua, the static table 'klhtm.data.abilities' use the method 'klhtm.string.get' (which gets a localisation string) to make the keys. To be sure the 'klhtm.string.get' method has been loaded, 'klhtm.data.abilites' is defined in KTM_Data.lua's onload() method.
+
+
+
+One exception to the above is the code in the GUI folder. Since it's new and written by someone else, it's still in the KLHTM_ format.
+
+The files and general descriptions are:
+
+	KTM_Data.lua - list of constants. Base threat / rage / damage values for abilities, location of talents in your trees, item links of set pieces, and helper methods for fetching the values
+	KTM_My.lua - your own personal modifiers for threat and abilities. Spell Ranks. Global Threat modifiers. States such as InCombat, IsAFK, Feigning death, and bonuses from talents and gear  you are wearing.
+	KTM_Combat.lua - Parsing combat events, working out the threat caused by them, and adding it to your tables.
+	KTM_Localisation.lua - localisation strings.
+	KTM_Net.lua - Contolls the chat channel used by the mod, and methods to send commands on it.
+	KTM_NetIn.lua - procesing messages that other people send on the chat channel.
+	KTM_Tables.lua - stores the data in your personal threat table and the raid threat table.
+	KTM_Boss.lua - mastertarget, aggrogain, and boss encounters.
+	KTM_Console.lua - Processing console commands
+	KTM_Output.lua - printing, including trace variables
+	KTM_Main.lua - nothing much, at the moment. About to be deleted.

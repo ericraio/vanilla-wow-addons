@@ -1,0 +1,536 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <Script file="BuffWatch.lua"/>
+
+    <CheckButton name="BW_LockButton_Template" inherits="UICheckButtonTemplate" hidden="true" virtual="true">
+        <Size>
+            <AbsDimension x="16" y="16"/>
+        </Size>
+        <Scripts>
+            <OnShow>
+                this:RegisterForClicks("LeftButtonUp")
+            </OnShow>
+            <OnClick>
+                BW_Check_Clicked()
+            </OnClick>
+            <OnLeave>
+                BW_MouseIsOverFrame()
+            </OnLeave>
+        </Scripts>
+    </CheckButton>
+
+    <Button name="BW_PlayerName_Template" hidden="false" virtual="true">
+        <Size>
+            <AbsDimension x="18" y="18"/>
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnShow>
+                this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+            </OnShow>
+            <OnClick>
+                BW_Name_Clicked(arg1)
+            </OnClick>
+            <OnLeave>
+                BW_MouseIsOverFrame()
+            </OnLeave>
+        </Scripts>
+    </Button>
+
+    <Button name="BW_BuffButton_Template" hidden="true" virtual="true">
+        <Size>
+            <AbsDimension x="18" y="18"/>
+        </Size>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="$parentIcon"/>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnShow>
+                this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+            </OnShow>
+            <OnClick>
+                BW_Buff_Clicked(arg1)
+            </OnClick>
+            <OnEnter>
+                BW_Buff_Tooltip()
+            </OnEnter>
+            <OnLeave>
+                GameTooltip:Hide()
+                BW_MouseIsOverFrame()
+            </OnLeave>
+        </Scripts>
+    </Button>
+
+    <Frame name="BW_Player_Template" hidden="true" virtual="true">
+        <Size>
+            <AbsDimension x="100" y="18"/>
+        </Size>
+        <Frames>
+            <CheckButton name="$parent_Lock" inherits="BW_LockButton_Template">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </CheckButton>
+
+            <Button name="$parent_Name" inherits="BW_PlayerName_Template">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent_Lock" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-1" y="2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+
+            <Button name="$parent_Buff1" inherits="BW_BuffButton_Template" id="1"/>
+            <Button name="$parent_Buff2" inherits="BW_BuffButton_Template" id="2"/>
+            <Button name="$parent_Buff3" inherits="BW_BuffButton_Template" id="3"/>
+            <Button name="$parent_Buff4" inherits="BW_BuffButton_Template" id="4"/>
+            <Button name="$parent_Buff5" inherits="BW_BuffButton_Template" id="5"/>
+            <Button name="$parent_Buff6" inherits="BW_BuffButton_Template" id="6"/>
+            <Button name="$parent_Buff7" inherits="BW_BuffButton_Template" id="7"/>
+            <Button name="$parent_Buff8" inherits="BW_BuffButton_Template" id="8"/>
+            <Button name="$parent_Buff9" inherits="BW_BuffButton_Template" id="9"/>
+            <Button name="$parent_Buff10" inherits="BW_BuffButton_Template" id="10"/>
+            <Button name="$parent_Buff11" inherits="BW_BuffButton_Template" id="11"/>
+            <Button name="$parent_Buff12" inherits="BW_BuffButton_Template" id="12"/>
+            <Button name="$parent_Buff13" inherits="BW_BuffButton_Template" id="13"/>
+            <Button name="$parent_Buff14" inherits="BW_BuffButton_Template" id="14"/>
+            <Button name="$parent_Buff15" inherits="BW_BuffButton_Template" id="15"/>
+            <Button name="$parent_Buff16" inherits="BW_BuffButton_Template" id="16"/>
+
+            <Button name="$parent_Debuff1" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff2" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff3" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff4" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff5" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff6" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff7" inherits="BW_BuffButton_Template"/>
+            <Button name="$parent_Debuff8" inherits="BW_BuffButton_Template"/>
+        </Frames>
+    </Frame>
+
+
+    <!--==================================================================================-->
+
+    <Frame name="BW" frameStrata="LOW" toplevel="false" enableMouse="true" movable="true" parent="UIParent" hidden="false">
+
+        <Size>
+            <AbsDimension x="150" y="20"/>
+        </Size>
+
+        <Anchors>
+            <Anchor point="TOPLEFT">
+                <Offset>
+                    <AbsDimension x="800" y="-25"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+
+        <Layers>
+            <Layer level="BACKGROUND">
+
+                <FontString name="BW_UPS" inherits="GameFontNormal" text="CPS = 0">
+                    <Anchors>
+                        <Anchor point="BOTTOM" relativeTo="BW" relativePoint="BOTTOM">
+                            <Offset>
+                                <AbsDimension x="0" y="5"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            
+            </Layer>
+        </Layers>
+        
+        <Frames>
+
+            <Frame name="$parent_Background">
+
+                <Size>
+                    <AbsDimension x="150" y="20"/>
+                </Size>
+
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+
+                <Backdrop name="$parentBackdrop" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                    <TileSize>
+                        <AbsValue val="12"/>
+                    </TileSize>
+                    <EdgeSize>
+                        <AbsValue val="12"/>
+                    </EdgeSize>
+                    <BackgroundInsets>
+                        <AbsInset left="2" right="2" top="2" bottom="2"/>
+                    </BackgroundInsets>
+                </Backdrop>
+
+            </Frame>
+
+            <CheckButton name="$parent_Lock_All" inherits="UICheckButtonTemplate" hidden="true">
+
+                <Size>
+                    <AbsDimension x="16" y="16"/>
+                </Size>
+
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="1" y="-2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+
+                <Scripts>
+                    <OnClick>
+                        BW_Set_AllChecks(this:GetChecked())
+                    </OnClick>
+                    <OnLeave>
+                        BW_MouseIsOverFrame()
+                    </OnLeave>
+                </Scripts>
+
+            </CheckButton>
+
+            <Button name="$parent_Header">
+
+                <Size>
+                    <AbsDimension x="75" y="10"/>
+                </Size>
+
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="BW_Background" relativePoint="TOP">
+                        <Offset>
+                            <AbsDimension x="0" y="-2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER">
+                            <Size>
+                                <AbsDimension x="75" y="10"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOP"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+
+                <Scripts>
+                    <OnShow>
+                        this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+                    </OnShow>
+                    <Onclick>
+                        BW_Header_Clicked(arg1)
+                    </Onclick>
+                    <OnLeave>
+                        BW_MouseIsOverFrame()
+                    </OnLeave>
+                </Scripts>
+
+            </Button>
+
+            <Button name="$parent_MinimizeButton" hidden="true">
+                <Size>
+                    <AbsDimension x="16" y="16"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="BW_Background" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-1" y="-1"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <NormalTexture file="Interface\AddOns\BuffWatch\MinimizeButton-Up"/>
+                <PushedTexture file="Interface\AddOns\BuffWatch\MinimizeButton-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+                <Scripts>
+                    <OnClick>
+                        BW_MinimizeButton_Clicked()
+                    </OnClick>
+                    <OnEnter>
+                        GameTooltip:SetOwner(this, "ANCHOR_BOTTOM")
+                        GameTooltip:SetText("Minimize")
+                    </OnEnter>
+                    <OnLeave>
+                        GameTooltip:Hide()
+                        BW_MouseIsOverFrame()
+                    </OnLeave>
+                </Scripts>
+            </Button>
+
+            <Frame name="BW_PlayersFrame" hidden="true">
+
+                <Size>
+                    <AbsDimension x="150" y="10"/>
+                </Size>
+
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+
+                <Frames>
+
+                    <Button name="BW_OptionsButton" hidden="true">
+
+                        <Size>
+                            <AbsDimension x="14" y="14"/>
+                        </Size>
+
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativeTo="BW_MinimizeButton" relativePoint="BOTTOMRIGHT">
+                                <Offset>
+                                    <AbsDimension x="-1" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+
+                        <NormalTexture file="Interface\Icons\INV_Misc_QuestionMark"/>
+
+                        <Scripts>
+                            <OnClick>
+                                BW_OptionsToggle()
+                            </OnClick>
+                            <OnEnter>
+                                GameTooltip:SetOwner(this, "ANCHOR_BOTTOM")
+                                GameTooltip:SetText("Options")
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide()
+                                BW_MouseIsOverFrame()
+                            </OnLeave>
+                        </Scripts>
+
+                    </Button>
+
+                    <Button name="BW_HideUnmonitoredButton" hidden="true">
+
+                        <Size>
+                            <AbsDimension x="14" y="14"/>
+                        </Size>
+
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativeTo="BW_OptionsButton" relativePoint="BOTTOMRIGHT"/>
+                        </Anchors>
+
+                        <NormalTexture file="Interface\Icons\Ability_Hibernation"/>
+
+                        <Scripts>
+                            <OnClick>
+                                BW_HideUnmonitored_Clicked()
+                            </OnClick>
+                            <OnEnter>
+                                BW_HideUnmonitored_OnEnter()
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide()
+                                BW_MouseIsOverFrame()
+                            </OnLeave>
+                        </Scripts>
+
+                    </Button>
+
+                    <Button name="BW_HideMonitoredButton" hidden="true">
+
+                        <Size>
+                            <AbsDimension x="14" y="14"/>
+                        </Size>
+
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativeTo="BW_HideUnmonitoredButton" relativePoint="BOTTOMRIGHT"/>
+                        </Anchors>
+
+                        <NormalTexture file="Interface\Icons\Ability_Warrior_Revenge"/>
+
+                        <Scripts>
+                            <OnClick>
+                                BW_HideMonitored_Clicked()
+                            </OnClick>
+                            <OnEnter>
+                                BW_HideMonitored_OnEnter()
+                            </OnEnter>
+                            <OnLeave>
+                                GameTooltip:Hide()
+                                BW_MouseIsOverFrame()
+                            </OnLeave>
+                        </Scripts>
+
+                    </Button>
+
+                    <Frame name="BW_Player1" inherits="BW_Player_Template" id="1"/>
+                    <Frame name="BW_Player2" inherits="BW_Player_Template" id="2"/>
+                    <Frame name="BW_Player3" inherits="BW_Player_Template" id="3"/>
+                    <Frame name="BW_Player4" inherits="BW_Player_Template" id="4"/>
+                    <Frame name="BW_Player5" inherits="BW_Player_Template" id="5"/>
+                    <Frame name="BW_Player6" inherits="BW_Player_Template" id="6"/>
+                    <Frame name="BW_Player7" inherits="BW_Player_Template" id="7"/>
+                    <Frame name="BW_Player8" inherits="BW_Player_Template" id="8"/>
+                    <Frame name="BW_Player9" inherits="BW_Player_Template" id="9"/>
+                    <Frame name="BW_Player10" inherits="BW_Player_Template" id="10"/>
+
+                    <Frame name="BW_Player11" inherits="BW_Player_Template" id="11"/>
+                    <Frame name="BW_Player12" inherits="BW_Player_Template" id="12"/>
+                    <Frame name="BW_Player13" inherits="BW_Player_Template" id="13"/>
+                    <Frame name="BW_Player14" inherits="BW_Player_Template" id="14"/>
+                    <Frame name="BW_Player15" inherits="BW_Player_Template" id="15"/>
+                    <Frame name="BW_Player16" inherits="BW_Player_Template" id="16"/>
+                    <Frame name="BW_Player17" inherits="BW_Player_Template" id="17"/>
+                    <Frame name="BW_Player18" inherits="BW_Player_Template" id="18"/>
+                    <Frame name="BW_Player19" inherits="BW_Player_Template" id="19"/>
+                    <Frame name="BW_Player20" inherits="BW_Player_Template" id="20"/>
+
+                    <Frame name="BW_Player21" inherits="BW_Player_Template" id="21"/>
+                    <Frame name="BW_Player22" inherits="BW_Player_Template" id="22"/>
+                    <Frame name="BW_Player23" inherits="BW_Player_Template" id="23"/>
+                    <Frame name="BW_Player24" inherits="BW_Player_Template" id="24"/>
+                    <Frame name="BW_Player25" inherits="BW_Player_Template" id="25"/>
+                    <Frame name="BW_Player26" inherits="BW_Player_Template" id="26"/>
+                    <Frame name="BW_Player27" inherits="BW_Player_Template" id="27"/>
+                    <Frame name="BW_Player28" inherits="BW_Player_Template" id="28"/>
+                    <Frame name="BW_Player29" inherits="BW_Player_Template" id="29"/>
+                    <Frame name="BW_Player30" inherits="BW_Player_Template" id="30"/>
+
+                    <Frame name="BW_Player31" inherits="BW_Player_Template" id="31"/>
+                    <Frame name="BW_Player32" inherits="BW_Player_Template" id="32"/>
+                    <Frame name="BW_Player33" inherits="BW_Player_Template" id="33"/>
+                    <Frame name="BW_Player34" inherits="BW_Player_Template" id="34"/>
+                    <Frame name="BW_Player35" inherits="BW_Player_Template" id="35"/>
+                    <Frame name="BW_Player36" inherits="BW_Player_Template" id="36"/>
+                    <Frame name="BW_Player37" inherits="BW_Player_Template" id="37"/>
+                    <Frame name="BW_Player38" inherits="BW_Player_Template" id="38"/>
+                    <Frame name="BW_Player39" inherits="BW_Player_Template" id="39"/>
+                    <Frame name="BW_Player40" inherits="BW_Player_Template" id="40"/>
+
+                    <Frame name="BW_Player41" inherits="BW_Player_Template" id="41"/>
+                    <Frame name="BW_Player42" inherits="BW_Player_Template" id="42"/>
+                    <Frame name="BW_Player43" inherits="BW_Player_Template" id="43"/>
+                    <Frame name="BW_Player44" inherits="BW_Player_Template" id="44"/>
+                    <Frame name="BW_Player45" inherits="BW_Player_Template" id="45"/>
+                    <Frame name="BW_Player46" inherits="BW_Player_Template" id="46"/>
+                    <Frame name="BW_Player47" inherits="BW_Player_Template" id="47"/>
+                    <Frame name="BW_Player48" inherits="BW_Player_Template" id="48"/>
+                    <Frame name="BW_Player49" inherits="BW_Player_Template" id="49"/>
+                    <Frame name="BW_Player50" inherits="BW_Player_Template" id="50"/>
+
+                    <Frame name="BW_Player51" inherits="BW_Player_Template" id="51"/>
+                    <Frame name="BW_Player52" inherits="BW_Player_Template" id="52"/>
+                    <Frame name="BW_Player53" inherits="BW_Player_Template" id="53"/>
+                    <Frame name="BW_Player54" inherits="BW_Player_Template" id="54"/>
+                    <Frame name="BW_Player55" inherits="BW_Player_Template" id="55"/>
+                    <Frame name="BW_Player56" inherits="BW_Player_Template" id="56"/>
+                    <Frame name="BW_Player57" inherits="BW_Player_Template" id="57"/>
+                    <Frame name="BW_Player58" inherits="BW_Player_Template" id="58"/>
+                    <Frame name="BW_Player59" inherits="BW_Player_Template" id="59"/>
+                    <Frame name="BW_Player60" inherits="BW_Player_Template" id="60"/>
+
+                    <Frame name="BW_Player61" inherits="BW_Player_Template" id="61"/>
+                    <Frame name="BW_Player62" inherits="BW_Player_Template" id="62"/>
+                    <Frame name="BW_Player63" inherits="BW_Player_Template" id="63"/>
+                    <Frame name="BW_Player64" inherits="BW_Player_Template" id="64"/>
+                    <Frame name="BW_Player65" inherits="BW_Player_Template" id="65"/>
+                    <Frame name="BW_Player66" inherits="BW_Player_Template" id="66"/>
+                    <Frame name="BW_Player67" inherits="BW_Player_Template" id="67"/>
+                    <Frame name="BW_Player68" inherits="BW_Player_Template" id="68"/>
+                    <Frame name="BW_Player69" inherits="BW_Player_Template" id="69"/>
+                    <Frame name="BW_Player70" inherits="BW_Player_Template" id="70"/>
+
+                    <Frame name="BW_Player71" inherits="BW_Player_Template" id="71"/>
+                    <Frame name="BW_Player72" inherits="BW_Player_Template" id="72"/>
+                    <Frame name="BW_Player73" inherits="BW_Player_Template" id="73"/>
+                    <Frame name="BW_Player74" inherits="BW_Player_Template" id="74"/>
+                    <Frame name="BW_Player75" inherits="BW_Player_Template" id="75"/>
+                    <Frame name="BW_Player76" inherits="BW_Player_Template" id="76"/>
+                    <Frame name="BW_Player77" inherits="BW_Player_Template" id="77"/>
+                    <Frame name="BW_Player78" inherits="BW_Player_Template" id="78"/>
+                    <Frame name="BW_Player79" inherits="BW_Player_Template" id="79"/>
+                    <Frame name="BW_Player80" inherits="BW_Player_Template" id="80"/>
+
+                </Frames>
+
+            </Frame>
+
+        </Frames>
+
+
+        <Scripts>
+            <OnLoad>
+                BW_OnLoad()
+            </OnLoad>
+            <OnEvent>
+                BW_OnEvent()
+            </OnEvent>
+--            <OnUpdate> 
+--                BW_OnUpdate(arg1)
+--            </OnUpdate>
+            <OnMouseDown>
+                BW_OnMouseDown(arg1)
+            </OnMouseDown>
+            <OnMouseUp>
+                BW_OnMouseUp(arg1)
+            </OnMouseUp>
+            <OnEnter>
+--                BW_UpdateBuffStatus()
+                BW_MouseIsOverFrame()
+            </OnEnter>
+            <OnLeave>
+                BW_MouseIsOverFrame()
+            </OnLeave>
+        </Scripts>
+
+    </Frame>
+
+    <Frame name="BW_HelpFrame" inherits="DialogBoxFrame">
+
+        <Size>
+            <AbsDimension x="640" y="480"/>
+        </Size>
+
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="CENTER">
+                    <Size>
+                        <AbsDimension x="600" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <Button name="$ParentOptionsButton" inherits="OptionsButtonTemplate" text="Options">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-50" y="-42"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        BW_OptionsToggle()
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+
+    </Frame>
+
+</Ui>

@@ -1,0 +1,1024 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<CheckButton name="AutoBar_Config_Button_Template" inherits="ActionButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				this:SetChecked(0);
+				AutoBar_Config_ButtonOnClick(arg1)
+			</OnClick>
+			<OnEnter>
+				AutoBar_Config_ButtonSetTooltip();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="AutoBar_Options_CheckBoxTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				AutoBar_Options_CheckBox_OnCheck();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<CheckButton name="AutoBar_Options_ConfigButton_OptionTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				AutoBar_Options_ConfigButton_Option_OnCheck();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<Frame name="AutoBar_MoveArrowsTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="64" y="32"/>
+		</Size>
+		<Frames>
+			<Button name="$parent_Up">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBar_Options_MoveArrow_OnClick(this:GetParent():GetID(),"UP");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this,"ANCHOR_RIGHT");
+						GameTooltip:SetText("Move item up.");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parent_Down">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Up"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoBar_Options_MoveArrow_OnClick(this:GetParent():GetID(),"DOWN");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this,"ANCHOR_RIGHT");
+						GameTooltip:SetText("Move item down.");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+	</Frame>
+	<Frame name="AutoBar_Options" toplevel="true" frameStrata="MEDIUM" hidden="true" parent="UIParent" enableMouse="true">
+		<Size>
+			<!--
+			<AbsDimension x="575" y="480"/>
+			-->
+			<AbsDimension x="600" y="280"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="448" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitleText" inherits="GameFontNormal" text="AutoBar">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentTitle">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."TitleText"):SetText("AutoBar ("..AUTOBAR_VERSION..")");
+				AutoBar_Config_OnLoad();
+			</OnLoad>
+			<OnShow>
+				AutoBar_Config_OnShow();
+			</OnShow>
+			<OnHide>
+				AutoBar_Options_ConfigButton:Hide();
+				AutoBar_ConfigUpdated();
+			</OnHide>
+		</Scripts>
+		<Frames>
+			<Frame name="$parent_Buttons" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="1" y="80"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-25"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parent_Text" inherits="GameFontHighlight" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relative_To="$parent">
+									<Offset>
+										<AbsDimension x="255" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4,0.4,0.4);
+						this:SetBackdropColor(0.15,0.15,0.15);
+						getglobal(this:GetName().."Title"):SetText("Buttons");
+						getglobal(this:GetName().."_Text"):SetText("Click to Edit");
+					</OnLoad>
+				</Scripts>
+				<Frames>
+					<CheckButton name="$parent_Button1" inherits="AutoBar_Config_Button_Template" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="40" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button2" inherits="AutoBar_Config_Button_Template" id="2">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button1">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button3" inherits="AutoBar_Config_Button_Template" id="3">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button2">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button4" inherits="AutoBar_Config_Button_Template" id="4">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button3">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button5" inherits="AutoBar_Config_Button_Template" id="5">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button4">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button6" inherits="AutoBar_Config_Button_Template" id="6">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button5">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button7" inherits="AutoBar_Config_Button_Template" id="7">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button6">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button8" inherits="AutoBar_Config_Button_Template" id="8">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button7">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button9" inherits="AutoBar_Config_Button_Template" id="9">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button8">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button10" inherits="AutoBar_Config_Button_Template" id="10">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button9">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button11" inherits="AutoBar_Config_Button_Template" id="11">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button10">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button12" inherits="AutoBar_Config_Button_Template" id="12">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button11">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_Bar" inherits="OptionFrameBoxTemplate">
+				<Size>
+					<AbsDimension x="1" y="155"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="10"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parent_Text" inherits="GameFontHighlight" justifyH="LEFT">
+							<Anchors>
+								<Anchor point="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4,0.4,0.4);
+						this:SetBackdropColor(0.15,0.15,0.15);
+						getglobal(this:GetName().."Title"):SetText("Bar");
+						getglobal(this:GetName().."_Text"):SetText("Control Right-Click on AutoBar\nButton when undocked to move.");
+					</OnLoad>
+				</Scripts>
+				<Frames>
+					<Slider name="$parent_Rows" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(1,12);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(12);
+								getglobal(this:GetName().."Low"):SetText(1);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="$parent_Columns" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent_Rows" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(1,12);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(12);
+								getglobal(this:GetName().."Low"):SetText(1);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="$parent_Gapping" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent_Columns" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(1,20);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(20);
+								getglobal(this:GetName().."Low"):SetText(1);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="$parent_Alpha" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent_Gapping" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(1,10);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(1);
+								getglobal(this:GetName().."Low"):SetText(0.1);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<CheckButton name="$parent_DockingMainBar" inherits="AutoBar_Options_CheckBoxTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Rows">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Slider name="$parent_DockShiftX" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent_DockingMainBar" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(-50,50);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(50);
+								getglobal(this:GetName().."Low"):SetText(-50);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="$parent_DockShiftY" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent_DockShiftX" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(-50,50);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(50);
+								getglobal(this:GetName().."Low"):SetText(-50);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="$parent_ButtonWidth" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parent_DockingMainBar" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="120" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(9,72);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(72);
+								getglobal(this:GetName().."Low"):SetText(9);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<Slider name="$parent_ButtonHeight" inherits="OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent_ButtonWidth" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								AutoBar_Options_Bar_Sliders(1);
+							</OnValueChanged>
+							<OnLoad>
+								this:SetMinMaxValues(9,72);
+								this:SetValueStep(1);
+								getglobal(this:GetName().."High"):SetText(72);
+								getglobal(this:GetName().."Low"):SetText(9);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+					<CheckButton name="$parent_WidthHeightLocked" inherits="AutoBar_Options_CheckBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_ButtonHeight">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_ReverseButtons" inherits="AutoBar_Options_CheckBoxTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_ButtonWidth">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_HideKeyText" inherits="AutoBar_Options_CheckBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_ReverseButtons">
+								<Offset>
+									<AbsDimension x="0" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_HideCount" inherits="AutoBar_Options_CheckBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_HideKeyText">
+								<Offset>
+									<AbsDimension x="0" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_ShowEmptyButtons" inherits="AutoBar_Options_CheckBoxTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_HideCount">
+								<Offset>
+									<AbsDimension x="0" y="5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Button name="$parent_ResetDisplay" inherits="UIPanelButtonTemplate" text="Reset to Default">
+						<Size>
+							<AbsDimension x="125" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-8" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AutoBar_Config[AutoBar_Player].display = {};
+								AutoBar_Config_OnShow();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="$parent_ConfigButton" toplevel="true" frameStrata="MEDIUM" hidden="true" enableMouse="true">
+				<Size>
+					<AbsDimension x="300" y="400"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="UIParent"/>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="11" right="12" top="12" bottom="11"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="32"/>
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+							<Size>
+								<AbsDimension x="448" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="12"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<FontString name="$parentTitleText" inherits="GameFontNormal" text="AutoBar">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentTitle">
+									<Offset>
+										<AbsDimension x="0" y="-14"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						-- this:SetBackdropBorderColor(0.4,0.4,0.4);
+						this:SetBackdropColor(0.15,0.15,0.15);
+						getglobal(this:GetName().."TitleText"):SetText("Edit Button");
+					</OnLoad>
+					<OnHide>
+						AutoBar_Options_ConfigButton_ChooseCategory:Hide();
+						AutoBar_Config_OnShow();
+						AutoBar_ConfigUpdated();
+					</OnHide>
+				</Scripts>
+				<Frames>
+					<CheckButton name="$parent_Button1" inherits="AutoBar_Config_Button_Template" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="30" y="-30"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button2" inherits="AutoBar_Config_Button_Template" id="2">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button1">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button3" inherits="AutoBar_Config_Button_Template" id="3">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button2">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button4" inherits="AutoBar_Config_Button_Template" id="4">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button3">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button5" inherits="AutoBar_Config_Button_Template" id="5">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button4">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button6" inherits="AutoBar_Config_Button_Template" id="6">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button5">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button7" inherits="AutoBar_Config_Button_Template" id="7">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button6">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Button8" inherits="AutoBar_Config_Button_Template" id="8">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button7">
+								<Offset>
+									<AbsDimension x="0" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<Frame name="$parent_Move1" inherits="AutoBar_MoveArrowsTemplate" id="1">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button1"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move2" inherits="AutoBar_MoveArrowsTemplate" id="2">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button2"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move3" inherits="AutoBar_MoveArrowsTemplate" id="3">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button3"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move4" inherits="AutoBar_MoveArrowsTemplate" id="4">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button4"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move5" inherits="AutoBar_MoveArrowsTemplate" id="5">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button5"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move6" inherits="AutoBar_MoveArrowsTemplate" id="6">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button6"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move7" inherits="AutoBar_MoveArrowsTemplate" id="7">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button7"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parent_Move8" inherits="AutoBar_MoveArrowsTemplate" id="8">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Button8"/>
+						</Anchors>
+					</Frame>
+					<CheckButton name="$parent_Option1" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="1">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move1"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option2" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="2">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move2"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option3" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="3">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move3"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option4" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="4">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move4"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option5" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="5">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move5"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option6" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="6">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move6"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option7" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="7">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move7"/>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="$parent_Option8" inherits="AutoBar_Options_ConfigButton_OptionTemplate" id="8">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Move8"/>
+						</Anchors>
+					</CheckButton>
+					<Button name="$parent_ConvertButton" inherits="UIPanelButtonTemplate" text="Convert">
+						<Size>
+							<AbsDimension x="200" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-30" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AutoBar_Config_Button_ConvertOnClick();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parent_DoneButton" inherits="UIPanelButtonTemplate" text="Done">
+						<Size>
+							<AbsDimension x="131" y="21"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER">
+								<Offset>
+									<AbsDimension x="0" y="-175"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								this:GetParent():Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Frame name="$parent_ChooseCategory" toplevel="true" frameStrata="MEDIUM" hidden="true" enableMouse="true">
+						<Size>
+							<AbsDimension x="300" y="400"/>
+						</Size>
+						<Anchors>
+							<Anchor point="CENTER" relativeTo="UIParent">
+								<Offset>
+									<AbsDimension x="100" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\CharacterFrame\UI-Party-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+							<TileSize>
+								<AbsValue val="32"/>
+							</TileSize>
+							<EdgeSize>
+								<AbsValue val="32"/>
+							</EdgeSize>
+						</Backdrop>
+						<Scripts>
+							<OnLoad>
+								local idx;
+								for idx = 1, 7, 1 do
+									getglobal(this:GetName().."_Text"..idx):SetPoint("LEFT",this:GetName().."_Button"..idx,"RIGHT",5,0);
+									getglobal(this:GetName().."_Text"..idx):SetWidth(150);
+								end
+							</OnLoad>
+							<OnShow>
+								AutoBar_Config_ButtonChooseCategory_OnShow();
+							</OnShow>
+							<OnHide>
+								this.categoryexplore = nil;
+								AutoBar_Config_Button_Edit();
+								AutoBar_ConfigUpdated();
+							</OnHide>
+						</Scripts>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parent_Text1" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_Text2" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_Text3" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_Text4" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_Text5" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_Text6" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_Text7" inherits="GameFontNormal" justifyH="LEFT"/>
+								<FontString name="$parent_HintText1" inherits="GameFontNormal" text="(Shift Click to explore Category)">
+									<Anchors>
+										<Anchor point="BOTTOM">
+											<Offset>
+												<AbsDimension x="0" y="40"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Button name="$parent_SingleItemCustom" inherits="UIPanelButtonTemplate" text="Insert Custom Single Item">
+								<Size>
+									<AbsDimension x="200" y="21"/>
+								</Size>
+								<Anchors>
+									<Anchor point="CENTER">
+										<Offset>
+											<AbsDimension x="0" y="175"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										AutoBar_Config_Button_InsertCustomItem();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parent_DoneButton" inherits="UIPanelButtonTemplate" text="Done">
+								<Size>
+									<AbsDimension x="131" y="21"/>
+								</Size>
+								<Anchors>
+									<Anchor point="CENTER">
+										<Offset>
+											<AbsDimension x="0" y="-175"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										this:GetParent():Hide();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<CheckButton name="$parent_Button1" inherits="AutoBar_Config_Button_Template" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="30" y="-45"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="$parent_Button2" inherits="AutoBar_Config_Button_Template" id="2">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button1">
+										<Offset>
+											<AbsDimension x="0" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="$parent_Button3" inherits="AutoBar_Config_Button_Template" id="3">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button2">
+										<Offset>
+											<AbsDimension x="0" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="$parent_Button4" inherits="AutoBar_Config_Button_Template" id="4">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button3">
+										<Offset>
+											<AbsDimension x="0" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="$parent_Button5" inherits="AutoBar_Config_Button_Template" id="5">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button4">
+										<Offset>
+											<AbsDimension x="0" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="$parent_Button6" inherits="AutoBar_Config_Button_Template" id="6">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button5">
+										<Offset>
+											<AbsDimension x="0" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="$parent_Button7" inherits="AutoBar_Config_Button_Template" id="7">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Button6">
+										<Offset>
+											<AbsDimension x="0" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<ScrollFrame name="$parent_Scroll" inherits="FauxScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="255" y="355"/> 
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-35" y="-23"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll(36, AutoBar_Config_ButtonChooseCategory_OnScroll);
+									</OnVerticalScroll>
+								</Scripts>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+											<Size>
+												<AbsDimension x="31" y="256"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+													<Offset>
+														<AbsDimension x="-2" y="5"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+											<Size>
+												<AbsDimension x="31" y="108"/>
+											</Size>
+											<Anchors>
+												<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+													<Offset>
+														<AbsDimension x="-2" y="-4"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.515625" right="1.0" top="0" bottom="0.421875"/>
+										</Texture>
+									</Layer>
+								</Layers>
+							</ScrollFrame>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

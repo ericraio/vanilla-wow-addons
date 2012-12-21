@@ -1,0 +1,943 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+        <Script file="localization.lua"/>
+        <Script file="localization.deDE.lua"/>
+        <Script file="localization.zhCN.lua"/>
+        <Script file="XPerl_Config.lua"/>
+        <Script file="XPerl_RaidHelper.lua"/>
+        <Script file="..\XPerl\XPerl_Usage.lua"/>
+
+        <GameTooltip name="XPerl_BottomTip" frameStrata="LOW" toplevel="true" parent="UIParent" inherits="GameTooltipTemplate"/>
+
+        <Button name="XPerl_BasicButton" virtual="true">
+                <Scripts>
+                        <OnEnter>
+                                if (this.tooltipText) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                        GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+                                end
+                        </OnEnter>
+                        <OnLeave>
+                                GameTooltip:Hide();
+                        </OnLeave>
+                </Scripts>
+        </Button>
+
+        <Button name="XPerl_DownArrowTemplate" inherits="XPerl_BasicButton" virtual="true">
+		<Size>
+                        <AbsDimension x="18" y="12"/>
+		</Size>
+
+                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                        <TexCoords left="0" right="0.187" top="0" bottom="0.0703125"/>
+                </NormalTexture>
+
+                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                        <TexCoords left="0" right="0.187" top="0.0703125" bottom="0.140625"/>
+                </PushedTexture>
+
+                <HighlightTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits" alphaMode="ADD">
+                        <TexCoords left="0" right="0.187" top="0.140625" bottom="0.2109375"/>
+                </HighlightTexture>
+        </Button>
+
+        <Button name="XPerl_UpArrowTemplate" inherits="XPerl_BasicButton" virtual="true">
+		<Size>
+                        <AbsDimension x="18" y="12"/>
+		</Size>
+
+                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                        <TexCoords left="0.19140625" right="0.375" top="0" bottom="0.0703125"/>
+                </NormalTexture>
+
+                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                        <TexCoords left="0.19140625" right="0.375" top="0.0703125" bottom="0.140625"/>
+                </PushedTexture>
+
+                <HighlightTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits" alphaMode="ADD">
+                        <TexCoords left="0.19140625" right="0.375" top="0.140625" bottom="0.2109375"/>
+                </HighlightTexture>
+        </Button>
+
+        <Button name="XPerl_UnitTemplate" movable="false" virtual="true" hidden="true">
+                <Scripts>
+                        <OnLoad>
+                                this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+                                XPerl_RegisterBar(getglobal(this:GetName().."_HealthBar"))
+                                this:SetScript("OnLoad", nil)
+                        </OnLoad>
+                        <OnClick>
+                                XPerl_OnClick(arg1);
+                        </OnClick>
+                        <OnEnter>
+                                XPerl_OnEnter();
+                        </OnEnter>
+                        <OnLeave>
+                                GameTooltip:Hide();
+                                XPerl_BottomTip:Hide();
+                        </OnLeave>
+                </Scripts>
+		<Size>
+                        <AbsDimension x="100" y="26"/>
+		</Size>
+                <Backdrop bgFile="Interface\AddOns\XPerl_RaidHelper\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="9"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="16"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="3" right="3" top="3" bottom="3"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <HighlightTexture file="Interface\Addons\XPerl\images\XPerl_Highlight" alphaMode="ADD">
+                        <TexCoords left="0" right="1" top="0.5" bottom="1"/>
+                </HighlightTexture>
+                <Frames>
+                        <StatusBar name="$parent_HealthBar" enableMouse="false">
+                                <Size>
+                                        <AbsDimension x="70" y="10"/>
+                                </Size>
+                                <HitRectInsets>
+                                        <AbsInset left="70" right="70" top="10" bottom="10"/>
+                                </HitRectInsets>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="3" y="-14"/>
+                                                </Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT">
+                                                <Offset>
+                                                        <AbsDimension x="-3" y="2"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <BarTexture name="$parentTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+                                <Layers>
+                                        <Layer level="OVERLAY">
+                                                <FontString name="$parentText" inherits="GameFontNormalSmall" hidden="tru">
+                                                        <Anchors>
+                                                                <Anchor point="CENTER">
+                                                                        <Offset>
+                                                                                <AbsDimension x="0" y="1"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                        <Color r="1" g="1" b="1"/>
+                                                </FontString>
+                                        </Layer>
+                                        <Layer level="BACKGROUND">
+                                                <Texture name="$parentBG" file="Interface\TargetingFrame\UI-TargetingFrame-BarFill" setAllPoints="true"/>
+                                        </Layer>
+                                </Layers>
+                        </StatusBar>
+                </Frames>
+
+                <Layers>
+                        <Layer level="OVERLAY">
+                                <!-- Combat Icon -->
+                                <Texture name="$parent_Combat" file="Interface\CharacterFrame\UI-StateIcon" hidden="true" topLevel="true">
+                                        <Size>
+                                                <AbsDimension x="24" y="24"/>
+                                        </Size>
+                                        <Anchors>
+                                                <Anchor point="TOPRIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="4" y="4"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                        <TexCoords left="0.5" right = "1.0" top="0.0" bottom="0.5"/>
+                                </Texture>
+
+                                <!-- Raid Target Icon -->
+                                <Texture name="$parent_RaidIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="true">
+                                        <Size>
+                                                <AbsDimension x="10" y="10"/>
+                                        </Size>
+                                        <Anchors>
+                                                <Anchor point="CENTER" relativePoint="TOPRIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="-4" y="-4"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                        <TexCoords left="0" right="0.25" top="0" bottom="0.25" />
+                                </Texture>
+
+                                <!-- Warning Icon -->
+                                <Texture name="$parent_Warning" file="Interface\Minimap\Ping\ping6" alphaMode="ADD" hidden="true" topLevel="true">
+                                        <Size>
+                                                <AbsDimension x="24" y="24"/>
+                                        </Size>
+                                        <Anchors>
+                                                <Anchor point="TOP">
+                                                        <Offset>
+                                                                <AbsDimension x="0" y="3"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </Texture>
+
+                                <FontString name="$parent_Name" inherits="GameFontNormalSmall" text="-" justifyH="LEFT" justifyV="TOP">
+                                        <FontHeight>
+                                                <AbsValue val="10"/>
+                                        </FontHeight>
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT">
+                                                        <Offset>
+                                                                <AbsDimension x="2" y="-2"/>
+                                                        </Offset>
+                                                </Anchor>
+                                                <Anchor point="BOTTOMRIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="-2" y="1"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </FontString>
+
+                                <FontString name="$parent_Label" inherits="GameFontNormalSmall" hidden="true" justifyH="RIGHT" justifyV="TOP">
+                                        <Size>
+                                                <AbsDimension x="24" y="12"/>
+                                        </Size>
+                                        <Anchors>
+                                                <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeTo="$parent_Name">
+                                                        <Offset>
+                                                                <AbsDimension x="-1" y="0"/>
+                                                        </Offset>
+                                                </Anchor>
+                                                <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_Name">
+                                                        <Offset>
+                                                                <AbsDimension x="-20" y="0"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </FontString>
+                        </Layer>
+                </Layers>
+        </Button>
+
+        <Frame name="XPerl_Frame" parent="UIParent" movable="true" hidden="true" clampedToScreen="true">
+                <Scripts>
+                        <OnLoad>
+                                this:RegisterForDrag("LeftButton")
+                                XPerl_OnLoad()
+                        </OnLoad>
+			<OnEvent>
+                                XPerl_OnEvent()
+			</OnEvent>
+                        <OnDragStart>
+                                if (not XPerlConfigHelper or not XPerlConfigHelper.Pinned or (IsAltKeyDown() and IsControlKeyDown() and IsShiftKeyDown())) then
+                                        this:StartMoving();
+                                end
+                        </OnDragStart>
+                        <OnDragStop>
+                                this:StopMovingOrSizing();
+                        </OnDragStop>
+                </Scripts>
+		<Size>
+                        <AbsDimension x="206" y="80"/>
+		</Size>
+		<Anchors>
+                        <Anchor point="CENTER"/>
+		</Anchors>
+                <Backdrop bgFile="Interface\AddOns\XPerl_RaidHelper\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="9"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="16"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="3" right="3" top="3" bottom="3"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Frames>
+                        <Frame name="$parent_TitleBar">
+                                <Size>
+                                        <AbsDimension x="160" y="12"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="3" y="-3"/>
+                                                </Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+                                                <Offset>
+                                                        <AbsDimension x="-3" y="-13"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <Frames>
+                                        <Button name="XPerl_Frame_StatsToggle" inherits="XPerl_UpArrowTemplate">
+                                                <HitRectInsets>
+                                                        <AbsInset left="-10" right="-10" top="-5" bottom="-5"/>
+                                                </HitRectInsets>
+                                                <Anchors>
+                                                        <Anchor point="TOPLEFT">
+                                                                <Offset>
+                                                                        <AbsDimension x="1" y="2"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.tooltipText = XPERL_BUTTON_TOGGLE_STATS_DESC;
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Toggle_Stats();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_CloseButton" inherits="UIPanelCloseButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="20" y="20"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="TOPRIGHT">
+                                                                <Offset>
+                                                                        <AbsDimension x="5" y="5"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <Scripts>
+                                                        <OnClick>
+                                                                XPerlConfigHelper.RaidHelper = 0;
+                                                                XPerl_EnableDisable();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_Pin" inherits="XPerl_BasicButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="XPerl_Frame_CloseButton" relativePoint="LEFT">
+                                                                <Offset>
+                                                                        <AbsDimension x="4" y="0"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Pin">
+                                                        <TexCoords left="0" right="0.46875" top="0" bottom="0.453125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Pin">
+                                                        <TexCoords left="0" right="0.46875" top="0.5" bottom="0.953125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_Frame_Pin:GetNormalTexture()
+                                                                        if (XPerlConfigHelper.Pinned) then
+                                                                                tex:SetTexCoord(0.5, 0.96875, 0, 0.453125)
+                                                                        else
+                                                                                tex:SetTexCoord(0, 0.46875, 0, 0.453125)
+                                                                        end
+
+                                                                        tex = XPerl_Frame_Pin:GetPushedTexture()
+                                                                        if (XPerlConfigHelper.Pinned) then
+                                                                                tex:SetTexCoord(0.5, 0.96875, 0.5, 0.953125)
+                                                                        else
+                                                                                tex:SetTexCoord(0, 0.46875, 0.5, 0.953125)
+                                                                        end
+                                                                end
+                                                                this.tooltipText = XPERL_BUTTON_HELPER_PIN
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerlConfigHelper.Pinned = not XPerlConfigHelper.Pinned
+                                                                this:SetButtonTex()
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_ExpandLock" inherits="XPerl_BasicButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="XPerl_Frame_Pin" relativePoint="LEFT"/>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.5" right="0.5703125" top="0.00390625" bottom="0.0703125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.5" right="0.5703125" top="0.078125" bottom="0.14453125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_Frame_ExpandLock:GetNormalTexture();
+                                                                        if (XPerlConfigHelper.ExpandLock == 1) then
+                                                                                tex:SetTexCoord(0.5, 0.5703125, 0.078125, 0.14453125);
+                                                                        else
+                                                                                tex:SetTexCoord(0.5, 0.5703125, 0.00390625, 0.0703125);
+                                                                        end
+                                                                end
+                                                        </OnLoad>
+                                                        <OnEnter>
+                                                                local s = XPERL_BUTTON_EXPAND_LOCK;
+
+                                                                local key = GetBindingText(GetBindingKey("TARGETFIRSTOTHER"), "KEY_");
+                                                                if (not key) then
+                                                                        key = XPERL_KEYHELP1;
+                                                                else
+                                                                        key = "|c0000FF00"..key.."|r";
+                                                                end
+                                                                s = s.."\r\r"..key..XPERL_KEYHELP2;
+
+                                                                GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+                                                                GameTooltip:SetText(s, nil, nil, nil, nil, 1);
+                                                        </OnEnter>
+                                                        <OnClick>
+                                                                XPerl_Toggle_ExpandLock();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_ToggleLabels" inherits="XPerl_BasicButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="XPerl_Frame_ExpandLock" relativePoint="LEFT"/>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.5859375" right="0.65625" top="0.00390625" bottom="0.0703125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.5859375" right="0.65625" top="0.078125" bottom="0.14453125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.tooltipText = XPERL_BUTTON_TOGGLE_LABELS;
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_Frame_ToggleLabels:GetNormalTexture();
+                                                                        if (XPerlConfigHelper.MTLabels == 1) then
+                                                                                tex:SetTexCoord(0.5859375, 0.65625, 0.078125, 0.14453125);
+                                                                        else
+                                                                                tex:SetTexCoord(0.5859375, 0.65625, 0.00390625, 0.0703125);
+                                                                        end
+                                                                end
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Toggle_ToggleLabels();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_ToggleTargets" inherits="XPerl_BasicButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="XPerl_Frame_ToggleLabels" relativePoint="LEFT"/>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.671875" right="0.7421875" top="0.00390625" bottom="0.0703125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.671875" right="0.7421875" top="0.078125" bottom="0.14453125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.tooltipText = XPERL_BUTTON_TOGGLE_TARGETS;
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_Frame_ToggleTargets:GetNormalTexture();
+
+                                                                        if (XPerlConfigHelper.OtherTargetTargets == 1) then
+                                                                                tex:SetTexCoord(0.671875, 0.7421875, 0.078125, 0.14453125);
+                                                                        else
+                                                                                tex:SetTexCoord(0.671875, 0.7421875, 0.00390625, 0.0703125);
+                                                                        end
+                                                                end
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Toggle_OtherTargets();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_ToggleMTTargets" inherits="XPerl_BasicButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="XPerl_Frame_ToggleTargets" relativePoint="LEFT"/>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.7578125" right="0.828125" top="0.00390625" bottom="0.0703125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.7578125" right="0.828125" top="0.078125" bottom="0.14453125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.tooltipText = XPERL_BUTTON_TOGGLE_MTTARGETS;
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_Frame_ToggleMTTargets:GetNormalTexture();
+
+                                                                        if (XPerlConfigHelper.MTTargetTargets == 1) then
+                                                                                tex:SetTexCoord(0.7578125, 0.828125, 0.078125, 0.14453125);
+                                                                        else
+                                                                                tex:SetTexCoord(0.7578125, 0.828125, 0.00390625, 0.0703125);
+                                                                        end
+                                                                end
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Toggle_MTTargets();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="XPerl_Frame_ToggleShowMT" inherits="XPerl_BasicButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="XPerl_Frame_ToggleMTTargets" relativePoint="LEFT"/>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.84375" right="0.9140625" top="0.00390625" bottom="0.0703125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.84375" right="0.9140625" top="0.078125" bottom="0.14453125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.tooltipText = XPERL_BUTTON_TOGGLE_SHOWMT;
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_Frame_ToggleShowMT:GetNormalTexture();
+
+                                                                        if (XPerlConfigHelper.ShowMT == 1) then
+                                                                                tex:SetTexCoord(0.84375, 0.9140625, 0.078125, 0.14453125);
+                                                                        else
+                                                                                tex:SetTexCoord(0.84375, 0.9140625, 0.00390625, 0.0703125);
+                                                                        end
+                                                                end
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Toggle_ShowMT();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+                                </Frames>
+                                <Layers>
+                                        <Layer level="ARTWORK">
+                                                <FontString name="XPerl_Frame_Title" inherits="GameFontNormalSmall" text="MT Targets" justifyH="LEFT">
+                                                        <Color r="1" g="1" b="1"/>
+                                                        <Anchors>
+                                                                <Anchor point="TOPLEFT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="20" y="0"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                                <Anchor point="BOTTOMRIGHT"/>
+                                                        </Anchors>
+                                                </FontString>
+                                        </Layer>
+                                </Layers>
+                        </Frame>
+
+                        <Frame name="XPerl_MTTargets">
+                                <Size>
+                                        <AbsDimension x="160" y="26"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="3" y="-13"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <Layers>
+                                        <Layer level="OVERLAY">
+                                                <Texture name="XPerl_MainAssist" file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits" hidden="true">
+                                                        <Size>
+                                                                <AbsDimension x="8" y="8"/>
+                                                        </Size>
+                                                        <Anchors>
+                                                                <Anchor point="RIGHT" relativePoint="LEFT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="-100" y="0"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                        <TexCoords left="0" right="0.125" top="0.25" bottom="0.359375"/>
+                                                </Texture>
+                                                <Texture name="XPerl_MyTarget" file="Interface\Minimap\Ping\ping5" hidden="true" alphaMode="ADD">
+                                                        <Size>
+                                                                <AbsDimension x="16" y="12"/>
+                                                        </Size>
+                                                        <Anchors>
+                                                                <Anchor point="RIGHT" relativePoint="LEFT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="-100" y="0"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                        <TexCoords left="0" right="0.23" top="0.35" bottom="0.65"/>
+                                                </Texture>
+                                        </Layer>
+                                </Layers>
+                        </Frame>
+
+                        <Frame name="XPerl_OtherTargets">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="XPerl_MTTargets" relativePoint="BOTTOMLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="0" y="-10"/>
+                                                </Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT">
+                                                <Offset>
+                                                        <AbsDimension x="-3" y="3"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <Scripts>
+                                        <OnEnter>
+                                                XPerl_ExpandOthers();
+                                        </OnEnter>
+                                        <OnLoad>
+                                                XPerl_OtherTargets_TitleOther:SetText(XPERL_TITLE_OTHERS)
+                                        </OnLoad>
+                                </Scripts>
+                                <Layers>
+                                        <Layer>
+                                                <FontString name="$parent_TitleOther" inherits="GameFontNormalSmall" justifyH="LEFT">
+                                                        <Size>
+                                                                <AbsDimension x="100" y="11"/>
+                                                        </Size>
+                                                        <Color r="1" g="0" b="0"/>
+                                                        <Anchors>
+                                                                <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="20" y="0"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                </FontString>
+
+                                                <FontString name="$parent_Key" inherits="GameFontNormalSmall" text="0">
+                                                        <Color r="0.5" g="0.5" b="0.5"/>
+                                                        <Anchors>
+                                                                <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="-3" y="0"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                </FontString>
+                                        </Layer>
+                                </Layers>
+                        </Frame>
+
+                        <Frame name="XPerl_ExpandArrowFrame" hidden="true">
+                                <Size>
+                                        <AbsDimension x="206" y="10"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="BOTTOMLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="0" y="3"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <Frames>
+                                        <Button name="XPerl_ExpandArrow" inherits="XPerl_DownArrowTemplate">
+                                                <Anchors>
+                                                        <Anchor point="BOTTOM"/>
+                                                </Anchors>
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.tooltipText = XPERL_BUTTON_EXPAND_DESC;
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_ExpandOthers();
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+                                </Frames>
+                                <Layers>
+                                        <Layer level="ARTWORK">
+                                                <FontString name="$parent_Stats" inherits="GameFontNormalSmall" text="0">
+                                                        <Color r="1" g="0.4" b="0.4"/>
+                                                        <Anchors>
+                                                                <Anchor point="BOTTOMLEFT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="3" y="2"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                </FontString>
+                                        </Layer>
+                                </Layers>
+                                <Scripts>
+                                        <OnEnter>
+                                                XPerl_ExpandOthers();
+                                        </OnEnter>
+                                </Scripts>
+                        </Frame>
+                </Frames>
+        </Frame>
+
+        <Button name="XPerl_StatsItemTemplate" virtual="true">
+                <Size>
+                        <AbsDimension x="160" y="10"/>
+                </Size>
+                <NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="4" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+                </NormalText>
+                <HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
+                <Scripts>
+                        <OnClick>
+                                XPerl_SetStatDetails(this:GetID());
+                        </OnClick>
+                </Scripts>
+        </Button>
+
+        <Frame name="XPerl_Threat" parent="XPerl_Frame" hidden="true">
+                <Size>
+                        <AbsDimension x="100" y="12"/>
+                </Size>
+                <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeTo="XPerl_Frame" relativePoint="TOPLEFT">
+                                <Offset>
+                                        <AbsDimension x="0" y="-2"/>
+                                </Offset>
+                        </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\AddOns\XPerl_RaidHelper\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="9"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="16"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="3" right="3" top="3" bottom="3"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Frames>
+                        <StatusBar name="XPerl_MyThreat">
+                                <HitRectInsets>
+                                        <AbsInset left="70" right="70" top="10" bottom="10"/>
+                                </HitRectInsets>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="3" y="-3"/>
+                                                </Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT">
+                                                <Offset>
+                                                        <AbsDimension x="-3" y="3"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <BarTexture name="$parentTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+                                <Layers>
+                                        <Layer level="OVERLAY">
+                                                <FontString name="$parentText" inherits="GameFontNormalSmall">
+                                                        <Anchors>
+                                                                <Anchor point="TOPLEFT"/>
+                                                                <Anchor point="BOTTOMRIGHT">
+                                                                        <Offset>
+                                                                                <AbsDimension x="0" y="1"/>
+                                                                        </Offset>
+                                                                </Anchor>
+                                                        </Anchors>
+                                                        <Color r="1" g="1" b="1"/>
+                                                </FontString>
+                                        </Layer>
+                                        <Layer level="BACKGROUND">
+                                                <Texture name="$parentBG" file="Interface\TargetingFrame\UI-TargetingFrame-BarFill" setAllPoints="true"/>
+                                        </Layer>
+                                </Layers>
+                        </StatusBar>
+                </Frames>
+        </Frame>
+
+        <Frame name="XPerl_Stats" parent="XPerl_Frame" hidden="true">
+                <Size>
+                        <AbsDimension x="170" y="80"/>
+                </Size>
+                <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeTo="XPerl_Threat" relativePoint="TOPLEFT">
+                                <Offset>
+                                        <AbsDimension x="0" y="-2"/>
+                                </Offset>
+                        </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\AddOns\XPerl_RaidHelper\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="9"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="16"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="3" right="3" top="3" bottom="3"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                        <OnLoad>
+                                XPerl_Stats_Title:SetText(XPERL_TARGET_STATISTICS)
+                        </OnLoad>
+                </Scripts>
+                <Layers>
+                        <Layer level="BACKGROUND">
+                                <FontString name="$parent_Title" inherits="GameFontNormalSmall">
+                                        <Color r="1" g="1" b="1"/>
+                                        <Anchors>
+                                                <Anchor point="TOP">
+                                                        <Offset>
+                                                                <AbsDimension x="0" y="-2"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </FontString>
+                        </Layer>
+                </Layers>
+                <Frames>
+                        <Button name="$parent1" inherits="XPerl_StatsItemTemplate" id="1">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="5" y="-13"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                        </Button>
+                        <Button name="$parent2" inherits="XPerl_StatsItemTemplate" id="2">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent1" relativePoint="BOTTOMLEFT"/>
+                                </Anchors>
+                        </Button>
+                        <Button name="$parent3" inherits="XPerl_StatsItemTemplate" id="3">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent2" relativePoint="BOTTOMLEFT"/>
+                                </Anchors>
+                        </Button>
+                        <Button name="$parent4" inherits="XPerl_StatsItemTemplate" id="4">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent3" relativePoint="BOTTOMLEFT"/>
+                                </Anchors>
+                        </Button>
+                        <Button name="$parent5" inherits="XPerl_StatsItemTemplate" id="5">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent4" relativePoint="BOTTOMLEFT"/>
+                                </Anchors>
+                        </Button>
+                        <Button name="$parent6" inherits="XPerl_StatsItemTemplate" id="6">
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent5" relativePoint="BOTTOMLEFT"/>
+                                </Anchors>
+                        </Button>
+                </Frames>
+        </Frame>
+
+        <Frame name="XPerl_Stats_List" parent="XPerl_Stats" hidden="true">
+                <Scripts>
+                        <OnLoad>
+                                this.shownStats = 0;
+                        </OnLoad>
+                        <OnEnter>
+                                this:SetHeight(160);
+                        </OnEnter>
+                        <OnShow>
+                                this:SetHeight(80);
+                        </OnShow>
+                        <OnLeave>
+                                this:SetHeight(80);
+                        </OnLeave>
+                </Scripts>
+                <Size>
+                        <AbsDimension x="120" y="80"/>
+                </Size>
+                <Anchors>
+                        <Anchor point="TOPRIGHT" relativeTo="XPerl_Stats" relativePoint="TOPLEFT">
+                                <Offset>
+                                        <AbsDimension x="1" y="0"/>
+                                </Offset>
+                        </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\AddOns\XPerl_RaidHelper\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="9"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="16"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="3" right="3" top="3" bottom="3"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Layers>
+                        <Layer level="BACKGROUND">
+                                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT">
+                                                        <Offset>
+                                                                <AbsDimension x="4" y="-4"/>
+                                                        </Offset>
+                                                </Anchor>
+                                                <Anchor point="BOTTOMRIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="-4" y="4"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </FontString>
+                        </Layer>
+                </Layers>
+        </Frame>
+</Ui>

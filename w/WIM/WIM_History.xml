@@ -1,0 +1,735 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<Script file="WIM_History.lua"/> 
+
+	<Button name="WIM_HistoryUsersButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="120" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="120" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				WIM_HistoryView_NameClick();
+				WIM_HistoryViewNameScrollBar_Update();
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="118" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="5" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+	
+	<Button name="WIM_HistoryFiltersButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="120" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="120" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				WIM_HistoryView_FilterClick();
+				WIM_HistoryViewFiltersScrollBar_Update();
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="118" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="5" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<Frame name="WIM_HistoryFrame" movable="true" alpha="1" enableMouse="true" toplevel="true" frameStrata="DIALOG" parent="UIParent" hidden="true"  clampedToScreen="true">
+		<Size>
+			<AbsDimension x="600" y="500" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="WIM_Options">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parentTitle" inherits="WIM_Options_TitlePanelTemplate">
+				<Size>
+					<AbsDimension x="580" y="35" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText"  font="Fonts\FRIZQT__.TTF" text="WIM History Viewer">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="16" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentExitButton">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-2" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+						<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight"/>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+							</OnLoad>
+							<OnClick>
+								this:GetParent():GetParent():Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="$parentNameList" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="160" y="290" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="3" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentTitle" inherits="WIM_Options_PanelTemplate">
+						<Size>
+							<AbsDimension x="50" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="2" y="-1" />
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="-2" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText"  font="Fonts\FRIZQT__.TTF" text="Users">
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="1" b="1" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-30" y="12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(16, WIM_HistoryViewNameScrollBar_Update); 
+							</OnVerticalScroll>
+							<OnShow>
+								WIM_HistoryViewNameScrollBar_Update();
+							</OnShow>
+						</Scripts>
+					</ScrollFrame>
+					<Button name="$parentButton1" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton2" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton3" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton4" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton5" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton6" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton7" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton8" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton9" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton8" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton10" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton9" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton11" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton12" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton13" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton12" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton14" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton13" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton15" inherits="WIM_HistoryUsersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton14" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="$parentFilterList" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="160" y="160" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentNameList" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="4" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentTitle" inherits="WIM_Options_PanelTemplate">
+						<Size>
+							<AbsDimension x="50" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="2" y="-1" />
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="-2" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText"  font="Fonts\FRIZQT__.TTF" text="Filters">
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="1" b="1" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-30" y="12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(16, WIM_HistoryViewFiltersScrollBar_Update); 
+							</OnVerticalScroll>
+							<OnShow>
+								WIM_HistoryViewFiltersScrollBar_Update();
+							</OnShow>
+						</Scripts>
+					</ScrollFrame>
+					<Button name="$parentButton1" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton2" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton3" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton4" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton5" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton6" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton7" inherits="WIM_HistoryFiltersButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="$parentMessageList" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="160" y="30" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentNameList" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="3" y="0" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="9" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentTitle" inherits="WIM_Options_PanelTemplate">
+						<Size>
+							<AbsDimension x="50" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="2" y="-1" />
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="-2" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText"  font="Fonts\FRIZQT__.TTF" text="Messages">
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="1" b="1" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<ScrollingMessageFrame name="$parentScrollingMessageFrame" enableMouse="true" fade="false" maxLines="500" movable="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoing="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-30" />
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoing="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-35" y="15" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT">
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<TextInsets>
+							<AbsInset left="0" right="10" top="0" bottom="0" />
+						</TextInsets>
+						<Scripts>
+							<OnMouseWheel>
+								if(arg1 > 0) then
+									if( IsShiftKeyDown() ) then
+										this:PageUp();
+									else
+										this:ScrollUp();
+									end
+								else
+									if( IsShiftKeyDown() ) then
+										this:PageDown();
+									else
+										this:ScrollDown();
+									end
+								end
+							</OnMouseWheel>
+							<OnHyperlinkClick>
+								ChatFrame_OnHyperlinkShow(arg1, arg2, arg3);
+							</OnHyperlinkClick>
+							<OnMessageScrollChanged>
+								WIM_UpdateScrollBars(this);
+							</OnMessageScrollChanged>
+							<OnMouseDown>
+								this:GetParent():GetParent():StartMoving();
+								this:GetParent():GetParent().isMoving = true;
+							</OnMouseDown>
+							<OnMouseUp>
+								this:GetParent():GetParent():StopMovingOrSizing();
+								this:GetParent():GetParent().isMoving = false;
+							</OnMouseUp>
+						</Scripts>
+					</ScrollingMessageFrame>
+					<Button name="$parentScrollUp">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentScrollingMessageFrame" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+						<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight"/>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+							</OnLoad>
+							<OnClick>
+								if( IsShiftKeyDown() ) then
+									getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):PageUp();
+								else
+									getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):ScrollUp();
+								end
+								WIM_UpdateScrollBars(getglobal(this:GetParent():GetName().."ScrollingMessageFrame"));
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentScrollDown">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativeTo="$parentScrollingMessageFrame" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+						<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight"/>
+						<Scripts>
+							<OnLoad>
+								this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+							</OnLoad>
+							<OnClick>
+								if( IsShiftKeyDown() ) then
+									getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):PageDown();
+								else
+									getglobal(this:GetParent():GetName().."ScrollingMessageFrame"):ScrollDown();
+								end
+								WIM_UpdateScrollBars(getglobal(this:GetParent():GetName().."ScrollingMessageFrame"));
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		
+		
+		
+		
+		
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName());
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				this:StartMoving();
+				this.isMoving = true;
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			</OnDragStop>
+			<OnShow>
+				PlaySound("igMainMenuOpen");
+				WIM_HistoryFrameMessageListScrollingMessageFrame:SetFont("Fonts\\FRIZQT__.TTF",WIM_Data.fontSize);
+				WIM_HistoryViewNameScrollBar_Update();
+				WIM_HistoryViewFiltersScrollBar_Update();
+			</OnShow>
+			<OnHide>
+				WIM_Help_Description_Click();
+				PlaySound("igMainMenuClose");
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+</Ui>

@@ -1,0 +1,226 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Button name="SH_GroupIgnoreButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="80" y="16"/>
+		</Size>
+		<NormalText name="$parentLabel" inherits="GameFontNormalSmall" justifyH="CENTER" nonspacewrap="true" />
+		<Scripts>
+			<OnClick>
+				local id=this:GetID()	
+				local group=getglobal(this:GetParent():GetName().."CurrentTarget").groupId
+				if(group) then
+					SmartHeal.HotListIgnoreList[id]=group
+				else
+					SmartHeal.HotListIgnoreList[id]=nil
+				end
+				this:Hide()
+				this:Show()
+			</OnClick>
+			<OnShow>
+				local id=this:GetID()
+				if(SmartHeal.HotListIgnoreList[id]) then
+					getglobal(this:GetName().."Label"):SetText(SH_GROUP.." "..SmartHeal.HotListIgnoreList[id])
+				else
+					getglobal(this:GetName().."Label"):SetText("N/A")
+				end
+			</OnShow>
+		</Scripts>
+	</Button>
+	
+	<Frame name="SH_GroupIgnoreList" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="180" y="150"/>
+		</Size>
+		
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentCurrentTargetLabel" text="SH_CURRENT_TARGET_GROUP" justifyH="LEFT" justifyV="TOP" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCurrentTarget" justifyH="LEFT" justifyV="TOP" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCurrentTarget" justifyH="LEFT" justifyV="TOP" inherits="GameFontNormalSmall" text="SH_IGNORED_GROUPS">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-55"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<Frame name="$parentTitleButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT" />
+				</Anchors>
+				<Size>
+					<AbsDimension y="20"/>
+				</Size>	
+				<Layers>
+					<Layer level="BACKGROUND">					
+						<!-- The title bar background -->
+						<Texture name="$parentBackground" >
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="5" y="-5"/>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset x="-5" y="-2"/>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/> 
+							<Gradient orientation="VERTICAL">
+								<MinColor r="0" g="0" b="0.2" a="1" />
+								<MaxColor r="0" g="0" b="0.7" a="1" />
+							</Gradient>
+						</Texture>
+						<FontString name="$parentText" inherits="GameFontNormal" text="SH_GROUP_IGNORE_LIST">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset x="0" y="-2"/>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="BORDER">
+					<!-- a dividing line between the title bar and the options -->
+						<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="4" y="0"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-4" y="-4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				
+			</Frame>
+		
+			<Button name="$parentCloseButton" hidden="false">
+				<Size>
+					<AbsDimension x="22" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentTitleButton" relativePoint="RIGHT">
+						<Offset x="-3" y="-3"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide()
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parentIgnore1" inherits="SH_GroupIgnoreButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-70"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentIgnore2" inherits="SH_GroupIgnoreButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentIgnore1"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentIgnore3" inherits="SH_GroupIgnoreButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentIgnore2"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentIgnore4" inherits="SH_GroupIgnoreButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentIgnore3"/>
+				</Anchors>
+			</Button>
+
+		</Frames>
+		
+		<Scripts>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnUpdate>
+				local r,g,b=RGB_hextodec(SmartHeal:getConfig("BGColor","hotlist"))
+				local a=SmartHeal:getConfig("BGColorOpacity","hotlist")
+				this:SetBackdropColor(r,g,b,a)
+				local _,group
+				for i=1,40 do
+					if(UnitIsUnit("target","raid"..i)) then
+						_,_,group,_,_,_,_,_,_=GetRaidRosterInfo(i)
+						break
+					end
+				end
+				
+				if(group) then
+					getglobal(this:GetName().."CurrentTarget"):SetText(SH_GROUP.." "..group)
+					getglobal(this:GetName().."CurrentTarget").groupId=group
+				else
+					getglobal(this:GetName().."CurrentTarget"):SetText("N/A")
+					getglobal(this:GetName().."CurrentTarget").groupId=nil
+				end
+			</OnUpdate>
+			<OnShow>
+				this:ClearAllPoints()
+				this:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

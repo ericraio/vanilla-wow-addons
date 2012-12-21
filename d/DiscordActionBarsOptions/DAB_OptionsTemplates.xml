@@ -1,0 +1,372 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+<CheckButton name="DAB_ScrollButtonTemplate" inherits="DL_ScrollButtonTemplate" virtual="true">
+	<Size><AbsDimension x="130" y="20"/></Size>
+</CheckButton>
+
+<Button name="DAB_MainMenuButton" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+	<Size><AbsDimension x="180" y="24"/></Size>
+</Button>
+
+<CheckButton name="DAB_CheckBoxTemplate" inherits="DiscordLib_CheckBoxTemplate" virtual="true">
+	<Scripts>
+		<OnClick>
+			DAB_CheckBox_OnClick();
+		</OnClick>
+	</Scripts>
+</CheckButton>
+
+<Slider name="DAB_SliderTemplate" inherits="DiscordLib_SliderTemplate" virtual="true">
+	<Frames>
+		<EditBox name="$parent_Display" inherits="DiscordLib_SliderEditBoxTemplate">
+			<Scripts>
+				<OnEnterPressed>
+					DAB_Slider_UpdateFromEditBox();
+				</OnEnterPressed>
+			</Scripts>
+		</EditBox>
+	</Frames>
+	<Scripts>
+		<OnValueChanged>
+			DAB_Slider_Update();
+		</OnValueChanged>
+	</Scripts>
+</Slider>
+
+<Button name="DAB_NudgeTemplate" inherits="DL_NudgeTemplate" virtual="true">
+	<Scripts>
+		<OnMouseUp>
+			if (arg1 == "MiddleButton") then
+				this.movingframe = nil;
+			else
+				DAB_Nudge(arg1);
+			end
+		</OnMouseUp>
+		<OnUpdate>
+			DAB_Nudge_OnUpdate(arg1);
+		</OnUpdate>
+	</Scripts>
+</Button>
+
+<EditBox name="DAB_EditBoxTemplate" inherits="DiscordLib_EditBoxTemplate" virtual="true">
+	<Scripts>
+		<OnEnterPressed>
+			DAB_EditBox_Update();
+		</OnEnterPressed>
+	</Scripts>
+</EditBox>
+
+<Button name="DAB_ColorPickerTemplate" inherits="DiscordLib_ColorPickerTemplate" virtual="true">
+	<Scripts>
+		<OnClick>
+			DAB_ColorPicker_OnClick();
+		</OnClick>
+	</Scripts>
+</Button>
+
+<Frame name="DAB_ConditionButtonTemplate" virtual="true">
+	<Size><AbsDimension x="360" y="40"/></Size>
+	<Frames>
+		<Button inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="15" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("^");
+				</OnLoad>
+				<OnClick>
+					DAB_Condition_MoveUp();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="15" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("v");
+				</OnLoad>
+				<OnClick>
+					DAB_Condition_MoveDown();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Edit" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="30" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetFont("Fonts\\ARIALN.TTF", 10);
+					this:SetText(DAB_TEXT.Edit);
+				</OnLoad>
+				<OnClick>
+					DAB_Condition_Edit();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Delete" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="30" y="20"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset><AbsDimension x="0" y="2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Text"):SetFont("Fonts\\ARIALN.TTF", 10);
+					this:SetText(DAB_TEXT.Delete);
+				</OnLoad>
+				<OnClick>
+					DAB_Condition_Delete();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parentIndex" font="Fonts\ARIALN.TTF" justifyH="CENTER" justifyV="CENTER">
+				<Size><AbsDimension x="20" y="40"/></Size>
+				<Color r="1" g="1" b="0"/>
+				<FontHeight>
+					<AbsValue val="16"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="15" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentConditionText" font="Fonts\ARIALN.TTF" justifyH="LEFT" justifyV="CENTER">
+				<Size><AbsDimension x="290" y="20"/></Size>
+				<Color r="0" g="1" b="0"/>
+				<FontHeight>
+					<AbsValue val="10"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="40" y="3"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentResponseText" font="Fonts\ARIALN.TTF" justifyH="LEFT" justifyV="CENTER">
+				<Size><AbsDimension x="290" y="20"/></Size>
+				<Color r=".4" g=".4" b="1"/>
+				<FontHeight>
+					<AbsValue val="10"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="40" y="-10"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentOverrideText" font="Fonts\ARIALN.TTF" justifyH="LEFT" justifyV="CENTER">
+				<Size><AbsDimension x="290" y="20"/></Size>
+				<Color r=".9" g=".4" b=".9"/>
+				<FontHeight>
+					<AbsValue val="10"/>
+				</FontHeight>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="40" y="-23"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<Texture>
+				<Size><AbsDimension x="360" y="1"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM"/>
+				</Anchors>
+				<Color r=".3" g=".3" b=".3"/>
+			</Texture>
+		</Layer>
+	</Layers>
+</Frame>
+
+<Frame name="DAB_KeybindingTemplate" virtual="true">
+	<Size><AbsDimension x="200" y="50"/></Size>
+	<Frames>
+		<Button name="$parent_Option" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="100" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="20" y="-2"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_DropMenu";
+					this.table = "DAB_KEYBINDING_OPTIONS";
+					this.index = "KEYBINDING";
+					this.subindex = "option";
+					this.subindex2 = "DropMenu";
+					getglobal(this:GetName().."_Setting"):SetFont("Fonts\\ARIALN.TTF", 12);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Suboption" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="65" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Option" relativePoint="RIGHT">
+					<Offset><AbsDimension x="40" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_ScrollMenu";
+					this.table = "DAB_KEYBINDING_SUBOPTIONS_"..this:GetParent():GetID();
+					this.index = "KEYBINDING";
+					this.subindex = "suboption";
+					getglobal(this:GetName().."_Label"):ClearAllPoints();
+					getglobal(this:GetName().."_Label"):SetPoint("RIGHT", this, "LEFT", 0, 0);
+					getglobal(this:GetName().."_Label"):SetFont("Fonts\\ARIALN.TTF", 12);
+					getglobal(this:GetName().."_Label"):SetTextColor(1, .82, 0);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Suboption2" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="105" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Suboption" relativePoint="RIGHT">
+					<Offset><AbsDimension x="35" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DAB_ScrollMenu";
+					this.table = "DAB_KEYBINDING_SUBOPTIONS2_"..this:GetParent():GetID();
+					this.index = "KEYBINDING";
+					this.subindex = "suboption2";
+					getglobal(this:GetName().."_Label"):ClearAllPoints();
+					getglobal(this:GetName().."_Label"):SetPoint("RIGHT", this, "LEFT", 0, 0);
+					getglobal(this:GetName().."_Label"):SetFont("Fonts\\ARIALN.TTF", 12);
+					getglobal(this:GetName().."_Label"):SetTextColor(1, .82, 0);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<CheckButton name="$parent_Down" inherits="DAB_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="95" y="-23"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "KEYBINDING";
+					this.subindex = "down";
+					this.subindex2 = "CheckBox";
+					DL_Set_Label(DAB_TEXT.RunOnDown);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Up" inherits="DAB_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Down" relativePoint="RIGHT">
+					<Offset><AbsDimension x="50" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "KEYBINDING";
+					this.subindex = "up";
+					this.subindex2 = "CheckBox";
+					DL_Set_Label(DAB_TEXT.RunOnUp);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Button name="$parent_Key1" inherits="UIPanelButtonTemplate2">
+			<Size><AbsDimension x="65" y="24"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Up" relativePoint="RIGHT">
+					<Offset><AbsDimension x="42" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<NormalText inherits="GameFontHighlightSmall"/>
+			<DisabledText inherits="GameFontDisable"/>
+			<HighlightText inherits="GameFontHighlightSmall"/>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up");
+				</OnLoad>
+				<OnClick>
+					DAB_KeybindingButton_OnClick(arg1, 1);
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Key2" inherits="UIPanelButtonTemplate2">
+			<Size><AbsDimension x="65" y="24"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Key1" relativePoint="RIGHT"/>
+			</Anchors>
+			<NormalText inherits="GameFontHighlightSmall"/>
+			<DisabledText inherits="GameFontDisable"/>
+			<HighlightText inherits="GameFontHighlightSmall"/>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up");
+				</OnLoad>
+				<OnClick>
+					DAB_KeybindingButton_OnClick(arg1, 2);
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parentIndex" font="Fonts\ARIALN.TTF" justifyH="CENTER" justifyV="CENTER">
+				<Size><AbsDimension x="20" y="30"/></Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset><AbsDimension x="-3" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Color r="1" g="1" b="0"/>
+				<FontHeight>
+					<AbsValue val="12"/>
+				</FontHeight>
+				<Shadow>
+					<Offset>
+						<AbsDimension x="1" y="-1"/>
+					</Offset>
+					<Color r="0" g="0" b="0"/>
+				</Shadow>
+			</FontString>
+			<FontString name="$parentRunOn" inherits="GameFontNormal">
+				<Color r="1" g="1" b="1"/>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-27"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<Texture name="$parentBorder">
+				<Size><AbsDimension x="370" y="2"/></Size>
+				<Color r=".4" g="0" b="0"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			getglobal(this:GetName().."RunOn"):SetText(DAB_TEXT.RunOn);
+		</OnLoad>
+	</Scripts>
+</Frame>
+
+</Ui>

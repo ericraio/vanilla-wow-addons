@@ -1,0 +1,629 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="localization-EFD.lua"/>
+	<Script file="Bag_Status_Meters.lua"/>
+	<FontString name="BSM_Font1" inherits="MasterFont" font="Fonts\FRIZQT__.TTF" virtual="true">
+		<FontHeight>
+			<AbsValue val="10"/>
+		</FontHeight>
+		<Color r="1.0" g="1.0" b="1.0"/>
+	</FontString>
+
+	<StatusBar name="BSM_StatusTemplate" virtual="true" frameStrata="MEDIUM" toplevel="true" hidden="false">
+		<Size>
+			<AbsDimension y="8"/>
+		</Size>
+		<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+		<BarColor r="0.0" g="1.0" b="0.0" a="0.6"/>
+	</StatusBar>
+<!--
+	<Model name="BSM_CooldownTemplate" file="Interface\Cooldown\UI-Cooldown-Indicator.mdx" scale="0.85" setAllPoints="true" hidden="true" virtual="true">
+		<Scripts>
+			<OnUpdateModel>
+				BSM_Cooldown_OnUpdate();
+			</OnUpdateModel>
+			<OnAnimFinished>
+				BSM_Cooldown_OnFinished();
+			</OnAnimFinished>
+		</Scripts>
+	</Model>
+-->
+   	<StatusBar name="BSM_DropdownBarTemplate" hidden="false" virtual="true">
+        <Size>
+    		<AbsDimension x="66" y="10"/>
+    	</Size>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() - 1);
+			</OnLoad>
+		</Scripts>
+		<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+		<BarColor r="0.0" g="1.0" b="0.0"/>
+   	</StatusBar>
+    <Button name="BSM_DropdownTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="70" y="19"/>
+		</Size>
+		<Layers>
+            <Layer level="ARTWORK">
+                <Texture file="Interface\Tooltips\UI-StatusBar-Border"/>
+            </Layer>
+		</Layers>
+        <Scripts>
+            <OnMouseDown>
+                if ( arg1 == "LeftButton" and not BSM_Save.O.lock ) then
+                    getglobal(BSM_FRAME):StartMoving();
+        		end
+            </OnMouseDown>
+            <OnMouseUp>
+                if ( arg1 == "LeftButton" ) then
+                    getglobal(BSM_FRAME):StopMovingOrSizing();
+                    BSM_SavePosition();
+                    getglobal("BSM_Options_PositionX"):SetText(math.floor(BSM_Save.dispX));
+                    getglobal("BSM_Options_PositionY"):SetText(math.floor(BSM_Save.dispY));
+        		end
+            </OnMouseUp>
+        </Scripts>
+    </Button>
+<!--
+    <FontString name="BSM_BindingLabel" inherits="BSM_Font1" virtual="true">
+        <Size>
+            <AbsDimension x="20" y="19"/>
+        </Size>
+        <Anchors>
+            <Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT"/>
+        </Anchors>
+    </FontString>
+-->
+    <Button name="BSM_BindingButton" inherits="UIPanelButtonTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="16" y="16"/>
+        </Size>
+        <Anchors>
+            <Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT"/>
+        </Anchors>
+		<NormalText inherits="GameFontHighlightSmall"/>
+		<DisabledText inherits="GameFontDisableSmall"/>
+		<HighlightText inherits="GameFontHighlightSmall"/>
+		<Scripts>
+            <OnClick>
+                BSM_openBag(this);
+            </OnClick>
+		</Scripts>
+    </Button>
+    <Frame name="BSM_BankBagTemplate"  virtual="true" hidden="true">
+		<Size>
+			<AbsDimension y="8"/>
+		</Size>
+        <Layers>
+            <Layer level="OVERLAY">
+        		<FontString name="$parentLabel" inherits="BSM_Font1" wraponspaces="true" toplevel="true">
+                    <Size>
+                        <AbsDimension y="8"/>
+                    </Size>
+        			<Anchors>
+        				<Anchor point="BOTTOMRIGHT" relativeTo="$parent"/>
+        				<Anchor point="BOTTOMLEFT" relativeTo="$parent"/>
+        			</Anchors>
+        		</FontString>
+        	</Layer>
+        </Layers>
+        <!--Doesn't show correctly on first load-->
+        <!--<Frames>
+        	<StatusBar name="$parentBar" inherits="BSM_StatusTemplate">
+        		<Anchors>
+        			<Anchor point="BOTTOMRIGHT"/>
+        			<Anchor point="BOTTOMLEFT"/>
+        		</Anchors>
+        	</StatusBar>
+        </Frames>-->
+    </Frame>
+
+
+
+    <Frame name="BSM_BarLabels" toplevel="true" frameStrata="HIGH" movable="false" enableMouse="false" hidden="false" parent="MainMenuBarArtFrame">
+        <Size>
+        	<AbsDimension x="0" y="8"/>
+        </Size>
+        <Anchors>
+        	<Anchor point="BOTTOMRIGHT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMRIGHT"/>
+        	<Anchor point="BOTTOMLEFT" relativeTo="CharacterBag3Slot" relativePoint="BOTTOMLEFT"/>
+        </Anchors>
+        <Layers>
+        	<Layer level="OVERLAY">
+        		<FontString name="$parent0" inherits="BSM_Font1" justifyH="CENTER">
+        			<Anchors>
+        		        <Anchor point="BOTTOMRIGHT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMRIGHT"/>
+        		        <Anchor point="BOTTOMLEFT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMLEFT"/>
+        			</Anchors>
+        		</FontString>
+        		<FontString name="$parent1" inherits="BSM_Font1" justifyH="CENTER">
+        			<Anchors>
+        		        <Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag0Slot" relativePoint="BOTTOMRIGHT"/>
+        		        <Anchor point="BOTTOMLEFT" relativeTo="CharacterBag0Slot" relativePoint="BOTTOMLEFT"/>
+        			</Anchors>
+            	</FontString>
+            	<FontString name="$parent2" inherits="BSM_Font1" justifyH="CENTER">
+            		<Anchors>
+            	        <Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag1Slot" relativePoint="BOTTOMRIGHT"/>
+            	        <Anchor point="BOTTOMLEFT" relativeTo="CharacterBag1Slot" relativePoint="BOTTOMLEFT"/>
+            		</Anchors>
+            	</FontString>
+            	<FontString name="$parent3" inherits="BSM_Font1" justifyH="CENTER">
+            		<Anchors>
+            	        <Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag2Slot" relativePoint="BOTTOMRIGHT"/>
+            	        <Anchor point="BOTTOMLEFT" relativeTo="CharacterBag2Slot" relativePoint="BOTTOMLEFT"/>
+            		</Anchors>
+            	</FontString>
+            	<FontString name="$parent4" inherits="BSM_Font1" justifyH="CENTER">
+            		<Anchors>
+            	        <Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag3Slot" relativePoint="BOTTOMRIGHT"/>
+            	        <Anchor point="BOTTOMLEFT" relativeTo="CharacterBag3Slot" relativePoint="BOTTOMLEFT"/>
+            		</Anchors>
+            	</FontString>
+            </Layer>
+        </Layers>
+	</Frame>
+
+    <Frame name="BSM_Bars" toplevel="false" frameStrata="HIGH" movable="false" enableMouse="false" hidden="false" parent="MainMenuBarArtFrame">
+        <Size>
+			<AbsDimension x="0" y="8"/>
+        </Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMRIGHT"/>
+			<Anchor point="BOTTOMLEFT" relativeTo="CharacterBag3Slot" relativePoint="BOTTOMLEFT"/>
+		</Anchors>
+		<Frames>
+        	<StatusBar name="$parent0" inherits="BSM_StatusTemplate">
+        		<Anchors>
+        			<Anchor point="BOTTOMRIGHT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMRIGHT"/>
+        			<Anchor point="BOTTOMLEFT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMLEFT"/>
+        		</Anchors>
+        	</StatusBar>
+        	<StatusBar name="$parent1" inherits="BSM_StatusTemplate">
+        		<Anchors>
+        			<Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag0Slot" relativePoint="BOTTOMRIGHT"/>
+        			<Anchor point="BOTTOMLEFT" relativeTo="CharacterBag0Slot" relativePoint="BOTTOMLEFT"/>
+        		</Anchors>
+        	</StatusBar>
+        	<StatusBar name="$parent2" inherits="BSM_StatusTemplate">
+        		<Anchors>
+        			<Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag1Slot" relativePoint="BOTTOMRIGHT"/>
+        			<Anchor point="BOTTOMLEFT" relativeTo="CharacterBag1Slot" relativePoint="BOTTOMLEFT"/>
+        		</Anchors>
+        	</StatusBar>
+        	<StatusBar name="$parent3" inherits="BSM_StatusTemplate">
+        		<Anchors>
+        			<Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag2Slot" relativePoint="BOTTOMRIGHT"/>
+        			<Anchor point="BOTTOMLEFT" relativeTo="CharacterBag2Slot" relativePoint="BOTTOMLEFT"/>
+        		</Anchors>
+        	</StatusBar>
+        	<StatusBar name="$parent4" inherits="BSM_StatusTemplate">
+        		<Anchors>
+        			<Anchor point="BOTTOMRIGHT" relativeTo="CharacterBag3Slot" relativePoint="BOTTOMRIGHT"/>
+        			<Anchor point="BOTTOMLEFT" relativeTo="CharacterBag3Slot" relativePoint="BOTTOMLEFT"/>
+        		</Anchors>
+        	</StatusBar>
+	   </Frames>
+	</Frame>
+
+<!--
+    <Frame name="BSM_Cooldowns" toplevel="true" movable="false" enableMouse="false" hidden="false" parent="MainMenuBarArtFrame">
+        <Size>
+			<AbsDimension x="0" y="8"/>
+        </Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo="MainMenuBarBackpackButton" relativePoint="BOTTOMRIGHT"/>
+			<Anchor point="TOPLEFT" relativeTo="CharacterBag3Slot" relativePoint="TOPLEFT"/>
+		</Anchors>
+		<Frames>
+        	<Model name="$parent0" inherits="BSM_CooldownTemplate" parent="MainMenuBarBackpackButton"/>
+        	<Model name="$parent1" inherits="BSM_CooldownTemplate" parent="CharacterBag0Slot"/>
+        	<Model name="$parent2" inherits="BSM_CooldownTemplate" parent="CharacterBag1Slot"/>
+        	<Model name="$parent3" inherits="BSM_CooldownTemplate" parent="CharacterBag2Slot"/>
+        	<Model name="$parent4" inherits="BSM_CooldownTemplate" parent="CharacterBag3Slot"/>
+        </Frames>
+	</Frame>
+-->
+
+	<Frame name="BSM_Frame" toplevel="false" movable="true" hidden="false" frameStrata="LOW" parent="UIParent">
+		<Size>
+			<AbsDimension x="90" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackAlpha">
+					<Size>
+						<AbsDimension x="80" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Texture>		
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentBorder" file="Interface\CastingBar\UI-CastingBar-Border">
+					<Size>
+						<AbsDimension x="102" y="50"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="BSM_FrameButton">
+				<Size>
+					<AbsDimension x="47" y="19"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="13"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="BSM_FrameButtonLabel" inherits="GameFontHighlight" wraponspaces="true" text="BSM_FREEBAGSLOTS">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+        				<FontString name="BSM_FrameText" inherits="GameFontHighlight">
+        					<Size>
+        						<AbsDimension x="105" y="21"/>
+        					</Size>
+        					<Anchors>
+        						<Anchor point="TOP" relativeTo="BSM_Frame">
+        							<Offset>
+        								<AbsDimension x="0" y="0"/>
+        							</Offset>
+        						</Anchor>
+        					</Anchors>
+        				</FontString>
+					</Layer>
+				</Layers>
+			</Button>
+			<StatusBar name="BSM_FrameStatus">
+				<Size>
+					<AbsDimension x="74" y="8"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1);
+					</OnLoad>
+				</Scripts>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0.0" g="1.0" b="0.0"/>
+			</StatusBar>
+		</Frames>
+		<Scripts>
+<!-- causes error on xml-load and has no sense since BSM_Save is not defined -->
+<!--            <OnClick>
+                if BSM_Save.click then
+                    BSM_openBag(this);
+                end
+            </OnClick>
+ -->
+			<OnLoad>
+				this:RegisterEvent("BAG_UPDATE");
+				this:RegisterEvent("UNIT_MODEL_CHANGED");
+				this:RegisterEvent("ITEM_LOCK_CHANGED");
+				this:RegisterEvent("VARIABLES_LOADED");
+			    BSM_initCommands();
+			</OnLoad>
+			<OnEvent>
+			    if event == "VARIABLES_LOADED" then
+			        BSM_loadVariables();
+			    end
+			    if event ~= "UNIT_MODEL_CHANGED" or arg1 == "player" then
+                    BSM_updateFreeSlots();
+                end
+			</OnEvent>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" and not BSM_Save.O.lock ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+					BSM_SavePosition();
+                    getglobal("BSM_Options_PositionX"):SetText(math.floor(BSM_Save.dispX));
+                    getglobal("BSM_Options_PositionY"):SetText(math.floor(BSM_Save.dispY));
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+    <Frame name="BSM_Dropdowns" toplevel="false" movable="true" enableMouse="false" hidden="true" frameStrata="LOW" parent="UIParent">
+		<Size>
+			<AbsDimension x="70" y="100"/>
+		</Size>
+		<Anchors>
+    		<Anchor point="TOPRIGHT" relativeTo="BSM_Frame" relativePoint="BOTTOMRIGHT">
+   				<Offset>
+    				<AbsDimension x="-5" y="5"/>
+				</Offset>
+    		</Anchor>
+		</Anchors>
+		<Frames>
+            <Button name="$parent0" inherits="BSM_DropdownTemplate">
+   				<Anchors>
+   					<Anchor point="TOPRIGHT">
+  						<Offset>
+   							<AbsDimension x="0" y="-1"/>
+   						</Offset>
+   					</Anchor>
+   				</Anchors>
+   				<Frames>
+                    <Button name="$parentKey" inherits="BSM_BindingButton"/>
+   				</Frames>
+   				<!--<Layers>
+   					<Layer level="OVERLAY">
+           				<FontString name="$parentKey" inherits="BSM_BindingLabel"/>
+   					</Layer>
+   				</Layers>-->
+            </Button>
+            <Button name="$parent1" inherits="BSM_DropdownTemplate">
+   				<Anchors>
+   					<Anchor point="TOPRIGHT" relativeTo="$parent0" relativePoint="BOTTOMRIGHT">
+   						<Offset>
+   							<AbsDimension x="0" y="-1"/>
+   						</Offset>
+   					</Anchor>
+   				</Anchors>
+   				<Frames>
+                    <Button name="$parentKey" inherits="BSM_BindingButton"/>
+   				</Frames>
+   				<!--<Layers>
+   					<Layer level="OVERLAY">
+           				<FontString name="$parentKey" inherits="BSM_BindingLabel"/>
+   					</Layer>
+   				</Layers>-->
+            </Button>
+            <Button name="$parent2" inherits="BSM_DropdownTemplate">
+   				<Anchors>
+   					<Anchor point="TOPRIGHT" relativeTo="$parent1" relativePoint="BOTTOMRIGHT">
+   						<Offset>
+   							<AbsDimension x="0" y="-1"/>
+   						</Offset>
+   					</Anchor>
+     			</Anchors>
+   				<Frames>
+                    <Button name="$parentKey" inherits="BSM_BindingButton"/>
+   				</Frames>
+        		<!--<Layers>
+        			<Layer level="OVERLAY">
+                		<FontString name="$parentKey" inherits="BSM_BindingLabel"/>
+        			</Layer>
+        		</Layers>-->
+            </Button>
+            <Button name="$parent3" inherits="BSM_DropdownTemplate">
+        		<Anchors>
+        			<Anchor point="TOPRIGHT" relativeTo="$parent2" relativePoint="BOTTOMRIGHT">
+        				<Offset>
+        					<AbsDimension x="0" y="-1"/>
+        				</Offset>
+        			</Anchor>
+        		</Anchors>
+   				<Frames>
+                    <Button name="$parentKey" inherits="BSM_BindingButton"/>
+   				</Frames>
+        		<!--<Layers>
+        			<Layer level="OVERLAY">
+                		<FontString name="$parentKey" inherits="BSM_BindingLabel"/>
+        			</Layer>
+        		</Layers>-->
+            </Button>
+            <Button name="$parent4" inherits="BSM_DropdownTemplate">
+        		<Anchors>
+        			<Anchor point="TOPRIGHT" relativeTo="$parent3" relativePoint="BOTTOMRIGHT">
+        				<Offset>
+        					<AbsDimension x="0" y="-1"/>
+        				</Offset>
+        			</Anchor>
+        		</Anchors>
+   				<Frames>
+                    <Button name="$parentKey" inherits="BSM_BindingButton"/>
+   				</Frames>
+        		<!--<Layers>
+        			<Layer level="OVERLAY">
+                		<FontString name="$parentKey" inherits="BSM_BindingLabel"/>
+        			</Layer>
+        		</Layers>-->
+            </Button>
+            <StatusBar name="$parentBars0" inherits="BSM_DropdownBarTemplate">
+                <Anchors>
+                	<Anchor point="LEFT" relativeTo="$parent0">
+                		<Offset>
+                			<AbsDimension x="2" y="0"/>
+                		</Offset>
+                	</Anchor>
+                </Anchors>
+            </StatusBar>
+            <StatusBar name="$parentBars1" inherits="BSM_DropdownBarTemplate">
+                <Anchors>
+                	<Anchor point="LEFT" relativeTo="$parent1">
+                		<Offset>
+                			<AbsDimension x="2" y="0"/>
+                		</Offset>
+                	</Anchor>
+                </Anchors>
+            </StatusBar>
+            <StatusBar name="$parentBars2" inherits="BSM_DropdownBarTemplate">
+                <Anchors>
+                	<Anchor point="LEFT" relativeTo="$parent2">
+                		<Offset>
+                			<AbsDimension x="2" y="0"/>
+                		</Offset>
+                	</Anchor>
+               	</Anchors>
+            </StatusBar>
+            <StatusBar name="$parentBars3" inherits="BSM_DropdownBarTemplate">
+               	<Anchors>
+                	<Anchor point="LEFT" relativeTo="$parent3">
+                		<Offset>
+                			<AbsDimension x="2" y="0"/>
+                		</Offset>
+                	</Anchor>
+                </Anchors>
+            </StatusBar>
+            <StatusBar name="$parentBars4" inherits="BSM_DropdownBarTemplate">
+                <Anchors>
+                	<Anchor point="LEFT" relativeTo="$parent4">
+                		<Offset>
+                			<AbsDimension x="2" y="0"/>
+                		</Offset>
+                	</Anchor>
+                </Anchors>
+            </StatusBar>
+        </Frames>
+    </Frame>
+	<Frame name="BSM_DropdownLabels" toplevel="true" movable="false" enableMouse="false" hidden="false" parent="BSM_Dropdowns">
+        <Anchors>
+        	<Anchor point="TOPRIGHT"/>
+        	<Anchor point="BOTTOMLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parent0" inherits="BSM_Font1" text="16/16">
+        			<Anchors>
+        				<Anchor point="CENTER" relativeTo="BSM_Dropdowns0">
+        					<Offset>
+        						<AbsDimension x="0" y="1"/>
+        					</Offset>
+        				</Anchor>
+        			</Anchors>
+        		</FontString>
+                <FontString name="$parent1" inherits="BSM_Font1" text="16/16">
+        			<Anchors>
+        				<Anchor point="CENTER" relativeTo="BSM_Dropdowns1">
+        					<Offset>
+        						<AbsDimension x="0" y="1"/>
+        					</Offset>
+        				</Anchor>
+        			</Anchors>
+        		</FontString>
+                <FontString name="$parent2" inherits="BSM_Font1" text="16/16">
+        			<Anchors>
+        				<Anchor point="CENTER" relativeTo="BSM_Dropdowns2">
+        					<Offset>
+        						<AbsDimension x="0" y="1"/>
+        					</Offset>
+        				</Anchor>
+        			</Anchors>
+        		</FontString>
+                <FontString name="$parent3" inherits="BSM_Font1" text="16/16">
+        			<Anchors>
+        				<Anchor point="CENTER" relativeTo="BSM_Dropdowns3">
+        					<Offset>
+        						<AbsDimension x="0" y="1"/>
+        					</Offset>
+        				</Anchor>
+        			</Anchors>
+        		</FontString>
+                <FontString name="$parent4" inherits="BSM_Font1" text="16/16">
+        			<Anchors>
+        				<Anchor point="CENTER" relativeTo="BSM_Dropdowns4">
+        					<Offset>
+        						<AbsDimension x="0" y="1"/>
+        					</Offset>
+        				</Anchor>
+        			</Anchors>
+        		</FontString>
+            </Layer>
+        </Layers>
+	</Frame>
+
+    <Frame name="BSM_Bank_Bars"  toplevel="false" frameStrata="HIGH" movable="false" enableMouse="false" hidden="true" parent="BankFrame">
+        <Size>
+			<AbsDimension x="0" y="8"/>
+        </Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag6" relativePoint="BOTTOMRIGHT"/>
+			<Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag1" relativePoint="BOTTOMLEFT"/>
+		</Anchors>
+		<Frames>
+            <Frame name="BSM_BankBag1" inherits="BSM_BankBagTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag1" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag1" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_BankBag2" inherits="BSM_BankBagTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag2" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag2" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_BankBag3" inherits="BSM_BankBagTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag3" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag3" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_BankBag4" inherits="BSM_BankBagTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag4" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag4" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_BankBag5" inherits="BSM_BankBagTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag5" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag5" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+            <Frame name="BSM_BankBag6" inherits="BSM_BankBagTemplate">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="BankFrameBag6" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="BankFrameBag6" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+		<Scripts>
+			<OnLoad>
+            	this:RegisterEvent("BANKFRAME_OPENED");
+            	this:RegisterEvent("BANKFRAME_CLOSED");
+	            this:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED");
+			</OnLoad>
+			<OnEvent>
+                if event == "BANKFRAME_OPENED" then
+                    this:Show();
+    				BSM_updateBankBags();
+                elseif event == "BANKFRAME_CLOSED" then
+                    this:Hide();
+                elseif this:IsVisible() then
+    				BSM_updateBankBags();
+                end
+			</OnEvent>
+			<OnUpdate>
+                if this:IsVisible() then
+    				BSM_updateBankBags();
+                end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

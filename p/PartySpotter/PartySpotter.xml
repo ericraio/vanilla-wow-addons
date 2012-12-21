@@ -1,0 +1,382 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+
+
+<Script file="Localisation.lua"/>
+<Script file="Localisation.de.lua"/>
+<Script file="Localisation.fr.lua"/>
+<Script file="PartySpotter.lua"/>
+
+
+
+	<Frame name="PartySpotter" toplevel="true" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				PartySpotter_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				PartySpotter_OnEvent();
+			</OnEvent>
+			<OnUpdate>
+				PartySpotter_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+
+
+
+
+	<Frame name="SpotTemplate" hidden="true" frameStrata="FULLSCREEN_DIALOG" virtual="true">
+		<Size>
+			<AbsDimension x="15" y="15"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentRaidSpot" file="Interface\AddOns\PartySpotter\Artwork\SpotGroup1" hidden="true"/>
+				<Texture name="$parentPartySpot" file="Interface\AddOns\PartySpotter\Artwork\SpotPartyIcon"  hidden="true"/>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Button name="PartySpotterKeyButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="84" y="17"/>
+		</Size>
+		<Frames>
+			<Frame name="$parentIcons" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentOther" file="Interface\AddOns\PartySpotter\Artwork\SpotGroup1" hidden="true">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="-14" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+		     		           	</Texture>
+		     		           	<Texture name="$parentNumber" file="Interface\AddOns\PartySpotter\Artwork\SpotGroup1t">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+		     		           	</Texture>
+		     		           	<Texture name="$parentParty" file="Interface\AddOns\PartySpotter\Artwork\SpotPartyIcon" hidden="true">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="14" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+		     		           	</Texture>
+						<FontString name="$parentText" inherits="GameFontNormalSmall" text="" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				PartySpotter_KeyButton_OnClick(arg1, this:GetID());
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+	</Button>
+
+	<Frame name="PartySpotterKeyTemplate" virtual="true" hidden="true">
+		<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="100" y="180"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentKeyTitle" inherits="GameFontNormalSmall" text="PSPOT_KEY_TITLE">
+					<Size>
+						<AbsDimension x="90" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentBttn1" inherits="PartySpotterKeyButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentKeyTitle" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn2" inherits="PartySpotterKeyButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn3" inherits="PartySpotterKeyButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn4" inherits="PartySpotterKeyButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn5" inherits="PartySpotterKeyButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn6" inherits="PartySpotterKeyButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn7" inherits="PartySpotterKeyButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentBttn8" inherits="PartySpotterKeyButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentBttn7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+
+
+
+
+	<Frame name="PartySpotterWM" toplevel="true" parent="WorldMapFrame">
+		<Scripts>
+			<OnUpdate>
+				PartySpotterWM_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="WorldMapPartySpotterKey" inherits="PartySpotterKeyTemplate" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" parent="WorldMapFrame">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo="WorldMapButton" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				WorldMapPartySpotterKey_OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="WorldMapSpotParty1" inherits="SpotTemplate" parent="WorldMapParty1"/>
+	<Frame name="WorldMapSpotParty2" inherits="SpotTemplate" parent="WorldMapParty2"/>
+	<Frame name="WorldMapSpotParty3" inherits="SpotTemplate" parent="WorldMapParty3"/>
+	<Frame name="WorldMapSpotParty4" inherits="SpotTemplate" parent="WorldMapParty4"/>
+
+	<Frame name="WorldMapSpotRaid1"  inherits="SpotTemplate" parent="WorldMapRaid1"/>
+	<Frame name="WorldMapSpotRaid2"  inherits="SpotTemplate" parent="WorldMapRaid2"/>
+	<Frame name="WorldMapSpotRaid3"  inherits="SpotTemplate" parent="WorldMapRaid3"/>
+	<Frame name="WorldMapSpotRaid4"  inherits="SpotTemplate" parent="WorldMapRaid4"/>
+	<Frame name="WorldMapSpotRaid5"  inherits="SpotTemplate" parent="WorldMapRaid5"/>
+	<Frame name="WorldMapSpotRaid6"  inherits="SpotTemplate" parent="WorldMapRaid6"/>
+	<Frame name="WorldMapSpotRaid7"  inherits="SpotTemplate" parent="WorldMapRaid7"/>
+	<Frame name="WorldMapSpotRaid8"  inherits="SpotTemplate" parent="WorldMapRaid8"/>
+	<Frame name="WorldMapSpotRaid9"  inherits="SpotTemplate" parent="WorldMapRaid9"/>
+	<Frame name="WorldMapSpotRaid10" inherits="SpotTemplate" parent="WorldMapRaid10"/>
+	<Frame name="WorldMapSpotRaid11" inherits="SpotTemplate" parent="WorldMapRaid11"/>
+	<Frame name="WorldMapSpotRaid12" inherits="SpotTemplate" parent="WorldMapRaid12"/>
+	<Frame name="WorldMapSpotRaid13" inherits="SpotTemplate" parent="WorldMapRaid13"/>
+	<Frame name="WorldMapSpotRaid14" inherits="SpotTemplate" parent="WorldMapRaid14"/>
+	<Frame name="WorldMapSpotRaid15" inherits="SpotTemplate" parent="WorldMapRaid15"/>
+	<Frame name="WorldMapSpotRaid16" inherits="SpotTemplate" parent="WorldMapRaid16"/>
+	<Frame name="WorldMapSpotRaid17" inherits="SpotTemplate" parent="WorldMapRaid17"/>
+	<Frame name="WorldMapSpotRaid18" inherits="SpotTemplate" parent="WorldMapRaid18"/>
+	<Frame name="WorldMapSpotRaid19" inherits="SpotTemplate" parent="WorldMapRaid19"/>
+	<Frame name="WorldMapSpotRaid20" inherits="SpotTemplate" parent="WorldMapRaid20"/>
+	<Frame name="WorldMapSpotRaid21" inherits="SpotTemplate" parent="WorldMapRaid21"/>
+	<Frame name="WorldMapSpotRaid22" inherits="SpotTemplate" parent="WorldMapRaid22"/>
+	<Frame name="WorldMapSpotRaid23" inherits="SpotTemplate" parent="WorldMapRaid23"/>
+	<Frame name="WorldMapSpotRaid24" inherits="SpotTemplate" parent="WorldMapRaid24"/>
+	<Frame name="WorldMapSpotRaid25" inherits="SpotTemplate" parent="WorldMapRaid25"/>
+	<Frame name="WorldMapSpotRaid26" inherits="SpotTemplate" parent="WorldMapRaid26"/>
+	<Frame name="WorldMapSpotRaid27" inherits="SpotTemplate" parent="WorldMapRaid27"/>
+	<Frame name="WorldMapSpotRaid28" inherits="SpotTemplate" parent="WorldMapRaid28"/>
+	<Frame name="WorldMapSpotRaid29" inherits="SpotTemplate" parent="WorldMapRaid29"/>
+	<Frame name="WorldMapSpotRaid30" inherits="SpotTemplate" parent="WorldMapRaid30"/>
+	<Frame name="WorldMapSpotRaid31" inherits="SpotTemplate" parent="WorldMapRaid31"/>
+	<Frame name="WorldMapSpotRaid32" inherits="SpotTemplate" parent="WorldMapRaid32"/>
+	<Frame name="WorldMapSpotRaid33" inherits="SpotTemplate" parent="WorldMapRaid33"/>
+	<Frame name="WorldMapSpotRaid34" inherits="SpotTemplate" parent="WorldMapRaid34"/>
+	<Frame name="WorldMapSpotRaid35" inherits="SpotTemplate" parent="WorldMapRaid35"/>
+	<Frame name="WorldMapSpotRaid36" inherits="SpotTemplate" parent="WorldMapRaid36"/>
+	<Frame name="WorldMapSpotRaid37" inherits="SpotTemplate" parent="WorldMapRaid37"/>
+	<Frame name="WorldMapSpotRaid38" inherits="SpotTemplate" parent="WorldMapRaid38"/>
+	<Frame name="WorldMapSpotRaid39" inherits="SpotTemplate" parent="WorldMapRaid39"/>
+	<Frame name="WorldMapSpotRaid40" inherits="SpotTemplate" parent="WorldMapRaid40"/>
+
+
+
+	<Frame name="PartySpotterBFM" toplevel="true" hidden="true">
+		<Scripts>
+			<OnUpdate>
+				PartySpotterBFM_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<frame name="BattlefieldMinimapSpotParty1" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotParty2" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotParty3" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotParty4" inherits="SpotTemplate"/>
+
+	<Frame name="BattlefieldMinimapSpotRaid1"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid2"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid3"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid4"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid5"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid6"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid7"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid8"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid9"  inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid10" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid11" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid12" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid13" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid14" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid15" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid16" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid17" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid18" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid19" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid20" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid21" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid22" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid23" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid24" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid25" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid26" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid27" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid28" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid29" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid30" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid31" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid32" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid33" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid34" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid35" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid36" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid37" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid38" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid39" inherits="SpotTemplate"/>
+	<Frame name="BattlefieldMinimapSpotRaid40" inherits="SpotTemplate"/>
+
+
+
+	<Frame name="PartySpotterAM" toplevel="true" parent="AlphaMapUnits">
+		<Scripts>
+			<OnUpdate>
+				if ( AlphaMapFrame ) then
+					PartySpotterAM_OnUpdate(arg1);
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="AlphaMapPartySpotterKey" inherits="PartySpotterKeyTemplate" frameStrata="FULLSCREEN_DIALOG" toplevel="true" enableMouse="true" movable="true" parent="AlphaMapUnits">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="4"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				AlphaMapPartySpotterKey_OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<frame name="AlphaMapSpotParty1" inherits="SpotTemplate" parent="AlphaMapParty1"/>
+	<Frame name="AlphaMapSpotParty2" inherits="SpotTemplate" parent="AlphaMapParty2"/>
+	<Frame name="AlphaMapSpotParty3" inherits="SpotTemplate" parent="AlphaMapParty3"/>
+	<Frame name="AlphaMapSpotParty4" inherits="SpotTemplate" parent="AlphaMapParty4"/>
+
+	<Frame name="AlphaMapSpotRaid1"  inherits="SpotTemplate" parent="AlphaMapRaid1"/>
+	<Frame name="AlphaMapSpotRaid2"  inherits="SpotTemplate" parent="AlphaMapRaid2"/>
+	<Frame name="AlphaMapSpotRaid3"  inherits="SpotTemplate" parent="AlphaMapRaid3"/>
+	<Frame name="AlphaMapSpotRaid4"  inherits="SpotTemplate" parent="AlphaMapRaid4"/>
+	<Frame name="AlphaMapSpotRaid5"  inherits="SpotTemplate" parent="AlphaMapRaid5"/>
+	<Frame name="AlphaMapSpotRaid6"  inherits="SpotTemplate" parent="AlphaMapRaid6"/>
+	<Frame name="AlphaMapSpotRaid7"  inherits="SpotTemplate" parent="AlphaMapRaid7"/>
+	<Frame name="AlphaMapSpotRaid8"  inherits="SpotTemplate" parent="AlphaMapRaid8"/>
+	<Frame name="AlphaMapSpotRaid9"  inherits="SpotTemplate" parent="AlphaMapRaid9"/>
+	<Frame name="AlphaMapSpotRaid10" inherits="SpotTemplate" parent="AlphaMapRaid10"/>
+	<Frame name="AlphaMapSpotRaid11" inherits="SpotTemplate" parent="AlphaMapRaid11"/>
+	<Frame name="AlphaMapSpotRaid12" inherits="SpotTemplate" parent="AlphaMapRaid12"/>
+	<Frame name="AlphaMapSpotRaid13" inherits="SpotTemplate" parent="AlphaMapRaid13"/>
+	<Frame name="AlphaMapSpotRaid14" inherits="SpotTemplate" parent="AlphaMapRaid14"/>
+	<Frame name="AlphaMapSpotRaid15" inherits="SpotTemplate" parent="AlphaMapRaid15"/>
+	<Frame name="AlphaMapSpotRaid16" inherits="SpotTemplate" parent="AlphaMapRaid16"/>
+	<Frame name="AlphaMapSpotRaid17" inherits="SpotTemplate" parent="AlphaMapRaid17"/>
+	<Frame name="AlphaMapSpotRaid18" inherits="SpotTemplate" parent="AlphaMapRaid18"/>
+	<Frame name="AlphaMapSpotRaid19" inherits="SpotTemplate" parent="AlphaMapRaid19"/>
+	<Frame name="AlphaMapSpotRaid20" inherits="SpotTemplate" parent="AlphaMapRaid20"/>
+	<Frame name="AlphaMapSpotRaid21" inherits="SpotTemplate" parent="AlphaMapRaid21"/>
+	<Frame name="AlphaMapSpotRaid22" inherits="SpotTemplate" parent="AlphaMapRaid22"/>
+	<Frame name="AlphaMapSpotRaid23" inherits="SpotTemplate" parent="AlphaMapRaid23"/>
+	<Frame name="AlphaMapSpotRaid24" inherits="SpotTemplate" parent="AlphaMapRaid24"/>
+	<Frame name="AlphaMapSpotRaid25" inherits="SpotTemplate" parent="AlphaMapRaid25"/>
+	<Frame name="AlphaMapSpotRaid26" inherits="SpotTemplate" parent="AlphaMapRaid26"/>
+	<Frame name="AlphaMapSpotRaid27" inherits="SpotTemplate" parent="AlphaMapRaid27"/>
+	<Frame name="AlphaMapSpotRaid28" inherits="SpotTemplate" parent="AlphaMapRaid28"/>
+	<Frame name="AlphaMapSpotRaid29" inherits="SpotTemplate" parent="AlphaMapRaid29"/>
+	<Frame name="AlphaMapSpotRaid30" inherits="SpotTemplate" parent="AlphaMapRaid30"/>
+	<Frame name="AlphaMapSpotRaid31" inherits="SpotTemplate" parent="AlphaMapRaid31"/>
+	<Frame name="AlphaMapSpotRaid32" inherits="SpotTemplate" parent="AlphaMapRaid32"/>
+	<Frame name="AlphaMapSpotRaid33" inherits="SpotTemplate" parent="AlphaMapRaid33"/>
+	<Frame name="AlphaMapSpotRaid34" inherits="SpotTemplate" parent="AlphaMapRaid34"/>
+	<Frame name="AlphaMapSpotRaid35" inherits="SpotTemplate" parent="AlphaMapRaid35"/>
+	<Frame name="AlphaMapSpotRaid36" inherits="SpotTemplate" parent="AlphaMapRaid36"/>
+	<Frame name="AlphaMapSpotRaid37" inherits="SpotTemplate" parent="AlphaMapRaid37"/>
+	<Frame name="AlphaMapSpotRaid38" inherits="SpotTemplate" parent="AlphaMapRaid38"/>
+	<Frame name="AlphaMapSpotRaid39" inherits="SpotTemplate" parent="AlphaMapRaid39"/>
+	<Frame name="AlphaMapSpotRaid40" inherits="SpotTemplate" parent="AlphaMapRaid40"/>
+
+</Ui>

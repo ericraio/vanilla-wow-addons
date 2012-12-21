@@ -1,0 +1,1148 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\WoW\Interface\FrameXML\UI.xsd">
+	<Script file="Localization.lua"/>
+	<Script file="Nurfed_CombatLog.lua"/>
+	<Frame name="Nurfed_CombatLogFrame" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnLoad>
+				Nurfed_CombatLogOnLoad();
+			</OnLoad>
+			<OnEvent>
+				Nurfed_CombatLogOnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	
+	<CheckButton name="NurfedCombatOptionsCheckTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Scripts>
+			<OnShow>
+				Nurfed_CombatCheckBoxOnShow();
+			</OnShow>
+			<OnClick>
+				Nurfed_CombatCheckBoxOnClick();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<Button name="NurfedCombatColorSwatchTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parent_SwatchBg">
+					<Size>
+						<AbsDimension x="14" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>
+				Nurfed_CombatColorSwatchOnShow();
+			</OnShow>
+			<OnClick>
+				Nurfed_CombatOpenColorPicker();
+			</OnClick>
+			<OnEnter>
+				getglobal(this:GetName().."_SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."_SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			</OnLeave>
+		</Scripts>
+		<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+	</Button>
+
+	<Button name="NurfedCombatOptionsBottomTabTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="50"/>
+		</Size>
+		<HitRectInsets>
+			<AbsInset left="15" right="14" top="13" bottom="15"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				Nurfed_CombatOptionTabSelect(this:GetID());
+			</OnClick>
+		</Scripts>
+		<NormalText inherits="GameFontNormalSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="3"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="3"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="6"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+		<DisabledTexture file="Interface\AddOns\Nurfed_CombatLog\images\UI-SpellBook-Tab-Selected"/>
+		<NormalTexture file="Interface\SpellBook\UI-SpellBook-Tab-Unselected"/>
+		<HighlightTexture file="Interface\SpellBook\UI-SpellbookPanel-Tab-Highlight"/>
+	</Button>
+
+	<Frame name="Nurfed_CombatOptionsFrame" toplevel="true" frameStrata="LOW" hidden="true" parent="UIParent" movable="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="420" y="350"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativeTo="UIParent" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-100"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="375" y="85"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="1" y="18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" nonspacewrap="true">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="Nurfed_CombatOptionPage1" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Button name="Nurfed_CombatColor1" inherits="NurfedCombatColorSwatchTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor2" inherits="NurfedCombatColorSwatchTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor1" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor3" inherits="NurfedCombatColorSwatchTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor2" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor4" inherits="NurfedCombatColorSwatchTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor3" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor5" inherits="NurfedCombatColorSwatchTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor4" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor6" inherits="NurfedCombatColorSwatchTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor5" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor7" inherits="NurfedCombatColorSwatchTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor6" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor8" inherits="NurfedCombatColorSwatchTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatColor7" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor9" inherits="NurfedCombatColorSwatchTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor10" inherits="NurfedCombatColorSwatchTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor9" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor11" inherits="NurfedCombatColorSwatchTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor12" inherits="NurfedCombatColorSwatchTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor13" inherits="NurfedCombatColorSwatchTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor12" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor14" inherits="NurfedCombatColorSwatchTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor13" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor15" inherits="NurfedCombatColorSwatchTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor14" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="Nurfed_CombatColor16" inherits="NurfedCombatColorSwatchTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatColor15" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<Frame name="Nurfed_CombatOptionPage2" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="Nurfed_CombatOptionCheck1" inherits="NurfedCombatOptionsCheckTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck2" inherits="NurfedCombatOptionsCheckTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck3" inherits="NurfedCombatOptionsCheckTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck4" inherits="NurfedCombatOptionsCheckTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck5" inherits="NurfedCombatOptionsCheckTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck6" inherits="NurfedCombatOptionsCheckTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck7" inherits="NurfedCombatOptionsCheckTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck6" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck8" inherits="NurfedCombatOptionsCheckTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck7" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck9" inherits="NurfedCombatOptionsCheckTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck8" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="Nurfed_CombatOptionPage3" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="Nurfed_CombatOptionCheck10" inherits="NurfedCombatOptionsCheckTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck11" inherits="NurfedCombatOptionsCheckTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck12" inherits="NurfedCombatOptionsCheckTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck13" inherits="NurfedCombatOptionsCheckTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck12" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck14" inherits="NurfedCombatOptionsCheckTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck13" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck15" inherits="NurfedCombatOptionsCheckTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck16" inherits="NurfedCombatOptionsCheckTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck15" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck17" inherits="NurfedCombatOptionsCheckTemplate" id="17">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck16" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck18" inherits="NurfedCombatOptionsCheckTemplate" id="18">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck17" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="Nurfed_CombatOptionPage4" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="Nurfed_CombatOptionCheck19" inherits="NurfedCombatOptionsCheckTemplate" id="19">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck20" inherits="NurfedCombatOptionsCheckTemplate" id="20">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck19" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck21" inherits="NurfedCombatOptionsCheckTemplate" id="21">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck20" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck22" inherits="NurfedCombatOptionsCheckTemplate" id="22">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck21" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck23" inherits="NurfedCombatOptionsCheckTemplate" id="23">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck22" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck24" inherits="NurfedCombatOptionsCheckTemplate" id="24">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck25" inherits="NurfedCombatOptionsCheckTemplate" id="25">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck15" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck26" inherits="NurfedCombatOptionsCheckTemplate" id="26">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck25" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck27" inherits="NurfedCombatOptionsCheckTemplate" id="27">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck26" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="Nurfed_CombatOptionPage5" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="Nurfed_CombatOptionCheck28" inherits="NurfedCombatOptionsCheckTemplate" id="28">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck29" inherits="NurfedCombatOptionsCheckTemplate" id="29">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck28" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck30" inherits="NurfedCombatOptionsCheckTemplate" id="30">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck29" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck31" inherits="NurfedCombatOptionsCheckTemplate" id="31">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck30" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck32" inherits="NurfedCombatOptionsCheckTemplate" id="32">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck31" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck33" inherits="NurfedCombatOptionsCheckTemplate" id="33">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck34" inherits="NurfedCombatOptionsCheckTemplate" id="34">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck33" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck35" inherits="NurfedCombatOptionsCheckTemplate" id="35">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck34" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck36" inherits="NurfedCombatOptionsCheckTemplate" id="36">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck35" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="Nurfed_CombatOptionPage6" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="Nurfed_CombatOptionCheck37" inherits="NurfedCombatOptionsCheckTemplate" id="37">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck38" inherits="NurfedCombatOptionsCheckTemplate" id="38">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck37" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck39" inherits="NurfedCombatOptionsCheckTemplate" id="39">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck38" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck40" inherits="NurfedCombatOptionsCheckTemplate" id="40">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck39" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck41" inherits="NurfedCombatOptionsCheckTemplate" id="41">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck40" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck42" inherits="NurfedCombatOptionsCheckTemplate" id="42">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck41" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck43" inherits="NurfedCombatOptionsCheckTemplate" id="43">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck42" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck44" inherits="NurfedCombatOptionsCheckTemplate" id="44">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck43" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck45" inherits="NurfedCombatOptionsCheckTemplate" id="45">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck46" inherits="NurfedCombatOptionsCheckTemplate" id="46">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck45" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck47" inherits="NurfedCombatOptionsCheckTemplate" id="47">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck46" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck48" inherits="NurfedCombatOptionsCheckTemplate" id="48">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck47" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck49" inherits="NurfedCombatOptionsCheckTemplate" id="49">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck48" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck50" inherits="NurfedCombatOptionsCheckTemplate" id="50">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck49" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck51" inherits="NurfedCombatOptionsCheckTemplate" id="51">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck50" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck52" inherits="NurfedCombatOptionsCheckTemplate" id="52">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck51" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="Nurfed_CombatOptionPage7" setAllPoints="true">
+				<Frames>
+					<Frame name="$parentSubFrame1" inherits="OptionFrameBoxTemplate">
+						<Size>
+							<AbsDimension x="395" y="260"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-45"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="Nurfed_CombatOptionCheck53" inherits="NurfedCombatOptionsCheckTemplate" id="53">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSubFrame1" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck54" inherits="NurfedCombatOptionsCheckTemplate" id="54">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck53" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck55" inherits="NurfedCombatOptionsCheckTemplate" id="55">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck54" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck56" inherits="NurfedCombatOptionsCheckTemplate" id="56">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck55" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck57" inherits="NurfedCombatOptionsCheckTemplate" id="57">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck56" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck58" inherits="NurfedCombatOptionsCheckTemplate" id="58">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck57" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck59" inherits="NurfedCombatOptionsCheckTemplate" id="59">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck58" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck60" inherits="NurfedCombatOptionsCheckTemplate" id="60">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionCheck59" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck61" inherits="NurfedCombatOptionsCheckTemplate" id="61">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSubFrame1" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck62" inherits="NurfedCombatOptionsCheckTemplate" id="62">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck61" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck63" inherits="NurfedCombatOptionsCheckTemplate" id="63">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck62" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck64" inherits="NurfedCombatOptionsCheckTemplate" id="64">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck63" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck65" inherits="NurfedCombatOptionsCheckTemplate" id="65">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck64" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck66" inherits="NurfedCombatOptionsCheckTemplate" id="66">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck65" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck67" inherits="NurfedCombatOptionsCheckTemplate" id="67">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck66" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck68" inherits="NurfedCombatOptionsCheckTemplate" id="68">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck67" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<CheckButton name="Nurfed_CombatOptionCheck69" inherits="NurfedCombatOptionsCheckTemplate" id="69">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="Nurfed_CombatOptionCheck68" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+		<!-- Frame handling buttons -->
+			<Button name="Nurfed_CombatFramesCloseButton" text="CLOSE" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Nurfed_CombatFramesMenu();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab1" inherits="NurfedCombatOptionsBottomTabTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Nurfed_CombatOptionsFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab2" inherits="NurfedCombatOptionsBottomTabTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Nurfed_CombatOptionTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab3" inherits="NurfedCombatOptionsBottomTabTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Nurfed_CombatOptionTab2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab4" inherits="NurfedCombatOptionsBottomTabTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Nurfed_CombatOptionTab3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab5" inherits="NurfedCombatOptionsBottomTabTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Nurfed_CombatOptionTab4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab6" inherits="NurfedCombatOptionsBottomTabTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="Nurfed_CombatOptionTab1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="20" y="30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="Nurfed_CombatOptionTab7" inherits="NurfedCombatOptionsBottomTabTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="Nurfed_CombatOptionTab6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				Nurfed_CombatOptionTabsInit();
+				PlaySound("igMainMenuOption");
+			</OnShow>
+			<OnHide>
+				PlaySound("igMainMenuQuit");
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

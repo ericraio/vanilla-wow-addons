@@ -1,0 +1,3691 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="localization.cn.lua"/>
+	<Script file="localization.tw.lua"/>
+	<Script file="localization.es.lua"/>
+	<Script file="globals.lua"/>
+	<Script file="SHunterTimers.lua"/>
+		
+	<Frame name="SHunterTimersBarTemplate" virtual="true" hidden="true" >
+		<Size>
+			<AbsDimension x="220" y="10"/>
+		</Size> 
+		<Frames>
+			<StatusBar name="$parentBar" inherits="TextStatusBar" enableMouse="true" >
+				<Size>
+					<AbsDimension x="220" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+				<BarColor r="0" g="0.8" b="0" />
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentLeftText" inherits="GameFontNormal" text="Error!">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="10" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentRightText" inherits="GameFontNormal" text="Error!">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="-10" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>					
+				</Layers>
+				<Scripts>	
+					<OnEnter>
+						SHunterTimers_Tooltip(this:GetParent());
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</StatusBar>
+			
+			<StatusBar name="$parentBGBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="200" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBar">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-TargetingFrame-BarFill"/>
+				<BarColor r="0" g="0.8" b="0" a="0.25"/>
+			</StatusBar>
+			
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" hidden="true">
+					<Size>
+						<AbsDimension x="10" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this.texture = nil;
+				this.channeling = false;
+				this.fadeOut = false;
+				this.startTime = nil;
+				this.endTime = nil;
+				this.duration = nil;
+				this.step = 0;
+				this.target = nil;
+			</OnLoad>
+			
+			<OnUpdate>
+				SHunterTimers_OnUpdateBar(this:GetID());
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<CheckButton name="SHTCheckBoxTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset left="0" right="-50" top="0" bottom="0"/>
+		</HitRectInsets>
+		<Scripts>
+			<OnClick>
+				if ( this:GetChecked() ) then
+					PlaySound("igMainMenuOptionCheckBoxOff");
+				else
+					PlaySound("igMainMenuOptionCheckBoxOn");
+				end
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	<Frame name="SHunterTimersAnchor" hidden="true" parent="UIParent" movable="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				this:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+			</OnDragStop>
+			<OnEnter>
+				GameTooltip:ClearLines();
+				GameTooltip:AddLine("Hunter Timers Anchor.");
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="SHunterTimersFrame" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="240" y="30"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativePoint="CENTER" relativeTo="SHunterTimersAnchor">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnLoad>
+				SHunterTimers_OnLoad();
+				this.updateTime = 0;
+			</OnLoad>
+			<OnUpdate>
+				SHunterTimersFrame_OnUpdate(GetTime());
+			</OnUpdate>
+			<OnEvent>
+				SHunterTimersFrame_OnEvent();
+			</OnEvent>
+			<OnDragStart>
+				this:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	<Frame name="SHunterTimersStatus1" inherits="SHunterTimersBarTemplate" id="1" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="TOP" relativeTo="SHunterTimersFrame">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus2" inherits="SHunterTimersBarTemplate" id="2" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus1">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus3" inherits="SHunterTimersBarTemplate" id="3" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus2">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus4" inherits="SHunterTimersBarTemplate" id="4" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus3">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus5" inherits="SHunterTimersBarTemplate" id="5" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus4">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus6" inherits="SHunterTimersBarTemplate" id="6" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus5">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus7" inherits="SHunterTimersBarTemplate" id="7" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus6">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus8" inherits="SHunterTimersBarTemplate" id="8" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus7">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus9" inherits="SHunterTimersBarTemplate" id="9" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus8">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus10" inherits="SHunterTimersBarTemplate" id="10" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus9">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SHunterTimersStatus11" inherits="SHunterTimersBarTemplate" id="11" parent="UIParent">
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="SHunterTimersStatus10">
+				<Offset>
+					<AbsDimension x="0" y="-10"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<GameTooltip name="SHuntersTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+	-- Main GUI Screen
+	<Frame name="SHunterTimersOptions" hidden="true" movable="true" enableKeyboard="true">
+		<Size>
+			<AbsDimension x="1015" y="581" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTitleBorder" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="270" y="32" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="5" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+				</Texture>
+				<FontString name="$parentTitleString" inherits="GameFontNormal" text="Sorren's Hunter Timers">
+					<Size>
+						<AbsDimension x="200" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-6" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentButtonOkay" text="Okay">
+				<Size>
+					<AbsDimension x="66" y="22" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="40" y="-535" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>SHunterTimers_SaveCloseOptions();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</NormalTexture>
+				<PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</PushedTexture>
+				<DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</DisabledTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</HighlightTexture>
+				<ButtonText>
+					<FontHeight>
+						<AbsValue val="10" />
+					</FontHeight>
+				</ButtonText>
+				<NormalFont name="$parentText" inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</NormalFont>
+				<HighlightFont inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</HighlightFont>
+				<DisabledFont inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="0.4901961" g="0.4901961" b="0.4901961" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</DisabledFont>
+				<PushedTextOffset x="0" y="0" />
+			</Button>
+			<Button name="$parentButtonApply" text="Apply">
+				<Size>
+					<AbsDimension x="66" y="22" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="137" y="-535" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>SHunterTimers_SaveOptions();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</NormalTexture>
+				<PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</PushedTexture>
+				<DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</DisabledTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</HighlightTexture>
+				<ButtonText>
+					<FontHeight>
+						<AbsValue val="10" />
+					</FontHeight>
+				</ButtonText>
+				<NormalFont name="$parentText" inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</NormalFont>
+				<HighlightFont inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</HighlightFont>
+				<DisabledFont inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="0.4901961" g="0.4901961" b="0.4901961" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</DisabledFont>
+				<PushedTextOffset x="0" y="0" />
+			</Button>
+			<Button name="$parentButtonCancel" text="Cancel">
+				<Size>
+					<AbsDimension x="66" y="22" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="233" y="-535" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>SHunterTimersOptions:Hide();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</NormalTexture>
+				<PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</PushedTexture>
+				<DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</DisabledTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
+					<TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+				</HighlightTexture>
+				<ButtonText>
+					<FontHeight>
+						<AbsValue val="10" />
+					</FontHeight>
+				</ButtonText>
+				<NormalFont name="$parentText" inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</NormalFont>
+				<HighlightFont inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</HighlightFont>
+				<DisabledFont inherits="GameFontNormal">
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="0.4901961" g="0.4901961" b="0.4901961" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</DisabledFont>
+				<PushedTextOffset x="0" y="0" />
+			</Button>
+
+			<Frame name="$parentBars">
+				<Size>
+					<AbsDimension x="474" y="462" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="520" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16" />
+					</EdgeSize>
+				</Backdrop>
+				<Frames>
+					<Frame name="SHunterTimersOptionsBarsLabel1">
+						<Size>
+							<AbsDimension x="75" y="18" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="210" y="-10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="SystemFont" text="Bars">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<CheckButton name="$parentCheckButtonOn">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="On">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<Button name="$parentColor1" id="1">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel3">
+						<Size>
+							<AbsDimension x="97" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="200" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Bar Start Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Button name="$parentColor5" id="5">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel4">
+						<Size>
+							<AbsDimension x="97" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="350" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Text Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton1">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Lock">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<Button name="$parentColor2" id="2">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel6">
+						<Size>
+							<AbsDimension x="97" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="200" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Bar End Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Button name="$parentColor6" id="6">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel7">
+						<Size>
+							<AbsDimension x="97" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="350" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Time Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentSlider1">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-110" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="0" maxValue="10" defaultValue="5" valueStep="1" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Distance Between Bars">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentSlider2">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-110" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="0.5" maxValue="1.5" defaultValue="1" valueStep="0.01" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Scale">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentSlider3">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-110" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="0" maxValue="3" defaultValue="2" valueStep="1" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Decimals">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentSlider4">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-155" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="0" maxValue="10" defaultValue="5" valueStep="1" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Flash Time">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentSlider5">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-155" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="0.01" maxValue="0.05" defaultValue="0.015" valueStep="0.005" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Flash Step">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentSlider6">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-155" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="0" maxValue="1" defaultValue="1" valueStep="0.01" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Overall Opacity">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="SHunterTimersOptionsBarsLabel8">
+						<Size>
+							<AbsDimension x="83" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="2" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Aimed Delay" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<EditBox name="$parentEditBox1" autoFocus="false" enableMouse="true" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="34" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="99" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString inherits="GameFontNormal">
+							<FontHeight>
+								<AbsValue val="14" />
+							</FontHeight>
+							<Color r="1" g="1" b="1" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<Scripts>
+							<OnClick>
+								this:SetFocus();
+							</OnClick>
+							<OnEnterPressed>
+								this:ClearFocus();
+							</OnEnterPressed>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+					<Frame name="SHunterTimersOptionsBarsLabel9">
+						<Size>
+							<AbsDimension x="21" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="141" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="ms" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Button name="$parentColor4" id="4">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel2">
+						<Size>
+							<AbsDimension x="97" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="200" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Border Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentSlider7">
+						<Size>
+							<AbsDimension x="128" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-200" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Slider name="$parentSlider" enableMouse="true" minValue="10" maxValue="32" defaultValue="10" valueStep="1" orientation="HORIZONTAL">
+								<Size>
+									<AbsDimension x="128" y="17" />
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" />
+									<Anchor point="RIGHT" />
+								</Anchors>
+								<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+									<BackgroundInsets>
+										<AbsInset left="3" right="3" top="6" bottom="6" />
+									</BackgroundInsets>
+									<TileSize>
+										<AbsValue val="8" />
+									</TileSize>
+									<EdgeSize>
+										<AbsValue val="8" />
+									</EdgeSize>
+								</Backdrop>
+								<Layers>
+									<Layer>
+										<FontString name="$parentTitle" inherits="GameFontNormalSmall" text="Bar Thickness">
+											<Anchors>
+												<Anchor point="BOTTOM" relativePoint="TOP" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentLow" inherits="GameFontNormalSmall" text="Low">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+										<FontString name="$parentHigh" inherits="GameFontNormalSmall" text="High">
+											<Anchors>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" />
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="10" />
+											</FontHeight>
+											<Color r="1" g="1" b="1" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+									<Size>
+										<AbsDimension x="32" y="32" />
+									</Size>
+								</ThumbTexture>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="SHunterTimersOptionsBarsLabel10">
+						<Size>
+							<AbsDimension x="83" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Shot Delay" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<EditBox name="$parentEditBox2" autoFocus="false" enableMouse="true" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="34" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="99" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString inherits="GameFontNormal">
+							<FontHeight>
+								<AbsValue val="14" />
+							</FontHeight>
+							<Color r="1" g="1" b="1" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<Scripts>
+							<OnClick>
+								this:SetFocus();
+							</OnClick>
+							<OnEnterPressed>
+								this:ClearFocus();
+							</OnEnterPressed>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+					<Frame name="SHunterTimersOptionsBarsLabel11">
+						<Size>
+							<AbsDimension x="21" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="141" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="ms" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Button name="$parentColor3" id="3">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel5">
+						<Size>
+							<AbsDimension x="97" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="200" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Backdrop Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton2">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Color Change">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton3">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-296" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Show Textures">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton4">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-296" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Large Textures">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton5">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-296" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Hide Gap">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton6">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Append Target">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<Button name="$parentColor7" id="7">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>SHT_ColorPicker(this:GetID());
+							</OnClick>
+						</Scripts>
+						<NormalTexture name="$parentSwatch" file="Interface\ChatFrame\ChatFrameColorSwatch">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+						</NormalTexture>
+						<PushedTextOffset x="0" y="0" />
+					</Button>
+					<Frame name="SHunterTimersOptionsBarsLabel12">
+						<Size>
+							<AbsDimension x="100" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="200" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Target Text Color" justifyH="LEFT">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton7">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Hide Padding">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton8">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-372" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Hide Text">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton9">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-372" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Hide Time">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton10">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="320" y="-372" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Sticky Auto Shot">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsBarsCheckButton11">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-410" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Cascade Bars Down">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="$parentTimers">
+				<Size>
+					<AbsDimension x="490" y="493" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5" />
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16" />
+					</EdgeSize>
+				</Backdrop>
+
+				<Frames>
+					<Frame name="SHunterTimersOptionsTimersLabel1">
+						<Size>
+							<AbsDimension x="75" y="18" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="190" y="-9" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentLabel" inherits="SystemFont" text="Timers">
+									<Anchors>
+										<Anchor point="TOPLEFT" />
+										<Anchor point="BOTTOMRIGHT" />
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton1">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Auto Shot">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton2">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Aimed Shot">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton3">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-106" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Hunter's Mark">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton4">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-144" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Flare">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton5">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-182" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Concussive Shot">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton6">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Scatter Shot">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton7">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Intimidation">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton8">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-296" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Bestial Wrath">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton9">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Scare Beast">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton10">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-372" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Wing Clip">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton11">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-410" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Counterattack">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton12">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-448" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Deterrence">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton13">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Serpent Sting">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton14">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Viper Sting">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton15">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-106" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Scorpid Sting">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton16">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-144" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Wyvern Sting">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton17">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-182" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Freezing Trap">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton18">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Frost Trap">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton19">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Explosive Trap">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton20">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-296" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Immolation Trap">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton21">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Entrapment">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton22">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-372" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Frenzy">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton23">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-410" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Rapid Fire">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton24">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="150" y="-448" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Berserking">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton25">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-30" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Quick Shots">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton26">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-68" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Expose Weakness">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton27">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-106" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Primal Blessing">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton28">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-144" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Devilsaur Eye">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton29">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-182" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Zandalarian Hero Medallion">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton30">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-220" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Earthstrike">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton31">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-258" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Badge of the Swarmguard">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton32">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-296" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Jom Gabbar">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+					<CheckButton name="SHunterTimersOptionsTimersCheckButton33">
+						<Size>
+							<AbsDimension x="32" y="32" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-334" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer>
+								<FontString name="$parentText" inherits="GameFontNormalSmall" text="Kiss of the Spider">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="0" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="10" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+					</CheckButton>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>this:RegisterForDrag("LeftButton");</OnLoad>
+			<OnDragStart>this:StartMoving();</OnDragStart>
+			<OnDragStop>this:StopMovingOrSizing();</OnDragStop>
+		</Scripts>
+	</Frame>
+</Ui>
+
+

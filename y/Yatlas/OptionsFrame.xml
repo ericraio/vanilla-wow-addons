@@ -1,0 +1,351 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+	<Frame name="YatlasOptionsFrame" hidden="true" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="420" y="410"/>
+		</Size>
+		<Anchors>
+ 			<Anchor point="CENTER" />
+ 		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="YatlasOptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="58"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="YATLAS_OPTIONS_TITLE">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="YatlasOptionsFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<CheckButton name="YatlasOptionsButtonEnable" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-29" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontHighlight" justifyH="LEFT" text="YATLAS_OPTIONS_ENABLEBUTTON">
+					<Size>
+						<AbsDimension x="275" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="24" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						this:RegisterEvent("VARIABLES_LOADED");
+					</OnLoad>
+					<OnEvent>
+						this:SetChecked(YatlasOptions.ShowButton);
+					</OnEvent>
+					<OnClick>
+						if (this:GetChecked()) then
+							YatlasOptions.ShowButton = true;
+						else
+							YatlasOptions.ShowButton = false;
+						end
+						YatlasButton_Update(YatlasFrame)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="YatlasOptionsButtonSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="180" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="56" y="-64" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						getglobal(this:GetName().."Text"):SetText(YATLAS_OPTIONS_BUTTONPOS);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						YatlasOptionsButtonSlider:SetMinMaxValues(0,360);
+						YatlasOptionsButtonSlider:SetValueStep(1);
+					</OnLoad>
+					<OnValueChanged>
+						if(YatlasButton_GetPosition() ~= YatlasOptionsButtonSlider:GetValue()) then
+							YatlasButton_SetPosition(YatlasOptionsButtonSlider:GetValue())
+							if(this:IsVisible()) then
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(format(YATLAS_OPTIONS_BUTTONPOS_TIP,
+										YatlasOptionsButtonSlider:GetValue()));
+							end
+						end
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(format(YATLAS_OPTIONS_BUTTONPOS_TIP,
+								YatlasOptionsButtonSlider:GetValue()));
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<CheckButton name="YatlasOptionsTrackOnShow" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-90" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontHighlight" justifyH="LEFT" text="YATLAS_OPTIONS_TRACKONSHOW">
+					<Size>
+						<AbsDimension x="275" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="24" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						this:RegisterEvent("VARIABLES_LOADED");
+					</OnLoad>
+					<OnEvent>
+						local aframe = next(YatlasOptions.Frames);
+						this:SetChecked(YatlasOptions.Frames[aframe].trackonshow ~= nil);
+					</OnEvent>
+					<OnClick>
+						-- control all frames at once
+						for h,v in pairs(YatlasOptions.Frames) do
+							if(this:GetChecked()) then
+								v.trackonshow = "player"
+							else
+								v.trackonshow = nil
+							end
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Frame name="YatlasOptionsFrameFrame" inherits="OptionFrameBoxTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-140" />
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-24" y="-140" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension y="226"/>
+				</Size>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(0,0,0)	
+					</OnLoad>
+				</Scripts>
+				<Frames>
+					<Button name="YatlasOptionsFrameSelect" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:RegisterEvent("VARIABLES_LOADED");
+							</OnLoad>
+							<OnEvent>
+								if(event == "VARIABLES_LOADED") then
+									UIDropDownMenu_Initialize(this, YatlasOptionsFrameSelect_Initialize);
+									UIDropDownMenu_SetSelectedID(this, 1);
+									UIDropDownMenu_SetWidth(150);
+									YatlasOptionsFrame_Update();
+								end
+							</OnEvent>
+						</Scripts>
+					</Button>
+					<Slider name="YatlasOptionsAlphaSlider" inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension x="180" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="32" y="-78" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel() + 4);
+								getglobal(this:GetName().."Text"):SetText(YATLAS_OPTIONS_ALPHA);
+								getglobal(this:GetName().."High"):SetText();
+								getglobal(this:GetName().."Low"):SetText();
+								this:SetMinMaxValues(.1,1);
+								this:SetValueStep(.05);
+							</OnLoad>
+							<OnValueChanged>
+								local frame = YatlasOptionsFrameSelect.currFrame;
+								frame:SetAlpha(YatlasOptionsAlphaSlider:GetValue());
+								YatlasOptions.Frames[frame:GetName()].Alpha = YatlasOptionsAlphaSlider:GetValue();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Slider name="YatlasOptionsIconSizeSlider" inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension x="180" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="32" y="-122" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel() + 4);
+								getglobal(this:GetName().."Text"):SetText(YATLAS_OPTIONS_ICONSIZE);
+								getglobal(this:GetName().."High"):SetText();
+								getglobal(this:GetName().."Low"):SetText();
+								this:SetMinMaxValues(8,36);
+								this:SetValueStep(1);
+							</OnLoad>
+							<OnValueChanged>
+								local frame = YatlasOptionsFrameSelect.currFrame;
+								local v = YatlasOptionsIconSizeSlider:GetValue();
+								if(YatlasOptions.Frames[frame:GetName()].IconSize ~= v) then
+									YatlasOptions.Frames[frame:GetName()].IconSize = v;
+								    YAPoints_Update(frame);
+								end
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<CheckButton name="YatlasOptionsCoordBEnable" inherits="UICheckButtonTemplate">
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="24" y="-164" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalText name="$parentText2" inherits="GameFontHighlight" justifyH="LEFT" text="YATLAS_OPTIONS_ENABLECOORD">
+							<Size>
+								<AbsDimension x="275" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="24" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</NormalText>
+						<Scripts>
+							<OnLoad>
+								this:SetFrameLevel(this:GetFrameLevel() + 4);
+								this:RegisterEvent("VARIABLES_LOADED");
+							</OnLoad>
+							<OnEvent>
+								this:SetChecked(YatlasOptions.ShowCursorCoords);
+							</OnEvent>
+							<OnClick>
+								if (this:GetChecked()) then
+									YatlasOptions.ShowCursorCoords = true;
+								else
+									YatlasOptions.ShowCursorCoords = false;
+									YatlasPopoutDataCoordText:SetText("");
+								end
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Button name="YatlasOptionsFrameOkay" inherits="GameMenuButtonTemplate" text="OKAY">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-13" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						YatlasOptionsFrame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+		--		UIPanelWindows[this:GetName()] = { area = "center", pushable = 0, whileDead = 1 };
+				this:RegisterEvent("VARIABLES_LOADED");
+			</OnLoad>
+			<OnEvent>
+
+			</OnEvent>
+			<OnShow>
+				
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

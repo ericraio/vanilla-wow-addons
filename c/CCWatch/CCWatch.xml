@@ -1,0 +1,398 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ 
+			..\..\..\FrameXML\UI.xsd">
+	<Script file="CCWatch.lua"/>
+	<Script file="CCWatch_Globals.lua"/>
+	<Script file="Interface\AddOns\CCWatch\Config\CCWatch_ConfigCC.lua"/>
+	<Script file="Interface\AddOns\CCWatch\Config\CCWatch_ConfigDebuff.lua"/>
+	<Script file="Interface\AddOns\CCWatch\Config\CCWatch_ConfigBuff.lua"/>
+	<Script file="localization.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="localization.de.lua"/>
+
+	<Frame name="CCWatchBarTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="170" y="20" />
+		</Size>
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" bgFile="Interface\Tooltips\UI-Tooltip-Background" tile="true">
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5" />
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontHighlight">
+					<Size>
+						<AbsDimension x="160" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<StatusBar name="$parentStatusBar">
+				<Size>
+					<AbsDimension x="160" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeto="$parent">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" font="Fonts\ARIALN.TTF" outline="NORMAL">
+							<FontHeight>
+								<AbsValue val="14"/>
+							</FontHeight>
+							<Color r="1.0" g="1.0" b="1.0"/>
+							<Size>
+								<AbsDimension x="48" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor	point="LEFT">
+									<Offset>
+										<AbsDimension x="-48" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture name="$parentSpark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1)
+					</OnLoad>
+				</Scripts>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="1.0" g="1.0" b="0.0"/>
+			</StatusBar>
+		</Frames>
+	</Frame>
+
+	<Frame name="CCWatchMovableTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="170" y="100" />
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:EnableMouse(0)
+			</OnLoad>
+ 			<OnMouseDown>
+ 				if ( arg1 == "LeftButton" and CCWATCH.STATUS == 2) then
+ 					this:StartMoving();
+ 				end
+ 			</OnMouseDown>
+ 			<OnMouseUp>
+ 				if ( arg1 == "LeftButton" ) then
+ 					this:StopMovingOrSizing();
+ 				end
+ 			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchCC" movable="true" inherits="CCWatchMovableTemplate" parent="UIParent">
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="80" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				CCWatch_OnLoad()
+			</OnLoad>
+			<OnUpdate>
+				CCWatch_OnUpdate()
+			</OnUpdate>
+			<OnEvent>
+				CCWatch_OnEvent(event)
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchDebuff" movable="true" inherits="CCWatchMovableTemplate" parent="UIParent">
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="-210" y="80" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+
+	<Frame name="CCWatchBuff" movable="true" inherits="CCWatchMovableTemplate" parent="UIParent">
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="210" y="80" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+
+
+	<Frame name="CCWatchBarCC1" parent="CCWatchCC" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarCC1_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+	<Frame name="CCWatchBarCC2" parent="CCWatchCC" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-60" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarCC2_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarCC3" parent="CCWatchCC" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-40" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarCC3_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarCC4" parent="CCWatchCC" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-20" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarCC4_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarCC5" parent="CCWatchCC" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarCC5_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="CCWatchBarDebuff1" parent="CCWatchDebuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarDebuff1_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+	<Frame name="CCWatchBarDebuff2" parent="CCWatchDebuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-60" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarDebuff2_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarDebuff3" parent="CCWatchDebuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-40" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarDebuff3_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarDebuff4" parent="CCWatchDebuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-20" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarDebuff4_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarDebuff5" parent="CCWatchDebuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarDebuff5_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="CCWatchBarBuff1" parent="CCWatchBuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarBuff1_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+	<Frame name="CCWatchBarBuff2" parent="CCWatchBuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-60" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarBuff2_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarBuff3" parent="CCWatchBuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-40" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarBuff3_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarBuff4" parent="CCWatchBuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-20" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarBuff4_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="CCWatchBarBuff5" parent="CCWatchBuff" inherits="CCWatchBarTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				CCWatchBarBuff5_OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+
+<!-- original SW hack for initialization due to lack of working GetTalentInfo() in the VARIABLE_LOADED, PLAYER_LOGIN, PLAYER_ENTERING_WORLD events -->
+	<Frame name="CCWatch_Variable_Frame" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				CCWatch_LoadVariablesOnUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

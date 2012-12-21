@@ -1,0 +1,1106 @@
+<Ui>
+	<!-- template for the grey buttons at bottom of window -->
+	<Button name="CliqueButtonTemplate" inherits="UIPanelButtonGrayTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="55" y="28"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				Clique:ButtonOnClick()
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<!-- template, used in list and edit, for the icon + name + rank + mouse binding -->
+	<Button name="CliqueEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="350" y="48"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" font="GameFontNormal" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="110" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="40" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentBinding" font="QuestFontNormalSmall" justifyH="LEFT">
+					<Color r="0.1" g="0.05" b="0"/>
+					<Size>
+						<AbsDimension x="178" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentRank" font="QuestFontNormalSmall" justifyH="RIGHT">
+					<Color r=".1" g="0.05" b="0"/>
+					<Size>
+						<AbsDimension x="68" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-15" y="-8"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<!-- HighlightTextures show over buttons, instead of creating a new frame, a custom texture is used underneath -->
+				<Texture name="$parentHighlight" file="Interface\ChatFrame\ChatFrameBackground" hidden="true">
+					<Gradient orientation="VERTICAL">
+						<MaxColor r=".15" g=".15" b=".15" a=".75"/>
+						<MinColor r=".85" g=".85" b=".85" a=".5"/>
+					</Gradient>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName().."Highlight"):Show()
+			</OnEnter>
+			<OnLeave>
+				if not this.lockedHighlight then
+					getglobal(this:GetName().."Highlight"):Hide()
+				end
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-- CliqueListFrame-specific use of CliqueEntryTemplate -->
+	<Button name="CliqueListTemplate" inherits="CliqueEntryTemplate" virtual="true">	
+		<Scripts>
+			<OnClick>
+				Clique:ListOnClick()
+			</OnClick>
+			<OnDoubleClick>
+				Clique:ListOnDoubleClick()
+			</OnDoubleClick>
+		</Scripts>
+	</Button>
+
+	<CheckButton name="CliqueIconTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Buttons\UI-EmptySlot-Disabled">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentIcon">
+			<Size>
+				<AbsDimension x="36" y="36"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+        <Scripts>
+            <OnClick>
+                Clique:ClickSpellIcon()
+            </OnClick>
+        </Scripts>
+	</CheckButton>
+    
+	<!-- Parent frame. Contains only background and three sub-frames: CliqueHelpFrame, CliqueListFrame and CliqueEditFrame -->
+	<Frame name="CliqueFrame" parent="SpellBookFrame" hidden="true">
+		<Size>
+			<AbsDimension x="425" y="375"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="15" y="-7"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="CliqueBackdropLeft" file="Interface\Stationery\StationeryTest1">
+					<Size>
+						<AbsDimension x="383" y="365"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="CliqueBackdropRight" file="Interface\Stationery\StationeryTest2">
+					<Size>
+						<AbsDimension x="48" y="365"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="CliqueBackdropLeft" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+
+			<!-- CliqueListFrame is the sub-frame that lists the clique spells with delete/new/edit/ok buttons -->
+			<Frame name="CliqueListFrame">
+				<Size>
+					<AbsDimension x="351" y="330"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="CliqueDropDown" inherits="UIDropDownMenuTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-85" y="28"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontHighlightSmall" text="Click Set:">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="5" y="3"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								--Clique:DropDown_OnLoad();
+							</OnLoad>
+							<OnShow>
+								Clique:DropDown_OnShow();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Button name="CliqueList1" inherits="CliqueListTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueList2" inherits="CliqueListTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueList1" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="CliqueList3" inherits="CliqueListTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueList2" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="CliqueList4" inherits="CliqueListTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueList3" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="CliqueList5" inherits="CliqueListTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueList4" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button name="CliqueList6" inherits="CliqueListTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueList5" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<ScrollFrame name="CliqueListScroll" inherits="FauxScrollFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueList1" relativePoint="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT" relativeTo="CliqueList6" relativePoint="BOTTOMRIGHT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="14" y="0"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="23" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MaxColor r="0.15" g="0.15" b="0.15" a="1"/>
+										<MinColor r="0.5" g="0.25" b="0.05" a="0"/>
+									</Gradient>
+								</Texture>
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="4" y="0"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="14" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MinColor r="0.15" g="0.15" b="0.15" a="1"/>
+										<MaxColor r="0.5" g="0.25" b="0.05" a="0"/>
+									</Gradient>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(48, Clique.ListScrollUpdate)
+							</OnVerticalScroll>
+							<OnShow>
+								Clique.ListScrollUpdate()
+							</OnShow>
+						</Scripts>
+					</ScrollFrame>
+					<Button name="CliqueButtonDelete" inherits="CliqueButtonTemplate" text="Delete">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="67" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueButtonMax" inherits="CliqueButtonTemplate" text="Max">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="CliqueButtonDelete" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueButtonNew" inherits="CliqueButtonTemplate" text="New">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueButtonDelete" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueButtonEdit" inherits="CliqueButtonTemplate" text="Edit">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueButtonNew" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueButtonOk" inherits="CliqueButtonTemplate" text="Ok">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueButtonEdit" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueButtonHelp" inherits="CliqueButtonTemplate" text="Help">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueButtonOk" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<!-- CliqueEditFrame is the sub-frame that has the multiline editbox to edit the script -->
+			<Frame name="CliqueEditFrame" hidden="true">
+				<Size>
+					<AbsDimension x="351" y="330"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="CliqueEditHint" inherits="SubSpellFont" text="Use a click combo above to change its click cast.">
+							<Size>
+								<AbsDimension x="351" y="16"/>
+							</Size>
+							<Color r="0" g="0" b="0"/>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+                    <Button name="CliqueEditIcon">
+						<Size>
+							<AbsDimension x="46" y="46"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-110" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+                        <Layers>
+                            <Layer level="ARTWORK">
+                                <Texture name="$parentTexture">
+                                    <Size>
+                                        <AbsDimension x="46" y="46"/>
+                                    </Size>
+                                    <Anchors>
+                                        <Anchor point="CENTER"/>
+                                    </Anchors>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Scripts>
+                            <OnMouseDown>
+                                CliqueTextEditBox:Hide()
+                                CliqueIconSelectFrame:Show()
+                            </OnMouseDown>
+                        </Scripts>
+                        <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+                    </Button>
+                    
+                    <Button name="CliqueEditBinding">
+						<Size>
+							<AbsDimension x="225" y="32"/>
+						</Size>
+                        <Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+                            <BackgroundInsets>
+                                <AbsInset left="4" right="4" top="4" bottom="4" />
+                            </BackgroundInsets>
+                            <EdgeSize>
+                                <AbsValue val="16" />
+                            </EdgeSize>
+                        </Backdrop>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CliqueEditIcon">
+								<Offset>
+									<AbsDimension x="15" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+                        <Layers>
+                            <Layer level="ARTWORK">
+                                <FontString name="$parentName" font="GameFontNormal" justifyH="CENTER" text="Alt+Control+Shift+LeftButton">
+                                    <Size>
+                                        <AbsDimension x="225" y="32"/>
+                                    </Size>
+                                    <Anchors>
+                                        <Anchor point="CENTER">
+                                            <Offset>
+                                                <AbsDimension x="0" y="0"/>
+                                            </Offset>
+                                        </Anchor>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                            <Layer level="BACKGROUND">
+                                <!-- HighlightTextures show over buttons, instead of creating a new frame, a custom texture is used underneath -->
+                                <Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" hidden="true">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                            <Offset>
+                                                <AbsDimension x="7" y="-7"/>
+                                            </Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT">
+                                            <Offset>
+                                                <AbsDimension x="-7" y="7"/>
+                                            </Offset>
+                                        </Anchor>
+                                    </Anchors>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Scripts>
+                            <OnLoad>
+                                this:SetBackdropBorderColor(.5,.5,.5,1)
+                            </OnLoad>
+                            <OnEnter>
+                                getglobal(this:GetName().."Highlight"):Show()
+                            </OnEnter>
+                            <OnLeave>
+                                getglobal(this:GetName().."Highlight"):Hide()
+                            </OnLeave>
+							<OnMouseDown>
+								Clique:EditSelectedBinding()
+							</OnMouseDown>
+                        </Scripts>
+                    </Button>
+
+					<!-- The entry we're editing -->
+                    <!--
+					<Button name="CliqueEditEntry" inherits="CliqueEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+                        <Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+                            <BackgroundInsets>
+                                <AbsInset left="4" right="4" top="4" bottom="4" />
+                            </BackgroundInsets>
+                            <EdgeSize>
+                                <AbsValue val="16" />
+                            </EdgeSize>
+                        </Backdrop>
+						<Scripts>
+							<OnMouseDown>
+								Clique:EditSelectedBinding()
+							</OnMouseDown>
+						</Scripts>
+					</Button>
+                    -->
+
+					<EditBox name="CliqueNameEditBox" letters="150" historyLines="0"  autoFocus="false">
+						<Size>
+							<AbsDimension x="300" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueEditHint" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="55" y="0"/>
+								</Offset>
+							</Anchor>	
+						</Anchors>
+						<Scripts>			
+							<OnEditFocusGained>
+                                if this.readOnly then
+                                    this:ClearFocus()
+                                end
+							</OnEditFocusGained>
+							<OnEscapePressed>
+								Clique:EditCancel()
+							</OnEscapePressed>
+							<OnTabPressed>
+								CliqueEditBox:SetFocus()
+							</OnTabPressed>
+						</Scripts>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="CliqueNameLabel" inherits="GameFontNormal" justifyH="LEFT" text="Name:">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="-50" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>					
+								</FontString>					
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset><AbsDimension x="-5" y="0"/></Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset><AbsDimension x="-10" y="0"/></Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>				
+						<FontString inherits="GameFontHighlight"/>
+						<TextInsets left="2" right="10" top="0" bottom="2"/>		
+					</EditBox>
+
+					<Button name="CliqueButtonSave" inherits="CliqueButtonTemplate" text="Save">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueButtonDelete" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CliqueButtonCancel" inherits="CliqueButtonTemplate" text="Cancel">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CliqueButtonSave" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Frame name="CliqueTextEditBox"> <!-- anonymous frame for layering editbox -->
+						<Size>
+							<AbsDimension x="348" y="205"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CliqueNameLabel">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+
+						<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<BackgroundInsets>
+								<AbsInset left="4" right="4" top="4" bottom="4" />
+							</BackgroundInsets>
+							<TileSize>
+								<AbsValue val="16" />
+							</TileSize>
+							<EdgeSize>
+								<AbsValue val="16" />
+							</EdgeSize>
+						</Backdrop>
+
+						<Frames>
+							<!-- The multi-line editbox -->
+							<ScrollFrame name="CliqueEditScrollFrame" inherits="UIPanelScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="310" y="190"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="8" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+		
+								<!-- Entire purpose of this layer is to do a gradient for the gutter -->
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture file="Interface\ChatFrame\ChatFrameBackground">
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+													<Offset>
+														<AbsDimension x="4" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+													<Offset>
+														<AbsDimension x="23" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<Gradient>
+												<MaxColor r="0.15" g="0.15" b="0.15" a="1"/>
+												<MinColor r="0.15" g="0.15" b="0.15" a="0"/>
+											</Gradient>
+										</Texture>
+									</Layer>
+								</Layers>
+								<!-- Basically copy/pasted from MacroFrame -->
+								<ScrollChild>
+									<EditBox name="CliqueEditBox" multiLine="true" maxLines="9" letters="4096" nonspacewrap="false" spacing="1" autoFocus="true">
+										<Size>
+											<AbsDimension x="310" y="190"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT"/>
+											<Anchor point="BOTTOMRIGHT"/>
+										</Anchors>
+										<Scripts>
+											<OnTextChanged>
+												local scrollBar = getglobal(this:GetParent():GetName().."ScrollBar")
+												this:GetParent():UpdateScrollChildRect();
+												local min;
+												local max;
+												min, max = scrollBar:GetMinMaxValues();
+												if ( max > 0 and (this.max ~= max) ) then
+													this.max = max;
+													scrollBar:SetValue(max);
+												end
+											</OnTextChanged>
+											<OnEscapePressed>
+												Clique:EditCancel()
+											</OnEscapePressed>
+											<OnTabPressed>
+												CliqueNameEditBox:SetFocus()
+											</OnTabPressed>
+                                            <OnMouseDown>
+                                                if arg1 == "RightButton" then
+                                                    Clique:DropMenu()
+                                                end
+                                            </OnMouseDown>
+										</Scripts>
+										<FontString inherits="GameFontHighlight"/>
+									</EditBox>
+								</ScrollChild>
+							</ScrollFrame>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(.5,.5,.5)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+
+			<!-- FocusGrabber is just an overlay to set focus since multiline EditBoxes vary in size -->
+			<Button name="CliqueFocusGrabber">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CliqueTextEditBox" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-8"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="CliqueTextEditBox" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+                    <OnLoad>
+                        this:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+                    </OnLoad>
+					<OnClick>
+                        if arg1 == "LeftButton" then
+                            CliqueEditBox:SetFocus()
+                        elseif arg1 == "RightButton" then
+                            Clique:DropMenu(this)
+                        end
+					</OnClick>
+				</Scripts>
+			</Button>
+            
+            <Frame name="CliqueIconSelectFrame" hidden="true">
+				<Size>
+					<AbsDimension x="351" y="330"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="CliqueEditHint" inherits="SubSpellFont" text="Use a click combo above to change its click cast.">
+							<Size>
+								<AbsDimension x="351" y="16"/>
+							</Size>
+							<Color r="0" g="0" b="0"/>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+                <Frames>
+                                
+                    <ScrollFrame name="CliqueIconScrollFrame" inherits="FauxScrollFrameTemplate">
+                        <Size>
+                            <AbsDimension x="296" y="195"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="CENTER" relativeTo="CliqueIconSelectFrame" relativePoint="CENTER">
+                                <Offset>
+                                    <AbsDimension x="-15" y="-40"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="14" y="0"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="23" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MaxColor r="0.15" g="0.15" b="0.15" a="1"/>
+										<MinColor r="0.5" g="0.25" b="0.05" a="0"/>
+									</Gradient>
+								</Texture>
+								<Texture file="Interface\ChatFrame\ChatFrameBackground">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="4" y="0"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="14" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Gradient>
+										<MinColor r="0.15" g="0.15" b="0.15" a="1"/>
+										<MaxColor r="0.5" g="0.25" b="0.05" a="0"/>
+									</Gradient>
+								</Texture>
+							</Layer>
+						</Layers>
+                        <Scripts>
+                            <OnVerticalScroll>
+                                local MACRO_ICON_ROW_HEIGHT = 36
+                                FauxScrollFrame_OnVerticalScroll(MACRO_ICON_ROW_HEIGHT, function() Clique:UpdateIconFrame() end);
+                            </OnVerticalScroll>
+                        </Scripts>
+                    </ScrollFrame>
+
+                    <CheckButton name="CliqueIcon1" inherits="CliqueIconTemplate" id="1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CliqueIconScrollFrame" relativePoint="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="25" y="-15"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon2" inherits="CliqueIconTemplate" id="2">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon1" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon3" inherits="CliqueIconTemplate" id="3">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon2" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon4" inherits="CliqueIconTemplate" id="4">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon3" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon5" inherits="CliqueIconTemplate" id="5">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon4" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon6" inherits="CliqueIconTemplate" id="6">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CliqueIcon1" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-8"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon7" inherits="CliqueIconTemplate" id="7">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon6" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon8" inherits="CliqueIconTemplate" id="8">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon7" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon9" inherits="CliqueIconTemplate" id="9">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon8" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon10" inherits="CliqueIconTemplate" id="10">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon9" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon11" inherits="CliqueIconTemplate" id="11">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CliqueIcon6" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-8"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon12" inherits="CliqueIconTemplate" id="12">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon11" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon13" inherits="CliqueIconTemplate" id="13">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon12" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon14" inherits="CliqueIconTemplate" id="14">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon13" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon15" inherits="CliqueIconTemplate" id="15">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon14" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon16" inherits="CliqueIconTemplate" id="16">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CliqueIcon11" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-8"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon17" inherits="CliqueIconTemplate" id="17">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon16" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon18" inherits="CliqueIconTemplate" id="18">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon17" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon19" inherits="CliqueIconTemplate" id="19">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon18" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    <CheckButton name="CliqueIcon20" inherits="CliqueIconTemplate" id="20">
+                        <Anchors>
+                            <Anchor point="LEFT" relativeTo="CliqueIcon19" relativePoint="RIGHT">
+                                <Offset>
+                                    <AbsDimension x="10" y="0"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                    </CheckButton>
+                    
+                </Frames>
+                <Scripts>
+                    <OnShow>
+                        Clique:UpdateIconFrame()
+                    </OnShow>
+                </Scripts>
+            </Frame>
+		</Frames>	
+		<Scripts>
+			<OnLoad>
+                CliqueBackdropLeft:SetVertexColor(.7,.7,.7,1)
+                CliqueBackdropRight:SetVertexColor(.7,.7,.7,1)
+                CliqueFrame:SetBackdropBorderColor(.5,.5,.5,1)
+			</OnLoad>
+            <OnHide>
+                Clique:ButtonOnClick(CliqueButtonCancel)
+            </OnHide>
+		</Scripts>
+	</Frame>
+
+	<!-- this is the pullout tab attached to the spellbook (little pixelated mouse with a wizard hat) -->
+	<CheckButton name="CliquePulloutTab" parent="SpellBookFrame" inherits="SpellBookSkillLineTabTemplate" hidden="false">
+		<Scripts>
+			<OnClick>
+				Clique:Toggle()
+			</OnClick>
+			<OnLoad>
+				this:SetNormalTexture("Interface\\AddOns\\Clique\\Images\\CliqueIcon")
+			</OnLoad>
+			<OnEnter>
+				-- do nothing, maybe show tooltip (commented to kill template's OnEnter)
+			</OnEnter>
+		</Scripts>
+	</CheckButton>
+	
+	<Frame name="CliqueTutorial" parent="CliqueFrame">
+		<Size>
+			<AbsDimension x="425" y="100"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CliqueFrame">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="CliqueTutorialText" inherits="GameFontNormal" justifyH="LEFT" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-5"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="5	"/>
+							</Offset>
+						</Anchor>
+					</Anchors>					
+				</FontString>					
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>

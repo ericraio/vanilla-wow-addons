@@ -1,0 +1,193 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="PopoutOptions.lua"/>
+
+	<Frame name="YatlasPopoutOptions" hidden="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="256" y="532"/>
+		</Size>
+		<Frames>
+			<CheckButton name="YatlasButtonEnable" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-70" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText name="$parentText2" inherits="GameFontHighlight" justifyH="LEFT" text="YATLAS_OPTIONS_ENABLEBUTTON">
+					<Size>
+						<AbsDimension x="275" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="24" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						this:RegisterEvent("VARIABLES_LOADED");
+					</OnLoad>
+					<OnEvent>
+						this:SetChecked(YatlasOptions.ShowButton);
+					</OnEvent>
+					<OnClick>
+						if (this:GetChecked()) then
+							YatlasOptions.ShowButton = true;
+						else
+							YatlasOptions.ShowButton = false;
+						end
+						YatlasButton_Update(YatlasFrame)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="YatlasButtonSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="180" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="32" y="-120" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						getglobal(this:GetName().."Text"):SetText(YATLAS_OPTIONS_BUTTONPOS);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						YatlasButtonSlider:SetMinMaxValues(0,360);
+						YatlasButtonSlider:SetValueStep(1);
+					</OnLoad>
+					<OnValueChanged>
+						YatlasButton_SetPosition(YatlasButtonSlider:GetValue())
+						if(this:IsVisible()) then
+							GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+							GameTooltip:SetText(format(YATLAS_OPTIONS_BUTTONPOS_TIP,
+									YatlasButtonSlider:GetValue()));
+						end
+					</OnValueChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(format(YATLAS_OPTIONS_BUTTONPOS_TIP,
+								YatlasButtonSlider:GetValue()));
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Slider name="YatlasAlphaSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="180" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="32" y="-180" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						getglobal(this:GetName().."Text"):SetText(YATLAS_OPTIONS_ALPHA);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						YatlasAlphaSlider:SetMinMaxValues(.1,1);
+						YatlasAlphaSlider:SetValueStep(.05);
+					</OnLoad>
+					<OnValueChanged>
+						YatlasFrame:SetAlpha(YatlasAlphaSlider:GetValue());
+						YatlasOptions.Alpha = YatlasAlphaSlider:GetValue();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider name="YatlasIconSizeSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="180" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="32" y="-240" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						getglobal(this:GetName().."Text"):SetText(YATLAS_OPTIONS_ICONSIZE);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						YatlasIconSizeSlider:SetMinMaxValues(8,36);
+						YatlasIconSizeSlider:SetValueStep(1);
+					</OnLoad>
+					<OnValueChanged>
+						YatlasOptions.Frames.YatlasFrame.IconSize = YatlasIconSizeSlider:GetValue();
+						YAOverlay_Update(YatlasFrame);
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<CheckButton name="YatlasCoordBEnable" inherits="UICheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-300" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText name="$parentText2" inherits="GameFontHighlight" justifyH="LEFT" text="YATLAS_OPTIONS_ENABLECOORD">
+					<Size>
+						<AbsDimension x="275" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="24" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+						this:RegisterEvent("VARIABLES_LOADED");
+					</OnLoad>
+					<OnEvent>
+						this:SetChecked(YatlasOptions.ShowCursorCoords);
+					</OnEvent>
+					<OnClick>
+						if (this:GetChecked()) then
+							YatlasOptions.ShowCursorCoords = true;
+						else
+							YatlasOptions.ShowCursorCoords = false;
+							YatlasPopoutDataCoordText:SetText("");
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				-- FIXME...this isn't right
+				this:SetPoint("TOPLEFT","YatlasPopoutFrameHolder","TOPLEFT",0,-4);
+				this:SetFrameStrata("DIALOG");
+				this:SetParent(YatlasPopoutFrameHolder);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

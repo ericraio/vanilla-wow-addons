@@ -1,0 +1,128 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Button name="DFM_FrameFinder" parent="UIParent" inherits="DiscordLib_DialogueBackdropTemplate" hidden="true" movable="true" frameStrata="HIGH">
+	<Size><AbsDimension x="260" y="305"/></Size>
+	<Anchors>
+		<Anchor point="LEFT" relativeTo="DFM_Options" relativePoint="RIGHT"/>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate">
+			<Scripts>
+				<OnClick>
+					DFM_FrameFinder:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Unlock" inherits="UIPanelButtonTemplate" hidden="false">
+			<Size><AbsDimension x="50" y="22"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_CloseButton" relativePoint="LEFT">
+					<Offset><AbsDimension x="5" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DFM_TEXT.Unlock);
+				</OnLoad>
+				<OnClick>
+					DFM_FINDER_LOCKED = nil;
+					DFM_FrameFinder_LockText:SetText(DFM_TEXT.Unlocked);
+				</OnClick>
+			</Scripts>
+		</Button>
+			<ScrollFrame name="$parent_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size><AbsDimension x="200" y="250"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-40"/></Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<EditBox name="$parent_Text" multiLine="true" letters="10000" autoFocus="false" enableMouse="true">
+						<Size><AbsDimension x="200" y="250"/></Size>
+						<Scripts>
+							<OnTextChanged>
+								local scrollBar = getglobal(this:GetParent():GetName().."ScrollBar")
+								this:GetParent():UpdateScrollChildRect();
+								local min;
+								local max;
+								min, max = scrollBar:GetMinMaxValues();
+								if ( max > 0 and (this.max ~= max) ) then
+									this.max = max;
+									scrollBar:SetValue(max);
+								end
+							</OnTextChanged>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+							<OnFocusLost>
+								DFM_FrameFinder_TextButton:Show();
+							</OnFocusLost>
+							<OnFocusGained>
+								DFM_FrameFinder_TextButton:Hide();
+							</OnFocusGained>
+							<OnHide>
+								DFM_FrameFinder_TextButton:Show();
+							</OnHide>
+						</Scripts>
+						<FontString inherits="GameFontHighlightSmall"/>
+					</EditBox>
+				</ScrollChild>
+			</ScrollFrame>
+			<Button name="$parent_TextButton" frameStrata="DIALOG">
+				<Size><AbsDimension x="200" y="250"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DFM_FrameFinder_ScrollFrame_Text"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						DFM_FrameFinder_ScrollFrame_Text:SetFocus();
+						this:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		<Frame name="$parent_ScrollFrameBackground" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="240" y="262"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_ScrollFrame">
+					<Offset><AbsDimension x="-10" y="7"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0,0,0);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_LockText" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset><AbsDimension x="-41" y="-20"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			this:RegisterForDrag("LeftButton");
+			DFM_FrameFinder_LockText:SetText(DFM_TEXT.Unlocked);
+		</OnLoad>
+		<OnDragStart>
+			this:StartMoving();
+		</OnDragStart>
+		<OnDragStop>
+			this:StopMovingOrSizing();
+		</OnDragStop>
+		<OnUpdate>
+			DFM_FrameFinder_OnUpdate();
+		</OnUpdate>
+	</Scripts>
+</Button>
+
+</Ui>

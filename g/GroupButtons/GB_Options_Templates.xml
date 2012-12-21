@@ -1,0 +1,384 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+<Frame name="GB_OptionsBGTemplate" hidden="false" virtual="true">
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+		<BackgroundInsets>
+			<AbsInset left="11" right="12" top="12" bottom="11"/>
+		</BackgroundInsets>
+		<TileSize>
+			<AbsValue val="32"/>
+		</TileSize>
+		<EdgeSize>
+			<AbsValue val="32"/>
+		</EdgeSize>
+	</Backdrop>
+</Frame>
+
+<Frame name="GB_ButtonBGTemplate" inherits="GB_BGTemplate" virtual="true">
+	<Size><AbsDimension x="160" y="10"/></Size>
+</Frame>
+
+<Button name="GB_ButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+	<Size><AbsDimension x="140" y="26"/></Size>
+</Button>
+
+<CheckButton name="GB_CheckBoxTemplate" inherits="UICheckButtonTemplate" virtual="true">
+	<Size><AbsDimension x="24" y="24"/></Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+						<Offset><AbsDimension x="5" y="1"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			GB_Checkbox_OnClick(this.index, this.func);
+		</OnClick>
+	</Scripts>
+</CheckButton>
+
+<CheckButton name="GB_CheckBoxTemplate2" inherits="UICheckButtonTemplate" virtual="true">
+	<Size><AbsDimension x="24" y="24"/></Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+						<Offset><AbsDimension x="5" y="1"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			GB_Checkbox_OnClick2(this.index, this.func, this.index2);
+		</OnClick>
+	</Scripts>
+</CheckButton>
+
+<Slider name="GB_SliderTemplate" inherits="OptionsSliderTemplate" virtual="true">
+	<Size><AbsDimension x="150" y="20"/></Size>
+	<Frames>
+		<EditBox name="$parent_Display" letters="3" autoFocus="false" inherits="InputBoxTemplate" justifyH="CENTER">
+			<Size><AbsDimension x="37" y="20"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT">
+					<Offset><AbsDimension x="5" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetTextColor(1,1,0);
+				</OnLoad>
+				<OnEnterPressed>
+					GB_Slider_UpdateFromEditBox(this:GetParent().maxlock,  this:GetParent().index, this:GetParent().func);
+				</OnEnterPressed>
+				<OnEscapePressed>
+					this:SetText(this:GetParent():GetValue());
+					this:ClearFocus();
+				</OnEscapePressed>
+			</Scripts>
+		</EditBox>
+	</Frames>
+	<Scripts>
+		<OnUpdate>
+			if (not this.minmaxset) then
+				this.minmaxset = 1;
+				local min, max = this:GetMinMaxValues();
+				getglobal(this:GetName().."Low"):SetText(min);
+				getglobal(this:GetName().."High"):SetText(max);
+			end
+		</OnUpdate>
+		<OnValueChanged>
+			GB_Slider_OnValueChanged(this.index, this.func);
+		</OnValueChanged>
+	</Scripts>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="TOP"/>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</Slider>
+
+<EditBox name="GB_EditBoxTemplate" letters="1000" autoFocus="false" inherits="InputBoxTemplate" virtual="true">
+	<Size><AbsDimension x="360" y="16"/></Size>
+	<Scripts>
+		<OnTextChanged>
+			GB_EditBox_OnTextChanged(this.index, this:GetID());
+		</OnTextChanged>
+	</Scripts>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</EditBox>
+
+<Frame name="GB_ActionOptionTemplate" hidden="false" virtual="true">
+	<Size><AbsDimension x="170" y="50"/></Size>
+	<Frames>
+		<Button name="$parent_Dropbox">
+			<Size><AbsDimension x="35" y="35"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="0" y="-15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<Texture name="$parent_Texture" file="Interface\AddOns\GroupButtons\EmptyButton">
+						<Size><AbsDimension x="35" y="35" /></Size>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+			<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+			<Scripts>
+				<OnLoad>
+					this:RegisterForDrag("LeftButton");
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+				</OnLoad>
+				<OnEnter>
+					GB_Show_Tooltip(GB_BAR, this:GetParent():GetID());
+				</OnEnter>
+				<OnReceiveDrag>
+					GB_Update_Spellbox(this:GetParent():GetID());
+				</OnReceiveDrag>
+				<OnClick>
+					GB_Update_Spellbox(this:GetParent():GetID());
+				</OnClick>
+				<OnDragStart>
+					GB_Update_Spellbox(this:GetParent():GetID());
+				</OnDragStart>
+				<OnLeave>
+					GameTooltip:Hide();
+				</OnLeave>
+			</Scripts>
+		</Button>
+		<Button name="$parent_ActionOptionsButton" inherits="UIPanelButtonTemplate" virtual="true" hidden="false" text="GB_TEXT_OPTIONS">
+			<Size><AbsDimension x="90" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Dropbox" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="15" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GB_Options_ShowPopup(GB_BAR, this:GetParent():GetID());
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="$parent_ClickCast" inherits="GB_BGTemplate">
+			<Size><AbsDimension x="85" y="22"/></Size>
+			<Frames>
+				<Button name="$parent_Button">
+					<Size><AbsDimension x="18" y="24"/></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset><AbsDimension x="-18" y="-1"/></Offset>
+						</Anchor>
+					</Anchors>
+					<HitRectInsets>
+						<AbsInset left="6" right="6" top="7" bottom="7"/>
+					</HitRectInsets>
+					<Scripts>
+						<OnClick>
+							GB_Options_ShowClickCastMenu();
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Up"/>
+					<PushedTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Down"/>
+					<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+					<HighlightTexture alphaMode="ADD" file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Highlight"/>
+				</Button>		
+			</Frames>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parent_Label" inherits="GameFontNormalSmall">
+						<Color r="1.0" g="1.0" b="1.0"/>
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT">
+								<Offset><AbsDimension x="4" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+					<FontString name="$parent_Setting" inherits="GameFontNormalSmall">
+						<Color r="1.0" g="1.0" b="0.0"/>
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset><AbsDimension x="3" y="0"/></Offset>
+							</Anchor>
+							<Anchor point="RIGHT">
+								<Offset><AbsDimension x="-3" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0,0,0);
+					GB_Set_Label(GB_TEXT.ClickCast);
+					GB_Set_Anchor("_ActionOptionsButton", -21, 2);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Number" inherits="GameFontNormalSmall" justifyH="RIGHT">
+				<Size><AbsDimension x="20" y="15"/></Size>
+				<Color r="0.0" g="1.0" b="0.0"/>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_ActionName" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<Size><AbsDimension x="145" y="15"/></Size>
+				<Color r="0.0" g="1.0" b="0.0"/>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="25" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnLoad>
+			local frame = this:GetName();
+			getglobal(frame.."_Number"):SetText(this:GetID()..". ");
+		</OnLoad>
+	</Scripts>
+</Frame>
+
+<Button name="GB_MenuOptionTemplate" virtual="true" enableMouse="true">
+	<Size><AbsDimension x="170" y="15"/></Size>
+	<HighlightTexture name = "$parentHighlight" alphaMode="ADD" file="Interface\QuestFrame\UI-QuestTitleHighlight"/>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString inherits="GameFontNormal" name="$parent_Text">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors><Anchor point="LEFT"/></Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			this:GetParent():Hide();
+			this:GetParent().onclick(this:GetID());
+		</OnClick>
+		<OnEnter>
+			this:GetParent().timer = nil;
+		</OnEnter>
+	</Scripts>
+</Button>
+
+<Frame name="GB_MenuTemplate" inherits="GB_BGTemplate" virtual="true" hidden="true"  frameStrata="high">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Scripts>
+		<OnEnter>
+			this.timer = nil;
+		</OnEnter>
+		<OnLeave>
+			this.timer = 1;
+		</OnLeave>
+		<OnUpdate>
+			GB_MenuTimeout();
+		</OnUpdate>
+	</Scripts>
+</Frame>
+
+<Frame name="GB_MenuControlTemplate" inherits="GB_BGTemplate" virtual="true">
+	<Size><AbsDimension x="199" y="26"/></Size>
+	<Frames>
+		<Button name="$parent_Button">
+			<Size><AbsDimension x="32" y="32"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT">
+					<Offset><AbsDimension x="-29" y="-1"/></Offset>
+				</Anchor>
+			</Anchors>
+			<HitRectInsets>
+				<AbsInset left="6" right="6" top="7" bottom="7"/>
+			</HitRectInsets>
+			<Scripts>
+				<OnClick>
+					GB_Options_ShowMenu(this:GetParent().menu);
+				</OnClick>
+			</Scripts>
+			<NormalTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Up"/>
+			<PushedTexture file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Down"/>
+			<DisabledTexture file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+			<HighlightTexture alphaMode="ADD" file="Interface\MainMenuBar\UI-MainMenu-ScrollDownButton-Highlight"/>
+		</Button>		
+	</Frames>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT">
+						<Offset><AbsDimension x="-5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_Setting" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="0.0"/>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset><AbsDimension x="3" y="0"/></Offset>
+					</Anchor>
+					<Anchor point="RIGHT">
+						<Offset><AbsDimension x="-20" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</Frame>
+
+<Button name="GB_ColorPickerTemplate" inherits="GB_BGTemplate" virtual="true">
+	<Size><AbsDimension x="25" y="25"/></Size>
+	<Layers>
+		<Layer level="ARTWORK">
+			<FontString name="$parent_Label" inherits="GameFontNormal">
+				<Color r="1.0" g="1.0" b="1.0"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT">
+						<Offset><AbsDimension x="5" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			GB_ColorPicker_Show(this.index);
+		</OnClick>
+	</Scripts>
+</Button>
+
+</Ui>

@@ -1,0 +1,126 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="IMBA_Gluth.lua"/>
+
+	<Frame name="IMBA_Gluth" parent="UIParent" enableMouse="true" movable="true" hidden="true" frameStrata="HIGH">
+		<Size>
+			<AbsDimension x="200" y="93"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parent_Title" inherits="IMBA_MainTitleTemplate">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<StatusBar name="$parent_TimerFrenzy" inherits="IMBA_BarTimerTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_Title" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</StatusBar>
+			<StatusBar name="$parent_TimerFear" inherits="IMBA_BarTimerTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_TimerFrenzy" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</StatusBar>			
+			<StatusBar name="$parent_TimerDecimate" inherits="IMBA_BarTimerTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_TimerFear" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</StatusBar>	
+			<Frame name="$parent_Close" enableMouse="true">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Image" file="Interface\AddOns\IMBA\textures\close.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(1, 1, 1, 1);
+						this:SetBackdropColor(0.0,0.0,0.0,0);
+					</OnLoad>
+					<OnMouseDown>
+						IMBA_Gluth:Hide();
+					</OnMouseDown>
+				</Scripts>
+			</Frame>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_Gluth_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				IMBA_Gluth_OnEvent(event);
+			</OnEvent>
+			<OnMouseUp>
+			 if ( this.isMoving ) then
+			  this:StopMovingOrSizing();
+			  this.isMoving = false;
+			 end
+			</OnMouseUp>
+			<OnMouseDown>
+			 if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+			  this:StartMoving();
+			  this.isMoving = true;
+			 end
+			</OnMouseDown>
+			<OnShow>
+			IMBA_Gluth_RegisterEvents();
+			</OnShow>
+			<OnHide>
+			IMBA_Gluth_UnregisterEvents();
+			 if ( this.isMoving ) then
+			  this:StopMovingOrSizing();
+			  this.isMoving = false;
+			 end
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

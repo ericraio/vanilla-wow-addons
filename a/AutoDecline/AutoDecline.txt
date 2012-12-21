@@ -1,0 +1,201 @@
+AutoDecline v1.3.1600
+by Pacer Dawn (pacer.dawn@earthlink.net)
+_______________________________________________________________________________
+
+This modification to the WoW interface allows a player to automatically decline (block) incoming guild invites, party invites, duel invitations, and guild charters.
+
+Type /ad, /autod, or /autodecline to bring up the options window, which will allow you to turn on or off which invites are automatically declined or not.  Place a check mark beside each option to decline, or clear the option to accept those requests.  Options are stored by character.  The default is to block all invites except for party invites.
+
+
+ACTIONS________________________________________________________________________
+
+You can define a series of slash commands to execute when an autodecline is triggered.  There are seperate actions for each of the autodecline types (party/duel/charter/guild).  To define an action for a decline type, use the following command line syntax:
+
+/autodecline {actiontype} {action}
+
+Where "{actiontype}" is one of the following: partyaction, duelaction, guildaction, charteraction, for party, duel, guild, and charter declines respectively.  "{action}" is a slash command to perform when the invite is declined.  This can be any legal slash command, and multiple commands can be defined.
+
+/autodecline {actiontype} remove {#}
+
+Using this command will remove the action in slot {#} from the list of actions for action {actiontype}.
+
+/autodecline {actiontype} list - List all actions
+
+Using this command will list all of the actions defined for action {actiontype}.
+
+There are two variables that can be used in the slash commands:
+
+$player - this will be replaced with the name of the player being declined
+$guild - for charters and guild invites, this will be replaced with the name of the guild
+
+So, for example, the following could be defined for declining charters:
+
+/autodecline charteraction /whisper $player Sign a charter for $guild?  It's considered polite to ask first...
+/autodecline charteraction /rude $player
+/autodecline charteraction /ignore $player
+
+This will send a whisper to the player giving you the charter, your character will then perform an emote to that player, and the player will be put on the ignore list.
+
+
+COMMAND LINE OPTIONS___________________________________________________________
+
+Syntax: /ad [guild {on|off}|party {on|off}|duel {on|off}|charter {on|off}|alert {on|off}|partyplayer {add|remove} {name} |partyplayer list|partyguild {on|off}|partyfriends {on|off}|{partyaction|duelaction|charteraction|guildaction} {action|list|remove #}|addlastinvite|status|about]
+
+guild on
+  Decline all guild invites
+
+guild off
+  Allow all guild invites
+
+guild
+  Toggle guild invites on and off
+
+party on
+  Decline all party invites
+
+party off
+  Allow all party invites
+
+party
+  Toggle party invites on and off
+
+duel on
+  Decline all duel invites
+
+duel off
+  Allow all duel requests
+
+duel
+  Toggle duel invites on and off
+
+charter on
+  Automatically close all guild charters
+
+charter off
+  Display guild charters as normal
+
+charter
+  Toggle charter invites on and off
+
+alert on
+  Whenever an invite is declined, a message will be displayed
+
+alert off
+  Automatic declines are not announced
+
+partyplayer add {name}
+  Add a name(s) to allow party requests from.  Multiple names can be specified, with each name seperated by a comma.
+
+partyplayer remove {name}
+  Remove a name(s) to allow party requests from.  Multiple names can be specified, with each name seperated by a comma.
+
+partyplayer list
+  List the names to allow party requests from.  This is the private AutoDecline list only, and does not include the friends list.
+
+partyguild on
+  Always allow party invites from members of your guild, reguardless of the party decline setting.
+
+partyguild off
+  Turn off always allowing party invites from members of your guild, reguardless of the party decline setting.
+
+partyfriends on
+  Always allow party invites from names in your friends list, reguardless of the party decline setting.
+
+partyfriends off
+  Turn off always allowing party invites from names in your friends list, and allow party invites from friends based on the party decline setting.
+
+partywhisper on
+  Always allow party invites from the last five players to send a /whisper, reguardless of the party decline setting.
+
+partywhisper off
+  Turn off always allowing party invites from the last five players to send a /whisper, reguardless of the party decline setting.
+
+partyaction {action}
+  Add a slash command to the list of actions to perform when a party request is declined
+
+partyaction remove {#}
+  Remove slash command as position # in the list of actions to perform when a party request is declined
+
+partyaction list
+  List the slash commands to perform when a party request is declined
+
+duelaction {action}
+  Add a slash command to the list of actions to perform when a duel request is declined
+
+duelaction remove {#}
+  Remove slash command as position # in the list of actions to perform when a duel request is declined
+
+duelaction list
+  List the slash commands to perform when a duel request is declined
+
+guildaction {action}
+  Add a slash command to the list of actions to perform when a guild request is declined
+
+guildaction remove {#}
+  Remove slash command as position # in the list of actions to perform when a guild request is declined
+
+guildaction list
+  List the slash commands to perform when a guild request is declined
+
+charteraction {action}
+  Add a slash command to the list of actions to perform when a charter request is declined
+
+charteraction remove {#}
+  Remove slash command as position # in the list of actions to perform when a charter request is declined
+
+charteraction list
+  List the slash commands to perform when a charter request is declined
+
+addlastinvite
+  Add the last player to invite you to a group to the allowed list.
+
+status
+  Show the current settings
+
+about
+  Display information about the mod
+
+
+REVISIONS______________________________________________________________________
+
+v1.3.1600 ** 08/14/2005
+
+  -Added more opportunities to get the player name.
+  -Changed command processing to allow turning debug mode on even if player name wasn't found
+  -Now unregisters events if the mod cannot be executed (due to missing player name for example)
+  -Made a change to the options screen to better indicate that checking party/guild/duel/charter meant that those types of requests would be declined
+  -Originally, you were supposed to be able to toggle the base decline settings by not specifying "on" or "off" on the command line.  However, I had a variable named incorrectly so that wasn't working.  That should work now.  Example, "/autodecline party" should toggle declining party invites on and off each time it is executed.
+  -To allow for future enhancement, the command line switches for maintaining the party allowed list were changed in the following way:
+  "/autodecline partyadd" was changed to "/autodecline partyplayer add"
+  "/autodecline partyremove" was changed to "/autodecline partyplayer remove"
+  "/autodecline partylist" was changed to "/autodecline partyplayer list"
+  -The options screen was enhanced to better indicate that the check values for the decline options meant that by checking them, you would be automatically declining that type of request.
+  -All text from the options screen has been moved to the localization.lua file.
+  -A new toggle has been added to allow invites from members of your guild.
+    /autodecline partyguild on - This will always allow party invites from members of your guild
+    /autodecline partyguild off - This will turn off always allowing party invites from members of your guild
+  -A new option has been added to the options screen to use the current settings for all characters.
+  -New commands have been added to maintain a list of slash commands (actions) to perform when something is declined.
+  -Added new command to add the last player to send a party invite to the allowed list.
+  -Lengthened last whisper history to include the last 5 names
+
+v1.2.1600 ** 07/14/05
+  -Updated interface number to 1600 in .toc file.
+  -Added functionality to always allow invites from names in the friends list
+  -Added new checkbox to settings window to turn allowing invites from friends on and off
+  -Added new toggle command line option partyfriends {on|off}
+  -Added functionality to always allow invites from last player to send a whisper
+  -Added new checkbox to settings window to turn allowing invites from last whisper on and off
+  -Added new toggle command line option partywhisper {on|off}
+  -Removed DEFAULTS button from settings screen
+
+v1.1.1300 ** 03/30/05 (not released)
+  -Added functionality to always allow invites from a specified list of names
+  -Added command line commands partyadd, partyremove, and partylist.
+
+v1.0.1300 ** 03/23/05
+  -Updated interface number to 1300 in .toc file.
+  -Changed version numbering to include interface number
+
+v1.0 ** 03/17/2005
+  -Initial Release

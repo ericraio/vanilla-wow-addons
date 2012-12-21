@@ -1,0 +1,861 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="IMBA_Template.lua"/>
+
+	<StatusBar name="IMBA_BarTimerTemplate" virtual="true">
+		<BarTexture name="$parent_Texture" file="Interface\AddOns\\IMBA\textures\BarTextures\Normal" />
+		<Size>
+			<AbsDimension x="180" y="16" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="12" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<FontString name="$parent_TextVal" justifyH="RIGHT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="12" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentBG">
+				<Size>
+					<AbsDimension x="180" y="18"/>
+				</Size>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Background" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="-" right="-1" top="-1" bottom="-1"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="1"/>
+					</EdgeSize>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1);
+						this:SetBackdropBorderColor(0.9, 0.9, 0.9, 0.6);
+						this:SetBackdropColor(0.3, 0.3, 0.3, 0.6);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitBarTimer(this);
+			</OnLoad>
+			<OnUpdate>
+				this:UpdateTimer();
+			</OnUpdate>
+		</Scripts>
+	</StatusBar>
+
+	<StatusBar name="IMBA_UnitHealthTemplate" virtual="true" enableMouse="true">
+		<BarTexture name="$parent_Texture" file="Interface\AddOns\\IMBA\textures\BarTextures\Normal" />
+		<Size>
+			<AbsDimension x="180" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<FontString name="$parent_TextVal" justifyH="RIGHT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentBG">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Background" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="-" right="-1" top="-1" bottom="-1"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="1"/>
+					</EdgeSize>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1);
+						this:SetBackdropBorderColor(0.9, 0.9, 0.9, 0.6);
+						this:SetBackdropColor(0.3, 0.3, 0.3, 0.6);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parent_Button" toplevel="true">
+				<Size>
+					<AbsDimension x="180" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>						
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
+					</OnLoad>
+					<OnClick>
+						this:GetParent():UnitHealthOnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+				
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitUnitHealth(this);
+			</OnLoad>
+			<OnClick>
+				this:UnitHealthOnClick();
+			</OnClick>
+			<OnUpdate>
+				this:UpdateUnitHealth();
+			</OnUpdate>
+		</Scripts>
+	</StatusBar>
+
+	<StatusBar name="IMBA_Counter" virtual="true" enableMouse="true">
+		<BarTexture name="$parent_Texture" file="Interface\AddOns\\IMBA\textures\BarTextures\Normal" />
+		<Size>
+			<AbsDimension x="180" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<FontString name="$parent_TextVal" justifyH="RIGHT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentBG">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Background" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="-" right="-1" top="-1" bottom="-1"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="1"/>
+					</EdgeSize>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1);
+						this:SetBackdropBorderColor(0.9, 0.9, 0.9, 0.6);
+						this:SetBackdropColor(0.3, 0.3, 0.3, 0.6);
+					</OnLoad>
+				</Scripts>
+			</Frame>				
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitCounter(this);
+			</OnLoad>
+			<OnUpdate>
+				this:UpdateCounter();
+			</OnUpdate>
+		</Scripts>
+	</StatusBar>
+
+	<StatusBar name="IMBA_RaidIconHealthTemplate" virtual="true" enableMouse="true">
+		<BarTexture name="$parent_Texture" file="Interface\AddOns\\IMBA\textures\BarTextures\Normal" />
+		<Size>
+			<AbsDimension x="180" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<FontString name="$parent_TextVal" justifyH="RIGHT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentBG">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Background" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="-" right="-1" top="-1" bottom="-1"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="1"/>
+					</EdgeSize>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1);
+						this:SetBackdropBorderColor(0.9, 0.9, 0.9, 0.6);
+						this:SetBackdropColor(0.3, 0.3, 0.3, 0.6);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parent_Button" toplevel="true">
+				<Size>
+					<AbsDimension x="180" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
+					</OnLoad>
+					<OnClick>
+						this:GetParent():RaidIconHealthOnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitRaidIconHealth(this);
+			</OnLoad>
+			<OnUpdate>
+				this:UpdateRaidIconHealth();
+			</OnUpdate>
+		</Scripts>
+	</StatusBar>
+
+	<StatusBar name="IMBA_NameHealthTemplate" virtual="true" enableMouse="true">
+		<BarTexture name="$parent_Texture" file="Interface\AddOns\\IMBA\textures\BarTextures\Normal" />
+		<Size>
+			<AbsDimension x="180" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<FontString name="$parent_TextVal" justifyH="RIGHT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentBG">
+				<Size>
+					<AbsDimension x="180" y="22"/>
+				</Size>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Background" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="-" right="-1" top="-1" bottom="-1"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="1"/>
+					</EdgeSize>
+				</Backdrop>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() - 1);
+						this:SetBackdropBorderColor(0.9, 0.9, 0.9, 0.6);
+						this:SetBackdropColor(0.3, 0.3, 0.3, 0.6);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parent_Button" toplevel="true">
+				<Size>
+					<AbsDimension x="180" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
+					</OnLoad>
+					<OnClick>
+						this:GetParent():NameHealthOnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitNameHealth(this);
+			</OnLoad>
+			<OnUpdate>
+				this:UpdateNameHealth();
+			</OnUpdate>
+		</Scripts>
+	</StatusBar>
+	
+
+	<Frame name="IMBA_MainTitleTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="180" y="14" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="CENTER" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="14" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitTitleTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_TitleTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="180" y="13" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="CENTER" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="13" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitTitleTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_TextTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="180" y="12" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="12" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<FontString name="$parent_TextVal" justifyH="RIGHT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="12" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitTextTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_TextIconTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="180" y="13" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="LEFT" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="13" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<Texture name="$parent_Icon" file="" hidden="true">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitTextIconTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_IconTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_Icon" file="" hidden="true">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitIconTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="IMBA_IconTemplateSmall" virtual="true">
+		<Size>
+			<AbsDimension x="12" y="12" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_Icon" file="" hidden="true">
+					<Size>
+						<AbsDimension x="12" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitIconTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_IconTemplateLarge" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_Icon" file="" hidden="true">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitIconTemplate(this);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_Close" virtual="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_Image" file="Interface\AddOns\ImpGothik\textures\close.blp">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(1, 1, 1, 1);
+				this:SetBackdropColor(0.0,0.0,0.0,0);
+			</OnLoad>
+			<OnMouseDown>
+				this:parent:Hide();
+			</OnMouseDown>
+		</Scripts>
+	</Frame>
+		<!--This Template is from CTRA/-->
+	<Frame name="IMBA_BossModTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="515" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentShowHide" justifyH="CENTER" justifyV="CENTER" hidden="true" font="Fonts\ARIALN.TTF">
+					<Size>
+						<AbsDimension x="12" y="20"/>
+					</Size>
+					<FontHeight>
+						<AbsValue val="20"/>
+					</FontHeight>
+					<Color r="1.0" g="0.82" b="0"/>
+					<Shadow>
+						<Offset>
+							<AbsDimension x="1" y="-1"/>
+						</Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentName" inherits="ChatFontNormal" hidden="false">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDescript" justifyH="LEFT" inherits="GameFontNormalSmall" hidden="false">
+					<Size>
+						<AbsDimension x="480" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="45" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentStatus" inherits="ChatFontNormal" hidden="false">
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentLine" file="Interface\Tooltips\UI-Tooltip-Background" hidden="false">
+					<Size>
+						<AbsDimension x="525" y="1"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentMenu" inherits="UIDropDownMenuTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="128" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnMouseUp>
+				if ( this.header ) then
+					IMBA_ToggleHeader(this.headername);
+					CloseMenus();
+				else
+					ToggleDropDownMenu(1, nil, getglobal(this:GetName() .. "Menu"), "cursor");
+				end
+			</OnMouseUp>
+			<OnEnter>
+				this.mouseIsOver = 1;
+				--GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				--if ( this.header and not this.expanded ) then
+				--	GameTooltip:SetText("Click to expand");
+				--elseif ( this.header ) then
+				--	GameTooltip:SetText("Click to contract");w
+				--elseif ( not this.header ) then
+				--	GameTooltip:SetText("Click to open options");
+				--end
+			</OnEnter>
+			<OnLeave>
+				this.mouseIsOver = nil;
+				--GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_TextFadeTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="280" y="48" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" justifyH="CENTER" font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="24" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitTextFade(this);
+			</OnLoad>
+			<OnUpdate>
+				this:UpdateText();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_MinimapMarker" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="$parent_Icon" inherits="IMBA_IconTemplateSmall"/>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_InitMinimapMarker(this);
+			</OnLoad>
+			<OnEvent>
+				this:MarkerOnEvent(event);
+			</OnEvent>
+			<OnUpdate>
+				this:UpdateMarker();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+
+	<Button name="IMBA_ColorButton" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Color r="1" g="0" b="0" a="1"/>
+		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parent_BG">
+					<Size>
+						<AbsDimension x="22" y="22"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOptionCheckBoxOn");
+				ColorPickerFrame.callFrame=this;
+				ColorPickerFrame.hasOpacity = false;
+				ColorPickerFrame.func=IMBA_ColorButton_Change;						
+				ColorPickerFrame:SetColorRGB(this.color.r, this.color.g, this.color.b);	
+				if this.color.a then
+					ColorPickerFrame.opacity = 1.0 - this.color.a;
+					ColorPickerFrame.opacityFunc=IMBA_ColorButton_Opacity_Change;
+					ColorPickerFrame.hasOpacity = true;
+				end
+				ColorPickerFrame.previousValues = this.color
+				ColorPickerFrame:ClearAllPoints();
+				if this.AttachFrame then
+					ColorPickerFrame:SetPoint("RIGHT",this.AttachFrame,"LEFT",0,0);
+				end
+				
+				ColorPickerFrame.cancelFunc = IMBA_ColorButton_Cancel;		
+				
+				ColorPickerFrame:Show();
+			</OnClick>
+		</Scripts>
+	</Button>
+</Ui>

@@ -1,0 +1,1017 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="CT_ExpenseHistory.lua"/>
+	<GameTooltip name="CT_EHTooltip" inherits="GameTooltipTemplate" parent="WorldFrame">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+	<Button name="CT_EH_LogTabTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+			</OnLoad>
+			<OnEnter>
+				getglobal(this:GetName() .. "Background"):SetVertexColor(0.5, 0.5, 0.5, 0.5);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "Background"):SetVertexColor(0, 0, 0, 0.5);
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Button name="CT_ExpenseHistoryFrameTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="115" y="32"/>
+        </Size>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(2);
+			</OnLoad>
+			<OnClick>
+				CT_EH_Tab_OnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Frame name="CT_ExpenseHistoryLogLineTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="375" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentDate" inherits="ChatFontNormal">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="20" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentChar" inherits="ChatFontNormal">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="80" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentType" inherits="ChatFontNormal">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="205" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentCost" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetAlpha(0.75);
+						this.staticMoney = 0;
+						MoneyFrame_SetType("STATIC");
+						this.info.truncateSmallCoins = 1;
+						MoneyFrame_Update(this:GetName(), 0);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="CT_ExpenseHistoryClassTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\Glues\CharacterCreate\UI-CharacterCreate-Classes" name="$parentTexture">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentPile">
+				<Size>
+					<AbsDimension x="25" y="1"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="42"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentBackground" file="Interface\Tooltips\UI-Tooltip-Background" hidden="false">
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="0.4"/>
+						</Texture>
+						<FontString name="$parentNumber" text="5" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="15"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+				GameTooltip:SetText(this.name);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_ExpenseHistoryFrame" movable="true" frameStrata="DIALOG" toplevel="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="375" y="535"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="300" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="CT_ExpenseHistory">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentRecordingText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-505"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentCloseButton" hidden="false">
+				<Size>
+					<AbsDimension x="42" y="42"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<Frame name="$parentDrag">
+				<Size>
+					<AbsDimension x="150" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StartMoving();
+						elseif ( arg1 == "RightButton" ) then
+							this:GetParent():ClearAllPoints();
+							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+					</OnMouseUp>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Left-click to drag\nRight-click to reset");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			
+			<Frame name="$parentSummary" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+					<FontString name="$parentPlayerDistribution" text="CT_EH_PLAYERDISTRIBUTION" inherits="GameFontNormal">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="25" y="-265"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+						<FontString name="$parentAverageRepair" text="CT_EH_AVERAGEREPAIR" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-40"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAvgExpensesPerDay" text="CT_EH_AVERAGEEXPENSES" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-65"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAvgExpensesFlights" text="CT_EH_FLIGHTCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-80"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAvgExpensesRepairs" text="CT_EH_REPAIRCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-95"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAvgExpensesReagents" text="CT_EH_REAGENTCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-110"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAvgExpensesAmmo" text="CT_EH_AMMOCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-125"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAvgExpensesMail" text="CT_EH_MAILCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-140"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTotalCost" text="CT_EH_TOTALCOST" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-165"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTotalCostFlights" text="CT_EH_FLIGHTCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-180"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTotalCostRepairs" text="CT_EH_REPAIRCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-195"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTotalCostReagents" text="CT_EH_REAGENTCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-210"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTotalCostAmmo" text="CT_EH_AMMOCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-225"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTotalCostMail" text="CT_EH_MAILCOSTS" inherits="ChatFontNormal">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="45" y="-240"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentAverageRepairMoney" inherits="MoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAverageRepair">
+								<Offset>
+									<AbsDimension x="350" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentAvgExpensesPerDayMoney" inherits="MoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAvgExpensesPerDay">
+								<Offset>
+									<AbsDimension x="350" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentTotalCostMoney" inherits="MoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTotalCost">
+								<Offset>
+									<AbsDimension x="350" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentAvgExpensesFlightsMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAvgExpensesFlights">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentAvgExpensesRepairsMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAvgExpensesRepairs">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentAvgExpensesReagentsMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAvgExpensesReagents">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentAvgExpensesAmmoMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAvgExpensesAmmo">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentAvgExpensesMailMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAvgExpensesMail">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentTotalCostFlightsMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTotalCostFlights">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentTotalCostRepairsMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTotalCostRepairs">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentTotalCostReagentsMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTotalCostReagents">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentTotalCostAmmoMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTotalCostAmmo">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentTotalCostMailMoney" inherits="SmallMoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTotalCostMail">
+								<Offset>
+									<AbsDimension x="330" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetAlpha(0.75);
+								this.staticMoney = 0;
+								MoneyFrame_SetType("STATIC");
+								MoneyFrame_Update(this:GetName(), 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentDiagram">
+						<Size>
+							<AbsDimension x="350" y="144"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="25" y="-270"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<Frame name="$parentClass1" inherits="CT_ExpenseHistoryClassTemplate" id="1">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="17" y="-20"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass2" inherits="CT_ExpenseHistoryClassTemplate" id="2">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass1">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass3" inherits="CT_ExpenseHistoryClassTemplate" id="3">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass2">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass4" inherits="CT_ExpenseHistoryClassTemplate" id="4">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass3">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass5" inherits="CT_ExpenseHistoryClassTemplate" id="5">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass4">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass6" inherits="CT_ExpenseHistoryClassTemplate" id="6">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass5">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass7" inherits="CT_ExpenseHistoryClassTemplate" id="7">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass6">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentClass8" inherits="CT_ExpenseHistoryClassTemplate" id="8">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClass7">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+						</Frames>
+					</Frame>
+					<Frame name="CT_ExpenseHistoryFrameDropDown" inherits="UIDropDownMenuTemplate" id="1">
+						<Size>
+							<AbsDimension x="125" y="15"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-475"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								CT_EH_DropDown_OnLoad();
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parentLog" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+					<Anchor point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Frames>
+					<Button name="$parentDate" inherits="CT_EH_LogTabTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="12" y="-35"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Size>
+							<AbsDimension x="60" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_EH_SortLogBy(1);
+								PlaySound("igMainMenuOptionCheckBoxOn");
+							</OnClick>
+						</Scripts>
+						<NormalText inherits="GameFontNormal" text="CT_EH_LOGDATE">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</NormalText>
+					</Button>
+					<Button name="$parentChar" inherits="CT_EH_LogTabTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="72" y="-35"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Size>
+							<AbsDimension x="125" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_EH_SortLogBy(2);
+								PlaySound("igMainMenuOptionCheckBoxOn");
+							</OnClick>
+						</Scripts>
+						<NormalText inherits="GameFontNormal" text="CT_EH_LOGCHAR">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</NormalText>
+					</Button>
+					<Button name="$parentType" inherits="CT_EH_LogTabTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="197" y="-35"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Size>
+							<AbsDimension x="73" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_EH_SortLogBy(3);
+								PlaySound("igMainMenuOptionCheckBoxOn");
+							</OnClick>
+						</Scripts>
+						<NormalText inherits="GameFontNormal" text="CT_EH_LOGTYPE">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</NormalText>
+					</Button>
+					<Button name="$parentCost" inherits="CT_EH_LogTabTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-30" y="-35"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Size>
+							<AbsDimension x="75" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_EH_SortLogBy(4);
+								PlaySound("igMainMenuOptionCheckBoxOn");
+							</OnClick>
+						</Scripts>
+						<NormalText inherits="GameFontNormal" text="CT_EH_LOGCOST">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</NormalText>
+					</Button>
+					<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="320" y="465"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="19" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(20, CT_EH_UpdateLog);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+					<Frame name="$parentLine1" inherits="CT_ExpenseHistoryLogLineTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-55"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine2" inherits="CT_ExpenseHistoryLogLineTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine1"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine3" inherits="CT_ExpenseHistoryLogLineTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine2"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine4" inherits="CT_ExpenseHistoryLogLineTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine3"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine5" inherits="CT_ExpenseHistoryLogLineTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine4"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine6" inherits="CT_ExpenseHistoryLogLineTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine5"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine7" inherits="CT_ExpenseHistoryLogLineTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine6"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine8" inherits="CT_ExpenseHistoryLogLineTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine7"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine9" inherits="CT_ExpenseHistoryLogLineTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine8"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine10" inherits="CT_ExpenseHistoryLogLineTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine9"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine11" inherits="CT_ExpenseHistoryLogLineTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine10"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine12" inherits="CT_ExpenseHistoryLogLineTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine11"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine13" inherits="CT_ExpenseHistoryLogLineTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine12"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine14" inherits="CT_ExpenseHistoryLogLineTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine13"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine15" inherits="CT_ExpenseHistoryLogLineTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine14"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine16" inherits="CT_ExpenseHistoryLogLineTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine15"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine17" inherits="CT_ExpenseHistoryLogLineTemplate" id="17">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine16"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine18" inherits="CT_ExpenseHistoryLogLineTemplate" id="18">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine17"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine19" inherits="CT_ExpenseHistoryLogLineTemplate" id="19">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine18"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine20" inherits="CT_ExpenseHistoryLogLineTemplate" id="20">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine19"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine21" inherits="CT_ExpenseHistoryLogLineTemplate" id="21">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine20"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentLine22" inherits="CT_ExpenseHistoryLogLineTemplate" id="22">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLine21"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Button name="$parentTab1" inherits="CT_ExpenseHistoryFrameTabTemplate" id="1" text="CT_EH_SUMMARY">
+                <Anchors>
+                    <Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="60" y="-8"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+			</Button>
+			<Button name="$parentTab2" inherits="CT_ExpenseHistoryFrameTabTemplate" id="2" text="CT_EH_LOG">
+                <Anchors>
+                   <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-16" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+				this.elapsed = 0;
+				PanelTemplates_SetNumTabs(this, 2);
+				PanelTemplates_SetTab(this, 1);
+			</OnLoad>
+			<OnEvent>
+				CT_EH_OnEvent(event);
+			</OnEvent>
+			<OnShow>
+				CT_EH_OnShow();
+			</OnShow>
+			<OnUpdate>
+				CT_EH_ProcessAnimation(arg1);
+			</OnUpdate>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

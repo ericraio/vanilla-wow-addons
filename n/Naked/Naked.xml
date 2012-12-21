@@ -1,0 +1,142 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Frame name="NakedObj" hidden="true">
+		<Scripts>
+			<OnLoad>
+				BINDING_HEADER_NAKED = "Naked";
+				BINDING_NAME_NAKED = "Naked";
+				BINDING_NAME_DRESSED = "Dressed";
+				BINDING_NAME_TNAKED = "Toggle Naked";
+				NakedObj.Stripped = false;
+				SlashCmdList["NAKED"] = function()
+					NakedObj.Off = true;
+					local e = {};
+					NakedObj.NakedInv = {};
+					for o=0,4 do
+						e[o] = 0;
+						for p=1,GetContainerNumSlots(o) do
+							if (not GetContainerItemInfo(o,p)) then
+								e[o] = e[o]+1;
+							end; 
+						end;
+					end;
+					foreachi(NakedSave_Ord, function(_,i)
+						PickupInventoryItem(i);
+						if (CursorHasItem()) then
+							d = false;
+							for o=0,4 do
+								if (e[o] > 0) then
+									local _,a = string.find(GetInventoryItemLink("player",i),"|h",3);
+									local b = string.find(GetInventoryItemLink("player",i),"|h",a);
+									local name = string.sub(GetInventoryItemLink("player",i),a+2,b-2);
+									NakedObj.NakedInv[name] = 1;
+									if (o==0) then
+										PutItemInBackpack(); 
+									else
+										PutItemInBag(19+o);
+									end;
+									e[o] = e[o] - 1;
+									d = true;
+									break;
+								end;
+							end;
+							--if (not d) then AutoEquipCursorItem(); return; end;
+						end;
+					end);
+				end;
+				SLASH_NAKED1="/Naked";
+				SlashCmdList["DRESSED"] = function()
+					NakedObj.Off = false;
+					for o=0,4 do
+						for p=1,GetContainerNumSlots(o) do
+							if (GetContainerItemLink(o,p)) then
+								local _,a = string.find(GetContainerItemLink(o,p),"|h",3);
+								local b = string.find(GetContainerItemLink(o,p),"|h",a);
+								local name = string.sub(GetContainerItemLink(o,p),a+2,b-2);
+								if (NakedObj.NakedInv[name] == 1) then
+									PickupContainerItem(o,p);
+									AutoEquipCursorItem();
+								end;
+							end;
+						end;
+					end;
+				end;
+				SLASH_DRESSED1="/Dressed";
+				SlashCmdList["NAKEDTOGGLE"] = function()
+					if (NakedObj.Off == true) then
+						SlashCmdList.DRESSED();
+					else
+						SlashCmdList.NAKED();
+					end;
+				end;
+				SLASH_NAKEDTOGGLE1 = "/Nakedtoggle";
+				SlashCmdList["NAKEDORD"] = function(msg)
+					if (msg == ("" or nil)) then
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8C8C8Invalid NakedOrd command. Type \"/NakedOrd Help\" for assistance.|r");
+					elseif (string.lower(msg) == "help") then
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8C8C8NakedOrd Commands:");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFF323296/NakedOrd help|r - Displays this help.");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFF323296/NakedOrd # # # # ...|r - Configures what slots should be removed and in what order. /NakedOrd 4 5 7 would cause /Naked to remove your shirt, chest, and waist in that order. Naked simply stops when your inventory is full, so make sure you put the most imporant items first!");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFF323296/NakedOrd list|r - Lists the number for each slot.");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFF323296/NakedOrd default|r - Loads the default order, which removes all items with durability in order of importance (|cFFC8646416 17 18 5 7 1 3 10 8 6 9|r)");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFF323296/NakedOrd full|r - Same as default, but includes shirt, tabard, and cloak as the lowest priority. No armor is visible at all. (|cFFC8646416 17 18 5 7 1 3 10 8 6 9 19 4 15|r)");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFF323296/NakedOrd extreme|r - Same as full, but includes trinkets, rings, and necklace. For removing all equipment period. (|cFFC8646416 17 18 5 7 1 3 10 8 6 9 19 4 15 11 12 13 14 2|r)|r");
+					elseif (string.lower(msg) == "list") then
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8C8C8|cFFC864641|r - Head");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864642|r - Neck");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864643|r - Shoulder");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864644|r - Shirt");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864645|r - Chest");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864646|r - Waist");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864647|r - Legs");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864648|r - Feet");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC864649|r - Wrist");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646410|r - Hand");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646411|r - Finger 1");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646412|r - Finger 2");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646413|r - Trinket 1");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646414|r - Trinket 2");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646415|r - Back");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646416|r - Main Hand");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646417|r - Off Hand");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646418|r - Ranged Weapon");
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8646419|r - Tabard");
+					elseif (string.lower(msg) == "default") then
+						SlashCmdList["NAKEDORD"]("16 17 18 5 7 1 3 10 8 6 9");
+					elseif (string.lower(msg) == "full") then
+						SlashCmdList["NAKEDORD"]("16 17 18 5 7 1 3 10 8 6 9 19 4 15");
+					elseif (string.lower(msg) == "extreme") then
+						SlashCmdList["NAKEDORD"]("16 17 18 5 7 1 3 10 8 6 9 19 4 15 11 12 13 14 2");
+					elseif ((not string.find(msg,"[^0-9%s]")) and (not (string.find(msg," ") == 1))) then
+						local tempord = {}
+						local g = string.find(msg, ' ');
+						local d = 0;
+						local tempm = msg;
+						while (true) do
+							if (g) then
+								d = string.sub(msg, 1, g-1) + 0;
+								table.insert(tempord, d);
+								msg = string.sub(msg, g+1);
+								g = string.find(msg, ' ');
+							else
+								table.insert(tempord,msg+0);
+								break;
+							end
+						end
+						NakedSave_Ord = tempord;
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8C8C8New Naked order saved: |cFFC86464"..tempm.."|r");
+					else
+						DEFAULT_CHAT_FRAME:AddMessage("|cFFC8C8C8Invalid NakedOrd command. Type \"/Nakedord help\" for assistance.|r");
+					end
+				end
+				SLASH_NAKEDORD1 = "/Nakedord";
+				this:RegisterEvent("VARIABLES_LOADED");
+			</OnLoad>
+			<OnEvent>
+				if (not NakedSave_Ord) then
+					SlashCmdList["NAKEDORD"]("default");
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

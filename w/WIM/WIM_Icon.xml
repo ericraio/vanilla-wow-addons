@@ -1,0 +1,275 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<Frame name="WIM_IconFrame" parent="UIParent" enableMouse="true" hidden="false" frameStrata="LOW"  clampedToScreen="true" movable="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Minimap" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="2" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="$parentButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\WIM\Images\miniDisabled"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						if( not IsShiftKeyDown() ) then
+							if(arg1 == "LeftButton") then
+								WIM_Icon_ToggleDropDown();
+							else
+								WIM_ShowNewMessages();
+							end
+						end
+					</OnClick>
+					<OnEnter>
+						if(WIM_Data.showToolTips == true and (not IsShiftKeyDown())) then
+							WIM_Icon_ToolTip:Show();
+							WIM_Icon_ToolTip:ClearAllPoints();
+							WIM_Icon_ToolTip:SetPoint("BOTTOMRIGHT", this, "TOPLEFT", 5 , -5);
+						else
+							WIM_Icon_ToolTip:Hide();
+						end
+					</OnEnter>
+					<OnLeave>
+						WIM_Icon_ToolTip:Hide();
+					</OnLeave>
+					<OnMouseDown>
+						if( IsShiftKeyDown() and WIM_Data.miniFreeMoving.enabled == true and arg1 == "LeftButton" ) then
+							WIM_Icon_ToolTip:Hide();
+							this:GetParent():StartMoving();
+							this:GetParent().isMoving = true;
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+						this:GetParent().isMoving = false;
+						if(WIM_Data.miniFreeMoving.enabled) then
+							WIM_Data.miniFreeMoving.left = WIM_IconFrame:GetLeft();
+							WIM_Data.miniFreeMoving.top = WIM_IconFrame:GetTop();
+						end
+					</OnMouseUp>
+				</Scripts>
+				<Frames>
+					<Frame name="WIM_Icon_NewMessageFlash" hidden="true"  frameStrata="DIALOG">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="WIM_Icon_DropDown" inherits="UIDropDownMenuTemplate" hidden="true" clampedToScreen="true">
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_Initialize(this, WIM_Icon_DropDown_Init, "MENU");
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				WIM_Icon_UpdatePosition();
+				this:Raise();
+			</OnLoad>
+			<OnEvent>
+				
+			</OnEvent>
+			<OnUpdate>
+				WIM_Icon_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="WIM_Icon_ToolTip" hidden="true" frameStrata="TOOLTIP" clampedToScreen="true">
+		<Size>
+			<AbsDimension x="250" y="88" />
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="5" y="-5" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+			<Color r="0" g="0" b="0" />
+			<BorderColor r="1" g="1" b="1" />
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle" inherits="GameFontNormalLarge" text="WIM">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+				</FontString>
+				<FontString inherits="GameFontNormal" text="WIM_VERSION">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="15" />
+					</FontHeight>
+					<Color r="0.5" g="0.5" b="0.5" />
+				</FontString>
+				<FontString name="$parentLine1" inherits="GameFontNormal" text="Conversations Menu">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+				<FontString inherits="GameFontNormal" text="Left-Click">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentLine1" relativePoint="TOP" />
+						<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+				<FontString name="$parentLine2" inherits="GameFontNormal" text="Show New Messages">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentLine1" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+				<FontString inherits="GameFontNormal" text="Right-Click">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentLine2" relativePoint="TOP" />
+						<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+				<FontString name="$parentLine3" inherits="GameFontNormal" text="WIM Options">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentLine2" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+				<FontString inherits="GameFontNormal" text="/wim">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentLine3" relativePoint="TOP" />
+						<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="20" />
+					</FontHeight>
+					<Color r="1" g="1" b="1" />
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:Raise();
+			</OnLoad>
+			<OnShow>
+				this:SetScale(UIParent:GetScale());
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+
+</Ui>

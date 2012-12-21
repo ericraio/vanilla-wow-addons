@@ -1,0 +1,119 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Button name="StatRingsButtonTemplate" frameStrata="HIGH" virtual="true" movable="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="TOPLEFT"/>
+		</Anchors>
+		<NormalTexture file="Interface\Minimap\Minimap-TrackingBorder"/>
+		<HighlightTexture file="Interface\Minimap\Minimap-TrackingBorder"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="NumberFontNormalSmall" virtual="true">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="4" y="-1"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:GetParent():SetMovable(true);
+			</OnLoad>
+			<!--
+			<OnMouseDown>
+				this:GetParent():StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				this:GetParent():StopMovingOrSizing();
+			</OnMouseUp>
+			-->
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_TOP");
+				GameTooltip:SetText(this:GetParent():GetName(), 1.0, 1.0, 1.0);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>    
+	
+	<Frame name="StatRingsRingTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="256" y="256"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Four textures, one for each quadrant -->
+				<Texture name="$parentTQ1"
+					 file="Interface\Addons\Moog_Hud\Icons\Ring.tga"
+					 hidden="true" />
+				<Texture name="$parentTQ2"
+					 file="Interface\Addons\Moog_Hud\Icons\Ring.tga"
+					 hidden="true"/>
+				<!-- The 'chip' texture is a piece of the ring -->
+				<Texture name="$parentTC"
+					 file="Interface\Addons\Moog_Hud\Icons\Ring.tga"
+					 hidden="true"/>
+				<!-- The 'slice' texture is the 45 degree slice -->
+				<Texture name="$parentTS"
+					 file="Interface\Addons\Moog_Hud\Icons\Slice.tga"
+					 hidden="true"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				StatRingsRingTemplate_OnLoad()
+			</OnLoad>
+			<OnUpdate>
+				StatRings_Update(arg1);
+			</OnUpdate>
+		</Scripts>
+		<!--
+		<Frames>
+			<Button name="$parentMoveAnchor" inherits="StatRingsButtonTemplate" hidden="true" />
+			<Slider name="$parentSizeSlider" inherits="OptionsSliderTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="$parentMoveAnchor" relativePoint="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnValueChanged>
+						local v = this:GetValue();
+						local newValue = 200 * (v/100);
+						this:GetParent().radius = newValue;
+						this:GetParent():SetWidth(newValue);
+						this:GetParent():SetHeight(newValue);
+						this:GetParent().dirty = true;
+						StatRings_SaveValue("sliderValue", this:GetValue());
+						if this:GetParent().SetAngle ~= nil then
+							this:GetParent():SetAngle(this:GetParent().angle);
+						end
+					</OnValueChanged>
+					<OnLoad>
+						this:SetMinMaxValues(1, 150);
+						this:SetValueStep(1);
+						this:RegisterEvent("VARIABLES_LOADED");
+					</OnLoad>
+					<OnEvent>
+						local savedVal = StatRings_LoadValue("sliderValue");
+						if savedVal == nil then
+							this:SetValue(75);
+						else
+							this:SetValue(savedVal);
+						end
+					</OnEvent>
+				</Scripts>
+			</Slider>
+		</Frames>
+		-->
+	</Frame>
+</Ui>

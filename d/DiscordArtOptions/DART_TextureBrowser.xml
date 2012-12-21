@@ -1,0 +1,563 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<CheckButton name="DART_TextureBrowser_TabTemplate" inherits="DiscordLib_PlainBackgroundTemplate" frameStrata="DIALOG" virtual="true">
+	<Size><AbsDimension x="80" y="20"/></Size>
+	<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="DART_TEXTUREBROWSERHEADER">
+				<Color r="1" g="1" b="1"/>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</CheckButton>
+
+	<CheckButton name="DART_TextureBrowser_ButtonTemplate" virtual="true">
+		<Size><AbsDimension x="36" y="36"/></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Size><AbsDimension x="64" y="64"/></Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset><AbsDimension x="0" y="-1"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parentIcon">
+			<Size><AbsDimension x="36" y="36"/></Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset><AbsDimension x="0" y="-1"/></Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+			</OnLoad>
+			<OnClick>
+				DART_TextureBrowser_OnClick(arg1);	
+			</OnClick>
+			<OnEnter>
+				DART_TextureBrowser_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				DART_TextureBrowser_OnLeave();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+
+<EditBox name="DART_TBEditBoxTemplate" inherits="DiscordLib_EditBoxTemplate" virtual="true">
+	<Scripts>
+		<OnEnterPressed>
+			this:ClearFocus();
+			DART_STICKY_TEXTURE[this.index] = this:GetText();
+			DART_TextureBrowser_UpdatePreview();
+		</OnEnterPressed>
+	</Scripts>
+</EditBox>
+
+<Button name="DART_PlusMinusButton" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+	<Size><AbsDimension x="15" y="15"/></Size>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+		</OnLoad>
+		<OnClick>
+			DART_TextureBrowser_AdjustCoord(arg1);
+		</OnClick>
+	</Scripts>
+</Button>
+
+
+	<Button name="DART_TextureBrowser" inherits="DiscordLib_DialogueBackdropTemplate" toplevel="true" parent="DART_Options" movable="true" hidden="true" frameStrata="HIGH">
+		<Size><AbsDimension x="297" y="435"/></Size>
+		<Anchors>
+			<Anchor point="RIGHT" relativePoint="LEFT"/>
+		</Anchors>
+		<Frames>
+			<CheckButton name="DART_TextureBrowser_DefaultTab" inherits="DART_TextureBrowser_TabTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="17" y="-30"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DART_TextureBrowser_DefaultTab_Text:SetText(DART_TEXT.DefaultUI);
+						this:SetBackdropColor(0,0,0);
+						this:SetBackdropBorderColor(.5, 0, 0);
+						this:SetChecked(1);
+					</OnLoad>
+					<OnClick>
+						DART_TEXTURES = DART_DEFAULT_TEXTURES;
+						DART_TextureBrowser_Update();
+						this:SetChecked(1);
+						DART_TextureBrowser_MacroTab:SetChecked();
+						DART_TextureBrowser_CustomTab:SetChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="DART_TextureBrowser_MacroTab" inherits="DART_TextureBrowser_TabTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="DART_TextureBrowser_DefaultTab" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DART_TextureBrowser_MacroTab_Text:SetText(DART_TEXT.MacroIcons);
+						this:SetBackdropColor(0,0,0);
+						this:SetBackdropBorderColor(.5, 0, 0);
+					</OnLoad>
+					<OnClick>
+						DART_TEXTURES = DART_MACRO_TEXTURES;
+						DART_TextureBrowser_Update();
+						this:SetChecked(1);
+						DART_TextureBrowser_DefaultTab:SetChecked();
+						DART_TextureBrowser_CustomTab:SetChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="DART_TextureBrowser_CustomTab" inherits="DART_TextureBrowser_TabTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="DART_TextureBrowser_MacroTab" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DART_TextureBrowser_CustomTab_Text:SetText(DART_TEXT.Custom);
+						this:SetBackdropColor(0,0,0);
+						this:SetBackdropBorderColor(.5, 0, 0);
+					</OnLoad>
+					<OnClick>
+						DART_TEXTURES = {};
+						DL_Copy_Table(DART_Settings.CustomTextures, DART_TEXTURES);
+						DART_TextureBrowser_Update();
+						this:SetChecked(1);
+						DART_TextureBrowser_DefaultTab:SetChecked();
+						DART_TextureBrowser_MacroTab:SetChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate">
+				<Scripts>
+					<OnClick>
+						DART_TextureBrowser:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<ScrollFrame name="$parent_ScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size><AbsDimension x="296" y="195"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="-39" y="-40"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(36, DART_TextureBrowser_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<CheckButton name="$parent_Button1" inherits="DART_TextureBrowser_ButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-53"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button2" inherits="DART_TextureBrowser_ButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button3" inherits="DART_TextureBrowser_ButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button4" inherits="DART_TextureBrowser_ButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button5" inherits="DART_TextureBrowser_ButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button6" inherits="DART_TextureBrowser_ButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Button1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button7" inherits="DART_TextureBrowser_ButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button6" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button8" inherits="DART_TextureBrowser_ButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button9" inherits="DART_TextureBrowser_ButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button10" inherits="DART_TextureBrowser_ButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button9" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button11" inherits="DART_TextureBrowser_ButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Button6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button12" inherits="DART_TextureBrowser_ButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button11" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button13" inherits="DART_TextureBrowser_ButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button12" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button14" inherits="DART_TextureBrowser_ButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button13" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button15" inherits="DART_TextureBrowser_ButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button14" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button16" inherits="DART_TextureBrowser_ButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Button11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button17" inherits="DART_TextureBrowser_ButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button16" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button18" inherits="DART_TextureBrowser_ButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button17" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button19" inherits="DART_TextureBrowser_ButtonTemplate" id="19">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button18" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent_Button20" inherits="DART_TextureBrowser_ButtonTemplate" id="20">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Button19" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+
+			<EditBox name="$parent_File" inherits="DART_TBEditBoxTemplate" id="file">
+				<Size><AbsDimension x="235" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.File);
+						DL_Set_Anchor("_ScrollFrame", 54, -10);
+						this.index = "file";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+	
+			<Frame name="$parent_CoordsLabel" frameStrata="HIGH">
+				<Size><AbsDimension x="10" y="15"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_ScrollFrame" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="54" y="-35"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parent_Header" inherits="GameFontNormalSmall" text="DART_COORDSHEADER">
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="$parent_X1" inherits="DART_TBEditBoxTemplate" id="x1">
+				<Size><AbsDimension x="73" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.CoordX1);
+						DL_Set_Anchor("_CoordsLabel", 0, 0);
+						this.index = "x1";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_X1Minus" inherits="DART_PlusMinusButton" text="-" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X1" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_X1Plus" inherits="DART_PlusMinusButton" text="+" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X1Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_X2" inherits="DART_TBEditBoxTemplate" id="x2">
+				<Size><AbsDimension x="73" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_X1" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.CoordX2);
+						this.index = "x2";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_X2Minus" inherits="DART_PlusMinusButton" text="-" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X2" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_X2Plus" inherits="DART_PlusMinusButton" text="+" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X2Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_Y1" inherits="DART_TBEditBoxTemplate" id="y1">
+				<Size><AbsDimension x="73" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.CoordY1);
+						DL_Set_Anchor("_X1", 40, 0, "LEFT", "RIGHT");
+						this.index = "y1";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_Y1Minus" inherits="DART_PlusMinusButton" text="-" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y1" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Y1Plus" inherits="DART_PlusMinusButton" text="+" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y1Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_Y2" inherits="DART_TBEditBoxTemplate" id="y2">
+				<Size><AbsDimension x="73" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_Y1" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.CoordY2);
+						this.index = "y2";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_Y2Minus" inherits="DART_PlusMinusButton" text="-" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y2" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Y2Plus" inherits="DART_PlusMinusButton" text="+" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y2Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_Height" inherits="DART_TBEditBoxTemplate" id="height">
+				<Size><AbsDimension x="80" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.Height);
+						DL_Set_Anchor("_ScrollFrame", 54, -95);
+						this.index = "height";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<EditBox name="$parent_Width" inherits="DART_TBEditBoxTemplate" id="width">
+				<Size><AbsDimension x="80" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.Width);
+						DL_Set_Anchor("_Height", 10, 0, "LEFT", "RIGHT");
+						this.index = "width";
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+	
+			<Frame name="$parent_Preview" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH">
+				<Size><AbsDimension x="40" y="40"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="40"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parentTexture">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset><AbsDimension x="5" y="-5"/></Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset><AbsDimension x="-5" y="5"/></Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(0, 0, 0);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Button name="$parent_AddTextureButton" inherits="DART_MainMenuButton">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset><AbsDimension x="0" y="15"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(DART_TEXT.AddTexture);
+					</OnLoad>
+					<OnClick>
+						DART_Options_AddTexture();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Header" inherits="GameFontNormalSmall" text="DART_TEXTUREBROWSERHEADER">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-15"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(1, 0, 0);
+				this:SetBackdropColor(0, 0, 0, 1);
+				this:RegisterForDrag("LeftButton", "RightButton");
+			</OnLoad>
+			<OnShow>
+				DART_TextureBrowser_Update();
+			</OnShow>
+			<OnDragStart>
+				this:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+			</OnDragStop>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnMouseWheel>
+				return;
+			</OnMouseWheel>
+		</Scripts>
+	</Button>
+
+</Ui>

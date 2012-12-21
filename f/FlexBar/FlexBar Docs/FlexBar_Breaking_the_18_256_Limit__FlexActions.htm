@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<meta name="GENERATOR" content="PageBreeze Free HTML Editor (http://www.pagebreeze.com)">
+<title>FlexBar_Breaking the 18/256 Limit: FlexActions</title>
+</head>
+<body bgcolor="#ffffff">
+<p align="center"><strong><em><font size="5">Breaking the 
+18/256 Limit - FlexActions</font></em></strong></p>
+<p align="left"><strong>18 macros/256 characters per</strong> are the limits we've 
+grown accustomed to in WoW.&nbsp; Well, with FlexBar those are gone.&nbsp; 
+FlexBar Scripts Editor allows editing scripts/macros as long as 10240 characters 
+each.&nbsp; Further, if you put your code in functions and load them on the 
+event 'ProfileLoaded' then your only limitation is 10240 characters per 
+function.&nbsp; Also, with the new flexmacro/flexscript commands you can have as 
+many macros as there are Button ID's.</p>
+<p align="left"><strong>RunScript and RunMacro</strong>:&nbsp; These two commands 
+allow you to run a script or macro on any flexbar event.&nbsp; BE AWARE - this 
+will NOT allow you to autocast spells.&nbsp; Spells will still only cast when 
+you click a button.&nbsp; This is built into WoW by Blizzard to prevent 
+bots.&nbsp; The only events on which spells will fire (AFAICT) are 
+"LeftButtonClick", "RightButtonClick" and "BindingKeyUp".</p>
+<p align="left">The Script or Macro may be inline code (IE: script='OpenAllBags()' 
+or macro='/dance') or the name of a script of macro saved in the scripts 
+editor.&nbsp; Also, you may put multiline macros inline by putting them in 
+brackets (IE: macro=['/dance' '/fbwait 20' '/bow']).</p>
+<p align="left">Example:&nbsp; A macro that will cast Raptor Strike if you have 
+Aspect of Monkey up and Aspect of Monkey if you don't</p>
+<p align="left">Open the scripts editor and enter:</p>
+<p align="left">/if HasBuff("Aspect of Monkey") </p>
+<p align="left">/fbcast Raptor Strike</p>
+<p align="left">/else</p>
+<p align="left">/fbcast Aspect of Monkey</p>
+<p align="left">/end</p>
+<p align="left">Save this as 'My Raptor' then put the following on a macro button 
+(standard macro button) /flexbar runmacro macro='My Raptor'.</p>
+<p align="left"><strong>FlexMacro and FlexScript:</strong>&nbsp; While using 
+runscript/runmacro with "leftbuttondown" or "rightbuttondown" will simulate 
+macros fairly well, it lacked two important features - a wide array of images 
+for the buttons and the ability to follow a remap the way normal actions 
+do.&nbsp; Enter FlexMacro and FlexScript.&nbsp; Like RunMacro and RunScript they 
+run either inline macro/lua code or code from a saved script.&nbsp; Unlike the 
+other two, they are attached to a button ID (not number) - remapping any button 
+to that ID will get that flexaction's texture and action.</p>
+<p align="left">Example:&nbsp; Instead of using up one of WoW's 18 macros for the 
+above example, I want it on ID 120 as a FlexMacro:</p>
+<p align="left">/flexbar FlexMacro ID=120 Texture='%macro120' Macro='My Raptor' 
+Name='Raptor'</p>
+<p align="left">will create a macro on ID 120 with an Icon (number 120 on the icon 
+selection pane of the WoW macro tool - I'll implement a GUI picker for this 
+later) and an action of the macro we saved as 'My Raptor'</p>
+<p align="left">Another I use is:</p>
+<p align="left">/flexbar FlexScript ID=120 Texture='%backpack' 
+Script='OpenAllBags()' Name='Bags'</p>
+<p align="left">to give me a button to toggle all my bags.</p>
+<p align="left"><strong>Special commands in FlexMacros:</strong></p>
+<p align="left">In multiline macros executed through flexbar 
+(runmacro/flexmacro/&lt;macro&gt; button in the editor) the following special 
+commands are available.&nbsp; NOTE:&nbsp; These are ONLY available through these 
+methods - standard WoW macros CANNOT use them.</p>
+<p align="left">/fbwait delay</p>
+<p align="left">Will wait delay tenths of a second before continuing 
+execution.&nbsp; Note that this releases execution back to the UI so will not 
+freeze your UI.&nbsp; Also note, you will NOT be able to use this to delay 
+spellcasting - just doesn't work that way.</p>
+<p align="left">/if &lt;condition&gt;</p>
+<p align="left">/else</p>
+<p align="left">/end</p>
+<p align="left">Provides a single level (you CANNOT nest) very simple if/then/else 
+construct.&nbsp; The condition is any condition you would use in 
+if='&lt;condition&gt;' in a flexbar command.&nbsp; I implemented this as a 
+simple means of testing my conditionals - it will likely not be greatly 
+enhanced.&nbsp; If you need more than it can offer - go to lua.</p>
+<p align="left">/break</p>
+<p align="left">Terminates macro execution.</p>
+<p align="left"><strong>Special Commands for Any macros:</strong></p>
+<p align="left">The infrastructure of FlexBar allowed me to implement several 
+slash command very easily -- they were a few lines of code and a few minutes so 
+I figured what the heck:</p>
+<p align="left">/fbdoin delay /command</p>
+<p align="left">will execute /command in delay tenths of a second.&nbsp; Note that 
+you CANNOT delay spellcasts with this.</p>
+<p align="left">/fbcast spellname</p>
+<p align="left">This replaces /cast with the added feature that, if you don't 
+specify a rank it uses the highest rank possible.&nbsp; /fbcast also casts pet 
+spells. so /flexbar runmacro macro=['/fbcast Shadow Bolt' '/fbcast Firebolt'] 
+will cause your imp to cast it's fire bolt while you cast your shadowbolt.</p>
+<p align="left">/fbuse itemname</p>
+<p align="left">This will use an item by name in your inventory.</p>
+<p align="left">/echo [#color] message</p>
+<p align="left">This will echo message above your head.&nbsp; The option color is 
+the color you want it in, your choices are #green, #red, #blue, #yellow, 
+#magenta, #cyan, #white.</p>
+<p align="left">/print [#color] message</p>
+<p align="left">This will display message in the chat box.&nbsp; Color is the same 
+as echo.</p>
+<p align="left"><strong>Special considerations for Scripts:</strong></p>
+<p align="left">Several functions are available in the FlexBar environment:</p>
+<p align="left">FB_CastSpellByName(spellname) has the same advantages as 
+/fbcast</p>
+<p align="left">varname=Utility_Class:New() will give you access to 
+:Print(msg,color), :Echo(msg,color) and TableCopy(tablevar) methods.&nbsp; Color 
+can be any of the /echo or /print colors without the # on them or can be a table 
+of RGB values.&nbsp; TableCopy returns a copy of the passed table to do copy by 
+reference.</p>
+<p align="left">FBLastEvent and FBLastSource are global variables that will return 
+the last event raised and the target that raised it.</p>
+<p align="left">FBTimers["timername"] = Timer_Class:New(delay, recurring, message, 
+sound, callback) can be used to set a timer.&nbsp; See WoW_UtilityClass.lua for 
+details.</p>
+<p align="left">Finally - I recommend that for any long scripts you encapsulate 
+the code in a function, load the script on='ProfileLoaded' then just call the 
+function from the runscript/flexscript commands.&nbsp; The reason being that the 
+code has to be compile to byte-code, and this ensures it only goes through that 
+once.</p>
+</body>
+</html>

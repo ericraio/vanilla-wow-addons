@@ -1,0 +1,285 @@
+Quutar:
+
+
+To determine what pet is out:
+
+First check if we are a Warlock (probably on Init).
+
+On press, check:
+
+if (UnitCreatureFamily("pet") == ServitudeLocalization.Pet4) then
+
+You might also want to check if the pet is a Doomguard and use Dispel Magic for that one.
+
+
+In my Localization file (not sure if Decursive works for French and German clients like Servitude did).
+
+
+
+
+if (GetLocale() == "frFR") then
+
+	ServitudeLocalization = 
+
+	{
+
+		Class = "D\195\169moniste";
+
+
+
+		Pet4 = "Felhunter";
+
+		Pet5 = "Doomguard";
+
+
+
+		Magic5 = "Festin magique";
+
+
+
+		Magic10 = "Dissiper Magie";
+
+
+
+		Buff11 = "Parano\195\175a";
+
+		Bufftype = "Magie";
+
+
+
+	}	
+
+elseif (GetLocale() == "deDE") then	
+
+	ServitudeLocalization = 
+
+	{
+
+		Class = "Hexenmeister";
+
+
+
+		Pet4 = "Teufelsjäger";
+
+		Pet5 = "Doomguard";
+
+
+
+		Magic5 = "Magie verschlingen";
+
+
+
+		Magic10 = "Magiebannung";
+
+
+
+		Buff11 = "Paranoia";
+
+		Bufftype = "Magie"; 
+
+		
+	}
+
+else 
+
+	ServitudeLocalization = 
+
+	{
+
+		Class = "Warlock";
+
+
+
+		Pet4 = "Felhunter";
+
+		Pet5 = "Doomguard";
+
+
+
+		Magic5 = "Devour Magic";
+
+
+
+		Magic10 = "Dispel Magic";
+
+
+
+
+
+		Buff11 = "Paranoia";
+
+		Bufftype = "Magic";
+
+
+
+	}
+
+end
+
+
+
+
+What I did was when PetActionBar_Update occured, I built an Array that put the Pet Action slots in with it's name. I then called that action by name from the array and it returned the slot..
+
+ie
+
+
+function Servitude_PetActionBar_Update()
+
+-- Call original function
+
+	Original_PetActionBar_Update();
+
+	local DebugMsg = false;
+
+	Pet_Action_List = {};
+
+-- Find the #&%&on, apply the autocast
+
+	local i;
+
+	for i=1, NUM_PET_ACTION_SLOTS, 1 do
+
+		local name, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(i);
+
+		if name ~= nil then
+
+			if (not PetBarLoaded) then
+
+				PetBarLoaded = true;
+
+			end	
+
+			Pet_Action_List[name] = i;
+
+			ServitudeMessage(DebugMsg, "Pet_Action_List: added "..name.."as index "..i);
+
+		else return
+
+		end	
+
+	end
+
+end	
+
+
+
+
+This allowed you to CastPetActionByName(ServitudeLocalization.Magic5) which would check the cooldown prior to use. Since this is only happening on the press of a #&%&on, you could check the cooldown at the time of the press too:
+
+
+function CastPetActionByName (inputname)
+
+	if IsPlayerMounted() or (not GetPetActionsUsable()) then
+
+--	if (not GetPetActionsUsable()) then
+
+		return;
+
+	end	
+
+	if Pet_Action_List[inputname] ~= nil then
+
+		local startTime, duration, enabled = GetPetActionCooldown(Pet_Action_List[inputname]);
+
+		if startTime == 0 and duration == 0 and enabled ~= 0 then			
+
+			CastPetAction(Pet_Action_List[inputname]);
+
+		end			
+
+	else
+
+		local i;
+
+		Pet_Action_List = {};
+
+		for i=1, NUM_PET_ACTION_SLOTS, 1 do
+
+			local name, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(i);
+
+			if name ~= nil then
+
+				Pet_Action_List[name] = i;
+
+			end			
+
+			if (name == inputname) then
+
+				local startTime, duration, enabled = GetPetActionCooldown(i);
+
+				if startTime == 0 and duration == 0 and enabled ~= 0 then					
+
+					CastPetAction(i);
+
+				end
+
+			end
+
+		end
+
+	end	
+
+end
+
+
+
+
+EDIT: I've trimmed out things like Making pet actions auto-castable. Next patch, you only need to check GetPetActionsUsable - it now returns false if mounted.
+
+[ post edited by Graguk ]
+
+
+if (PetBarLoaded and not PetSpellsInitialized) then
+
+		Build_Pet_Action_List();
+
+		return;
+
+	end
+
+
+
+and
+
+
+function Build_Pet_Action_List()
+
+	local i;
+
+	Pet_Action_List = {};
+
+	for i=1, NUM_PET_ACTION_SLOTS, 1 do
+
+		local name, subtext, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(i);
+
+		if name ~= nil then
+
+			Pet_Action_List[name] = i;
+
+			if not PetSpellsInitialized then
+
+				PetSpellsInitialized = true;
+
+			end
+
+		end		
+
+	end
+
+end
+
+
+
+
+On the UNIT_PET event if it's the player:
+
+
+
+elseif (event == "UNIT_PET" and arg1 == "player") then
+
+		PetBarLoaded = false;
+
+		PetSpellsInitialized = false;
+
+end

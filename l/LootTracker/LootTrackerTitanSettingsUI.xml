@@ -1,0 +1,163 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    
+   
+    <Frame name="LT_TitanSettingsTemplate" virtual="true" inherits="OptionFrameBoxTemplate">
+        <Size x="210" y="185"/>
+        <Frames>
+        
+            <!-- Threshold slider -->
+            <Slider name="LT_ThresholdSlider" inherits="OptionsSliderTemplate">
+                <Size x="190" y="20"/>
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="TopLEFT" relativeTo="LT_TooltipFrame">
+                        <Offset x="10" y="-20"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        local settings = LT_GetSettings();
+                        local text = getglobal("LT_ThresholdSliderText");
+                        local low = getglobal("LT_ThresholdSliderLow");
+                        local high = getglobal("LT_ThresholdSliderHigh");
+                        this:SetMinMaxValues(LT_MinQuality, LT_MaxQuality);
+                        this:SetValueStep(1);
+                        this:SetValue(settings.QualityThreshold);
+                        text:SetText(string.format(LT_LABEL_THRESHOLD, LT_GetColoredQualityName(settings.QualityThreshold)));
+                        low:SetText(LT_GetColoredQualityName(LT_MinQuality));
+                        high:SetText(LT_GetColoredQualityName(LT_MaxQuality));
+                    </OnShow>
+                    <OnValueChanged>
+                        local settings = LT_GetSettings();
+                        if (settings.QualityThreshold ~= this:GetValue()) then
+                            settings.QualityThreshold = this:GetValue();
+                            LT_DebugMessage(1, string.format(LT_SLASHCOMMAND_THRESHOLD_QUERY, settings.QualityThreshold));
+                            LT_FireChange();
+                        end
+                        
+                        local text = getglobal("LT_ThresholdSliderText");
+                        text:SetText(string.format(LT_LABEL_THRESHOLD, LT_GetColoredQualityName(settings.QualityThreshold)));
+                    </OnValueChanged>
+                </Scripts>
+            </Slider>
+        
+            <!-- Tooltip slider -->
+            <Slider name="LT_TooltipSlider" inherits="OptionsSliderTemplate">
+                <Size x="190" y="20"/>
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_ThresholdSlider">
+                        <Offset x="0" y="-20"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        local settings = LT_GetSettings();
+                        local text = getglobal("LT_TooltipSliderText");
+                        local low = getglobal("LT_TooltipSliderLow");
+                        local high = getglobal("LT_TooltipSliderHigh");
+                        this:SetMinMaxValues(LT_MinTooltipMode, LT_MaxTooltipMode);
+                        this:SetValueStep(1);
+                        this:SetValue(settings.TooltipMode);
+                        text:SetText(string.format(LT_LABEL_TOOLTIP_MODE, LT_TOOLTIP_DESCRIPTION[settings.TooltipMode]));
+                        low:SetText(LT_TOOLTIP_DESCRIPTION[LT_MinTooltipMode]);
+                        high:SetText(LT_TOOLTIP_DESCRIPTION[LT_MaxTooltipMode]);
+                    </OnShow>
+                    <OnValueChanged>
+                        local settings = LT_GetSettings();
+                        if (settings.TooltipMode ~= this:GetValue()) then
+                            settings.TooltipMode = this:GetValue();
+                            LT_DebugMessage(1, string.format("Tooltip mode is %d", settings.TooltipMode));
+                            LT_FireChange();
+                        end
+                        
+                        local text = getglobal("LT_TooltipSliderText");
+                        text:SetText(string.format(LT_LABEL_TOOLTIP_MODE, LT_TOOLTIP_DESCRIPTION[settings.TooltipMode]));
+                    </OnValueChanged>
+                </Scripts>
+            </Slider>
+            
+            <!-- Show items -->
+            <CheckButton name="LT_ShowItemsCheckBox" inherits="OptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_TooltipSlider">
+                        <Offset x="0" y="-10"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        local settings = LT_GetSettings();
+                        this:SetChecked(settings.TooltipShowItems);
+                        
+                        local text = getglobal("LT_ShowItemsCheckBoxText");
+                        text:SetText(LT_LABEL_SHOWITEMS);
+                    </OnShow>
+                    <OnClick>
+                        local settings = LT_GetSettings();
+                        settings.TooltipShowItems = this:GetChecked();
+                        LT_DebugMessage(1, string.format("TooltipShowItems mode is %s", tostring(settings.TooltipShowItems)));
+                        LT_FireChange();
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            
+            <!-- Show kills -->
+            <CheckButton name="LT_ShowKillsCheckBox" inherits="OptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_ShowItemsCheckBox">
+                        <Offset x="0" y="4"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        local settings = LT_GetSettings();
+                        this:SetChecked(settings.TooltipShowKills);
+                        
+                        local text = getglobal("LT_ShowKillsCheckBoxText");
+                        text:SetText(LT_LABEL_SHOWKILLS);
+                    </OnShow>
+                    <OnClick>
+                        local settings = LT_GetSettings();
+                        settings.TooltipShowKills = this:GetChecked();
+                        LT_DebugMessage(1, string.format("TooltipShowKills mode is %s", tostring(settings.TooltipShowKills)));
+                        LT_FireChange();
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            
+            <!-- Show players -->
+            <CheckButton name="LT_ShowPlayersCheckBox" inherits="OptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TopLEFT" relativePoint="BottomLEFT" relativeTo="LT_ShowKillsCheckBox">
+                        <Offset x="0" y="4"/>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnShow>
+                        local settings = LT_GetSettings();
+                        this:SetChecked(settings.TooltipShowPlayers);
+                        
+                        local text = getglobal("LT_ShowPlayersCheckBoxText");
+                        text:SetText(LT_LABEL_SHOWPLAYERS);
+                    </OnShow>
+                    <OnClick>
+                        local settings = LT_GetSettings();
+                        settings.TooltipShowPlayers = this:GetChecked();
+                        LT_DebugMessage(1, string.format("TooltipShowPlayers mode is %s", tostring(settings.TooltipShowPlayers)));
+                        LT_FireChange();
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+        
+        </Frames>
+        <Scripts>
+            <OnShow>
+                --LT_AddListener(LT_UpdateUI);
+                --LT_UpdateUI();
+            </OnShow>
+            <OnHide>
+                --LT_RemoveListener(LT_UpdateUI);
+            </OnHide>
+        </Scripts>
+    </Frame>
+</Ui>

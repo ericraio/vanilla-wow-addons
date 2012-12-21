@@ -1,0 +1,17 @@
+if (GetLocale() == "frFR") then
+	-- Class Names
+	PERL_LOCALIZED_DRUID = "Druide";
+	PERL_LOCALIZED_HUNTER = "Chasseur";
+	PERL_LOCALIZED_MAGE = "Mage";
+	PERL_LOCALIZED_PALADIN = "Paladin";
+	PERL_LOCALIZED_PRIEST = "Pr\195\170tre";
+	PERL_LOCALIZED_ROGUE = "Voleur";
+	PERL_LOCALIZED_SHAMAN = "Chaman";
+	PERL_LOCALIZED_WARLOCK = "D\195\169moniste";
+	PERL_LOCALIZED_WARRIOR = "Guerrier";
+
+	-- Creature Types
+	PERL_LOCALIZED_CIVILIAN = "Civil";
+	PERL_LOCALIZED_CREATURE = "Cr\195\169ature";
+	PERL_LOCALIZED_NOTSPECIFIED = "Non indiqu\195\169";
+end

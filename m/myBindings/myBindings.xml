@@ -1,0 +1,1113 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML\UI.xsd">
+
+	<Script file="myBindingsLocals.lua"/>
+	<Script file="myBindingsCategories.lua"/>
+	<Script file="myBindings.lua"/>
+
+	<!-- Button to replace the default key bindings button on the game menu. -->
+	<Button name="myBindingsGameMenuButton" inherits="GameMenuButtonTemplate" text="KEY_BINDINGS"
+			parent="GameMenuFrame">
+		<Anchors>
+			<Anchor point="TOP" relativeTo="GameMenuButtonUIOptions" relativePoint="BOTTOM">
+				<Offset>
+					<AbsDimension x="0" y="-1"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				if ( myAddOnsFrame ) then
+					myGameMenuButtonAddOns:SetPoint("TOP", this:GetName(), "BOTTOM", 0, -1)
+				else
+					GameMenuButtonMacros:SetPoint("TOP", this:GetName(), "BOTTOM", 0, -1)
+				end
+			</OnLoad>
+			<OnClick>
+				PlaySound("igMainMenuOption")
+				ShowUIPanel(myBindingsOptionsFrame)
+			</OnClick>
+		</Scripts>
+	</Button>
+
+
+	<!-- Templates -->
+
+	<Button name="myBindingsCategoryButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="185" y="22"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				myBindings:CategoryOnClick(this:GetText())
+			</OnClick>
+		</Scripts>
+		<NormalTexture name="$parentNormalTexture" file="Interface\AuctionFrame\UI-AuctionFrame-FilterBg">
+			<TexCoords left="0" right="0.53125" top="0" bottom="0.625"/>
+		</NormalTexture>
+		<NormalText name="$parentNormalText" inherits="GameFontHighlightSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="8" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText name="$parentHighlightText" inherits="GameFontNormalSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="8" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+	</Button>
+
+	<Frame name="myBindingsHeaderButtonTemplate" inherits="OptionFrameBoxTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="186" y="22"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(0.4, 0.4, 0.4)
+				this:SetBackdropColor(0.15, 0.15, 0.15)
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<Button name="$parentButton">
+				<Size>
+					<AbsDimension x="186" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						myBindings:HeaderOnClick()
+					</OnClick>
+				</Scripts>
+				<NormalText name="$parentNormalText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="8" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalText>
+				<HighlightText name="$parentHighlightText" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="8" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</HighlightText>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Button name="myBindingsBindButtonTemplate" inherits="UIPanelButtonTemplate2" virtual="true">
+		<Scripts>
+			<OnClick>
+				myBindings:BindingOnClick(arg1)
+			</OnClick>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
+			</OnLoad>
+		</Scripts>
+		<NormalText inherits="GameFontHighlightSmall"/>
+		<DisabledText inherits="GameFontDisable"/>
+		<HighlightText inherits="GameFontHighlightSmall"/>
+	</Button>
+
+	<Frame name="myBindingsBindLineTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="560" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="170" y="24"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="12" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentKey1Button" inherits="myBindingsBindButtonTemplate" id="1">
+				<Size>
+					<AbsDimension x="165" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="204" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentKey2Button" inherits="myBindingsBindButtonTemplate" id="2">
+				<Size>
+					<AbsDimension x="165" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentKey1Button" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Button name="myBindingsSaveOptionTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="190" y="22"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalText name="$parentNormalText" inherits="GameFontHighlight" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="8" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText name="$parentHighlightText" inherits="GameFontNormal" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="8" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+	</Button>
+
+	<!-- Key Bindings Frame -->
+
+	<Frame name="myBindingsOptionsFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG"
+		   movable="true" enableMouse="true" hidden="true" enableKeyboard="true">
+		<Size>
+			<AbsDimension x="796" y="518"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\KeyBindingFrame\UI-KeyBindingFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="258"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\KeyBindingFrame\UI-KeyBindingFrame-Top">
+					<Size>
+						<AbsDimension x="452" y="258"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\KeyBindingFrame\UI-KeyBindingFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="258"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\KeyBindingFrame\UI-KeyBindingFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="260"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\KeyBindingFrame\UI-KeyBindingFrame-Bot">
+					<Size>
+						<AbsDimension x="452" y="260"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\KeyBindingFrame\UI-KeyBindingFrame-BotRight">
+					<Size>
+						<AbsDimension x="128" y="260"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentBindingsLoadedLabel" inherits="GameFontNormal"
+							justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="22" y="-17"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMenuTitle" inherits="GameFontNormal"
+							text="MYBINDINGS_MENU_TITLE">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="22" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentBindingsTitle" inherits="GameFontNormal" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="232" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentKey1Title" inherits="GameFontNormal" text="KEY1">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-270" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentKey2Title" inherits="GameFontNormal" text="KEY2">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-105" y="-34"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentOutputText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="51"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="KEY_BINDINGS">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+					<Size>
+						<AbsDimension x="31" y="292"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="200" y="-51"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+					<Size>
+						<AbsDimension x="31" y="106"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="200" y="69"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentExpandCollapseButton">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMenuTitle" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="6" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+				</NormalTexture>
+				<Scripts>
+					<OnLoad>
+						this:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+					</OnLoad>
+					<OnClick>
+						this.expandAll = not this.expandAll
+
+						if ( this.expandAll ) then
+							this:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+						else
+							this:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+						end
+
+						myBindings:ExpandCollapseHeadings(this.expandAll)
+						myBindings:HeadingsUpdate()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<ScrollFrame name="myBindingsOptionsHeadingsScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="200" y="389"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-57"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(22, ace:call(myBindings, "HeadingsUpdate"))
+					</OnVerticalScroll>
+					<OnMouseWheel>
+						ScrollFrameTemplate_OnMouseWheel(arg1)
+					</OnMouseWheel>
+				</Scripts>
+			</ScrollFrame>
+			<ScrollFrame name="myBindingsOptionsBindingsScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="517" y="392"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="241" y="-54"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(22, ace:call(myBindings, "BindingsUpdate"))
+					</OnVerticalScroll>
+					<OnMouseWheel>
+						if ( this.selected ) then
+							if ( arg1 > 0 ) then
+								myBindings:OnKeyDown("MOUSEWHEELUP")
+							else
+								myBindings:OnKeyDown("MOUSEWHEELDOWN")
+							end
+						else
+							ScrollFrameTemplate_OnMouseWheel(arg1)
+						end
+					</OnMouseWheel>
+				</Scripts>
+			</ScrollFrame>
+
+
+			<!-- Buttons for addon headings scroll frame - Categories -->
+
+			<Button name="myBindingsOptionsBindCategory1" inherits="myBindingsCategoryButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-54"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory2" inherits="myBindingsCategoryButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory3" inherits="myBindingsCategoryButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory4" inherits="myBindingsCategoryButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory5" inherits="myBindingsCategoryButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory6" inherits="myBindingsCategoryButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory7" inherits="myBindingsCategoryButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory8" inherits="myBindingsCategoryButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory9" inherits="myBindingsCategoryButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory10" inherits="myBindingsCategoryButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory11" inherits="myBindingsCategoryButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory12" inherits="myBindingsCategoryButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory13" inherits="myBindingsCategoryButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory14" inherits="myBindingsCategoryButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory15" inherits="myBindingsCategoryButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory16" inherits="myBindingsCategoryButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory17" inherits="myBindingsCategoryButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindCategory18" inherits="myBindingsCategoryButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindCategory17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<!-- Buttons for addon headings scroll frame - Headings -->
+
+			<Button name="myBindingsOptionsBindHeader1" inherits="myBindingsHeaderButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-54"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader2" inherits="myBindingsHeaderButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader3" inherits="myBindingsHeaderButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader4" inherits="myBindingsHeaderButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader5" inherits="myBindingsHeaderButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader6" inherits="myBindingsHeaderButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader7" inherits="myBindingsHeaderButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader8" inherits="myBindingsHeaderButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader9" inherits="myBindingsHeaderButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader10" inherits="myBindingsHeaderButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader11" inherits="myBindingsHeaderButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader12" inherits="myBindingsHeaderButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader13" inherits="myBindingsHeaderButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader14" inherits="myBindingsHeaderButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader15" inherits="myBindingsHeaderButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader16" inherits="myBindingsHeaderButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader17" inherits="myBindingsHeaderButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="myBindingsOptionsBindHeader18" inherits="myBindingsHeaderButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindHeader17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+			<!-- Key bindings frame buttons -->
+
+			<Frame name="myBindingsOptionsBindingLine1" inherits="myBindingsBindLineTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="222" y="-56"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine2" inherits="myBindingsBindLineTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine3" inherits="myBindingsBindLineTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine4" inherits="myBindingsBindLineTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine5" inherits="myBindingsBindLineTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine6" inherits="myBindingsBindLineTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine7" inherits="myBindingsBindLineTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine8" inherits="myBindingsBindLineTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine9" inherits="myBindingsBindLineTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine10" inherits="myBindingsBindLineTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine11" inherits="myBindingsBindLineTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine12" inherits="myBindingsBindLineTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine13" inherits="myBindingsBindLineTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine14" inherits="myBindingsBindLineTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine15" inherits="myBindingsBindLineTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine16" inherits="myBindingsBindLineTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="myBindingsOptionsBindingLine17" inherits="myBindingsBindLineTemplate" id="17">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="myBindingsOptionsBindingLine16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+
+
+			<!-- Bottom buttons -->
+			<Button name="$parentGameDefaultsButton" inherits="UIPanelButtonTemplate"
+					text="MYBINDINGS_GAME_DEFAULTS">
+				<Size>
+					<AbsDimension x="130" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						this:UnlockHighlight()
+					</OnShow>
+					<OnClick>
+						myBindings:LoadGameDefaultBindings()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentConfirmBindButton" inherits="UIPanelButtonTemplate"
+					text="MYBINDINGS_CONFIRM_REPLACE" hidden="true">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-130" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						myBindings:ConfirmKeyBind()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelBindButton" inherits="UIPanelButtonTemplate"
+					text="CANCEL" hidden="true">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-30" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						myBindings:CancelKeyBind()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentUnbindButton" inherits="UIPanelButtonTemplate"
+					text="MYBINDINGS_UNBIND_BUTTON">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-211" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						myBindings:UnbindKey()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentOkayButton" inherits="UIPanelButtonTemplate"
+					text="MYBINDINGS_SAVE_BUTTON">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-111" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						myBindings:SaveBindings()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCancelButton" inherits="UIPanelButtonTemplate"
+					text="CANCEL">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-11" y="21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("gsTitleOptionExit")
+						LoadBindings(GetCurrentBindingSet())
+						myBindings:CloseInterface()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnClick>
+				myBindings:OnKeyDown(arg1)
+			</OnClick>
+			<OnKeyDown>
+				myBindings:OnKeyDown()
+			</OnKeyDown>
+			<OnMouseWheel>
+				return
+			</OnMouseWheel>
+			<OnShow>
+				myBindings:OnShow()
+			</OnShow>
+			<OnHide>
+				myBindingsOptionsFrameOutputText:SetText("")
+				myBindings:OnHide()
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

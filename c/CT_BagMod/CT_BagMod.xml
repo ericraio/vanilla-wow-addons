@@ -1,0 +1,344 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_BagMod.lua"/>
+	<Button name="CT_CCBBTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="37" y="37"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEnter>
+				CT_CCButton_OnEnter();
+			</OnEnter>
+			<OnLoad>
+				CT_CCItemSlotButton_OnLoad();
+				this:RegisterEvent("BAG_UPDATE");
+				this.isBag = 1;
+				this.CID = this:GetID()+1;
+			</OnLoad>
+			<OnClick>
+				if ( IsShiftKeyDown() ) then
+					if ( ChatFrameEditBox:IsVisible() and this:GetID() > 0 ) then
+						ChatFrameEditBox:Insert(GetInventoryItemLink("player", ContainerIDToInventoryID(this:GetID())));
+					else
+						OpenAllBags();
+					end
+				else
+					CT_CCSlotButton_OnClick();
+				end
+			</OnClick>
+			<OnDragStart>
+				CT_CCSlotButton_OnDrag();
+			</OnDragStart>
+			<OnReceiveDrag>
+				CT_CCSlotButton_OnClick();
+			</OnReceiveDrag>
+		</Scripts>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+	</Button>
+	<Frame name="CT_EBFrame" virtual="true">
+		<Size>
+			<AbsDimension x="29" y="32"/>
+		</Size>
+		<Frames>
+			<EditBox name="$parentEditBox" letters="20" historyLines="0">
+				<Size>
+					<AbsDimension x="120" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentEditBoxLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="12" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-11" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentEditBoxMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="105" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentEditBoxLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentEditBoxRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size>
+								<AbsDimension x="12" y="29"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentEditBoxMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<FontString inherits="ChatFontNormal"/>
+				<Scripts>
+					<OnEnterPressed>
+						CT_CCEditBox_OnEnterPressed(this);
+					</OnEnterPressed>
+					<OnEscapePressed>
+						CT_CCEditBox_OnEscapePressed(this);
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCFrame" virtual="true">
+		<Size>
+			<AbsDimension x="120" y="120"/>
+		</Size>
+		<Frames>
+			<Button name="$parentPortraitButton" hidden="false">
+				<Size>
+					<AbsDimension x="40" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="7" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						CT_CCFrame_OnEnter();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						CT_CCFrame_ToggleEditBox();
+					</OnClick>
+					<OnShow>
+						CT_CCFrame_OnShow();
+					</OnShow>
+				</Scripts>
+			</Button>			
+			<Frame name="$parentEBFrame" inherits="CT_EBFrame" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="50" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCFrame0" inherits="CT_CCFrame" id="0" parent="ContainerFrame1" enableMouse="true" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ContainerFrame1" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="CT_CCFrame1" inherits="CT_CCFrame" id="1" parent="ContainerFrame2" enableMouse="true" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ContainerFrame2" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="CT_CCFrame2" inherits="CT_CCFrame" id="2" parent="ContainerFrame3" enableMouse="true" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ContainerFrame3" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="CT_CCFrame3" inherits="CT_CCFrame" id="3" parent="ContainerFrame4" enableMouse="true" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ContainerFrame4" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="CT_CCFrame4" inherits="CT_CCFrame" id="4" parent="ContainerFrame5" enableMouse="true" hidden="false">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="ContainerFrame5" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="CT_CCB0" parent="MainMenuBarArtFrame" enableMouse="true" hidden="false" id="0">
+		<Size>
+			<AbsDimension x="150" y="37"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MainMenuBarBackpackButton" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="$parentButton" inherits="CT_CCBBTemplate" id="0" hidden="false" enableMouse="true"/>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCB1" parent="MainMenuBarArtFrame" enableMouse="true" hidden="false" id="1">
+		<Size>
+			<AbsDimension x="150" y="37"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="CharacterBag0Slot" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="$parentButton" inherits="CT_CCBBTemplate" id="1" hidden="false" enableMouse="true"/>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCB2" parent="MainMenuBarArtFrame" enableMouse="true" hidden="false" id="2">
+		<Size>
+			<AbsDimension x="150" y="37"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="CharacterBag1Slot" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="$parentButton" inherits="CT_CCBBTemplate" id="2" hidden="false" enableMouse="true"/>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCB3" parent="MainMenuBarArtFrame" enableMouse="true" hidden="false" id="3">
+		<Size>
+			<AbsDimension x="150" y="37"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="CharacterBag2Slot" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="$parentButton" inherits="CT_CCBBTemplate" id="3" hidden="false" enableMouse="true"/>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCB4" parent="MainMenuBarArtFrame" enableMouse="true" hidden="false" id="4">
+		<Size>
+			<AbsDimension x="150" y="37"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="CharacterBag3Slot" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Button name="$parentButton" inherits="CT_CCBBTemplate" id="4" hidden="false" enableMouse="true"/>
+		</Frames>
+	</Frame>
+	<Frame name="CT_CCGlobalFrame" hidden="false" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("BANKFRAME_OPENED");
+				this:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
+				OpenAllBags();
+				CloseAllBags();
+			</OnLoad>
+			<OnEvent>
+				CT_CC_UpdateBank();
+			</OnEvent>
+			<OnUpdate>
+				CT_CCGlobalFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_CCBankFrame" hidden="false" parent="BankFrame">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("BANKFRAME_OPENED");
+				this:RegisterEvent("PLAYERBANKSLOTS_CHANGED");
+				OpenAllBags();
+				CloseAllBags();
+			</OnLoad>
+			<OnEvent>
+				CT_CC_UpdateBank(event);
+			</OnEvent>
+			<OnUpdate>
+				CT_CCGlobalFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Gotta love huge hacks -->
+				<FontString inherits="GameFontNormal" hidden="true" name="$parentItemSlots" text="ITEMSLOTTEXT">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="BankFrame">
+							<Offset>
+								<AbsDimension x="-11" y="195"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontNormal" name="$parentAvailableItemSlots">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentItemSlots" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontNormal" hidden="true" name="$parentBagSlots" text="BAGSLOTTEXT">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="BankFrame">
+							<Offset>
+								<AbsDimension x="-11" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontNormal" name="$parentAvailableBagSlots">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentBagSlots" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString inherits="GameFontNormalSmall" name="$parentTotalSlots" text="Total Slots: 0/70">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="BankFrame">
+							<Offset>
+								<AbsDimension x="30" y="105"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>

@@ -1,0 +1,77 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<StatusBar name="SW_BarTemplate" virtual="true" hidden="true">
+		<BarTexture name="$parent_Texture" file="Interface\AddOns\SW_Stats\images\b3" />
+		<Size>
+			<AbsDimension x="128" y="10" />
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" inherits="GameFontNormalSmall" justifyH="LEFT" />
+				<FontString name="$parent_TextVal" inherits="GameFontNormalSmall" justifyH="RIGHT" />
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				SW_InitBarFrameBar(this);
+			</OnLoad>
+		</Scripts>
+	</StatusBar>
+	<Frame name="SW_BarFrame_Title" virtual="true" hidden="false">
+		<Scripts>
+			<OnMouseUp>
+				if ( this:GetParent().isMoving ) then
+					this:GetParent():StopMovingOrSizing();
+					this:GetParent().isMoving = false;
+				end
+				</OnMouseUp>
+			<OnMouseDown>
+				if ( ( ( not this:GetParent().isLocked ) or ( this:GetParent().isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:GetParent():StartMoving();
+					this:GetParent().isMoving = true;
+				end
+				</OnMouseDown>
+			<OnHide>
+				if ( this.isMoving ) then
+					this:GetParent():StopMovingOrSizing();
+					this:GetParent().isMoving = false;
+				end
+				</OnHide>
+			<OnLoad>
+				local scTarget = this:GetName().."_Texture";
+				getglobal(scTarget):SetVertexColor(1,0,0,1);
+				scTarget = this:GetName().."_Text";
+				getglobal(scTarget):SetTextColor(1,1,1,1);
+				table.insert(SW_Registerd_BF_Titles, this:GetName());
+			</OnLoad>
+		</Scripts>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="SW">
+					<Anchors>
+						<Anchor point="LEFT" />
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parent_Texture" file="Interface\AddOns\SW_Stats\images\titleBar">
+					<Color r="1" g="0" b="0" a="1" />
+					<Anchors>
+						<Anchor point="TOPLEFT" />
+						<Anchor point="BOTTOMRIGHT" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames></Frames>
+	</Frame>
+
+</Ui>

@@ -1,0 +1,1 @@
+The newest documentation can be found at http://www.wowace.com/index.php/ParserLib

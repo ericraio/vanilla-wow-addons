@@ -1,0 +1,867 @@
+<!-- TargetOfTarget: Keeps Target of Target shown below TargetFrame      -->
+<!--                                                                     -->
+<!-- Copyright (c) 2005 Itchyban of Veeshan                              -->
+<!--                                                                     -->
+<!-- Version 2.1 Beta 1                                                      -->
+<!--                                                                     -->
+<!-- $Header: /usr/local/cvsroot/WoW/Interface/AddOns/TargetOfTarget/ParamsFrame.xml,v 1.8 2005/05/29 19:54:41 jeff Exp $ -->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+../../FrameXML/UI.xsd">
+
+  <EditBox name="HoTT_Params_FourDigitInputBox_Template"
+	   virtual="true"
+	   autoFocus="false"
+	   parent = "HoTT_Params_Frame"
+	   inherits="HoTT_InputBoxTemplate"
+	   letters="5">
+    <Size>
+      <AbsDimension x="38" y="20"/>
+      <!-- Does not seem to want to scale vertically -->
+      <!-- Looks to be locked at 20 px high -->
+      <!-- 30 wide holds 0000 nicely -->
+      <!-- 34 for -1000 -->
+    </Size>
+  </EditBox>
+  
+  <Frame name="HoTT_Params_Frame" 
+	 toplevel="true" 
+	 frameStrata="DIALOG" 
+	 movable="true" 
+	 enableMouse="true" 
+	 hidden="true" 
+	 parent="UIParent" 
+	 enableKeyboard="true">
+    <Size>
+      <AbsDimension x="525" y="300"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" 
+	      edgeFile="Interface\DialogFrame\UI-DialogBox-Border" 
+	      tile="true">
+      <BackgroundInsets>
+	<AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+	<AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+	<AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+    <Layers>
+      <Layer level="ARTWORK">
+	<Texture name="HoTT_Params_Frame_Title" 
+		 file="Interface\DialogFrame\UI-DialogBox-Header">
+	  <Size>
+	    <AbsDimension x="300" y="64"/>
+	  </Size>
+	  <Anchors>
+	    <Anchor point="TOP">
+	      <Offset>
+		<AbsDimension x="0" y="12"/>
+	      </Offset>
+	    </Anchor>
+	  </Anchors>
+	</Texture>
+	<FontString name="HoTT_Params_Frame_Title_Text" 
+		    inherits="GameFontNormal" 
+		    text="ToT UI Parameters">
+	  <Anchors>
+	    <Anchor point="TOP" 
+		    relativeTo="HoTT_Params_Frame_Title">
+	      <Offset>
+		<AbsDimension x="0" y="-14"/>
+	      </Offset>
+	    </Anchor>
+	  </Anchors>
+	</FontString>
+      </Layer>
+
+      <Layer level="ARTWORK">
+	<FontString name="HoTT_Params_Frame_PositioningText" 
+		    inherits="GameFontHighlight" 
+		    text="Positioning">
+	  <Anchors>
+	    <Anchor point="LEFT"
+		    relativeTo="HoTT_Params_Frame"
+		    relativePoint="TOPLEFT">
+	      <Offset>
+		<AbsDimension x="32" y="-32"/>
+	      </Offset>
+	    </Anchor>
+	  </Anchors>
+	</FontString>
+      </Layer>
+    </Layers>
+
+    <Frames>
+      <EditBox name="HoTT_Params_Frame_ObjectName_EditBox"
+	       autoFocus="false"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_InputBoxTemplate">
+	<Size>
+	  <AbsDimension x="200" y="20"/>
+	  <!-- Looks to be locked at 20 px high -->
+	  <!-- 240 wide is plenty for "MiniGroup_TargetFrame_HealthBar" -->
+	</Size>
+	
+	<Anchors>
+	  <Anchor point="TOP" 
+		  relativeTo="HoTT_Params_Frame"
+		  relativePoint="TOP">
+	    <Offset>
+	      <AbsDimension x="0" y="-46"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_ObjectText"
+			inherits="GameFontNormalSmall"
+			text="Relative To Object">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_PositioningText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+	
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_ObjectName_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEscapePressed>
+	    HoTT_Params_Frame_LoadValues();
+	  </OnEscapePressed>
+	  
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_ObjectName_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_AggroMessage_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_DisplayLeft_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+      <EditBox name="HoTT_Params_Frame_DisplayLeft_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_ObjectName_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="20" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_DisplayInsetsText"
+			inherits="GameFontNormalSmall"
+			text="Display Insets">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_ObjectText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_DisplayLeft_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_DisplayLeft_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_ObjectName_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_DisplayRight_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+      
+      <EditBox name="HoTT_Params_Frame_DisplayRight_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="RIGHT" 
+		  relativeTo="HoTT_Params_Frame_ObjectName_EditBox"
+		  relativePoint="RIGHT">
+	    <Offset>
+	      <AbsDimension x="-20" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_DisplayRight_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_DisplayRight_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_DisplayLeft_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_TextLeft_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+      
+      <EditBox name="HoTT_Params_Frame_TextLeft_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_DisplayLeft_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="20" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_TextInsetsText"
+			inherits="GameFontNormalSmall"
+			text="Text Insets">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_DisplayInsetsText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_TextLeft_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_TextLeft_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_DisplayRight_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_TextRight_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+      
+      <EditBox name="HoTT_Params_Frame_TextRight_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="RIGHT" 
+		  relativeTo="HoTT_Params_Frame_DisplayRight_EditBox"
+		  relativePoint="RIGHT">
+	    <Offset>
+	      <AbsDimension x="-20" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_TextRight_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_TextRight_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_TextLeft_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_Scale_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+      <Frame name="HoTT_Params_Frame_ShowAlignmentFrame"
+	     hidden="false">
+	<Size>
+	  <AbsDimension x="30" y="20"/>
+	</Size>
+	<Anchors>
+	  <Anchor point="LEFT"
+		  relativeTo="HoTT_Params_Frame_TextLeft_EditBox"
+		  relativePoint="RIGHT">
+	    <Offset>
+	      <AbsDimension x="0" y="0"/>
+	    </Offset>
+	  </Anchor>
+	  
+	  <Anchor point="RIGHT"
+		  relativeTo="HoTT_Params_Frame_TextRight_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="0" y="0"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+      </Frame>
+
+      <CheckButton name="HoTT_Params_Frame_ButtonLeft" 
+		   inherits="UICheckButtonTemplate" 
+		   id="1">
+	<Size>
+	  <AbsDimension x="24" y="24"/>
+	</Size>
+	
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_TextLeft_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="-8" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_AlignmentText"
+			inherits="GameFontNormalSmall"
+			text="Align Text">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_TextInsetsText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnClick>
+	    PlaySound("igMainMenuOptionCheckBoxOn");
+	    HoTT_Params_Frame_ButtonCenter:SetChecked(false);
+	    HoTT_Params_Frame_ButtonRight:SetChecked(false);
+	    HoTT_Params_Frame_Alignment_Changed("LEFT");
+	    HoTT_Params_Frame_ClearFocus();
+	    HoTT_Params_Frame_CheckRefocus();
+	  </OnClick>
+	</Scripts>
+      </CheckButton>
+      
+      
+      <CheckButton name="HoTT_Params_Frame_ButtonCenter" 
+		   inherits="UICheckButtonTemplate" 
+		   id="2">
+	<Size>
+	  <AbsDimension x="24" y="24"/>
+	</Size>
+	
+	<Anchors>
+	  <Anchor point="CENTER" 
+		  relativeTo="HoTT_Params_Frame_ShowAlignmentFrame"
+		  relativePoint="CENTER">
+	    <Offset>
+	      <AbsDimension x="0" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Scripts>
+	  <OnClick>
+	    PlaySound("igMainMenuOptionCheckBoxOn");
+	    HoTT_Params_Frame_ButtonLeft:SetChecked(false);
+	    HoTT_Params_Frame_ButtonRight:SetChecked(false);
+	    HoTT_Params_Frame_Alignment_Changed("CENTER");
+	    HoTT_Params_Frame_ClearFocus();
+	    HoTT_Params_Frame_CheckRefocus();
+	  </OnClick>
+	</Scripts>
+      </CheckButton>
+      
+      
+      <CheckButton name="HoTT_Params_Frame_ButtonRight" 
+		   inherits="UICheckButtonTemplate" 
+		   id="3">
+	<Size>
+	  <AbsDimension x="24" y="24"/>
+	</Size>
+	
+	<Anchors>
+	  <Anchor point="RIGHT" 
+		  relativeTo="HoTT_Params_Frame_TextRight_EditBox"
+		  relativePoint="RIGHT">
+	    <Offset>
+	      <AbsDimension x="9" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Scripts>
+	  <OnClick>
+	    PlaySound("igMainMenuOptionCheckBoxOn");
+	    HoTT_Params_Frame_ButtonLeft:SetChecked(false);
+	    HoTT_Params_Frame_ButtonCenter:SetChecked(false);
+	    HoTT_Params_Frame_Alignment_Changed("RIGHT");
+	    HoTT_Params_Frame_ClearFocus();
+	    HoTT_Params_Frame_CheckRefocus();
+	  </OnClick>
+	</Scripts>
+      </CheckButton>
+      
+      <EditBox name="HoTT_Params_Frame_Scale_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_ObjectName_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="0" y="-96"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_ScaleText"
+			inherits="GameFontNormalSmall"
+			text="Scale Display By">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_AlignmentText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_Scale_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_Scale_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_TextRight_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_Drop0_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+      
+      <EditBox name="HoTT_Params_Frame_Drop0_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_ObjectName_EditBox"
+		  relativePoint="RIGHT">
+	    <Offset>
+	      <AbsDimension x="24" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_DropsText"
+			inherits="GameFontNormalSmall"
+			text="Drop By">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_Drop0_EditBox"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="-5" y="24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_BuffsText"
+			inherits="GameFontNormalSmall"
+			text="Showing">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_Drop0_EditBox"
+			relativePoint="RIGHT">
+		  <Offset>
+		    <AbsDimension x="16" y="24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_BuffsText0"
+			inherits="GameFontNormalSmall"
+			text="No Rows">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_Drop0_EditBox"
+			relativePoint="RIGHT">
+		  <Offset>
+		    <AbsDimension x="16" y="0"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_Drop0_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_Drop0_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_Scale_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_Drop1_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+      <EditBox name="HoTT_Params_Frame_Drop1_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_Drop0_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="0" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_BuffsText1"
+			inherits="GameFontNormalSmall"
+			text="One Row">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_Drop1_EditBox"
+			relativePoint="RIGHT">
+		  <Offset>
+		    <AbsDimension x="16" y="0"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_Drop1_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_Drop1_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_Drop0_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_Drop2_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+      <EditBox name="HoTT_Params_Frame_Drop2_EditBox"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_Params_FourDigitInputBox_Template">
+	<Anchors>
+	  <Anchor point="LEFT" 
+		  relativeTo="HoTT_Params_Frame_Drop1_EditBox"
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="0" y="-24"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_BuffsText2"
+			inherits="GameFontNormalSmall"
+			text="Two Rows">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_Drop2_EditBox"
+			relativePoint="RIGHT">
+		  <Offset>
+		    <AbsDimension x="16" y="0"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+
+	<Scripts>
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_Drop2_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_Drop2_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_Drop1_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_AggroMessage_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+
+      <EditBox name="HoTT_Params_Frame_AggroMessage_EditBox"
+	       autoFocus="false"
+	       parent = "HoTT_Params_Frame"
+	       inherits="HoTT_InputBoxTemplate">
+	<Size>
+	  <AbsDimension x="200" y="20"/>
+	</Size>
+	
+	<Anchors>
+	  <Anchor point="TOPLEFT" 
+		  relativeTo="HoTT_Params_Frame_ObjectName_EditBox">
+	    <Offset>
+	      <AbsDimension x="0" y="-156"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+
+	<Layers>
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_AlertsText" 
+			inherits="GameFontHighlight" 
+			text="Alerts">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_PositioningText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-156"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+
+	  <Layer level="ARTWORK">
+	    <FontString name="HoTT_Params_Frame_AggroText" 
+			inherits="GameFontNormalSmall" 
+			text="Aggro Gained Message">
+	      <Anchors>
+		<Anchor point="LEFT"
+			relativeTo="HoTT_Params_Frame_AlertsText"
+			relativePoint="LEFT">
+		  <Offset>
+		    <AbsDimension x="0" y="-24"/>
+		  </Offset>
+		</Anchor>
+	      </Anchors>
+	    </FontString>
+	  </Layer>
+	</Layers>
+	
+	<Scripts>
+	  <OnShow>
+	    this:ClearFocus();
+	  </OnShow>
+	  
+	  <OnEnterPressed>
+	    HoTT_Params_Frame_AggroMessage_Changed(this:GetText());
+	  </OnEnterPressed>
+
+	  <OnEscapePressed>
+	    HoTT_Params_Frame_LoadValues();
+	  </OnEscapePressed>
+	  
+	  <OnEditFocusLost>
+	    this:HighlightText(0,0);
+	    HoTT_Params_Frame_AggroMessage_Changed(this:GetText());
+	  </OnEditFocusLost>
+
+	  <OnTabPressed>
+	    if ( IsShiftKeyDown () ) then
+	       HoTT_Params_Frame_Drop2_EditBox:SetFocus();
+	    else
+	       HoTT_Params_Frame_ObjectName_EditBox:SetFocus();
+	    end
+	  </OnTabPressed>
+	</Scripts>
+      </EditBox>
+
+      <Button name="HoTT_Params_FrameDefaults" 
+	      inherits="GameMenuButtonTemplate" 
+	      text="DEFAULTS">
+	<Size>
+	  <AbsDimension x="100" y="21"/>
+	</Size>
+	<Anchors>
+	  <Anchor point="BOTTOMLEFT">
+	    <Offset>
+	      <AbsDimension x="28" y="16"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+	<Scripts>
+	  <OnClick>
+	    PlaySound("igMainMenuOptionCheckBoxOn");
+	    HoTT_Params_Frame_OnDefaults();
+	  </OnClick>
+	</Scripts>
+      </Button>
+      
+      <Button name="HoTT_Params_FrameCancel" 
+	      inherits="GameMenuButtonTemplate" 
+	      text="CANCEL">
+	<Size>
+	  <AbsDimension x="100" y="21"/>
+	</Size>
+	<Anchors>
+	  <Anchor point="BOTTOMRIGHT">
+	    <Offset>
+	      <AbsDimension x="-16" y="16"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+	<Scripts>
+	  <OnClick>
+	    HoTT_Params_Frame_OnCancel();
+	  </OnClick>
+	</Scripts>
+      </Button>
+      
+      <Button name="HoTT_Params_FrameOkay" 
+	      inherits="GameMenuButtonTemplate" 
+	      text="OKAY">
+	<Size>
+	  <AbsDimension x="100" y="21"/>
+	</Size>
+	<Anchors>
+	  <Anchor point="RIGHT" 
+		  relativeTo="HoTT_Params_FrameCancel" 
+		  relativePoint="LEFT">
+	    <Offset>
+	      <AbsDimension x="0" y="0"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+	<Scripts>
+	  <OnClick>
+	    HoTT_Params_Frame_OnOkay();
+	  </OnClick>
+	</Scripts>
+      </Button>
+
+
+    </Frames>
+    
+    <Scripts>
+      <OnShow>
+	HoTT_Params_Frame_LoadValues();
+      </OnShow>
+
+      <OnKeyDown>
+	if ( arg1 == "ESCAPE" ) then
+	   PlaySound("gsTitleOptionExit");
+	   HideUIPanel(HoTT_Params_Frame);
+	   -- HoTT_Params_Frame_Cancel();
+	elseif ( arg1 == "PRINTSCREEN" ) then
+	   Screenshot();
+	   return;
+	end
+      </OnKeyDown>
+    </Scripts>
+  </Frame>
+
+
+</Ui>
+
+
+

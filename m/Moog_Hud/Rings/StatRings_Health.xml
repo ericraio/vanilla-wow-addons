@@ -1,0 +1,70 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Frame name="StatRingsHealth" parent="UIParent" inherits="StatRingsRingTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Moog_HudLeft" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="-15" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				StatRings_RegisterRing(this, "Health");
+      			StatRingsRingTemplate_OnLoad();
+      			this.isInCombat = false;      			
+				this:SetAlpha(0.1);
+				
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+				this:RegisterEvent("UNIT_HEALTH");
+				this:RegisterEvent("UNIT_MAXHEALTH");
+				this:RegisterEvent("PLAYER_ENTER_COMBAT");
+				this:RegisterEvent("PLAYER_LEAVE_COMBAT");
+				this:RegisterEvent("PLAYER_REGEN_ENABLED");
+				this:RegisterEvent("PLAYER_REGEN_DISABLED");
+				this:RegisterEvent("PLAYER_LEVEL_UP");
+    			
+				this:UpdateColor({["r"] = 0.1, ["g"] = 0.9, ["b"] = 0.0});
+				this:SetMax(UnitHealthMax("player"));
+				this:SetValue(UnitHealth("player"));
+
+				function this:UpdateAlpha()
+					--if not getglobal(this:GetName().."MoveAnchor"):IsVisible() then
+						if this.isInCombat then
+							StatRingsTest_SetAlpha(self, 0.5);
+						elseif this.startValue &lt; this.maxValue  then
+							StatRingsTest_SetAlpha(self, 0.5);
+						elseif not this.isInCombat then
+							StatRingsTest_SetAlpha(self, 0.1);
+						end
+					--end
+				end
+				this:AddUpdateFunction(this.UpdateAlpha);
+			</OnLoad>
+			<OnEvent>
+				if (event == "PLAYER_ENTERING_WORLD") then
+					this:UpdateColor({["r"] = 0.1, ["g"] = 0.9, ["b"] = 0.0});
+					this:SetMax(UnitHealthMax("player"));
+					this:SetValue(UnitHealth("player"), UnitHealthMax("player"));
+					return;
+				elseif event == "PLAYER_ENTER_COMBAT" or event == "PLAYER_REGEN_DISABLED" then
+					this.isInCombat = true;
+					this.alphaState = -1;
+				elseif event == "PLAYER_LEAVE_COMBAT" or event == "PLAYER_REGEN_ENABLED" then
+					this.isInCombat = false;
+					this.alphaState = -1;
+				elseif event == "PLAYER_LEVEL_UP" then
+					this:SetMax(UnitHealthMax("player"));
+				end
+				if arg1 == "player" then
+			  		if (event == "UNIT_MAXHEALTH") then
+						this:SetMax(UnitHealthMax(arg1));
+					else
+						this:SetValue(UnitHealth(arg1));
+					end
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

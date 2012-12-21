@@ -1,0 +1,403 @@
+<Ui>	
+	<Script file="tradeDispenser_TradeControl.lua"/>
+
+	<Frame name="tradeDispenserTradeControl" hidden="true" parent="tradeDispenser" enableMouse="true">
+		<Size>	<AbsDimension x="182" y="346"/>	</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT"  relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+				<Offset><AbsDimension x="0" y="2"/></Offset>
+			</Anchor>
+		</Anchors>	
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>	<AbsValue val="16"/>	</EdgeSize>
+			<TileSize>	<AbsValue val="0"/>		</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">		<!-- TITLE -->
+				<FontString name="$parentLbL" inherits="GameFontNormal" text="Ignore players:">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="10" y="-10"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>		
+		<Frames>
+			<Frame name="$parentTitleBkg" hidden="false">
+				<Size>	<AbsDimension x="182" y="28"/>	</Size>
+				<Anchors>
+					<Anchor point="BOTTOM"  relativeTo="$parent" relativePoint="TOP">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>	<AbsValue val="16"/>	</EdgeSize>
+					<TileSize>	<AbsValue val="0"/>		</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="4" right="4" top="4" bottom="4"/>
+					</BackgroundInsets>
+				</Backdrop>	
+				<Layers>
+					<Layer level="ARTWORK">		<!-- TITLE -->
+						<FontString name="$parentLbL" inherits="GameFontNormal" text="TradeControl:">
+							<Anchors>
+								<Anchor point="Center">
+									<Offset><AbsDimension x="0" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetWidth(this:GetParent():GetWidth());
+						this:SetBackdropBorderColor(1, 1, 1,1);
+						this:SetBackdropColor(0.2, 0, 0, 1);
+						local f=tradeDispenserTradeControlTitleBkgLbL;
+						f:SetText(tD_Loc.control.title);
+						f:SetTextColor(1,1,1);
+					</OnLoad>
+				</Scripts>
+			</Frame>		
+			
+			<CheckButton name="$parentRaid" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="10" y="-25"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="not in Raid/Party">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>				
+				<Scripts>
+					<OnLoad>
+						tradeDispenserTradeControlRaidLbL:SetText(tD_Loc.control.notraid);
+					</OnLoad>
+					<OnClick>
+						tD_CharDatas.Raid = not tD_CharDatas.Raid;
+						tradeDispenserPlaySound(this)
+						if ( this:GetChecked() ) then
+							tradeDispenserTradeControlGuild:Show();
+						else
+							tradeDispenserTradeControlGuild:Hide();
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this:GetParent(),"ANCHOR_TOPRIGHT",0,50);
+						tradeDispenserDrawTooltip(tD_Loc.control.notinraid)	
+					</OnEnter>
+					<OnLeave>	GameTooltip:Hide();	</OnLeave>						
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="$parentGuild" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRaid" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="25" y="-1"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="accept GuildMembers">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>				
+				<Scripts>
+					<OnLoad>
+						tradeDispenserTradeControlGuildLbL:SetText(tD_Loc.control.acceptguild);
+					</OnLoad>
+					<OnClick>
+						tD_CharDatas.Guild = not tD_CharDatas.Guild;
+						tradeDispenserPlaySound(this)
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this:GetParent(),"ANCHOR_TOPRIGHT",0,50);
+						tradeDispenserDrawTooltip(tD_Loc.control.accguild)	
+					</OnEnter>
+					<OnLeave>	GameTooltip:Hide();	</OnLeave>						
+				</Scripts>
+			</CheckButton>
+			
+			
+			<CheckButton name="$parentAccept" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentGuild" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-25" y="-55"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="Auto-Accept">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						tradeDispenserTradeControlAcceptLbL:SetText(tD_Loc.control.autoaccept);
+					</OnLoad>				
+					<OnShow>
+						if (tD_CharDatas.AutoAccept) then 
+							this:SetChecked(1);
+						end
+					</OnShow>
+					<OnClick>
+						tD_CharDatas.AutoAccept = not tD_CharDatas.AutoAccept;
+						tradeDispenserPlaySound(this)
+					</OnClick>
+				</Scripts>
+			</CheckButton>	
+						
+			<CheckButton name="$parentInfos" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentAccept" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="Client Infos">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						this:SetChecked(tD_CharDatas.ClientInfos);
+						tradeDispenserTradeControlInfosLbL:SetText(tD_Loc.control.ClientInfos);
+					</OnShow>
+					<OnClick>
+						tD_CharDatas.ClientInfos = not tD_CharDatas.ClientInfos;
+						tradeDispenserPlaySound(this)
+					</OnClick>
+				</Scripts>
+			</CheckButton>			
+			
+			<CheckButton name="$parentLevel" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentInfos" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="PlayerLevel">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>		
+				<Frames>
+					<Slider name="$parentMin" inherits="OptionsSliderTemplate" hidden="false">
+						<Size><AbsDimension x="136" y="16"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentLbL" relativePoint="BOTTOMLEFT">
+								<Offset><AbsDimension x="0" y="-3"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								tradeDispenserTradeControlLevelMinText:SetText("");
+								tradeDispenserTradeControlLevelMinHigh:SetText("60");
+								tradeDispenserTradeControlLevelMinLow:SetText("1");
+								tradeDispenserTradeControlLevelMinHigh:SetTextColor(1,0.9,0);
+								tradeDispenserTradeControlLevelMinLow:SetTextColor(1,0.9,0);
+								this:SetMinMaxValues(1,60);
+								this:SetValueStep(1);
+								this:SetValue(55);
+							</OnLoad>
+							<OnValueChanged>
+								tD_CharDatas.LevelValue = this:GetValue();
+								tradeDispenserTradeControlLevelLbL:SetText(tD_Loc.control.level..this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>	
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						local f=tradeDispenserTradeControlLevelLbL;
+						f:SetText(tD_Loc.control.leveltext);
+						f:SetTextColor(1,1,1);						
+					</OnLoad>
+					<OnClick>
+						tD_CharDatas.LevelCheck = not tD_CharDatas.LevelCheck;
+						tradeDispenserPlaySound(this)
+						local f=tradeDispenserTradeControlLevelMin;
+						if ( this:GetChecked() ) then		f:Show();	else	f:Hide();	end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<Button name="$parentBanlistBtn" inherits="UIPanelButtonTemplate" text="Banlist">
+				<Size>	<AbsDimension x="136" y="26"/>	</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentGuild" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(tD_Loc.buttons.banlist);
+					</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (tradeDispenserBanlist:IsVisible()) then
+							tradeDispenserBanlist:Hide()
+							this:UnlockHighlight()
+						else 	
+							tradeDispenserBanlist:Show()
+							this:LockHighlight();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>	
+			
+			<CheckButton name="$parentBans" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentBanlistBtn" relativePoint="LEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						tD_CharDatas.BanlistActive= not tD_CharDatas.BanlistActive;
+						tradeDispenserPlaySound(this)
+						local f=tradeDispenserTradeControlBanlistBtn;
+						if ( this:GetChecked() ) then
+							f:Enable();
+						else
+							if (tradeDispenserBanlist:IsVisible()) then
+								f:UnlockHighlight();
+								tradeDispenserBanlist:Hide();
+							end
+							f:Disable();
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			
+			<CheckButton name="$parentRegister" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="10" y="78"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormal" text="Register Clients">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>	
+				<Frames>
+					<Slider name="$parentMaxTrades" inherits="OptionsSliderTemplate" hidden="false">
+						<Size><AbsDimension x="136" y="16"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentLbL" relativePoint="BOTTOMLEFT">
+								<Offset><AbsDimension x="0" y="-15"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								tradeDispenserTradeControlRegisterMaxTradesText:SetText(tD_Loc.control.maxtrades.." 1");
+								tradeDispenserTradeControlRegisterMaxTradesHigh:SetText("5");
+								tradeDispenserTradeControlRegisterMaxTradesLow:SetText("1");
+								this:SetMinMaxValues(1,5);
+								this:SetValueStep(1);
+								this:SetValue(1);
+							</OnLoad>
+							<OnValueChanged>
+								tD_CharDatas.RegisterValue = this:GetValue();
+								tradeDispenserTradeControlRegisterMaxTradesText:SetText(tD_Loc.control.maxtrades..this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>	
+					<Button name="$parentReset" inherits="UIPanelButtonTemplate" text="Reset">
+						<Size>	<AbsDimension x="136" y="26"/>	</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentMaxTrades" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetText(tD_Loc.buttons.reset);
+							</OnLoad>
+							<OnClick>
+								tradeDispenserPlaySound(this)
+								tradeDispenser_ResetRegistratedChars();
+							</OnClick>
+						</Scripts>
+					</Button>					
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						local f=tradeDispenserTradeControlRegisterLbL;
+						f:SetText(tD_Loc.control.register);
+						f:SetTextColor(1,1,1);
+					</OnLoad>
+					<OnClick>
+						tD_CharDatas.RegisterCheck = not tD_CharDatas.RegisterCheck;
+						tradeDispenserPlaySound(this)
+						tradeDispenser_TradeControl_Update();
+					</OnClick>
+				</Scripts>
+			</CheckButton>			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(1, 1, 1,1);
+				this:SetBackdropColor(0, 0, 0.2, 1);
+				tradeDispenserTradeControlLbL:SetText(tD_Loc.control.ignore);
+				tradeDispenserTradeControlLbL:SetTextColor(1,1,1);
+			</OnLoad>
+			<OnMouseDown> this:GetParent():StartMoving();  </OnMouseDown>
+			<OnMouseUp>  this:GetParent():StopMovingOrSizing(); </OnMouseUp>
+			<OnDragStop> this:GetParent():StopMovingOrSizing(); </OnDragStop>
+		</Scripts>
+	</Frame>	
+</Ui>

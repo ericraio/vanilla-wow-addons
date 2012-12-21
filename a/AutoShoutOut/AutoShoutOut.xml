@@ -1,0 +1,755 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+	..\FrameXML\UI.xsd">
+	
+	<!-- AutoShoutOut XML v1.15.5 -->
+	
+	<Script file="AutoShoutOutLocalization.lua"/>
+    <Script file="AutoShoutOut.lua"/>
+
+	<Button name="EventList_GlobalButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="137" y="16"/>
+		</Size>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT"/>
+			</Anchors>
+		</HighlightTexture>
+		<Scripts>
+			<OnClick>
+				ASO_Window_EventList_OnClick(arg1,this);
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+				GameTooltip:SetText(this.tooltip);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-- Background frame to receive global events -->
+    <Frame name="AutoShoutOutEventsFrame" parent="UIParent" hidden="true">
+		
+		<Scripts>
+			<OnLoad>
+				ASO_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				ASO_OnEvent(event)
+			</OnEvent>
+		</Scripts>
+		
+    </Frame>
+
+	<!-- Main window -->
+	<Frame name="AutoShoutOutWindow" parent="UIParent" hidden="true" enableMouse="true" movable="true" toplevel="true">
+		
+		<TitleRegion setAllPoints="true"/>
+
+		<Scripts>
+			<OnShow>
+				ASO_Window_OnShow();
+			</OnShow>
+			<OnHide>
+				ASO_Window_OnHide();
+			</OnHide>
+		</Scripts>
+		
+		<Size>
+			<AbsDimension x="365" y="341"/> <!-- Too bad can't use localization variable name for width size here! -->
+		</Size>
+		
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+			<!-- <Anchor point="BOTTOMRIGHT" relativeTo="UIParent" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="-10" y="75"/>
+				</Offset>
+			</Anchor> -->
+		</Anchors>
+		
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+			edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+		</Backdrop>
+
+		<Layers>
+		
+			<!-- Main layout layer: headers, labels, etc. -->
+			<Layer level="ARTWORK">
+			
+				<!-- Window Header -->
+				<Texture name="AutoShoutOutWindow_TitleBox"
+				         file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="500" y="64" /> <!-- Too bad can't use localization variable name for width size here! -->
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				
+				<FontString name="AutoShoutOutWindow_Title" inherits="GameFontNormal" text="ASO_LOCSTR_UI_Window_Title">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="AutoShoutOutWindow_TitleBox">
+							<Offset>
+								<AbsDimension x="0" y="11" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+				<FontString name="AutoShoutOutWindow_VersionInfo" inherits="GameFontHighlight" text="ASO_Version">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="AutoShoutOutWindow" relativeFrom="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="15" y="16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+			</Layer>
+			
+		</Layers>
+
+		<Frames>	
+
+			<Button name="AutoShoutOutWindow_Close_Button" inherits="UIPanelButtonTemplate" text="ASO_LOCSTR_CLOSE">
+				<Size>
+					<AbsDimension x="90" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-13" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ASO_Window_Toggle();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="AutoShoutOutWindowCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="4" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ASO_Window_Toggle();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+	
+			<Frame name="ConfigurationsDropDown" inherits="UIDropDownMenuTemplate" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="AutoShoutOutWindow" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-60"/> <!-- x="22" y="-35" -->
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="ASO_LOCSTR_UI_ConfigurationsDropDownLabel">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						ASO_Window_ConfigurationsDropDown_OnLoad();
+					</OnLoad>
+					<OnShow>
+						ASO_Window_ConfigurationsDropDown_OnShow();
+					</OnShow>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="AutoSwitchCheckButton" inherits="UICheckButtonTemplate" id="22">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="ConfigurationsDropDownLabel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="15" y="-21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="ASO_LOCSTR_UI_AutoSwitchCheckButtonLabel" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						ASO_Window_OnClick_AutoSwitchCheckButton();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<!-- Event List Frame -->
+			<Frame name="AutoShoutOutWindow_EventList_Frame" inherits="UIParent" hidden="false">
+				
+				<Size>
+					<!-- Make sure it's 8 bigger than the contents, for borders -->
+					<AbsDimension x="142" y="92"/> <!-- 87 x 60, y is 16 per item-->
+				</Size>
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="ConfigurationsDropDown" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="16" y="-13"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background"
+				          edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+						this:SetBackdropColor(0.1, 0.1, 0.1);
+					</OnLoad>
+				</Scripts>
+				
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="AutoShoutOutWindow_EventListTitle" inherits="GameFontHighlight" text="ASO_LOCSTR_UI_Event_List_Title">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+
+				<Frames>
+					
+					<Button name="EventList_GlobalButton1" inherits="EventList_GlobalButtonTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="AutoShoutOutWindow_EventList_Frame">
+								<Offset>
+									<AbsDimension x="4" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormal" text="ASO_LOCSTR_HEALTH_LABEL">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="2" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>			
+							</Layer>
+						</Layers>
+					</Button>
+					
+					<Button name="EventList_GlobalButton2" inherits="EventList_GlobalButtonTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="EventList_GlobalButton1"
+									relativePoint="BOTTOMLEFT"/>
+						</Anchors>		
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormal" text="ASO_LOCSTR_LIFE_LABEL">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="2" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>			
+							</Layer>
+						</Layers>
+					</Button>
+					
+					<Button name="EventList_GlobalButton3" inherits="EventList_GlobalButtonTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="EventList_GlobalButton2"
+									relativePoint="BOTTOMLEFT"/>
+						</Anchors>		
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormal" text="ASO_LOCSTR_MANA_LABEL">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="2" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>			
+							</Layer>
+						</Layers>
+					</Button>
+					
+					<Button name="EventList_GlobalButton4" inherits="EventList_GlobalButtonTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="EventList_GlobalButton3"
+									relativePoint="BOTTOMLEFT"/>
+						</Anchors>		
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormal" text="ASO_LOCSTR_PETHEALTH_LABEL">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="2" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>			
+							</Layer>
+						</Layers>
+					</Button>
+					
+					<Button name="EventList_GlobalButton5" inherits="EventList_GlobalButtonTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="EventList_GlobalButton4"
+									relativePoint="BOTTOMLEFT"/>
+						</Anchors>		
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormal" text="ASO_LOCSTR_REZSTONE_LABEL">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="2" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>			
+							</Layer>
+						</Layers>
+					</Button>
+					
+				</Frames>
+
+			</Frame>
+
+			<EditBox name="NotifyPercentEditBox" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="30" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoShoutOutWindow" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="-86"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="ASO_LOCSTR_UI_NotifyPercentEditBoxLabel">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-5" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						ASO_Window_OnTabPressed_NotifyPercentEditBox();
+					</OnTabPressed>
+					<OnEnterPressed>
+						ASO_Window_OnEnterPressed_NotifyPercentEditBox();
+					</OnEnterPressed>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<EditBox name="NotifyFrequencyEditBox" letters="3" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="36" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="NotifyPercentEditBox" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-23"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="ASO_LOCSTR_UI_NotifyFrequencyEditBox">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-11" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						ASO_Window_OnTabPressed_NotifyFrequencyEditBox();
+					</OnTabPressed>
+					<OnEnterPressed>
+						ASO_Window_OnEnterPressed_NotifyFrequencyEditBox();
+					</OnEnterPressed>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<CheckButton name="IsCombatOnlyCheckButton" inherits="UICheckButtonTemplate" id="4">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="AutoSwitchCheckButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="ASO_LOCSTR_UI_IsCombatOnlyCheckButtonLabel" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						ASO_Window_OnClick_IsCombatOnlyCheckButton();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="IsNotifyDuringDuelCheckButton" inherits="UICheckButtonTemplate" id="22">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IsCombatOnlyCheckButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="ASO_LOCSTR_UI_IsNotifyDuringDuelCheckButtonLabel" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						ASO_Window_OnClick_IsNotifyDuringDuelCheckButton();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="IsShoutEnabledCheckButton" inherits="UICheckButtonTemplate" id="5">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AutoShoutOutWindow_EventListTitle" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-5" y="-110"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="ASO_LOCSTR_UI_IsShoutEnabledCheckButtonLabel" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						ASO_Window_OnClick_IsShoutEnabledCheckButton();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="IsMessagingEnabledCheckButton" inherits="UICheckButtonTemplate" id="6">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="IsShoutEnabledCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString text="ASO_LOCSTR_UI_IsMessagingEnabledCheckButtonLabel" name="$parentLabel" inherits="GameFontHighlight">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						ASO_Window_OnClick_IsMessagingEnabledCheckButton();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<EditBox name="MessageTargetEditBox" letters="12" numeric="false" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="115" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="IsMessagingEnabledCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="60" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="ASO_LOCSTR_UI_MessageTargetEditBoxLabel">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-11" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						ASO_Window_OnTabPressed_MessageTargetEditBox();
+					</OnTabPressed>
+					<OnEnterPressed>
+						ASO_Window_OnEnterPressed_MessageTargetEditBox();
+					</OnEnterPressed>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<EditBox name="MessageMessageEditBox" letters="250" numeric="false" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="260" y="16"/> <!-- Too bad can't use localization variable name for width size here! -->
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="IsMessagingEnabledCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="79" y="-56"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlight" name="$parentLabel" text="ASO_LOCSTR_UI_MessageMessageEditBoxLabel">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-11" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTabPressed>
+						ASO_Window_OnTabPressed_MessageMessageEditBox();
+					</OnTabPressed>
+					<OnEnterPressed>
+						ASO_Window_OnEnterPressed_MessageMessageEditBox();
+					</OnEnterPressed>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<Button name="TargetChannelsButton" inherits="UIPanelButtonTemplate" text="ASO_LOCSTR_UI_TargetChannelsButton">
+				<Size>
+					<AbsDimension x="85" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="MessageTargetEditBox" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						ASO_Window_OnClick_ChannelsButton(this);
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.tooltip);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+		</Frames>	
+		
+    </Frame>
+
+</Ui>

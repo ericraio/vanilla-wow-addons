@@ -1,0 +1,223 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+        <Script file="XPerl_Usage.lua"/>
+        <Script file="XPerl_Globals.lua"/>
+        <Script file="XPerl_Init.lua"/>
+        <Script file="XPerl_Slash.lua"/>
+
+        <Frame name="XPerl_Globals">
+		<Scripts>
+			<OnLoad>
+                                this:RegisterEvent("VARIABLES_LOADED")
+                                this:RegisterEvent("PLAYER_ENTERING_WORLD")
+			</OnLoad>
+			<OnEvent>
+                                XPerl_Globals_OnEvent(event)
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+        <Frame name="XPerl_Portrait_Template" virtual="true">
+                <Size>
+                        <AbsDimension x="60" y="62"/>
+                </Size>
+                <Backdrop bgFile="Interface\Addons\XPerl\Images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="16"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="32"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="5" right="5" top="5" bottom="5"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Frames>
+                        <PlayerModel name="$parent_Portrait3D">
+                                <Size>
+                                        <AbsDimension x="51" y="52"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset><AbsDimension x="6" y="-6"/></Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT">
+                                                <Offset><AbsDimension x="-4" y="3"/></Offset>
+                                        </Anchor>
+                                </Anchors>
+                        </PlayerModel>
+                </Frames>
+                <Layers>
+                        <Layer level="ARTWORK">
+                                <Texture name="$parent_Portrait" hidden="true">
+                                        <Size><AbsDimension x="50" y="50"/></Size>
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT">
+                                                        <Offset><AbsDimension x="6" y="-5"/></Offset>
+                                                </Anchor>
+                                                <Anchor point="BOTTOMRIGHT">
+                                                        <Offset><AbsDimension x="-4" y="4"/></Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </Texture>
+                        </Layer>
+                </Layers>
+        </Frame>
+
+        <StatusBar name="XPerlStatusBar" virtual="true">
+                <BarTexture name="$parentTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+                <Layers>
+                        <!-- Text -->
+                        <Layer level="OVERLAY">
+                                <FontString name="$parentText" inherits="GameFontNormalSmall">
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT"/>
+                                                <Anchor point="BOTTOMRIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="0" y="1"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </FontString>
+                                <FontString name="$parentPercent" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+                                        <Size>
+                                                <AbsDimension x="50" y="12"/>
+                                        </Size>
+                                        <Anchors>
+                                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                                        <Offset>
+                                                                <AbsDimension x="0" y="1"/>
+                                                        </Offset>
+                                                </Anchor>
+                                        </Anchors>
+                                </FontString>
+                        </Layer>
+                        <Layer level="BACKGROUND">
+                                <Texture name="$parentBG" file="Interface\TargetingFrame\UI-TargetingFrame-BarFill" setAllPoints="true"/>
+                        </Layer>
+                </Layers>
+                <Scripts>
+                        <OnLoad>
+                                XPerl_RegisterBar(this)
+                                this:SetScript("OnLoad", nil)
+                        </OnLoad>
+                </Scripts>
+        </StatusBar>
+
+        <!-- Stats Template -->
+        <Frame name="XPerl_Stats_Template" virtual="true">
+                <Size>
+                        <AbsDimension x="160" y="40"/>
+                </Size>
+                <Backdrop bgFile="Interface\Addons\XPerl\Images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="16"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="32"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="5" right="5" top="5" bottom="5"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Frames>
+                        <!-- Health Bar -->
+                        <StatusBar name="$parent_HealthBar" inherits="XPerlStatusBar">
+                                <Size>
+                                        <AbsDimension x="112" y="10"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="8" y="-9"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <BarColor r="0" g="0.8" b="0"/>
+                        </StatusBar>
+
+                        <!-- Mana Bar -->
+                        <StatusBar name="$parent_ManaBar" inherits="XPerlStatusBar">
+                                <Size>
+                                        <AbsDimension x="112" y="10"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_HealthBar">
+                                                <Offset>
+                                                        <AbsDimension x="0" y="-2"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <BarColor r="0" g="0" b="1"/>
+                        </StatusBar>
+                </Frames>
+        </Frame>
+
+        <Frame name="XPerl_StatsXP_Template" inherits="XPerl_Stats_Template" virtual="true">
+                <Frames>
+                        <StatusBar name="$parent_XPBar" inherits="XPerlStatusBar" hidden="true">
+                                <Size>
+                                        <AbsDimension x="112" y="10"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_ManaBar"/>
+                                </Anchors>
+                                <BarColor r="0" g="0.8" b="0"/>
+                        </StatusBar>
+                        <StatusBar name="$parent_XPRestBar" hidden="true">
+                                <Size>
+                                        <AbsDimension x="112" y="10"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent_XPBar"/>
+                                        <Anchor point="BOTTOMRIGHT" relativeTo="$parent_XPBar"/>
+                                </Anchors>
+                                <BarTexture name="$parentTex" file="Interface\TargetingFrame\UI-StatusBar"/>
+                                <BarColor r="0" g="0.8" b="0"/>
+                        </StatusBar>
+                </Frames>
+        </Frame>
+
+        <Button name="XPerl_BuffTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+                                <Texture name="$parentIcon" setAllPoints="true" />
+			</Layer>
+			<Layer level="OVERLAY">
+                                <FontString name="$parentCount" inherits="NumberFontNormalSmall">
+                                        <Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+                                                                <AbsDimension x="5" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+                                </FontString>
+			</Layer>
+		</Layers>
+	</Button>
+
+        <Button name="XPerl_DeBuffTemplate" virtual="true" inherits="XPerl_BuffTemplate">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Layers>
+                        <Layer level="OVERLAY">
+                                <Texture name="$parentBorder" file="Interface\Buttons\UI-Debuff-Overlays" setAllPoints="true">
+					<Anchors>
+                                                <Anchor point="TOPLEFT">
+							<Offset>
+                                                                <AbsDimension x="-1" y="1"/>
+							</Offset>
+                                                </Anchor>
+                                                <Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+</Ui>

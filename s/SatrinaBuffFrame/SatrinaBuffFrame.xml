@@ -1,0 +1,581 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<GameTooltip name="SBFTooltip" frameStrata="TOOLTIP" hidden="true" parent="UIParent" inherits="GameTooltipTemplate"/>
+
+	<Frame name="BuffFrameDragTabTemplate" hidden="true" virtual="true">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+		</Backdrop>
+		<Size>
+			<AbsDimension x="50" y="12"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall" justifyh="CENTER">
+					<Size>
+						<AbsDimension x="50" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>			
+		</Layers>	
+		<Scripts>
+			<OnMouseDown>
+				if (arg1 == "LeftButton") and this:IsVisible() then
+					this:GetParent():StartMoving()
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:GetParent():StopMovingOrSizing()
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+	
+	<Button name="SatrinaEffectButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon"/>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentCount" inherits="NumberFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-1" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDuration" hidden="false">
+				<Size>
+					<AbsDimension x="40" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="GameFontNormalSmall">
+							<Size>
+								<AbsDimension x="40" y="10"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnEvent>
+				SatrinaBuffFrame_BuffButton_OnEvent(event)
+			</OnEvent>
+			<OnUpdate>
+				SatrinaBuffFrame_BuffButton_OnUpdate(arg1)
+			</OnUpdate>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+			<OnClick>
+				if not SATBUFF.showingOptions then
+					CancelPlayerBuff(this.index)
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name="SatrinaEnchantButtonTemplate" inherits="SatrinaEffectButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				SatrinaBuffFrame_BuffButton_OnLoad()
+			</OnLoad>
+			<OnEnter>
+				if not SATBUFF.showingOptions then
+					local anchor = "ANCHOR_BOTTOMLEFT"
+					GameTooltip:SetOwner(this, anchor)
+					GameTooltip:SetInventoryItem("player", this:GetID())
+				end
+			</OnEnter>
+			<OnClick>
+			</OnClick>
+			<OnEvent>
+			</OnEvent>
+			<OnUpdate>
+			</OnUpdate>
+		</Scripts>
+	</Button>
+
+	<Button name="SatrinaBuffButtonTemplate" inherits="SatrinaEffectButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				this.buffFilter = "HELPFUL"
+				SatrinaBuffFrame_BuffButton_OnLoad()
+			</OnLoad>
+			<OnEnter>
+				SatrinaBuffFrame_OnEnter(1)
+			</OnEnter>
+		</Scripts>
+	</Button>
+
+	<Button name="SatrinaDebuffButtonTemplate" inherits="SatrinaEffectButtonTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parentBorder" file="Interface\Buttons\UI-Debuff-Overlays">
+					<Size>
+						<AbsDimension x="21" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
+				</Texture>	
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this.buffFilter = "HARMFUL"
+				SatrinaBuffFrame_BuffButton_OnLoad()
+			</OnLoad>
+			<OnEnter>
+				SatrinaBuffFrame_OnEnter()
+			</OnEnter>
+		</Scripts>
+	</Button>
+
+	<Frame name="SatrinaBuffFrame" frameStrata="LOW" toplevel="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-65" y="-240"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="$parentDragTab" inherits="BuffFrameDragTabTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="TOP"/>
+				</Anchors>
+			</Frame>
+			<Button name="SatrinaBuffButton1" inherits="SatrinaBuffButtonTemplate" id="0">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton2" inherits="SatrinaBuffButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton3" inherits="SatrinaBuffButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton2" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton4" inherits="SatrinaBuffButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton3" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton5" inherits="SatrinaBuffButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton4" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton6" inherits="SatrinaBuffButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton5" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton7" inherits="SatrinaBuffButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton6" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton8" inherits="SatrinaBuffButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton7" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton9" inherits="SatrinaBuffButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton8" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton10" inherits="SatrinaBuffButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton9" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton11" inherits="SatrinaBuffButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton10" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton12" inherits="SatrinaBuffButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton11" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton13" inherits="SatrinaBuffButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton12" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton14" inherits="SatrinaBuffButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton13" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton15" inherits="SatrinaBuffButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton14" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton16" inherits="SatrinaBuffButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton15" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton17" inherits="SatrinaBuffButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton16" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton18" inherits="SatrinaBuffButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton17" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton19" inherits="SatrinaBuffButtonTemplate" id="18">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton18" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaBuffButton20" inherits="SatrinaBuffButtonTemplate" id="19">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaBuffButton19" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				SatrinaBuffFrame_OnLoad()
+			</OnLoad>
+			<OnEvent>
+				SatrinaBuffFrame_OnEvent(event)
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+	<Frame name="SatrinaDebuffFrame" frameStrata="LOW" toplevel="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-110" y="-240"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="$parentDragTab" inherits="BuffFrameDragTabTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="TOP"/>
+				</Anchors>
+			</Frame>
+			<Button name="SatrinaDebuffButton1" inherits="SatrinaDebuffButtonTemplate" id="0">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton2" inherits="SatrinaDebuffButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton3" inherits="SatrinaDebuffButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton2" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton4" inherits="SatrinaDebuffButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton3" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton5" inherits="SatrinaDebuffButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton4" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton6" inherits="SatrinaDebuffButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton5" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton7" inherits="SatrinaDebuffButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton6" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton8" inherits="SatrinaDebuffButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton7" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton9" inherits="SatrinaDebuffButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton8" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton10" inherits="SatrinaDebuffButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton9" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton11" inherits="SatrinaDebuffButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton10" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton12" inherits="SatrinaDebuffButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton11" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton13" inherits="SatrinaDebuffButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton12" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton14" inherits="SatrinaDebuffButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton13" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton15" inherits="SatrinaDebuffButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton14" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaDebuffButton16" inherits="SatrinaDebuffButtonTemplate" id="15">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SatrinaDebuffButton15" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+	
+	<Frame name="SatrinaEnchantFrame" frameStrata="LOW" toplevel="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="50" y="30"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-70" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="$parentDragTab" inherits="BuffFrameDragTabTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="TOP"/>
+				</Anchors>
+			</Frame>
+			<Button name="SatrinaEnchant1" inherits="SatrinaEnchantButtonTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="SatrinaEnchant2" inherits="SatrinaEnchantButtonTemplate" id="17">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="SatrinaEnchant1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="20" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				SatrinaBuffFrame_OnEnchantLoad()
+			</OnLoad>
+			<OnUpdate>
+				SatrinaBuffFrame_OnEnchantUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+	</Frame>	
+
+</Ui>

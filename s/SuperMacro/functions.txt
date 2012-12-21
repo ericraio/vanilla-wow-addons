@@ -1,0 +1,289 @@
+Functions and slash commands found in SuperMacro addon that can be helpful in your macros are listed here in alphabetical order. Alt-click on an item to insert its item link into the macro.
+
+(For even more convenience and to shorten macros, I recommend another addon, Alias, a.k.a ASF. Read end of file for explanation.)
+
+(P.S. I may accept requests for other convenient functions and slash commands.)
+
+--Table of Contents
+CancelBuff(buff [,...]), unbuff
+cast
+caststop(spell [,...])
+Channel(spell), /smchan, /smchannel
+CraftItem( skill, item, count), /craft, /smcraft
+DoOrder(spell | item [,...]), /order, /smorder
+echo
+/equip, /smequip, /eq, /smeq
+/equipoff, /smequipoff, /eqoff, /smeqoff
+Fail(message), /fail
+FindBuff(buff [ [, unit], item]), buffed
+FindItem(item)
+/in seconds[+] command, SM_IN(seconds, command, repeat)
+Macro
+Pass(message), /pass
+pickup(bag, slot), pickup(inventory_slot), pickup("item")
+/print msg, /smprint, SM_print(msg), echo
+PrintColor(r,g,b,msg [,...]), Printc
+Printd(msg [,...]), Print
+PrintTable(table, rowname, level), Printt
+RunBody(longtext)
+RunLine(command [,...])
+RunMacro(index|macro), Macro, /macro
+RunSuperMacro(index|super)
+SayRandom(speech [,...]), /sayrandom, /smsayrandom
+send
+SetActionMacro(actionid, macro)
+SetActionSuperMacro(actionid, supername)
+/shift form -- for druids, rogues, warriors only
+stopcast
+/unequip, /smunequip, /uneq, /smuneq
+use(bag,slot), use(item), /use, /smuse
+UseItemByName(item)
+## Alias
+--End table of contents
+
+## CancelBuff(buff [,...]), unbuff, /unbuff, /smunbuff
+Cancel the player's buffs that match the given strings.
+Ex. /script CancelBuff("Demon Skin")
+Ex. /script CancelBuff("demon") -- cancel buffs with demon in it, including Demon Skin
+Ex. /script unbuff("demon") -- same as above
+Ex. /unbuff demon -- same as above
+Ex. /unbuff mana, frost -- cancel any buffs matching mana or frost
+Ex. /unbuff . -- cancel all buffs, use with care
+Ex. /unbuff a -- careful, cancel all buffs with 'a' in their names
+
+## cast
+cast is same as CastSpellByName.
+Ex. cast("Heal")
+
+## caststop(spell [,...])
+Cast a spell, then stop. Will cast multiple spells in sequence. Only works properly for spells that don't cause global cooldown. (Not tested.)
+Ex. /script caststop("Arcane Power","Presence of Mind","Frostbolt")
+is equivalent to
+/cast Arcane Power
+/script SpellStopCasting();
+/cast Presence of Mind
+/script SpellStopCasting();
+/cast Frostbolt
+
+## Channel(spell), /smchan, /smchannel
+Safely channel a spell, ignoring accidental multiple keypresses.
+Ex. SM_Channel("mind flay")
+Ex. /smchan mind flay
+-- test tooltip
+
+## CraftItem( skill, item, count), /craft, /smcraft
+Create item or enchant (at least one time). If count is left out (nil) then will make one. If count is zero, then will make all available. If count is negative, then will leave that much.
+Ex. /craft First aid, Heavy Linen Bandage -- make one bandage
+Ex. /smcraft First aid, Heavy Linen Bandage, 0 -- make all available bandages
+Ex. CraftItem( "First aid", "Heavy Linen Bandage", -1 ) -- make all but one
+
+## DoOrder(...), /order, /smorder
+Use first available item or cast spell in a list separated by commas, and ignore the rest of the list. Alt-click on item to insert item link into macro.
+Ex. DoOrder("healing potion", "lesser healing potion", "healing touch")
+Ex. /order healing potion, lesser healing potion, healing touch
+-- if healing potion found, will use it, and ignore the rest of the list
+
+## echo
+See /print.
+
+## /equip, /smequip, /eq, /smeq
+Equip or use an item. Also works with item links. Alt-click on item to insert item link into macro.
+Ex. /eq hatchet
+
+## /equipoff, /smequipoff, /eqoff, /smeqoff
+Equip item into off-hand slot. Also works with item links. Alt-click on item to insert item link into macro.
+Ex. /eqoff shield
+
+## Fail(message), /fail
+Run message or script if current action (spell or item) failed. See Pass for success.
+Ex. /script CastSpellByName("Attack") Fail("Can't attack")
+Ex. /script CastSpellByName("nada") Fail("not a spell")
+Ex. /script Fail("no action")
+Ex. /fail /script use('hearthstone')
+Ex.
+/cast Heal
+/fail /p can't heal
+
+## FindBuff, buffed
+See if a unit has a specific buff or debuff, or weapon buff.
+Usage 1: FindBuff(buff [ [, unit], item])
+Usage 2: buffed(buff [ [, unit], item])
+buff is the buff's name, or part of it's name--not case sensitive
+unit is API 'unit' value ('player' if left empty or nil)
+item value is boolean. if item is not nil or false or empty, then will search for item buff instead
+Ex. buffed("Find Herbs") -- player's buff; returns "track", 0
+Ex. buffed("herbs") -- also works
+Ex. FindBuff("rockbiter",nil,1) -- player's weapon buff; returns "main" or "off", time left, charges
+Ex. buffed("rockb") -- same as above
+Ex. buffed("gouge", 'target') -- target's buff; returns "debuff", id
+Ex. buffed("perception") -- returns "buff", id
+
+## FindItem(item)
+Find an item in your container bags or inventory. If found in inventory, returns slot, nil, texture, count. If found in bags, returns bag, slot, texture, total count in all bags. Also works with item links. Alt-click on item to insert item link into macro.
+Ex. local bag,slot,texture,count = FindItem("Lesser Magic Essence");
+
+## /in seconds[+] command, /smin, SM_IN(seconds, command[, repeat])
+Execute command in seconds seconds. Use + after sec to repeat. Separate multiple commands with \n. Does not cast spells or use items. 
+Ex. /in 5 /p NOW
+Ex. /script SM_IN(5, "/p NOW") -- same as first, no repeat
+Ex. /in 1 /script PlaySound( "LOOTWINDOWCOINSOUND")
+Ex. /smin 600+ /print 10 mins repeating -- use + to repeat
+Ex. SM_IN(600, "/print 10 mins repeating", 1) -- repeats, same as above, but no +, instead include third parameter
+Ex. /in 1 /t ;me hi\n/t ;me hey -- multiple commands separated by \n
+Ex. /script SM_IN(1,"/t ;me hi\n/t ;me hey") -- same as above
+Ex. /in 1m /print 1 min passed -- 1m = 1 minute, 1h = 1 hour, 1s = 1 second
+Ex. /script SM_IN("1m","/print 1 min passed") -- same as above, note 1m in quotes
+Ex. /in 1h30m5s+ /print repeat every hour and 30 mins and 5 seconds
+
+## Macro
+See RunMacro.
+
+## Pass(message), /pass
+Run message or script if current action (spell or item) succeeded. See Fail for failure.
+Ex. /script CastSpellByName("Attack") Pass("Attacking")
+Ex. /pass /macro Cheer
+Ex.
+/cast Heal
+/pass /p Healing
+
+## pickup(bag, slot), pickup(inventory_slot), pickup("item")
+Pickup item from inventory or bags. One argument for inventory; two arguments for bags. Argument can also be a string containing the item's name. Calling this function again puts the item into that slot, which may swap items. Also works with item links. Alt-click on item to insert item link into macro.
+Ex. pickup(16) --main hand weapon
+Ex. pickup("mainhandslot") -- also main hand weapon
+Ex. pickup(1,4) -- bag 1, 4th slot
+Ex. pickup("hearthstone") -- pickup hearthstone
+Ex. pickup("hearthstone") pickup("healing potion") -- consecutive pickups will swap these items
+Ex. pickup("hearthstone") pickup(4,7) -- put hearthstone in that slot; may swap if slot is not empty
+Ex. pickup("ring of iron will") pickup("finger0slot") -- put ring on first finger slot
+
+## /print msg, /smprint, SM_print(msg), echo
+Print message into chat that only you can see. It's identical to DEFAULT_CHAT_MESSAGE:AddMessage. Default color is white, but you can change it in options.
+Ex. /print test
+Ex. echo("test")
+
+## PrintColor(r,g,b,...), Printc
+Print message into chat that only you can see using specified color codes, in order of red, green, and blue. Color values are between 0 and 1. Also accepts any number of arguments like Printd.
+Ex. PrintColor(1,0,1, "test") -- purple
+Ex. PrintColor(1,1,0, "msg1", "msg2") -- yellow
+
+## Printd(...), Print
+Print message into chat that only you can see. Unlike /print, this accepts any number of arguments and prints each onto separate lines. Also, color is always white. If Print is taken by another addon, it will not overwrite it.
+Ex. Printd("Test")
+Ex. Print("msg 1", "msg 2") -- only if another addon doesn't have Print
+
+## PrintTable(table, row, level), Printt
+Print a table into chat for your view only.
+Ex. PrintTable(SM_VARS)
+
+## RunBody(longtext)
+Execute longtext like a macro. Each line is separated by \n.
+Ex. RunBody("/cast Attack\n/pass /p Attack!")
+Ex. /in 5 /script RunBody("/print 5 secs passed\n/macro MyMacro")
+
+## RunLine(...)
+Execute a line like a macro or chat message. Takes multiple lines, where each line is another argument separated by commas. Excellent for doing slash commands within 'if' blocks.
+Ex. RunLine("/p hi")
+Ex. RunLine("/p hi", "/dance", "/supermacro")
+Ex. if GetSpellCooldown(1,'spell')==0 then CastSpell(1,'spell') RunLine("/in 5 /print Cooldown finished") end
+
+## RunMacro(index | name), Macro, /macro
+Execute a macro by name or by index.
+Ex. /macro Attack -- runs macro named Attack
+Ex. RunMacro("Attack") -- same as above
+Ex. Macro(1) -- run first macro in macro frame
+Ex. /macro 1 -- will run macro named 1; note difference from last example
+Ex. Macro("1") -- same as last example
+Ex. /macro -- opens SuperMacro frame (no argument passed)
+
+## RunSuperMacro(index | super)
+Execute a SuperMacro by name or by index (in the order shown in SuperMacro frame at Super tab).
+Ex. RunSuperMacro(1);
+Ex. RunSuperMacro("MySuperMacro");
+
+## SayRandom(...), /sayrandom, /smsayrandom
+Say a random phrase from a list separated by comma. Actually, you can do more than send chat messages. There's an equal chance (1 in number of list items+1) that nothing will happen.
+Ex. /sayrandom hi, hello -- says hi or hello or nothing
+Ex. /script SayRandom("hi","hello"); -- same as last example
+Ex. /script SayRandom("/script Print(1)","/script Print(2)"); -- actions besides chat
+Ex. /sayrandom /script Print(1), /script Print(2) -- same as last example
+
+## send
+send is same as SendChatMessage. Also see RunLine.
+Ex. send("hi") -- send "hi" to local channel
+Ex. send("hi", "WHISPER", "COMMON", "Aquendyn") -- send whisper
+
+## SetActionMacro(actionid, macro)
+Set or replace an action button with another macro. The global variable lastActionUsed can be used to get the ID of the last action button that was pressed or clicked.
+Ex. Swap two macros named FindHerbs and FindMinerals.
+
+Macro FindHerbs looks like this:
+/cast Find Herbs
+
+/script SetActionMacro( lastActionUsed, 'FindMinerals' )
+
+Macro FindMinerals looks like this:
+/cast Find Minerals
+
+/script SetActionMacro( lastActionUsed, 'FindHerbs' )
+
+Drag either macro into an action button on your action bar. Each time you execute that action, the macros will swap, along with their appropriate icons and tooltips.
+
+## SetActionSuperMacro(actionid, supername)
+Set or replace an action button with a SuperMacro. The global variable lastActionUsed can be used to get the ID of the last action button that was pressed or clicked. See SetActionMacro for an example.
+Ex. SetActionSuperMacro(1,"MySuperMacro");
+
+## /shift form
+Form is number or name of form, stealth, or stance.
+Druids: bear=1, aquatic=2, cat=3, travel=4, moonkin=5
+Rogues: stealth=1
+Warriors: battle=1, defend=2, berzerk=3
+Ex. /shift bear
+Ex. /shift battle
+Ex. /shift stealth
+Ex. /shift 1 -- all four commands are equivalent, any of them will shift to battle for warriors, stealth for rogues, bear for druids
+
+## stopcast
+stopcast is same as SpellStopCasting
+Ex.
+/cast Arcane Power
+/script stopcast()
+
+## /unequip, /smunequip, /uneq, /smuneq
+Unequip an item if you have an empty bag space. Alt-click on item to insert item link into macro.
+Ex. /uneq shield
+
+## use, /use, /smuse
+Use an item by name or link, by bag and slot, or by inventory slot. Alt-click on item to insert item link into macro.
+Ex. /use hearthstone
+Ex. /use 4,1
+Ex. /script use("hearthstone");
+Ex. /script use(4,1); -- bag 4, 1st slot
+Ex. /script use(13); -- trinket
+
+## UseItemByName(item)
+Use or equip an item given its name or item link. Alt-click on item to insert item link into macro.
+Ex. UseItemByName("hearthstone")
+
+#############
+#
+## Aliases to simplify macros
+#
+############
+Aliases can simplify your macros significantly.
+For example, to get current mana, alias is simply ;pm--instead of UnitMana('player'). More importantly, Alias allows values from functions into chat. Instead of:
+/script SendChatMessage("Buffing you", "WHISPER", "COMMON", UnitName("target"))
+use a regular chat message:
+;tt Buffing you
+
+Useful default aliases include:
+;z for /script
+;cn for CastSpellByName
+;c for /cast
+;m for /macro
+;rl for /console reloadui
+;pm for player mana
+;pmm for player max mana
+;ph for player health
+;phm for player max health
+;p2h for party2 health (and so on for party3, party4, party5)
+

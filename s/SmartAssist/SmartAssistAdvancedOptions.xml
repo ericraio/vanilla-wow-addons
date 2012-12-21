@@ -1,0 +1,424 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	
+	<Frame name="SAAdvancedOptionsFrame" setAllPoints="true" enableMouse="true" parent="SAOptionsFrame" hidden="true">
+		<Size>
+			<AbsDimension x="500" y="380"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="SAOptionsFrame" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			
+			<Button name="SASelectModifierDD" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAOptionsFrame">
+						<Offset>
+							<AbsDimension x="9" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SASelectModifierDDInfo" inherits="GameFontNormal" text="assists player">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="130" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				
+				<Scripts>
+					<OnLoad>
+						SASelectModifierDD_OnLoad();
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Assist if you select player while holding modifier",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="SAAssistModifierDD" inherits="UIDropDownMenuTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SASelectModifierDD">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="SAAssistModifierDDInfo" inherits="GameFontNormal" text="disables autocast on assist">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="130" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				
+				<Scripts>
+					<OnLoad>
+						SAAssistModifierDD_OnLoad();
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Holding down this key will disable 'auto cast on assist' allowing you just to select target when needed.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			
+			<Button name="ModifierHelp" inherits="SA_HelpTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="SAOptionsFrame">
+						<Offset>
+							<AbsDimension x="-30" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<Button name="SADisableInfo">
+				<Size>
+					<AbsDimension x="200" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAOptionsFrame">
+						<Offset>
+							<AbsDimension x="22" y="-120"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormal" justifyH="LEFT" name="$parentText" text="Temporarily disable feature if raid has more members than">
+							<Color r="1" g="1" b="1"/>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Fallback to target nearest and priority by health are excellent features in party and smaller raids but on larger raids they are more likelly to be nuisance. With this you can set if and when those features are temporarily disabled.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+						
+			<Slider name="SADisableSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="220" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SADisableInfo" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("members > ");
+						getglobal(this:GetName().."High"):SetText("35");
+						getglobal(this:GetName().."Low"):SetText("4");
+						this:SetMinMaxValues(4,35);
+						this:SetValueStep(1);
+					</OnLoad>
+					<OnValueChanged>
+						SA_Options_UpdateDisableSlider();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			
+			<CheckButton name="SADisableTargetNearestCB" inherits="OptionsCheckButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SADisableSlider">
+						<Offset>
+							<AbsDimension x="30" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Disable fallback to target nearest">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("DisableTargetNearest");
+					</OnClick>
+					<OnShow>
+						this:SetScale(0.8);
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SADisablePriorityHealthCB" inherits="OptionsCheckButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SADisableTargetNearestCB">
+						<Offset>
+							<AbsDimension x="0" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Disable priority health">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("DisablePriorityHealth");
+					</OnClick>
+					<OnShow>
+						this:SetScale(0.8);
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="SAPauseResetsOrderCB" inherits="OptionsCheckButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SADisableInfo">
+						<Offset>
+							<AbsDimension x="0" y="-110"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Assist order is reseted if target is kept over 3s">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("PauseResetsOrder");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+						
+			<CheckButton name="SADisableAssistWithoutPullerCB" inherits="OptionsCheckButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAPauseResetsOrderCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Disable assisting raid members when without puller">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("DisableAssistWithoutPuller");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="SAVerboseAssistCB" inherits="OptionsCheckButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SADisableAssistWithoutPullerCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Verbose assists">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						SA_ToggleOption("VerboseAssist");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="SAVerboseIncomingCB" inherits="OptionsCheckButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAVerboseAssistCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Verbose incoming enemies">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Requires assist list to be enabled. Uses SCT if available.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						SA_ToggleOption("VerboseIncoming");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="SAVerboseNearestCB" inherits="OptionsCheckButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAVerboseIncomingCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Verbose check nearest">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Display red alert message if acquired attacking target from check nearest. Uses SCT if available.",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						SA_ToggleOption("VerboseNearest");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="SAVerboseUnableToAssistCB" inherits="OptionsCheckButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SAVerboseNearestCB">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" text="Verbose unable to assist">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Verbose unable to assist in chat window",1,1,1,1,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						SA_ToggleOption("VerboseUnableToAssist");
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+						
+			
+		</Frames>
+
+		<Scripts>
+			<OnShow>
+				SA_Options_OnShowAdvanced();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+</Ui>	

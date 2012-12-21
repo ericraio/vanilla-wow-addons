@@ -1,0 +1,1493 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="MoveAnything.lua"/>
+	<Script file="MAPredefinedFrames.lua"/>
+
+	<Button name="GameMenuButtonMoveAnything" parent = "GameMenuFrame" inherits="GameMenuButtonTemplate" text="MoveAnything!">
+		<Scripts>
+			<OnLoad>
+				GameMenu_AddButton( this );
+			</OnLoad>
+			<OnClick>
+				PlaySound("igMainMenuContinue");
+				HideUIPanel(GameMenuFrame);
+				MAOptions:Show();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="ResizingButton" virtual="true">
+		<Size>
+			<AbsDimension x="8" y="8"/>
+		</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="4"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="8"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="2" right="2" top="2" bottom="2"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnLoad>
+				local anchorto, anchor = MoveAnything_SizingAnchor( this );
+				this:SetPoint( anchor, this:GetParent():GetName(), anchorto, 0, 0 );
+			</OnLoad>
+			<OnShow>
+				this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+			</OnShow>
+			<OnMouseDown>
+				if( arg1 == "RightButton" ) then
+					local t = getglobal( this:GetParent():GetName().."Backdrop" );
+					if( IsShiftKeyDown() ) then
+						if( t:IsVisible() ) then
+							t:Hide();
+						else
+							t:Show();
+						end
+					else
+						this:GetParent():StartMoving();
+					end
+				else
+					this:GetParent().MASizingAnchor = MoveAnything_SizingAnchor( this );
+					this:GetParent():StartSizing( MoveAnything_SizingAnchor( this ) );
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:GetParent():StopMovingOrSizing()
+				MoveAnything_UpdatePosition( this:GetParent() );
+				this:GetParent().MASizingAnchor = nil;
+				if( arg1 == "RightButton" and not IsShiftKeyDown() ) then
+					MoveAnything_StopMoving( this:GetParent().tagged:GetName() );
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+
+	<Frame name="MALocator" frameStrata="DIALOG" enableMouse="true" hidden="true" parent="UIParent" movable="true" resizable="true">
+		<Size>
+			<AbsDimension x="100" y="100"/>
+		</Size>
+		<ResizeBounds>
+			<minResize>
+				<AbsDimension x="8" y="8"/>
+			</minResize>
+		</ResizeBounds>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="8"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="3" top="3" bottom="3"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnMouseDown>
+				if( arg1 == "LeftButton" ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing()
+				if( arg1 == "RightButton" ) then
+					if( IsShiftKeyDown() ) then
+						Print( "Locator left: "..this:GetLeft().." bottom: "..this:GetBottom()..
+								" width: "..this:GetWidth().." height: "..this:GetHeight() );
+					else
+						this:Hide();
+					end
+				end
+			</OnMouseUp>
+		</Scripts>
+		<Frames>
+			<Button name="$parentResize_TOP" inherits="ResizingButton"/>
+			<Button name="$parentResize_LEFT" inherits="ResizingButton"/>
+			<Button name="$parentResize_BOTTOM" inherits="ResizingButton"/>
+			<Button name="$parentResize_RIGHT" inherits="ResizingButton"/>
+		</Frames>
+	</Frame>
+
+	<Frame name="MoveAnythingUpdater" parent="UIParent">
+		<Scripts>
+			<OnUpdate>
+				MoveAnythingUpdater_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="MoveAnythingTemplate" frameStrata="DIALOG" enableMouse="true" hidden="true" parent="UIParent" movable="true" resizable="true" virtual="true" setAllPoints="true">
+		<Size>
+			<AbsDimension x="100" y="100"/>
+		</Size>
+		<ResizeBounds>
+			<minResize>
+				<AbsDimension x="8" y="8"/>
+			</minResize>
+		</ResizeBounds>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				getglobal( this:GetName().."Backdrop" ):SetBackdropColor(1,1,1,0.5);
+				getglobal( this:GetName().."Backdrop" ):SetBackdropBorderColor(1,1,1,0.5);
+			</OnLoad>
+			<OnMouseDown>
+				this:StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				this:StopMovingOrSizing()
+				MoveAnything_UpdatePosition( this );
+				if( arg1 == "RightButton" and this.tagged ) then
+					local t = getglobal( this:GetName().."Backdrop" );
+					if( IsShiftKeyDown() ) then
+						if( t:IsVisible() ) then
+							t:Hide();
+						else
+							t:Show();
+						end
+					else
+						MoveAnything_StopMoving( this.tagged:GetName() );
+					end
+				end
+			</OnMouseUp>
+			<OnSizeChanged>
+				MoveAnything_OnSizeChanged( this );
+			</OnSizeChanged>
+			<OnShow>
+				MA_MoverOnShow();
+				getglobal( this:GetName().."Backdrop" ):Show();
+				getglobal( this:GetName().."BackdropMovingFrameName" ):SetText( "Moving\n"..this.helpfulName );
+				if( MoveAnything_NoScale[ this.tagged:GetName() ] ) then
+					getglobal( this:GetName().."Resize_TOP" ):Hide();
+					getglobal( this:GetName().."Resize_LEFT" ):Hide();
+					getglobal( this:GetName().."Resize_BOTTOM" ):Hide();
+					getglobal( this:GetName().."Resize_RIGHT" ):Hide();
+				else
+					getglobal( this:GetName().."Resize_TOP" ):Show();
+					getglobal( this:GetName().."Resize_LEFT" ):Show();
+					getglobal( this:GetName().."Resize_BOTTOM" ):Show();
+					getglobal( this:GetName().."Resize_RIGHT" ):Show();
+				end
+			</OnShow>
+			<OnHide>
+				MA_MoverOnHide();
+			</OnHide>
+		</Scripts>
+		<Frames>
+			<Frame name="$parentBackdrop" setAllPoints="true" enableMouse="false">
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="8"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top="3" bottom="3"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentMovingFrameName" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Button name="$parentResize_TOP" inherits="ResizingButton"/>
+			<Button name="$parentResize_LEFT" inherits="ResizingButton"/>
+			<Button name="$parentResize_BOTTOM" inherits="ResizingButton"/>
+			<Button name="$parentResize_RIGHT" inherits="ResizingButton"/>
+		</Frames>
+	</Frame>
+	<Frame name="MoveAnything1" inherits="MoveAnythingTemplate" parent="UIParent" id="1"/>
+	<Frame name="MoveAnything2" inherits="MoveAnythingTemplate" parent="UIParent" id="2"/>
+	<Frame name="MoveAnything3" inherits="MoveAnythingTemplate" parent="UIParent" id="3"/>
+	<Frame name="MoveAnything4" inherits="MoveAnythingTemplate" parent="UIParent" id="4"/>
+	<Frame name="MoveAnything5" inherits="MoveAnythingTemplate" parent="UIParent" id="5"/>
+	<Frame name="MoveAnything6" inherits="MoveAnythingTemplate" parent="UIParent" id="6"/>
+	<Frame name="MoveAnything7" inherits="MoveAnythingTemplate" parent="UIParent" id="7"/>
+	<Frame name="MoveAnything8" inherits="MoveAnythingTemplate" parent="UIParent" id="8"/>
+	<Frame name="MoveAnything9" inherits="MoveAnythingTemplate" parent="UIParent" id="9"/>
+	<Frame name="MoveAnything10" inherits="MoveAnythingTemplate" parent="UIParent" id="10"/>
+	<Frame name="MoveAnything11" inherits="MoveAnythingTemplate" parent="UIParent" id="11"/>
+	<Frame name="MoveAnything12" inherits="MoveAnythingTemplate" parent="UIParent" id="12"/>
+	<Frame name="MoveAnything13" inherits="MoveAnythingTemplate" parent="UIParent" id="13"/>
+	<Frame name="MoveAnything14" inherits="MoveAnythingTemplate" parent="UIParent" id="14"/>
+	<Frame name="MoveAnything15" inherits="MoveAnythingTemplate" parent="UIParent" id="15"/>
+	<Frame name="MoveAnything16" inherits="MoveAnythingTemplate" parent="UIParent" id="16"/>
+	<Frame name="MoveAnything17" inherits="MoveAnythingTemplate" parent="UIParent" id="17"/>
+	<Frame name="MoveAnything18" inherits="MoveAnythingTemplate" parent="UIParent" id="18"/>
+	<Frame name="MoveAnything19" inherits="MoveAnythingTemplate" parent="UIParent" id="19"/>
+	<Frame name="MoveAnything20" inherits="MoveAnythingTemplate" parent="UIParent" id="20"/>
+
+	<!-- Some frames to hook things that don't really exist, but that we want to be able to move, such as bag frames -->
+	<Frame name="MovableBagFrame" virtual="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="1" y="1"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				local CONTAINER_FRAME_TABLE = {
+					[0] = {"Interface\\ContainerFrame\\UI-BackpackBackground", 256, 256, 239},
+					[1] = {"Interface\\ContainerFrame\\UI-Bag-1x4", 256, 128, 96},
+					[2] = {"Interface\\ContainerFrame\\UI-Bag-1x4", 256, 128, 96},
+					[3] = {"Interface\\ContainerFrame\\UI-Bag-1x4", 256, 128, 96},
+					[4] = {"Interface\\ContainerFrame\\UI-Bag-1x4", 256, 128, 96},
+					[5] = {"Interface\\ContainerFrame\\UI-Bag-1x4+2", 256, 128, 116},
+					[6] = {"Interface\\ContainerFrame\\UI-Bag-1x4+2", 256, 128, 116},
+					[7] = {"Interface\\ContainerFrame\\UI-Bag-1x4+2", 256, 128, 116},
+					[8] = {"Interface\\ContainerFrame\\UI-Bag-2x4", 256, 256, 137},
+					[9] = {"Interface\\ContainerFrame\\UI-Bag-2x4+2", 256, 256, 157},
+					[10] = {"Interface\\ContainerFrame\\UI-Bag-2x4+2", 256, 256, 157},
+					[11] = {"Interface\\ContainerFrame\\UI-Bag-2x4+2", 256, 256, 157},
+					[12] = {"Interface\\ContainerFrame\\UI-Bag-3x4", 256, 256, 178},
+					[13] = {"Interface\\ContainerFrame\\UI-Bag-3x4+2", 256, 256, 198},
+					[14] = {"Interface\\ContainerFrame\\UI-Bag-3x4+2", 256, 256, 198},
+					[15] = {"Interface\\ContainerFrame\\UI-Bag-3x4+2", 256, 256, 198},
+					[16] = {"Interface\\ContainerFrame\\UI-Bag-4x4", 256, 256, 219},
+					[18] = {"Interface\\ContainerFrame\\UI-Bag-4x4+2", 256, 256, 239},
+					[20] = {"Interface\\ContainerFrame\\UI-Bag-5x4", 256, 256, 259},
+				};
+				MoveAnything_BagFrames[ this:GetID() ] = this;
+				this.OnBeginMove = function( this )
+						this.size = GetContainerNumSlots( this:GetID() );
+						if( this.size ~= 0 ) then
+							local frameSettings = CONTAINER_FRAME_TABLE[this.size];
+							if ( this:GetID() == 0 ) then
+								frameSettings = CONTAINER_FRAME_TABLE[0];
+							end
+							this:SetWidth(CONTAINER_WIDTH);
+							this:SetHeight(frameSettings[4]);
+							local container = MoveAnything_FindContainerFrame( this:GetID() );
+							if( container ) then
+								MoveAnything_RemoveContainerFromList( container );
+								MoveAnything_GrabContainerFrame( container, MoveAnything_BagFrames[ this:GetID() ] );
+								container:HiddenClearAllPoints();
+								container:HiddenSetPoint( "BOTTOMLEFT", this:GetName(), "BOTTOMLEFT", 0, 0 );
+							end
+							return true;
+						else
+							Print( "You must be at the bank to move bank bags", 1.0, 0.2, 0.2 );
+							return false;
+						end
+					end
+				this.OnMoveAnythingPreReset = function( this )
+						if( this.attachedChildren ) then
+							for i, v in this.attachedChildren do
+								v:ClearAllPoints();
+								v:Hide();
+							end
+						end
+					end
+
+				--this:OnBeginMove();
+				this:ClearAllPoints();
+				local x,y;
+				x = -50 - (this:GetID() * 50);
+				y = 50 + (this:GetID() * 50);
+				this:SetPoint( "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", x, y );
+				this:SetScale( UIParent:GetScale() );
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="BagFrame1" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="0"/>
+	<Frame name="BagFrame2" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="1"/>
+	<Frame name="BagFrame3" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="2"/>
+	<Frame name="BagFrame4" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="3"/>
+	<Frame name="BagFrame5" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="4"/>
+	<Frame name="BankBagFrame1" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="5"/>
+	<Frame name="BankBagFrame2" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="6"/>
+	<Frame name="BankBagFrame3" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="7"/>
+	<Frame name="BankBagFrame4" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="8"/>
+	<Frame name="BankBagFrame5" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="9"/>
+	<Frame name="BankBagFrame6" inherits="MovableBagFrame" parent="UIParent" hidden="false" id="10"/>
+
+	<Frame name="UIPanelMover1" parent="UIParent" hidden="false" enableMouse="false">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+
+	<Frame name="UIPanelMover2" parent="UIParent" hidden="false" enableMouse="false">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="384" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+
+	<Frame name="TooltipMover" parent="UIParent" hidden="false" enableMouse="false">
+		<Size>
+			<AbsDimension x="150" y="80"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP"/>
+		</Anchors>
+		<Scripts>
+			<OnShow>
+				this:SetFrameLevel( GameTooltip:GetFrameLevel() + 1 );
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="BagButtonsMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="208" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo = "MainMenuBarArtFrame">
+				<Offset>
+					<AbsDimension x="-6" y="2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "BagButtonsVerticalMover" ) ) then
+							MoveAnything_ResetFrameOptions( "BagButtonsVerticalMover" );
+						end
+						MainMenuBarBackpackButton:ClearAllPoints();
+						MainMenuBarBackpackButton:SetPoint( "RIGHT", this:GetName(), "RIGHT", 0, 0 );
+						CharacterBag0Slot:ClearAllPoints();
+						CharacterBag0Slot:SetPoint( "RIGHT", "MainMenuBarBackpackButton", "LEFT", -2, 0 );
+						CharacterBag1Slot:ClearAllPoints();
+						CharacterBag1Slot:SetPoint( "RIGHT", "CharacterBag0Slot", "LEFT", -2, 0 );
+						CharacterBag2Slot:ClearAllPoints();
+						CharacterBag2Slot:SetPoint( "RIGHT", "CharacterBag1Slot", "LEFT", -2, 0 );
+						CharacterBag3Slot:ClearAllPoints();
+						CharacterBag3Slot:SetPoint( "RIGHT", "CharacterBag2Slot", "LEFT", -2, 0 );
+						this.attachedChildren = {};
+						table.insert( this.attachedChildren, getglobal( "MainMenuBarBackpackButton" ) );
+						for i = 0, 3, 1 do
+						   table.insert( this.attachedChildren, getglobal( "CharacterBag"..i.."Slot" ) );
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						MainMenuBarBackpackButton:ClearAllPoints();
+						MainMenuBarBackpackButton:SetPoint( "BOTTOMRIGHT", "MainMenuBarArtFrame", "BOTTOMRIGHT", -6, 2 );
+						CharacterBag0Slot:ClearAllPoints();
+						CharacterBag0Slot:SetPoint( "RIGHT", "MainMenuBarBackpackButton", "LEFT", -5, 0 );
+						CharacterBag1Slot:ClearAllPoints();
+						CharacterBag1Slot:SetPoint( "RIGHT", "CharacterBag0Slot", "LEFT", -5, 0 );
+						CharacterBag2Slot:ClearAllPoints();
+						CharacterBag2Slot:SetPoint( "RIGHT", "CharacterBag1Slot", "LEFT", -5, 0 );
+						CharacterBag3Slot:ClearAllPoints();
+						CharacterBag3Slot:SetPoint( "RIGHT", "CharacterBag2Slot", "LEFT", -5, 0 );
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="BagButtonsVerticalMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="32" y="208"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativeTo = "MainMenuBarArtFrame">
+				<Offset>
+					<AbsDimension x="-6" y="2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "BagButtonsMover" ) ) then
+							MoveAnything_ResetFrameOptions( "BagButtonsMover" );
+						end
+						MainMenuBarBackpackButton:ClearAllPoints();
+						MainMenuBarBackpackButton:SetPoint( "BOTTOM", this:GetName(), "BOTTOM", 0, 0 );
+						CharacterBag0Slot:ClearAllPoints();
+						CharacterBag0Slot:SetPoint( "BOTTOM", "MainMenuBarBackpackButton", "TOP", 0, 3 );
+						CharacterBag1Slot:ClearAllPoints();
+						CharacterBag1Slot:SetPoint( "BOTTOM", "CharacterBag0Slot", "TOP", 0, 3 );
+						CharacterBag2Slot:ClearAllPoints();
+						CharacterBag2Slot:SetPoint( "BOTTOM", "CharacterBag1Slot", "TOP", 0, 3 );
+						CharacterBag3Slot:ClearAllPoints();
+						CharacterBag3Slot:SetPoint( "BOTTOM", "CharacterBag2Slot", "TOP", 0, 3 );
+						this.attachedChildren = {};
+						table.insert( this.attachedChildren, getglobal( "MainMenuBarBackpackButton" ) );
+						for i = 0, 3, 1 do
+							table.insert( this.attachedChildren, getglobal( "CharacterBag"..i.."Slot" ) );
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						MainMenuBarBackpackButton:ClearAllPoints();
+						MainMenuBarBackpackButton:SetPoint( "BOTTOMRIGHT", "MainMenuBarArtFrame", "BOTTOMRIGHT", -6, 2 );
+						CharacterBag0Slot:ClearAllPoints();
+						CharacterBag0Slot:SetPoint( "RIGHT", "MainMenuBarBackpackButton", "LEFT", -5, 0 );
+						CharacterBag1Slot:ClearAllPoints();
+						CharacterBag1Slot:SetPoint( "RIGHT", "CharacterBag0Slot", "LEFT", -5, 0 );
+						CharacterBag2Slot:ClearAllPoints();
+						CharacterBag2Slot:SetPoint( "RIGHT", "CharacterBag1Slot", "LEFT", -5, 0 );
+						CharacterBag3Slot:ClearAllPoints();
+						CharacterBag3Slot:SetPoint( "RIGHT", "CharacterBag2Slot", "LEFT", -5, 0 );
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MicroButtonsMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="216" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "MainMenuBarArtFrame">
+				<Offset>
+					<AbsDimension x="546" y="2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "MicroButtonsVerticalMover" ) ) then
+							MoveAnything_ResetFrameOptions( "MicroButtonsVerticalMover" );
+						end
+						local grab = { CharacterMicroButton, SpellbookMicroButton,
+								TalentMicroButton, QuestLogMicroButton,
+								SocialsMicroButton, WorldMapMicroButton,
+								MainMenuMicroButton, HelpMicroButton };
+						this.attachedChildren = {};
+						for i in grab do
+							local b, pb;
+							b = grab[i];
+							if( i == 1 ) then
+								b:ClearAllPoints();
+								b:SetPoint( "BOTTOMLEFT", this:GetName(), "BOTTOMLEFT" );
+								pb = nil;
+							else
+								pb = grab[i-1];
+							end
+							table.insert( this.attachedChildren, b );
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						CharacterMicroButton:ClearAllPoints();
+						CharacterMicroButton:SetPoint( "BOTTOMLEFT", "MainMenuBarArtFrame", "BOTTOMLEFT", 546, 2 );
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="MicroButtonsVerticalMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="32" y="275"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "MainMenuBarArtFrame">
+				<Offset>
+					<AbsDimension x="546" y="2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "MicroButtonsMover" ) ) then
+							MoveAnything_ResetFrameOptions( "MicroButtonsMover" );
+						end
+						local grab = { CharacterMicroButton, SpellbookMicroButton,
+								TalentMicroButton, QuestLogMicroButton,
+								SocialsMicroButton, WorldMapMicroButton,
+								MainMenuMicroButton, HelpMicroButton };
+						this.attachedChildren = {};
+						for i in grab do
+							local b, pb;
+							b = grab[i];
+							grab[i]:ClearAllPoints();
+							if( i == 1 ) then
+								grab[i]:SetPoint( "TOPLEFT", this:GetName(), "TOPLEFT", 0, 24 );
+							else
+								grab[i]:SetPoint( "TOPLEFT", grab[i-1]:GetName(), "BOTTOMLEFT", 0, 24 );
+							end
+							table.insert( this.attachedChildren, b );
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						CharacterMicroButton:ClearAllPoints();
+						CharacterMicroButton:SetPoint( "BOTTOMLEFT", "MainMenuBarArtFrame", "BOTTOMLEFT", 546, 2 );
+						local grab = { CharacterMicroButton, SpellbookMicroButton,
+								TalentMicroButton, QuestLogMicroButton,
+								SocialsMicroButton, WorldMapMicroButton,
+								MainMenuMicroButton, HelpMicroButton };
+						for i in grab do
+							local b, pb;
+							if( i > 1 ) then
+								grab[i]:ClearAllPoints();
+								grab[i]:SetPoint( "BOTTOMLEFT", grab[i-1]:GetName(), "BOTTOMRIGHT", -2, 0 );
+							end
+						end
+						this:Hide();
+						UpdateTalentButton();
+					end
+				this.OnMoveAnythingPostAttach = function( this )
+						UpdateTalentButton();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="BasicActionButtonsMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="496" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "MainMenuBarArtFrame">
+				<Offset>
+					<AbsDimension x="8" y="4"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						local b, pb;
+						if( MoveAnything_IsFrameHooked( "BasicActionButtonsVerticalMover" ) ) then
+							MoveAnything_ResetFrameOptions( "BasicActionButtonsVerticalMover" );
+						end
+						ActionButton1:ClearAllPoints();
+						ActionButton1:SetPoint( "LEFT", this:GetName(), "LEFT", 0, 0 );
+						ActionBarUpButton:ClearAllPoints( );
+						ActionBarUpButton:SetPoint( "TOPLEFT", "ActionButton12", "TOPRIGHT", -6, 4 );
+						ActionBarDownButton:ClearAllPoints();
+						ActionBarDownButton:SetPoint( "BOTTOMLEFT", "ActionButton12", "BOTTOMRIGHT", -6, -8 );
+						this.attachedChildren = {};
+						for i = 1, 12, 1 do
+							b = getglobal( "ActionButton"..i );
+						   table.insert( this.attachedChildren, getglobal( "ActionButton"..i ) );
+						   table.insert( this.attachedChildren, getglobal( "BonusActionButton"..i ) );
+							if( i > 1 ) then
+								pb = getglobal( "ActionButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 2, 0 );
+							end
+							getglobal( "BonusActionButton"..i ):ClearAllPoints();
+							getglobal( "BonusActionButton"..i ):SetPoint( "CENTER", b:GetName(), "CENTER" );
+						end
+						table.insert( this.attachedChildren, ActionBarUpButton );
+						table.insert( this.attachedChildren, ActionBarDownButton );
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						local b, pb;
+						ActionButton1:ClearAllPoints();
+						ActionButton1:SetPoint( "BOTTOMLEFT", "MainMenuBarArtFrame", "BOTTOMLEFT", 8, 4 );
+						ActionBarUpButton:ClearAllPoints();
+						ActionBarUpButton:SetPoint( "CENTER", "MainMenuBarArtFrame", "TOPLEFT", 522, -22 );
+						ActionBarDownButton:ClearAllPoints();
+						ActionBarDownButton:SetPoint( "CENTER", "MainMenuBarArtFrame", "TOPLEFT", 522, -42 );
+						for i = 1, 12, 1 do
+							b = getglobal( "ActionButton"..i );
+							if( i > 1 ) then
+								pb = getglobal( "ActionButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 6, 0 );
+							end
+							getglobal( "BonusActionButton"..i ):ClearAllPoints();
+							getglobal( "BonusActionButton"..i ):SetPoint( "CENTER", b:GetName(), "CENTER" );
+						end
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="BasicActionButtonsVerticalMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="32" y="475"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "MainMenuBarArtFrame">
+				<Offset>
+					<AbsDimension x="8" y="4"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						local b, pb;
+						if( MoveAnything_IsFrameHooked( "BasicActionButtonsMover" ) ) then
+							MoveAnything_ResetFrameOptions( "BasicActionButtonsMover" );
+						end
+						ActionButton1:ClearAllPoints();
+						ActionButton1:SetPoint( "TOP", this:GetName(), "TOP", 0, 0 );
+						this.attachedChildren = {};
+						for i = 1, 12, 1 do
+							b = getglobal( "ActionButton"..i );
+							table.insert( this.attachedChildren, getglobal( "ActionButton"..i ) );
+							table.insert( this.attachedChildren, getglobal( "BonusActionButton"..i ) );
+							if( i > 1 ) then
+								pb = getglobal( "ActionButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "TOP", pb:GetName(), "BOTTOM", 0, -2 );
+							end
+							getglobal( "BonusActionButton"..i ):ClearAllPoints();
+							getglobal( "BonusActionButton"..i ):SetPoint( "CENTER", b:GetName(), "CENTER" );
+						end
+						table.insert( this.attachedChildren, ActionBarUpButton );
+						table.insert( this.attachedChildren, ActionBarDownButton );
+						ActionBarUpButton:ClearAllPoints( );
+						ActionBarUpButton:SetPoint( "TOPLEFT", "ActionButton12", "BOTTOMLEFT", -8, 4 );
+						ActionBarDownButton:ClearAllPoints();
+						ActionBarDownButton:SetPoint( "TOPRIGHT", "ActionButton12", "BOTTOMRIGHT", 8, 4 );
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						local b, pb;
+						ActionButton1:ClearAllPoints();
+						ActionButton1:SetPoint( "BOTTOMLEFT", "MainMenuBarArtFrame", "BOTTOMLEFT", 8, 4 );
+						ActionBarUpButton:ClearAllPoints();
+						ActionBarUpButton:SetPoint( "CENTER", "MainMenuBarArtFrame", "TOPLEFT", 522, -22 );
+						ActionBarDownButton:ClearAllPoints();
+						ActionBarDownButton:SetPoint( "CENTER", "MainMenuBarArtFrame", "TOPLEFT", 522, -42 );
+						for i = 1, 12, 1 do
+							b = getglobal( "ActionButton"..i );
+							if( i > 1 ) then
+								pb = getglobal( "ActionButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 6, 0 );
+							end
+							getglobal( "BonusActionButton"..i ):ClearAllPoints();
+							getglobal( "BonusActionButton"..i ):SetPoint( "CENTER", b:GetName(), "CENTER" );
+						end
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="PetActionButtonsMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="370" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "PetActionBarFrame">
+				<Offset>
+					<AbsDimension x="36" y="1"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "PetActionButtonsVerticalMover" ) ) then
+							MoveAnything_ResetFrameOptions( "PetActionButtonsVerticalMover" );
+						end
+						PetActionButton1:ClearAllPoints();
+						PetActionButton1:SetPoint( "LEFT", this:GetName(), "LEFT", 0, 0 );
+						this:SetFrameLevel( PetActionButton1:GetFrameLevel() + 1 );
+						this.attachedChildren = {};
+						for i = 1, 10, 1 do
+						   table.insert( this.attachedChildren, getglobal( "PetActionButton"..i ) );
+							if i > 1 then
+								b = getglobal( "PetActionButton"..i );
+								pb = getglobal( "PetActionButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 3, 0 );
+							end
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						PetActionButton1:ClearAllPoints();
+						PetActionButton1:SetPoint( "BOTTOMLEFT", "PetActionBarFrame", "BOTTOMLEFT", 36, 1 );
+						for i = 2, 10, 1 do
+							b = getglobal( "PetActionButton"..i );
+							pb = getglobal( "PetActionButton"..(i-1) );
+							b:ClearAllPoints();
+							b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 8, 0 );
+						end
+						this.attachedChildren = nil;
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="PetActionButtonsVerticalMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="32" y="370"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "PetActionBarFrame">
+				<Offset>
+					<AbsDimension x="36" y="1"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "PetActionButtonsMover" ) ) then
+							MoveAnything_ResetFrameOptions( "PetActionButtonsMover" );
+						end
+						local b, pb;
+						PetActionButton1:ClearAllPoints();
+						PetActionButton1:SetPoint( "TOP", this:GetName(), "TOP", 0, 0 );
+						this:SetFrameLevel( PetActionButton1:GetFrameLevel() + 1 );
+						this.attachedChildren = {};
+						for i = 1, 10, 1 do
+						   table.insert( this.attachedChildren, getglobal( "PetActionButton"..i ) );
+							if i > 1 then
+								b = getglobal( "PetActionButton"..i );
+								pb = getglobal( "PetActionButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "TOP", pb:GetName(), "BOTTOM", 0, -3 );
+							end
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						local b, pb;
+						PetActionButton1:ClearAllPoints();
+						PetActionButton1:SetPoint( "BOTTOMLEFT", "PetActionBarFrame", "BOTTOMLEFT", 36, 1 );
+						for i = 2, 10, 1 do
+							b = getglobal( "PetActionButton"..i );
+							pb = getglobal( "PetActionButton"..(i-1) );
+							b:ClearAllPoints();
+							b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 8, 0 );
+						end
+						this.attachedChildren = nil;
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="ShapeshiftButtonsMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="225" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "ShapeshiftBarFrame">
+				<Offset>
+					<AbsDimension x="11" y="3"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "ShapeshiftButtonsVerticalMover" ) ) then
+							MoveAnything_ResetFrameOptions( "ShapeshiftButtonsVerticalMover" );
+						end
+						ShapeshiftButton1:ClearAllPoints();
+						ShapeshiftButton1:SetPoint( "LEFT", this:GetName(), "LEFT", 7, 0 );
+						this:SetFrameLevel( ShapeshiftButton1:GetFrameLevel() + 1 );
+						this.attachedChildren = {};
+						for i = 1, 10, 1 do
+						   table.insert( this.attachedChildren, getglobal( "ShapeshiftButton"..i ) );
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						ShapeshiftButton1:ClearAllPoints();
+						ShapeshiftButton1:SetPoint( "BOTTOMLEFT", "ShapeshiftBarFrame", "BOTTOMLEFT", 11, 3 );
+						this.attachedChildren = nil;
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="ShapeshiftButtonsVerticalMover" parent="UIParent" hidden="true" enableMouse="false">
+		<Size>
+			<AbsDimension x="32" y="225"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo = "ShapeshiftBarFrame">
+				<Offset>
+					<AbsDimension x="11" y="3"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						if( MoveAnything_IsFrameHooked( "ShapeshiftButtonsMover" ) ) then
+							MoveAnything_ResetFrameOptions( "ShapeshiftButtonsMover" );
+						end
+						local b, pb;
+						ShapeshiftButton1:ClearAllPoints();
+						ShapeshiftButton1:SetPoint( "TOP", this:GetName(), "TOP", 0, -7 );
+						this:SetFrameLevel( ShapeshiftButton1:GetFrameLevel() + 1 );
+						this.attachedChildren = {};
+						for i = 1, 10, 1 do
+						   table.insert( this.attachedChildren, getglobal( "ShapeshiftButton"..i ) );
+							if i > 1 then
+								b = getglobal( "ShapeshiftButton"..i );
+								pb = getglobal( "ShapeshiftButton"..(i-1) );
+								b:ClearAllPoints();
+								b:SetPoint( "TOP", pb:GetName(), "BOTTOM", 0, -7 );
+							end
+						end
+						this:Show();
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						local b, pb;
+						ShapeshiftButton1:ClearAllPoints();
+						ShapeshiftButton1:SetPoint( "BOTTOMLEFT", "ShapeshiftBarFrame", "BOTTOMLEFT", 11, 3 );
+						for i = 2, 10, 1 do
+							b = getglobal( "ShapeshiftButton"..i );
+							pb = getglobal( "ShapeshiftButton"..(i-1) );
+							b:ClearAllPoints();
+							b:SetPoint( "LEFT", pb:GetName(), "RIGHT", 7, 0 );
+						end
+						this.attachedChildren = nil;
+						this:Hide();
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="FramerateMover" parent="UIParent" hidden="false" enableMouse="false">
+		<Size>
+			<AbsDimension x="90" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOM" relativeTo = "WorldFrame">
+				<Offset>
+					<AbsDimension x="0" y="64"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				this.OnMoveAnythingHook = function( this )
+						this.attachedChildren = {};
+						table.insert( this.attachedChildren, getglobal( "FramerateLabel" ) );
+						FramerateLabel:ClearAllPoints();
+						FramerateLabel:SetPoint( "LEFT", this:GetName(), "LEFT", 12, 0 );
+					end
+				this.OnMoveAnythingPostReset = function( this )
+						this.attachedChildren = nil;
+						FramerateLabel:ClearAllPoints();
+						FramerateLabel:SetPoint( "BOTTOM", "WorldFrame", "BOTTOM", 0, 64 );
+					end
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Button name="MAOptionsButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="24"/>
+		</Size>
+		<NormalText inherits="GameFontHighlight"/>
+		<DisabledText inherits="GameFontDisable"/>
+		<HighlightText inherits="GameFontHighlight"/>
+	</Button>
+	<Frame name="MAMovableFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="24"/>
+		</Size>
+		<Frames>
+			<Frame name="$parentBackdrop">
+				<Size>
+					<AbsDimension x="250" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor( 0.03, 0.03, 0.03 );
+						this:SetBackdropBorderColor( 0.4, 0.4, 0.4 );
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentFrameName">
+				<Size>
+					<AbsDimension x="250" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentText" inherits="GameFontNormal" text="ThisIsAReallyReallYLongFRAMENAME">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="6" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="$parentMove" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentFrameName">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MoveAnything_OnMoveCheck( this );
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHide" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentMove">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MoveAnything_OnHideCheck( this );
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button name="$parentReset" inherits="UIPanelButtonTemplate" text="Reset">
+				<Size>
+					<AbsDimension x="44" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="3" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalText inherits="GameFontHighlight"/>
+				<Scripts>
+					<OnClick>
+						MoveAnything_OnResetCheck( this );
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="MAOptions" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<TitleRegion setAllPoints="true"/>
+		<Size>
+			<AbsDimension x="420" y="345"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="MAOptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="280" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="MoveAnything!">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="MAOptionsFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="MAOptionsFrameNameHeader" inherits="GameFontNormalSmall" text="Frame Name">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="24" y="-32"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="MAOptionsMoveHeader" inherits="GameFontNormalSmall" text="Move">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" relativeTo="MAOptionsFrameNameHeader">
+							<Offset>
+								<AbsDimension x="246" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="MAOptionsHideHeader" inherits="GameFontNormalSmall" text="Hide">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" relativeTo="MAOptionsMoveHeader">
+							<Offset>
+								<AbsDimension x="40" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="MAOptionsCharacterSpecific" inherits="UICheckButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="24" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("Character Specific Settings");
+					</OnLoad>
+					<OnClick>
+						MoveAnything_OnCheckCharacterSpecific( this );
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button name="MAOptionsResetAll" inherits="MAOptionsButtonTemplate" text="Reset All">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-14" y="14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						StaticPopup_Show( "MOVEANYTHING_RESET_CONFIRM" );
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="MAOptionsClose" inherits="MAOptionsButtonTemplate" text="Close">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="MAOptionsResetAll">
+						<Offset>
+							<AbsDimension x="-4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						MAOptions:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="MAMove1" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAOptionsFrameNameHeader">
+						<Offset>
+							<AbsDimension x="-8" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove2" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove1">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove3" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove2">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove4" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove3">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove5" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove4">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove6" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove5">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove7" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove6">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove8" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove7">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove9" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove8">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MAMove10" inherits="MAMovableFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MAMove9">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<ScrollFrame name="MAScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="20" y="251"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-38" y="-49"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll( MOVEANYTHING_SCROLL_HEIGHT,
+								MoveAnythingOptions_Update );
+					</OnVerticalScroll>
+				</Scripts>
+				<Frames>
+					<Frame name="MAScrollBorder">
+						<Size>
+							<AbsDimension x="20" y="222"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="24" y = "-14"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropColor( 0.1, 0.1, 0.1 );
+								this:SetBackdropBorderColor( 0.4, 0.4, 0.4 );
+							</OnLoad>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("VARIABLES_LOADED");
+				this:RegisterEvent("ADDON_LOADED");
+			</OnLoad>
+			<OnShow>
+				MoveAnythingOptions_OnShow();
+			</OnShow>
+			<OnHide>
+				MoveAnythingOptions_OnHide();
+			</OnHide>
+			<OnEvent>
+				MoveAnything_Init();
+				MoveAnything_RefreshPositions();
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Button name="MA_NudgeButton" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+		<Size><AbsDimension x="24" y="24"/></Size>
+		<Scripts>
+			<OnClick>
+				MA_Nudge(this.dir, arg1);
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="MA_MoverButton" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+		<Size><AbsDimension x="15" y="15"/></Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Button name="ResizingNudger" hidden="true" parent="UIParent" movable="true">
+		<Size>
+			<AbsDimension x="200" y="175"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativeTo="MAOptions" relativePoint="BOTTOM">
+				<Offset><AbsDimension x="0" y="-20"/></Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="4"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="8"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="2" right="2" top="2" bottom="2"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset><AbsDimension x="0" y="-6"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMouseOver" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset><AbsDimension x="0" y="6"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_NudgeUp" inherits="MA_NudgeButton">
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset><AbsDimension x="0" y="24"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("^");
+						this.dir = 1;
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parent_CenterMe" inherits="UIPanelButtonTemplate" hidden="false">
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_NudgeUp" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("C");
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+					<OnClick>
+						MA_Center(0);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_NudgeDown" inherits="MA_NudgeButton">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_CenterMe" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("v");
+						this.dir = 2;
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parent_NudgeLeft" inherits="MA_NudgeButton">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent_CenterMe" relativePoint="LEFT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(MA_LEFTARROW);
+						this.dir = 3;
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parent_NudgeRight" inherits="MA_NudgeButton">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_CenterMe" relativePoint="RIGHT">
+						<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(MA_RIGHTARROW);
+						this.dir = 4;
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parent_CenterH" inherits="UIPanelButtonTemplate" hidden="false">
+				<Size><AbsDimension x="32" y="24"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent_NudgeLeft" relativePoint="LEFT">
+						<Offset><AbsDimension x="-10" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("C-H");
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+					<OnClick>
+						MA_Center(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_CenterV" inherits="UIPanelButtonTemplate" hidden="false">
+				<Size><AbsDimension x="32" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_CenterH" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("C-V");
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+					</OnLoad>
+					<OnClick>
+						MA_Center(2);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_MoverPlus" inherits="MA_MoverButton" text="+">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="-7" y="-7"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MA_Mover(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_MoverMinus" inherits="MA_MoverButton" text="-">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="7" y="-7"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MA_Mover(0);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton");
+				ResizingNudger:SetBackdropColor(0,0,0,0.75);
+				ResizingNudger:SetBackdropBorderColor(0,0,0,0.75);
+			</OnLoad>
+			<OnDragStart>
+				this:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+			</OnDragStop>
+			<OnShow>
+				MA_NudgerOnShow();
+			</OnShow>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnUpdate>
+				MA_NudgerOnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Button>
+</Ui>

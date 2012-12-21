@@ -1,0 +1,470 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+    ..\..\..\FrameXML\UI.xsd">
+
+	<Frame name="PowaListLigneTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="25"/>
+		</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="" tile="true">
+			<EdgeSize>
+				<AbsValue val="12"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="8"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="2" right="2" top="2" bottom="2"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				-- layer : texte de la ligne
+				<FontString name="$parent_text" inherits="GameFontHighlightSmall" text="Buff numero 1">
+                    <Anchors>
+	                    <Anchor point="LEFT">
+		                    <Offset>
+			                    <AbsDimension x="10" y="0"/>
+				            </Offset>
+				        </Anchor>
+					</Anchors>
+		        </FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			-- frames : boutons
+			<Button name="$parent_buttondelete">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ListeDeleteEffect(this);
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(PowaText.listdelete, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\CancelButton-Up"/>
+				<PushedTexture file="Interface\Buttons\CancelButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\CancelButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parent_buttonload">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent_buttondelete" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="5" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ListeLoadEffect(this);
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(PowaText.listload, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="$parent_buttontest" inherits="OptionsButtonTemplate" text="Test">
+				<Size>
+					<AbsDimension x="40" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ListeTestEffect(this);
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+				</Scripts>				
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0.0, 0.0, 0.0);
+			</OnLoad>
+		</Scripts>
+	</Frame> -- fin de ligne
+
+-- ------------------------------------------------------------------------------------------------------------------------------------
+
+	<Frame name="PowaListFrame" movable="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" enableKeyboard="true">
+		<Size>
+			<AbsDimension x="320" y="410" /> -- y=400 si AddAll
+		</Size>
+        <Anchors>
+			<Anchor point="TOPLEFT" relativeTo="PowaBarConfigFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+        </Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Scripts>
+			<OnMouseDown>
+				PowaBar_MouseDown( arg1, "PowaListFrame" );
+			</OnMouseDown>
+			<OnMouseUp>
+				PowaBar_MouseUp( arg1, "PowaListFrame" );
+			</OnMouseUp>
+		</Scripts>
+		<Layers>
+			<Layer>
+		        <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+		          <Size>
+		            <AbsDimension x="180" y="32" />
+				  </Size>
+		          <Anchors>
+				    <Anchor point="TOP">
+		              <Offset>
+				        <AbsDimension x="0" y="8" />
+		              </Offset>
+				    </Anchor>
+		          </Anchors>
+				  <TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+		        </Texture>
+				-- TITRE		
+				<FontString name="PowaHeaderList" inherits="GameFontNormalSmall" text="Buff/Debuff Liste">
+		          <Size>
+				    <AbsDimension x="140" y="0" />
+		          </Size>
+				  <Anchors>
+		            <Anchor point="TOP">
+				      <Offset>
+		                <AbsDimension x="0" y="-4" />
+				      </Offset>
+		            </Anchor>
+				  </Anchors>
+		          <FontHeight>
+				    <AbsValue val="14" />
+		          </FontHeight>
+				</FontString>
+				-- aide
+				<FontString name="PowaHelpList" inherits="GameFontNormalSmall" text="Texte">
+		          <Size>
+				    <AbsDimension x="260" y="30" />
+		          </Size>
+				  <Anchors>
+		            <Anchor point="TOP">
+				      <Offset>
+		                <AbsDimension x="0" y="-335" />
+				      </Offset>
+		            </Anchor>
+				  </Anchors>
+		          <FontHeight>
+				    <AbsValue val="14" />
+		          </FontHeight>
+				</FontString>
+				<FontString name="PowaListPage" inherits="GameFontNormal" text="Page 1/10">
+		          <Size>
+				    <AbsDimension x="140" y="0" />
+		          </Size>
+				  <Anchors>
+		            <Anchor point="TOP">
+				      <Offset>
+		                <AbsDimension x="5" y="-313" />
+				      </Offset>
+		            </Anchor>
+				  </Anchors>
+		          <FontHeight>
+				    <AbsValue val="14" />
+		          </FontHeight>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+
+			<Button name="PowaListButtonListDebuffs" inherits="OptionsButtonTemplate" text="Debuffs">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ListChangeType("Debuff");
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="PowaListButtonListBuffs" inherits="OptionsButtonTemplate" text="Buffs">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="PowaListButtonListDebuffs" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ListChangeType("Buff");
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="PowaListButtonListDebuffType" inherits="OptionsButtonTemplate" text="Debuff Type">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PowaListButtonListDebuffs" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ListChangeType("DebuffType");
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			-- ligne 1
+			<Frame name="PowaListLigne1" inherits="PowaListLigneTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PowaListFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="65" y="-55"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne2" inherits="PowaListLigneTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne3" inherits="PowaListLigneTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne2" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne4" inherits="PowaListLigneTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne3" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne5" inherits="PowaListLigneTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne4" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne6" inherits="PowaListLigneTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne5" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne7" inherits="PowaListLigneTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne6" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne8" inherits="PowaListLigneTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne7" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne9" inherits="PowaListLigneTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne8" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="PowaListLigne10" inherits="PowaListLigneTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaListLigne9" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			-- bouton ajouter
+			<Button name="PowaListButtonSave" inherits="OptionsButtonTemplate" text=">> Ajouter">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="PowaListFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="15"/> -- y=40 si AddAll
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_SaveEffect();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(PowaText.listaideadd, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			-- bouton ajouter tout
+			<Button name="PowaListButtonSaveAll" inherits="OptionsButtonTemplate" text=">> Ajouter Tout">
+				<Size>
+					<AbsDimension x="120" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="PowaListFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="15" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(PowaText.listaideaddall, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			-- bouton fermer
+			<Button name="PowaListButtonClose" inherits="OptionsButtonTemplate" text="Fermer">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="PowaListFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(PowaText.nomClose);
+						getglobal("PowaListButtonSaveAll"):SetText(PowaText.listaddall);
+						getglobal("PowaListButtonSaveAll"):Hide();
+						getglobal("PowaListButtonSave"):SetText(PowaText.listadd);
+						getglobal("PowaHeaderList"):SetText(PowaText.listheader);
+					</OnLoad>
+					<OnClick>
+						Powa_ShowList();
+					</OnClick>
+				</Scripts>
+			</Button>
+			-- fleche pages next
+			<Button name="powa_listnext">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="PowaListLigne10" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ChangeListNext()
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			-- fleche pages prev
+			<Button name="powa_listprevious">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PowaListLigne10" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ChangeListPrev()
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			-- fin lignes
+		</Frames>
+    </Frame> -- fin de la fenetre
+
+-- ------------------------------------------------------------------------------------------------------------------------------------
+
+</Ui>

@@ -1,0 +1,410 @@
+<!--
+
+SKMapFrame
+
+-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Button name="SKMapFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+
+				this:SetFrameLevel(this:GetFrameLevel() + 4);
+			</OnLoad>
+			<OnClick>
+				PanelTemplates_Tab_OnClick(SKMapFrame);
+				SKMapTab_OnClick();
+			</OnClick>
+			<OnShow>
+				PanelTemplates_TabResize(10);
+				getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 30);
+			</OnShow>
+		</Scripts>
+	</Button>
+
+	<Frame name="SKMapFrame" toplevel="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="768" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="45"/>
+		</HitRectInsets>
+		<Layers>
+<!--			<Layer level="ARTWORK">-->
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\AddOns\SKMap\Icons\SKMap-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\AddOns\SKMap\Icons\SKMap-TopRight">
+					<Size>
+						<AbsDimension x="512" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\AddOns\SKMap\Icons\SKMap-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture file="Interface\AddOns\SKMap\Icons\SKMap-BottomRight">
+					<Size>
+						<AbsDimension x="512" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString name="SKMapTitleText" inherits="GameFontHighlight" text="SKM_TITLE">
+					<Size>
+					    <AbsDimension x="300" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SKMapFrame" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-17"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture file="Interface\AddOns\SKMap\Icons\SKMap-UI-Icon">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="6" y="58"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+
+			<Button name="SKMapCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="SKMapFrame" relativePoint="TOPRIGHT">
+
+						<Offset>
+							<AbsDimension x="-10" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="SKMapFrameTab1" inherits="SKMapFrameTabButtonTemplate" id="1" text="SKMAP_TAB_LIST">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="65" y="61"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="SKMapFrameTab2" inherits="SKMapFrameTabButtonTemplate" id="2" text="SKMAP_TAB_DUEL">
+				<Anchors>
+				   <Anchor point="LEFT" relativeTo="SKMapFrameTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<Button name="SKMapFrameTab3" inherits="SKMapFrameTabButtonTemplate" id="3" text="SKMAP_TAB_REPORT">
+				<Anchors>
+				   <Anchor point="LEFT" relativeTo="SKMapFrameTab2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="SKMapFrameTab4" inherits="SKMapFrameTabButtonTemplate" id="4" text="SKMAP_TAB_OPTIONS">
+				<Anchors>
+				   <Anchor point="LEFT" relativeTo="SKMapFrameTab3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				SKMapFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				SKMapFrame_OnEvent(event);
+			</OnEvent>
+			<OnShow>
+				SKMapFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				SKMapFrame_OnHide();
+			</OnHide>
+			<OnEscapePressed>
+<!--				SKMapFrame:Hide();-->
+			</OnEscapePressed>
+
+		</Scripts>
+	</Frame>
+
+
+
+<!-- SKMapStaticPopupEdit
+     Popup Edit dialog box
+-->
+	<Frame name="SKMapStaticPopupEdit" toplevel="true" enableMouse="true" frameStrata="DIALOG"
+	       hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="400" y="150"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP" relativeTo="SKMapFrame" relativePoint="TOP">
+<!--      <Anchor point="TOP" relativeTo="UIParent" relativePoint="TOP"> -->
+				<Offset>
+					<AbsDimension x="0" y="-70"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+
+				<Size>
+					<AbsDimension x="128" y="17" />
+				</Size>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="276" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString inherits="GameFontNormal" name="$parentTitle">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SKMapStaticPopupEdit">
+							<Offset>
+								<AbsDimension x="0" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString inherits="GameFontHighlight" name="$parentPrompt">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="SKMapStaticPopupEdit" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-35"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+
+			<Button name="$parentClear" inherits="GameMenuButtonTemplate" text="SKMAP_CLEAR">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOM" relativeTo="SKMapStaticPopupEdit">
+						<Offset>
+							<AbsDimension x="0" y="30" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						SKMap_EditBox_Clear();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentAccept" inherits="GameMenuButtonTemplate" text="OKAY">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentClear">
+						<Offset>
+							<AbsDimension x="-10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						PlaySound("gsTitleOptionOK");
+						SKMap_EditBox_Accept();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="CANCEL">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentClear">
+						<Offset>
+							<AbsDimension x="10" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						SKMap_EditBox_Cancel();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<EditBox name="$parentEditBox" historyLines="1">
+				<Size>
+					<AbsDimension x="300" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="SKMapStaticPopupEdit" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension x="256" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="-10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension x="75" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.70703125" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+
+				<Scripts>
+					<OnEnterPressed>
+						 SKMap_EditBox_Accept();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						 SKMap_EditBox_Cancel();
+					</OnEscapePressed>
+					<OnTabPressed>
+					</OnTabPressed>
+				</Scripts>
+
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				<!--this:SetAlpha(1);  -->
+				<!--this:SetBackdropColor(0, 0, 0, 2.0);-->
+			</OnLoad>
+			<OnShow>
+				SKMap_EditBox_OnShow();
+			</OnShow>
+			<OnHide>
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+</Ui>
+
+

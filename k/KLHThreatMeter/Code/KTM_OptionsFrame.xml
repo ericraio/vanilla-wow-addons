@@ -1,0 +1,734 @@
+﻿<!--
+	KLHThreatMeter KTM_OptionsFrame.xml
+	
+	A GUI for viewing and editing options for the main KTM GUI. The options are
+	divided into three sections, General, Self and Raid. Each section has its own
+	frame and components; only one frame is visible at a time. There is also a 
+	controls frame for changing frames and closing the options GUI.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	
+	<!-- The font used by the check buttons -->
+	<FontString name="KLHTM_OptionsDefaultFont" inherits="GameFontNormal" virtual="true">
+		<Color r="1.0" g="1.0" b="1.0"/>
+	</FontString>
+	
+	<!-- The font used by most strings -->
+	<FontString name="KLHTM_OptionsStringFont" inherits="KLHTM_OptionsDefaultFont" virtual="true"/>
+	
+	<!-- The font used by the headings -->
+	<FontString name="KLHTM_OptionsHeaderFont" inherits="KLHTM_OptionsDefaultFont" virtual="true">
+		<Color r="1.0" g="0.82" b="0"/>
+	</FontString>
+	
+	
+	<!-- a layout frame for header strings -->
+	<Frame name="KLHTM_OptionsHeaderTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentText" inherits="KLHTM_OptionsHeaderFont">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- a template for all the check buttons -->
+	<CheckButton name="KLHTM_CheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="KLHTM_OptionsStringFont">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+	</CheckButton>
+	
+	<!-- a template for the control buttons -->
+	<Button name="KLHTM_OptionsButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="73" y="22"/>
+		</Size>
+	</Button>
+	
+	<!-- a template for sliders -->
+	<Slider name="KLHTM_OptionsSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="140" y="18"/>
+		</Size>
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="-5" bottom="-5"/>
+		</HitRectInsets>
+		<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="8"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="8"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="3" top="6" bottom="6"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- A description of the slider -->
+				<FontString name="$parentText" inherits="KLHTM_OptionsStringFont">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<!-- The current value -->
+				<FontString name="$parentValue" inherits="KLHTM_OptionsStringFont">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+			<Size>
+				<AbsDimension x="32" y="32"/>
+			</Size>
+		</ThumbTexture>
+	</Slider>
+	
+	<!-- a template for the main subframes - ie self, raid, general etc -->
+	<Frame name="KLHTM_OptionsFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="250" y="150"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTitle">
+				<Offset x="0" y="-5"/>
+			</Anchor>
+		</Anchors>
+	</Frame>
+
+	<!-- The base frame for the options gui -->
+	<Frame name="KLHTM_OptionsFrame" parent="UIParent" hidden="true" enableMouse="true" movable="true" toplevel="true">
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="300" y="240"/>
+		</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+			    <AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+			    <AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+			    <AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnDragStart>
+				KLHTM_OptionsFrame:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				KLHTM_OptionsFrame:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+		<Frames>
+			
+			<!-- Title bar -->
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="290" y="15"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="5" y="-5"/>
+					</Anchor>
+					<Anchor point="TOPRIGHT">
+						<Offset x="-5" y="-5"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BORDER">					
+						<!-- The title bar background -->
+						<Texture name="$parentBackground">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="-1" y="1"/>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset x="1" y="0"/>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/> 
+						</Texture>
+						<!-- title bar text -->
+						<FontString name="$parentText" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="10"/>
+							</FontHeight>
+						</FontString>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<!-- a dividing line between the title bar and the options -->
+						<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="-1" y="3"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="1" y="-4"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<!-- General options -->
+			<Frame name="$parentGeneral" inherits="KLHTM_OptionsFrameTemplate">
+				
+				<Frames>
+					<!-- minimised button visibility -->	
+					<Frame name="$parentMinimisedHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+					</Frame>
+					
+					<CheckButton name="$parentMinimisedPin" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedHeader" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MinimisedPin"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMinimisedOptions" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedPin" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MinimisedOptions"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMinimisedView" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedOptions" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MinimisedView"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMinimisedMasterTarget" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedView" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MinimisedMasterTarget"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMinimisedClearThreat" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedMasterTarget" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MinimisedClearThreat"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Maximised button visibility -->
+					<Frame name="$parentMaximisedHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="135" y="0"/>
+							</Anchor>
+						</Anchors>
+					</Frame>
+
+					<CheckButton name="$parentMaximisedPin" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMaximisedHeader" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MaximisedPin"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMaximisedView" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMaximisedPin" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MaximisedView"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMaximisedMasterTarget" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMaximisedView" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MaximisedMasterTarget"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMaximisedClearThreat" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMaximisedMasterTarget" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsGeneral_OnClick("MaximisedClearThreat"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- other options -->
+					<Frame name="$parentHeaderOther" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMaximisedClearThreat" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-10"/>
+							</Anchor>
+						</Anchors>
+					</Frame>
+				
+					<!-- Global scale -->
+					<Slider name="$parentScale" inherits="KLHTM_OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentHeaderOther" relativePoint="BOTTOMLEFT">
+								<Offset x="2" y="-2"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged> 
+								KLHTM_OptionsGeneral_OnValueChanged("Scale");
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					
+				</Frames>
+			</Frame>
+			
+			<!-- Self view options -->
+			<Frame name="$parentSelf" inherits="KLHTM_OptionsFrameTemplate">
+				<Frames>
+					
+					<!-- Column visibility -->
+					<Frame name="$parentColumnHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+					</Frame>
+					
+					<CheckButton name="$parentColumnHits" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("ColumnHits"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentColumnRage" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnHits" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("ColumnRage"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentColumnDamage" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnRage" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("ColumnDamage"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentColumnThreat" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnDamage" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("ColumnThreat"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentColumnThreatPercent" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnThreat" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("ColumnThreatPercent"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Other options -->
+					<Frame name="$parentOtherHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="135" y="0"/>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<!-- Show threat when minimised -->
+					<CheckButton name="$parentMinimisedThreat" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentOtherHeader" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("MinimisedThreat"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Hide zero rows -->
+					<CheckButton name="$parentHideZero" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedThreat" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("HideZero"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("selfhide"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Abbreviate large numbers -->
+					<CheckButton name="$parentAbbreviate" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentHideZero" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsSelf_OnClick("Abbreviate"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("abbreviate"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			
+			<!-- Raid view options -->
+			<Frame name="$parentRaid" inherits="KLHTM_OptionsFrameTemplate">
+				<Frames>
+					
+					<!-- Column Visibility -->
+					<Frame name="$parentColumnHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+					</Frame>
+					
+					<CheckButton name="$parentColumnThreat" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("ColumnThreat"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentColumnThreatPercent" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnThreat" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("ColumnThreatPercent"); </OnClick>
+						</Scripts>
+					</CheckButton>
+				
+					<!-- Minimised string visibility -->
+					<Frame name="$parentMinimisedHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumnThreatPercent" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-10"/>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<CheckButton name="$parentMinimisedRank" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedHeader" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-4"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("MinimisedRank"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMinimisedThreatPercent" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedRank" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("MinimisedThreatPercent"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<CheckButton name="$parentMinimisedDeficit" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinimisedThreatPercent" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("MinimisedDeficit"); </OnClick>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Other options -->
+					<Frame name="$parentOtherHeader" inherits="KLHTM_OptionsHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="135" y="0"/>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					
+					<!-- rows -->
+					<Slider name="$parentRows" inherits="KLHTM_OptionsSliderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentOtherHeader" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-2"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged> KLHTM_OptionsRaid_OnValueChanged("Rows"); </OnValueChanged>
+							<OnEnter> KLHTM_Options_OnEnter("rows"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</Slider>
+					
+					<!-- Hide zero rows -->
+					<CheckButton name="$parentHideZero" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRows" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="-14"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("HideZero"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("raidhide"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Resize -->
+					<CheckButton name="$parentResize" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentHideZero" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("Resize"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("resize"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Abbreviate large numbers -->
+					<CheckButton name="$parentAbbreviate" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentResize" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("Abbreviate"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("abbreviate"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Show aggro gain -->
+					<CheckButton name="$parentAggroGain" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentAbbreviate" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_OptionsRaid_OnClick("AggroGain"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("aggro"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave>
+						</Scripts>
+					</CheckButton>
+					
+					<!-- Hide bottom bar --> 
+					<CheckButton name="$parentHideBottom" inherits="KLHTM_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentAggroGain" relativePoint="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Scripts> 
+							<OnClick> KLHTM_OptionsRaid_OnClick("HideBottom"); </OnClick>
+							<OnEnter> KLHTM_Options_OnEnter("bottom"); </OnEnter>
+							<OnLeave> KLHTM_Options_OnLeave(); </OnLeave> 
+						</Scripts>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			
+			<!-- Controls -->
+			<Frame name="$parentControls">
+				<Size>
+					<AbsDimension x="290" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset x="5" y="5"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset x="-5" y="5"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<!-- a dividing line between the buttons and the options -->
+						<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-1" y="6"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="1" y="-1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<!-- Subframe selection -->
+					<Button name="$parentGeneral" inherits="KLHTM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								KLHTM_OptionsButton_OnClick("General")
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentSelf" inherits="KLHTM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentGeneral" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								KLHTM_OptionsButton_OnClick("Self")
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentRaid" inherits="KLHTM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentSelf" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								KLHTM_OptionsButton_OnClick("Raid")
+							</OnClick>
+						</Scripts>
+					</Button>
+					<!-- close button -->
+					<Button name="$parentClose" inherits="KLHTM_OptionsButtonTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentRaid" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								KLHTM_OptionsButton_OnClick("Close")
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

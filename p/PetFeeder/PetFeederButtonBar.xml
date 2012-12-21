@@ -1,0 +1,282 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="PetFeederButtonBar.lua"/>
+	<CheckButton name="PetFeederButtonBar_ButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parent_Icon"/>
+			</Layer>
+		</Layers>
+		<NormalTexture name="$parent_NormalTexture" file="Interface\Buttons\UI-Quickslot2" >
+			<Size>
+				<AbsDimension x="32" y="32"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="-1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				PetFeederButtonBar_OnClick();
+			</OnClick>
+			<OnMouseDown>
+				if (arg1 == "RightButton") then
+					if (IsControlKeyDown()) then
+						PetFeederButtonBar:StartMoving();
+					end
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "RightButton") then
+					PetFeederButtonBar:StopMovingOrSizing();
+
+				end
+			</OnMouseUp>
+		</Scripts>
+	</CheckButton>
+	<Frame name="PetFeederButtonBar" hidden="true" toplevel="true" parent="UIParent" movable="true">
+		<Size>
+			<AbsDimension x="50" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Frames>
+			<CheckButton name="PetFeederButton_Icon" hidden="true" inherits="PetFeederButtonBar_ButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+		                    	<Layer level="TOP">
+				                    <FontString name="$parentText" text="" inherits="NumberFontNormal" wraponspaces="true">
+				                            <Size>
+				                                <AbsDimension x="30" y="20"/>
+				                            </Size>
+				                            <Anchors>
+				                                <Anchor point="CENTER"/>
+				                            </Anchors>
+						    </FontString>		    
+			    		</Layer>
+		
+		                </Layers>
+				<Scripts>
+					<OnEnter>
+						PetFeederButtonBar_IconToolTip();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseDown>
+						if (arg1 == "LeftButton") then
+							PetFeederButtonBar:StartMoving();
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						if (arg1 == "LeftButton") then
+							PetFeederButtonBar:StopMovingOrSizing();
+		
+						end
+					</OnMouseUp>
+					<OnClick>
+						if (arg1 == "RightButton") then
+							togglePetFeeder(nil);
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<StatusBar name="PetFeederButton_XPBar" hidden="true" toplevel="true" frameStrata="FULLSCREEN" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="1" y="5"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="PetFeederButton_Icon" relativePoint="BOTTOMRIGHT">
+						
+			                </Anchor>
+					<Anchor point="BOTTOMLEFT" relativeTo="PetFeederButton_Icon" relativePoint="BOTTOMLEFT">
+						
+					</Anchor>
+				
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlightSmall" >
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			</StatusBar>
+			<CheckButton name="PetFeederButton_Happiness" hidden="true"  >
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PetFeederButton_Icon" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture name="$parent_NormalTexture" file="Interface\PetPaperDollFrame\UI-PetHappiness" setAllPoints="true">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.1875" top="0" bottom="0.359375"/>
+				</NormalTexture>
+				
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnMouseDown>
+						if (arg1 == "RightButton") then
+							if (IsControlKeyDown()) then
+								PetFeederButtonBar:StartMoving();
+							end
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						if (arg1 == "RightButton") then
+							PetFeederButtonBar:StopMovingOrSizing();
+		
+						end
+					</OnMouseUp>
+					<OnClick>
+						if (arg1 == "LeftButton") then
+							togglePetFeeder(nil);
+						end
+					</OnClick>
+					<OnEnter>
+						PetFeederButtonBar_HappinessToolTip();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			<StatusBar name="PetFeederButton_LoyaltyBar" hidden="true" toplevel="true" enableMouse="true" frameStrata="FULLSCREEN" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="1" y="5"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="PetFeederButton_Happiness" relativePoint="BOTTOMRIGHT">
+						
+			                </Anchor>
+					<Anchor point="BOTTOMLEFT" relativeTo="PetFeederButton_Happiness" relativePoint="BOTTOMLEFT">
+						
+					</Anchor>
+				
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlightSmall" >
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			</StatusBar>
+			<CheckButton name="PetFeederButton_Food" hidden="true" inherits="PetFeederButtonBar_ButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PetFeederButton_Happiness" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+		                    	<Layer level="TOP">
+				                    <FontString name="$parentText" text="" inherits="NumberFontNormal" wraponspaces="true">
+				                            <Size>
+				                                <AbsDimension x="30" y="20"/>
+				                            </Size>
+				                            <Anchors>
+				                                <Anchor point="BOTTOMRIGHT"/>
+				                            </Anchors>
+						    </FontString>		    
+			    		</Layer>
+		
+		                </Layers>
+				<Scripts>
+					<OnClick>
+						if (arg1 == "LeftButton") then
+							PetFeeder_Feed();
+						end
+					</OnClick>
+					<OnEnter>
+						PetFeederButtonBar_FoodToolTip();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				PetFeederButtonBar_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				PetFeederButtonBar_OnEvent();
+			</OnEvent>
+			<OnMouseDown>
+				if (arg1 == "RightButton") then
+					if (IsControlKeyDown()) then
+						this:StartMoving();
+					end
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if (arg1 == "RightButton") then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnHide>
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	<CheckButton name="PetFeeder_PFB_Enabled_CheckBt" text="PETFEEDER_SHOWBUTTONBAR" parent="PetFeeder_FoodsFrame" inherits="PetFeeder_Template_CheckBt" >
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="20" y="-70"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnShow>getglobal(this:GetName()):SetChecked(PeetFeederPlayer_Config.BarEnabled);</OnShow>
+		</Scripts>
+	</CheckButton>
+</Ui>

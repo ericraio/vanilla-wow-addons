@@ -1,0 +1,506 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+<!--
+	Version: 3.0.4
+	Revision: $Id: Tooltip.xml,v 1.6 2005/06/13 15:19:03 norganna Exp $
+-->
+	<Script file="Tooltip.lua"/>
+	<Frame name="TinyMoneyFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="128" y="10"/>
+		</Size>
+		<Frames>
+			<Button name="$parentCopperButton">
+				<Size>
+					<AbsDimension x="14" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local parent = this:GetParent();
+						OpenCoinPickupFrame(1, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
+						parent.hasPickup = 1;
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\MoneyFrame\UI-MoneyIcons">
+					<Size>
+						<AbsDimension x="10" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
+				</NormalTexture>
+				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</NormalText>
+				<PushedTextOffset>
+					<AbsDimension x="0" y="0"/>
+				</PushedTextOffset>
+			</Button>
+			<Button name="$parentSilverButton">
+				<Size>
+					<AbsDimension x="14" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCopperButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local parent = this:GetParent();
+						OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
+						parent.hasPickup = 1;
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\MoneyFrame\UI-MoneyIcons">
+					<Size>
+						<AbsDimension x="10" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
+				</NormalTexture>
+				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</NormalText>
+				<PushedTextOffset>
+					<AbsDimension x="0" y="0"/>
+				</PushedTextOffset>
+			</Button>
+			<Button name="$parentGoldButton">
+				<Size>
+					<AbsDimension x="14" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentSilverButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local parent = this:GetParent();
+						OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
+						parent.hasPickup = 1;
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\MoneyFrame\UI-MoneyIcons">
+					<Size>
+						<AbsDimension x="10" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.25" top="0" bottom="1"/>
+				</NormalTexture>
+				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</NormalText>
+				<PushedTextOffset>
+					<AbsDimension x="0" y="0"/>
+				</PushedTextOffset>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				SmallMoneyFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				MoneyFrame_OnEvent();
+			</OnEvent>
+			<OnShow>
+				MoneyFrame_UpdateMoney();
+			</OnShow>
+			<OnHide>
+				if ( this.hasPickup == 1 ) then
+					CoinPickupFrame:Hide();
+					this.hasPickup = 0;
+				end
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Frame name="EnhancedTooltipTemplate" frameStrata="TOOLTIP" hidden="true" virtual="true">
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="INFO">
+				<Texture name="$parentIcon" file="Interface\Buttons\UI-Quickslot2" hidden="true">
+					<Size>
+					  <AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="10" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<FontString name="$parentText1" inherits="GameFontNormal" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText2" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText1" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText3" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText2" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText4" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText3" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText5" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText4" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText6" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText5" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText7" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText6" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText8" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText7" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText9" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText8" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText10" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText9" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText11" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText10" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText12" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText11" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText13" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText12" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText14" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText13" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText15" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText14" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText16" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText15" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText17" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText16" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText18" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText17" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText19" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText18" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText20" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText19" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<PlayerModel name="$parentPreview" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-10"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.rps = 0.1;
+						this.rotation = 1.5;
+					</OnLoad>
+					<OnUpdate>
+						if (this:IsVisible()) then
+							this.rotation = this.rotation + (arg1 * 2 * PI * this.rps);
+							if ( this.rotation &lt; 0 ) then
+								this.rotation = this.rotation + (2 * PI);
+							end
+							this:SetRotation(this.rotation);
+						end
+					</OnUpdate>
+				</Scripts>
+			</PlayerModel>
+
+			<Frame name="$parentMoney1" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney2" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney3" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney4" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney5" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney6" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney7" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney8" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney9" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney10" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="EnhancedTooltip" inherits="EnhancedTooltipTemplate" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnLoad>
+				TT_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				TT_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+</Ui>

@@ -1,0 +1,538 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="OutfitDisplayFrame.lua"/>
+	<Button name="OutfitDisplayItemButtonTemplate" inherits="ItemButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				OutfitDisplayItemButton_OnLoad();
+			</OnLoad>
+			<OnShow>
+				OutfitDisplayItemButton_Draw(this);
+			</OnShow>
+			<OnClick>
+				OutfitDisplayItemButton_OnClick(arg1);
+			</OnClick>
+			<OnEvent>
+				OutfitDisplayItemButton_OnEvent(event);
+			</OnEvent>
+			<OnEnter>
+				OutfitDisplayItemButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip.finished = nil;
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnReceiveDrag>
+				OutfitDisplayItemButton_OnClick("LeftButton", 1);
+			</OnReceiveDrag>
+		</Scripts>
+	</Button>
+
+	<CheckButton name="OutfitDisplayFrameCheckBoxTemplate" inherits="UICheckButtonTemplate" virtual="true">
+	    <HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+	    </HitRectInsets>
+	    <Size>
+			<AbsDimension x="25" y="25"/>
+	    </Size>
+	    <Scripts>
+	        <OnLoad>
+			OutfitDisplayCheckBox_OnLoad();
+		</OnLoad>
+		<OnClick>
+			OutfitDisplayCheckBox_OnClick();
+		</OnClick>
+		<OnEnter>
+			OutfitDisplayCheckBox_OnEnter();
+		</OnEnter>
+		<OnLeave>
+			GameTooltip.finished = nil;
+			GameTooltip:Hide();
+		</OnLeave>
+	    </Scripts>
+	</CheckButton>
+
+	<CheckButton name="OutfitDisplayFrameOverrideBoxTemplate" inherits="UICheckButtonTemplate" virtual="true">
+	    <HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+	    </HitRectInsets>
+	    <Size>
+			<AbsDimension x="25" y="25"/>
+	    </Size>
+	    <Scripts>
+	        <OnLoad>
+			OutfitDisplayOverrideBox_OnLoad();
+		</OnLoad>
+		<OnEnter>
+			OutfitDisplayOverrideBox_OnEnter();
+		</OnEnter>
+		<OnLeave>
+			GameTooltip.finished = nil;
+			GameTooltip:Hide();
+		</OnLeave>
+	    </Scripts>
+	</CheckButton>
+
+    <Frame name="OutfitDisplayFrame" virtual="true">
+	<HitRectInsets>
+		<AbsInset left="0" right="30" top="0" bottom="75"/>
+	</HitRectInsets>
+	<Layers>
+	    <Layer level="BACKGROUND">
+	    	<Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-L1">
+			<Size>
+	                    <AbsDimension x="256" y="256"/>
+        	        </Size>
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+			</Anchors>
+		</Texture>
+		<Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-R1">
+			<Size>
+				<AbsDimension x="128" y="256"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="256" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Texture>
+		<Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-BottomLeft">
+			<Size>
+				<AbsDimension x="256" y="256"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-256"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Texture>
+		<Texture file="Interface\PaperDollInfoFrame\UI-Character-CharacterTab-BottomRight">
+			<Size>
+				<AbsDimension x="128" y="256"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="256" y="-256"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Texture>
+	    </Layer>
+	</Layers>
+	<Frames>
+		<Button name="$parentHeadSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="21" y="-74"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentNeckSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentHeadSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentShoulderSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentNeckSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentBackSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentShoulderSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentChestSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentBackSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentShirtSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentChestSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentTabardSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentShirtSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentWristSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentTabardSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentHandsSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="305" y="-74"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentWaistSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentHandsSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentLegsSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentWaistSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentFeetSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentLegsSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentFinger0Slot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentFeetSlot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentFinger1Slot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentFinger0Slot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentTrinket0Slot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentFinger1Slot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentTrinket1Slot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentTrinket0Slot" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-4"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentMainHandSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="122" y="127"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentSecondaryHandSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentMainHandSlot" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="5" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentRangedSlot" inherits="OutfitDisplayItemButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parentSecondaryHandSlot" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="5" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<CheckButton name="$parentHeadSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHeadSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentShowHelm" inherits="OutfitDisplayFrameOverrideBoxTemplate" hidden="true">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHeadSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentNeckSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentNeckSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentShoulderSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentShoulderSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+	    <CheckButton name="$parentBackSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+	        <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentBackSlot"
+					relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+	    <CheckButton name="$parentShowCloak" inherits="OutfitDisplayFrameOverrideBoxTemplate" hidde="true">
+	        <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentBackSlot"
+					relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentChestSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentChestSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentShirtSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentShirtSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentTabardSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentTabardSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentWristSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentWristSlot"
+				relativePoint="RIGHT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentHandsSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentHandsSlot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentWaistSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentWaistSlot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentLegsSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentLegsSlot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentFeetSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentFeetSlot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentFinger0SlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentFinger0Slot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentFinger1SlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentFinger1Slot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentTrinket0SlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentTrinket0Slot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentTrinket1SlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentTrinket1Slot"
+				relativePoint="LEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentMainHandSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parentMainHandSlot"
+				relativePoint="TOP" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentSecondaryHandSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parentSecondaryHandSlot"
+				relativePoint="TOP" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parentRangedSlotCheckBox" inherits="OutfitDisplayFrameCheckBoxTemplate">
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parentRangedSlot"
+				relativePoint="TOP" />
+			</Anchors>
+		</CheckButton>
+		<DressUpModel name="$parentModel" scale="1.0">
+			<Size>
+				<AbsDimension x="183" y="300"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="90" y="-88"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+	                <OnLoad>
+        	            Model_OnLoad();
+			    this:RegisterEvent("DISPLAY_SIZE_CHANGED");
+			    this:RegisterEvent("UNIT_MODEL_CHANGED");
+			    this:RegisterEvent("PLAYER_ENTERING_WORLD");
+			</OnLoad>
+			<OnEvent>
+			    if ( event == "PLAYER_ENTERING_WORLD" ) then
+			        this:SetUnit("player");
+				return;
+			    end
+			    if ( this:IsVisible() ) then
+				OutfitDisplayFrame_UpdateModel(this);
+			    end
+			</OnEvent>
+                	<OnUpdate>
+				Model_OnUpdate(arg1, this);
+        	        </OnUpdate>
+			</Scripts>
+			<Frames>
+				<Button name="$parentRotateLeftButton">
+					<Size>
+						<AbsDimension x="35" y="35"/>
+					</Size>
+					<Scripts>
+						<OnLoad>
+							this:RegisterForClicks("LeftButtonDown", "LeftButtonUp");
+							local parent = this:GetParent():GetParent():GetName();
+							this:ClearAllPoints();
+							this:SetPoint("TOPLEFT", parent.."HeadSlotCheckBox", "TOPRIGHT", 12, 0);
+						</OnLoad>
+						<OnClick>
+							Model_RotateLeft(this:GetParent());
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\Buttons\UI-RotationLeft-Button-Up"/>
+					<PushedTexture file="Interface\Buttons\UI-RotationLeft-Button-Down"/>
+					<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+				</Button>
+				<Button name="$parentRotateRightButton">
+					<Size>
+						<AbsDimension x="35" y="35"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentRotateLeftButton" relativePoint="TOPRIGHT"/>
+					</Anchors>
+					<Scripts>
+						<OnLoad>
+							this:RegisterForClicks("LeftButtonDown", "LeftButtonUp");
+						</OnLoad>
+						<OnClick>
+							Model_RotateRight(this:GetParent());
+						</OnClick>
+					</Scripts>
+					<NormalTexture file="Interface\Buttons\UI-RotationRight-Button-Up"/>
+					<PushedTexture file="Interface\Buttons\UI-RotationRight-Button-Down"/>
+					<HighlightTexture file="Interface\Buttons\ButtonHilight-Round" alphaMode="ADD"/>
+				</Button>
+			</Frames>
+		</DressUpModel>
+	    	<SimpleHTML name="$parentMessage">
+			<Size>
+				<AbsDimension x="183" y="64"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER"/>
+			</Anchors>
+			<FontString name="$parentFontString" inherits="GameFontNormal">
+				<Size>
+					<AbsDimension x="183" y="0"/>
+				</Size>
+			</FontString>
+			<Scripts>
+				<OnLoad>
+					this:SetFrameLevel(this:GetFrameLevel()+1);
+				</OnLoad>
+			</Scripts>
+		</SimpleHTML>
+		<Frame name="$parentMessageUpdateFrame" hidden="true">
+			<Scripts>
+				<OnUpdate>
+					OutfitDisplayFrame_MessageUpdate(arg1);
+				</OnUpdate>
+			</Scripts>
+		</Frame>
+	</Frames>
+	<Scripts>
+	    <OnLoad>
+		OutfitDisplayFrame_OnLoad();
+	    </OnLoad>
+	    <OnEvent>
+		OutfitDisplayFrame_OnEvent(event, arg1);
+	    </OnEvent>
+	    <OnMouseWheel>
+		return;
+	    </OnMouseWheel>
+	</Scripts>
+    </Frame>
+
+</Ui>

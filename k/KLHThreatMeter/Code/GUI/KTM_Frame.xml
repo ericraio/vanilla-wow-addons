@@ -1,0 +1,1124 @@
+﻿<!--	
+	KLHThreatMeter KTM_Frame.xml
+
+	The main window for the KLHThreatMeter gui. Controlled by KTM_Gui.lua, KTM_SelfGui.lua,
+	KTM_RaidGui.lua, KTM_TitleGui.lua. Also contains an OnUpdate frame. A brief table of
+	contents:
+	
+	- Title bar (info strings, command buttons, background)
+	- Self frame (headers, data rows, totals)
+	- Raid frame (headers, data rows, bottom bar)
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	
+	<!-- The base font -->
+	<Font name="KLHTM_FontDefault" inherits="GameFontNormal" virtual="true">
+		<Color r="1.0" g="1.0" b="1.0"/>
+	</Font>
+	
+	<!-- Used by the "name" data strings -->
+	<Font name="KLHTM_FontLeft" inherits="KLHTM_FontDefault" justifyH="LEFT" virtual="true"/>
+	
+	<!-- Used by title bar strings -->
+	<Font name="KLHTM_FontCenter" inherits="KLHTM_FontDefault" justifyH="CENTER" virtual="true"/>
+	
+	<!-- Used by data strings -->
+	<Font name="KLHTM_FontRight" inherits="KLHTM_FontDefault" justifyH="RIGHT" virtual="true"/>
+	
+	<!-- Used by column headers -->
+	<Font name="KLHTM_FontYellowRight" inherits="KLHTM_FontRight" virtual="true">
+		<Color r="1.0" g="0.82" b="0"/>
+	</Font>
+	
+	<!-- Used by the "name" column headers -->
+	<Font name="KLHTM_FontYellowLeft" inherits="KLHTM_FontLeft" virtual="true">
+		<Color r="1.0" g="0.82" b="0"/>
+	</Font>
+	
+	
+	<!-- A fontstring with the default font and a frame for packaging. Used by
+		 "name" data strings. -->
+	<Frame name="KLHTM_StringTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="KLHTM_FontLeft">
+					<Anchors>
+						<Anchor point="RIGHT">	
+							<Offset x="10" y="0"/>	
+						</Anchor>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- A fontstring with right-aligned font and a frame for packaging. Used by data strings -->
+	<Frame name="KLHTM_NumberTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="KLHTM_FontRight">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset x="-6" y="0"/>
+						</Anchor>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- A column header for the Raid view -->
+	<Frame name="KLHTM_RaidNumberHeaderTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="KLHTM_FontYellowRight">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset x="-6" y="0"/>
+						</Anchor>
+						<Anchor point="RIGHT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- A left-sligned column header for the Raid view -->
+	<Frame name="KLHTM_RaidStringHeaderTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="KLHTM_FontYellowLeft">
+					<Anchors>
+						<Anchor point="RIGHT">	
+							<Offset x="10" y="0"/>	
+						</Anchor>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- A column header for the Self view -->
+	<Button name="KLHTM_SelfHeaderNumberTemplate" virtual="true">
+		<NormalText name="$parentText" inherits="KLHTM_FontYellowRight">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset x="-6" y="0"/>
+				</Anchor>
+				<Anchor point="RIGHT"/>
+			</Anchors>
+		</NormalText>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT"/>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+	
+	<!-- A left-aligned column header for the Self view -->
+	<Button name="KLHTM_SelfHeaderStringTemplate" virtual="true">
+		<NormalText name="$parentText" inherits="KLHTM_FontYellowLeft">
+			<Anchors>
+				<Anchor point="RIGHT">	
+					<Offset x="10" y="0"/>	
+				</Anchor>
+				<Anchor point="LEFT"/>
+			</Anchors>
+		</NormalText>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT"/>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<!-- A title bar string -->
+	<Frame name="KLHTM_TitleStringTemplate" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="KLHTM_FontCenter">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnDragStop> KLHTM_Frame_OnDragStop(); </OnDragStop>
+		</Scripts>
+	</Frame>
+	
+	<!-- The command buttons on the right side of the title bar -->
+	<Button name="KLHTM_ButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLeave> KLHTM_Button_OnLeave(); </OnLeave>
+		</Scripts>
+		<HighlightTexture>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset x="2" y="-2"/>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset x="-2" y="2"/>
+				</Anchor>
+			</Anchors>
+			<Color r="1.0" g="1.0" b="0" a="0.1"/> 
+		</HighlightTexture>
+	</Button>
+	
+	<!-- A dark red background texture used by some buttons to supplement a transparent texture -->
+	<Texture name="KLHTM_ButtonBackground" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset x="2" y="-2"/>
+			</Anchor>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset x="-2" y="2"/>
+			</Anchor>
+		</Anchors>
+		<Color r="0.7" g="0" b="0"/>
+	</Texture>
+	
+	<!-- A data row for a single person in the raid -->
+	<Frame name="KLHTM_RaidRowTemplate" virtual="true">
+		<Frames>
+			<!-- Player name -->
+			<Frame name="$parentName" inherits="KLHTM_StringTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+			</Frame>
+			<!-- Threat value -->
+			<Frame name="$parentThreat" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+			<!-- Percent of max threat -->
+			<Frame name="$parentPercentThreat" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentThreat" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<!-- Status bar showing % threat -->
+				<Texture name="$parentBar" file="Interface\TargetingFrame\UI-StatusBar">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="0" y="-1"/>
+						</Anchor>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	
+	<!-- A data row for a single ability type in the Self window -->
+	<Frame name="KLHTM_SelfRowTemplate" virtual="true">
+		<Frames>
+			<!-- Ability name -->
+			<Frame name="$parentName" inherits="KLHTM_StringTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+			</Frame>
+			<!-- Ability hits -->
+			<Frame name="$parentHits" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+			<!-- Total rage cost -->
+			<Frame name="$parentRage" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentHits" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+			<!-- Damage done -->
+			<Frame name="$parentDamage" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentRage" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+			<!-- Threat -->
+			<Frame name="$parentThreat" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentDamage" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+			<!-- Percent threat contribution -->
+			<Frame name="$parentPercentThreat" inherits="KLHTM_NumberTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentThreat" relativePoint="RIGHT"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<!-- Status bar showing values relative to the total -->
+				<Texture name="$parentBar" file="Interface\TargetingFrame\UI-StatusBar">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="0" y="-1"/>
+						</Anchor>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<!-- The main window -->
+	<Frame name="KLHTM_Frame" parent="UIParent" hidden="true" enableMouse="true" movable="true">
+		<!-- a dodgy addition to possibly work around the frame scale issues on startup -->
+		<Size>
+			<AbsDimension x="1" y="1"/>
+		</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+			    <AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+			    <AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+			    <AbsInset left="4" right="4" top="4" bottom="4"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<!-- The title bar of the main frame. Contains command buttons, texts, background -->
+			<Frame name="KLHTM_TitleFrame">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="5" y="-5"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">					
+						<!-- The title bar background -->
+						<Texture name="$parentBackground" >
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="-1" y="1"/>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset x="1" y="0"/>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<!-- The title bar strings (left to right) -->
+				<Frames>
+					<!-- Minimised title -->
+					<Frame name="$parentShortTitle" inherits="KLHTM_StringTemplate">
+						<Anchors>
+							<Anchor point="LEFT">
+								<Offset x="2" y="1"/>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<!-- Maximised title -->
+					<Frame name="$parentLongTitle" inherits="KLHTM_StringTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentShortTitle"/>
+						</Anchors>
+					</Frame>
+					<!-- Total threat (self min) -->
+					<Frame name="$parentThreat" inherits="KLHTM_TitleStringTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentLongTitle"/>
+						</Anchors>
+						<Scripts>
+							<OnEnter> KLHTM_TitleString_OnEnter("threat"); </OnEnter>
+							<OnLeave> KLHTM_TitleString_OnLeave("threat"); </OnLeave>
+							<OnDragStart> 
+								KLHTM_TitleString_OnLeave("threat");
+								KLHTM_Frame_OnDragStart();
+							 </OnDragStart>
+						</Scripts>
+					</Frame>
+					<!-- Threat rank (raid min) -->
+					<Frame name="$parentThreatRank" inherits="KLHTM_TitleStringTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentThreat"/>
+						</Anchors>
+						<Scripts>
+							<OnEnter> KLHTM_TitleString_OnEnter("rank"); </OnEnter>
+							<OnLeave> KLHTM_TitleString_OnLeave("rank"); </OnLeave>
+							<OnDragStart> 
+								KLHTM_TitleString_OnLeave("rank"); 
+								KLHTM_Frame_OnDragStart();
+							 </OnDragStart>
+						</Scripts>
+					</Frame>
+					<!-- Threat defecit (raid min) -->
+					<Frame name="$parentThreatDefecit" inherits="KLHTM_TitleStringTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentThreatRank"/>
+						</Anchors>
+						<Scripts>
+							<OnEnter> KLHTM_TitleString_OnEnter("tdef"); </OnEnter>
+							<OnLeave> KLHTM_TitleString_OnLeave("tdef"); </OnLeave>
+							<OnDragStart> 
+								KLHTM_TitleString_OnLeave("tdef"); 
+								KLHTM_Frame_OnDragStart();
+							 </OnDragStart>
+						</Scripts>
+					</Frame>
+					<!-- Threat percent (raid min) -->
+					<Frame name="$parentThreatPercent" inherits="KLHTM_TitleStringTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentThreatDefecit"/>
+						</Anchors>
+						<Scripts>
+							<OnEnter> KLHTM_TitleString_OnEnter("pc"); </OnEnter>
+							<OnLeave> KLHTM_TitleString_OnLeave("pc"); </OnLeave>
+							<OnDragStart> 
+								KLHTM_TitleString_OnLeave("pc"); 
+								KLHTM_Frame_OnDragStart();
+							 </OnDragStart>
+						</Scripts>
+					</Frame>
+
+					<!-- Command buttons (right to left) -->
+					<!-- Close -->
+					<Button name="$parentClose" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_TitleButton_OnClick("close"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("close"); </OnEnter>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up">
+							<TexCoords left="0.175" top="0.175" right="0.825" bottom="0.825"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down">
+							<TexCoords left="0.175" top="0.175" right="0.825" bottom="0.825"/>
+						</PushedTexture>
+					</Button>
+					<!-- Minimise -->
+					<Button name="$parentMinimise" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentClose" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>					
+							<OnClick> KLHTM_TitleButton_OnClick("min"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("min"); </OnEnter>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-MinusButton-UP">
+							<TexCoords left="0.05" top="0.05" right="0.95" bottom="0.95"/>
+						</NormalTexture>
+					</Button> 
+					<!-- Maximise -->
+					<Button name="$parentMaximise" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentMinimise" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>					
+							<OnClick> KLHTM_TitleButton_OnClick("max"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("max"); </OnEnter>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-PlusButton-UP">
+							<TexCoords left="0.05" top="0.05" right="0.95" bottom="0.95"/>
+						</NormalTexture>
+					</Button>
+					<!-- Options -->
+					<Button name="$parentOptions" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentMaximise" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>							
+							<OnClick> KLHTM_TitleButton_OnClick("opt"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("opt"); </OnEnter>
+						</Scripts>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture inherits="KLHTM_ButtonBackground"/>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-Chat-Up">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-Chat-Down">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</PushedTexture>
+					</Button>
+					<!-- Pin -->
+					<Button name="$parentPin" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentOptions" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>							
+							<OnClick> KLHTM_TitleButton_OnClick("pin"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("pin"); </OnEnter>
+						</Scripts>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture inherits="KLHTM_ButtonBackground"/>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</PushedTexture>
+					</Button>
+					<!-- Unpin -->
+					<Button name="$parentUnpin" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentPin" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>							
+							<OnClick> KLHTM_TitleButton_OnClick("unpin"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("unpin"); </OnEnter>
+						</Scripts>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture inherits="KLHTM_ButtonBackground"/>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</PushedTexture>
+					</Button>
+					<!-- Self View -->
+					<Button name="$parentSelfView" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentUnpin" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>					
+							<OnClick> KLHTM_TitleButton_OnClick("self"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("self"); </OnEnter>
+						</Scripts>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture inherits="KLHTM_ButtonBackground"/>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</PushedTexture>
+					</Button>
+					<!-- Raid View -->
+					<Button name="$parentRaidView" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentSelfView" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>					
+							<OnClick> KLHTM_TitleButton_OnClick("raid"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("raid"); </OnEnter>
+						</Scripts>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture inherits="KLHTM_ButtonBackground"/>
+							</Layer>
+						</Layers>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down">
+							<TexCoords left="0.1" top="0.1" right="0.9" bottom="0.9"/>
+						</PushedTexture>
+					</Button>
+					<!-- Master Target Set -->
+					<Button name="$parentMasterTarget" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentRaidView" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>					
+							<OnClick> KLHTM_TitleButton_OnClick("targ"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("targ"); </OnEnter>
+						</Scripts>
+						<NormalTexture file="Interface\Icons\Ability_Hunter_SniperShot">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="1" y="-1"/>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset x="-1" y="1"/>
+								</Anchor>
+							</Anchors>
+						</NormalTexture>
+					</Button>
+					<!-- Raid Threat Clear -->
+					<Button name="$parentClearThreat" inherits="KLHTM_ButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentMasterTarget" relativePoint="LEFT"/>
+						</Anchors>
+						<Scripts>					
+							<OnClick> KLHTM_TitleButton_OnClick("clear"); </OnClick>
+							<OnEnter> KLHTM_TitleButton_OnEnter("clear"); </OnEnter>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\CancelButton-Up">
+							<TexCoords left="0.275" top="0.2" right="0.8" bottom="0.725"/>
+						</NormalTexture>
+						<PushedTexture file="Interface\Buttons\CancelButton-Down">
+							<TexCoords left="0.275" top="0.2" right="0.8" bottom="0.725"/>
+						</PushedTexture>
+					</Button>
+				</Frames>
+			</Frame>
+			
+			<!-- Shows threat data from the raid members -->
+			<Frame name="KLHTM_RaidFrame">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="KLHTM_TitleFrame" relativePoint="BOTTOMLEFT">
+						<Offset x="1" y="-1"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset x="-1" y="6"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<!-- a dividing line between the title bar and the data -->
+						<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-2" y="4"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="-3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<!-- player name header -->
+					<Frame name="$parentHeaderName" inherits="KLHTM_RaidStringHeaderTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+					</Frame>
+					<!-- threat header -->
+					<Frame name="$parentHeaderThreat" inherits="KLHTM_RaidNumberHeaderTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderName" relativePoint="RIGHT"/>
+						</Anchors>
+					</Frame>
+					<!-- percent threat header -->
+					<Frame name="$parentHeaderPercentThreat" inherits="KLHTM_RaidNumberHeaderTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderThreat" relativePoint="RIGHT"/>	
+						</Anchors>
+					</Frame>
+					
+					<!-- Threat data for a member of the raid -->
+					<Frame name="$parentRow1" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentHeaderName" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow2" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow1" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow3" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow2" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow4" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow3" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow5" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow4" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow6" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow5" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow7" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow6" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow8" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow7" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow9" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow8" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow10" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow9" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow11" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow10" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow12" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow11" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow13" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow12" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow14" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow13" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow15" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow14" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow16" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow15" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow17" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow16" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow18" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow17" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow19" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow18" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow20" inherits="KLHTM_RaidRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow19" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					
+					<!-- A row below the raid data -->
+					<Frame name="$parentBottom">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<!-- a dividing line between the main data and bottom bar -->
+								<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-2" y="5"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="-3" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Frames>
+							<!-- user's threat defecit -->
+							<Frame name="$parentThreatDefecit" inherits="KLHTM_StringTemplate">
+								<Anchors>
+									<Anchor point="LEFT"/>
+								</Anchors>
+								<Scripts>
+									<OnEnter> KLHTM_RaidString_OnEnter("tdef"); </OnEnter>
+									<OnLeave> KLHTM_RaidString_OnLeave("tdef"); </OnLeave>
+									<OnDragStart> 
+										KLHTM_RaidString_OnLeave("tdef"); 
+										KLHTM_Frame_OnDragStart();
+									 </OnDragStart>
+									<OnDragStop> KLHTM_Frame_OnDragStop(); </OnDragStop> 
+								</Scripts>
+							</Frame>
+							<!-- Shows the master target -->
+							<Frame name="$parentMasterTarget">
+								<Anchors>
+									<Anchor point="LEFT" relativeTo="$parentThreatDefecit" relativePoint="RIGHT"/>
+									<Anchor point="RIGHT">
+										<Offset x="-5" y="0"/>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="OVERLAY">
+										<!-- the default KLHTM_StringTemplace is overridden to add the right anchor,
+											 which truncates strings rather than letting them grow off the window -->
+										<FontString name="$parentText" inherits="GameFontNormal" maxLines="1" justifyH="RIGHT"> 
+											<Anchors>
+												<Anchor point="LEFT"/>
+												<Anchor point="RIGHT"/>
+											</Anchors>
+											<Color r="1" g="1" b="1"/>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnEnter> KLHTM_RaidString_OnEnter("targ"); </OnEnter>
+									<OnLeave> KLHTM_RaidString_OnLeave("targ"); </OnLeave>
+									<OnDragStart> 
+										KLHTM_RaidString_OnLeave("targ"); 
+										KLHTM_Frame_OnDragStart();
+									 </OnDragStart>
+									<OnDragStop> KLHTM_Frame_OnDragStop(); </OnDragStop> 
+								</Scripts>
+							</Frame>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+			
+			<!-- Shows personal threat data -->
+			<Frame name="KLHTM_SelfFrame">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="KLHTM_TitleFrame" relativePoint="BOTTOMLEFT">
+						<Offset x="1" y="-1"/>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset x="-1" y="6"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<!-- a dividing line between the title bar and the data -->
+						<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-2" y="4"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="-3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentHeaderName" inherits="KLHTM_SelfHeaderStringTemplate">
+						<!-- similar to header template but with left-aligned text -->
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_SelfHeader_OnClick("name"); </OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentHeaderHits" inherits="KLHTM_SelfHeaderNumberTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderName" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_SelfHeader_OnClick("hits"); </OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentHeaderRage" inherits="KLHTM_SelfHeaderNumberTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderHits" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_SelfHeader_OnClick("rage"); </OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentHeaderDamage" inherits="KLHTM_SelfHeaderNumberTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderRage" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_SelfHeader_OnClick("dam"); </OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentHeaderThreat" inherits="KLHTM_SelfHeaderNumberTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderDamage" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_SelfHeader_OnClick("threat"); </OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentHeaderPercentThreat" inherits="KLHTM_SelfHeaderNumberTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentHeaderThreat" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick> KLHTM_SelfHeader_OnClick("pc"); </OnClick>
+						</Scripts>
+					</Button>
+					
+					<!-- The rows -->
+					<Frame name="$parentRow1" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentHeaderName" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow2" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow1" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow3" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow2" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow4" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow3" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow5" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow4" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow6" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow5" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow7" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow6" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow8" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow7" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow9" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow8" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow10" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow9" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow11" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow10" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow12" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow11" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow13" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow12" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow14" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow13" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentRow15" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentRow14" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<!-- A row of totals at the bottom of the self frame -->
+					<Frame name="$parentBottom" inherits="KLHTM_SelfRowTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset x="0" y="0"/>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<!-- a dividing line between the main data and bottom bar -->
+								<Texture name="$parentLine" file="Interface\TradeSkillFrame\UI-TradeSkill-SkillBorder">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-2" y="3"/>
+											</Offset>
+										</Anchor>
+										<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="-3" y="-4"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.1" right="1.0" top="0" bottom="0.25"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Frames>
+							<!-- A button to reset the threat data -->
+							<Button name="KLHTM_SelfFrameBottomReset" inherits="UIPanelButtonTemplate">
+								<Anchors>
+									<Anchor point="LEFT">
+										<Offset>
+											<AbsDimension x="0" y="-1"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick> KLHTM_SelfButton_OnClick("reset"); </OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnDragStart> KLHTM_Frame_OnDragStart(); </OnDragStart>
+			<OnDragStop> KLHTM_Frame_OnDragStop(); </OnDragStop>
+		</Scripts>
+	</Frame>
+
+	<Frame name="KLHTM_OnUpdateFrame">
+		<Scripts>
+			<OnLoad>
+				--KLHTM_Frame:RegisterEvent("VARIABLES_LOADED")
+				klhtm.onload()
+			</OnLoad>
+			<OnUpdate>
+				--KLHTM_OnUpdate()
+				klhtm.onupdate()
+			</OnUpdate>
+			<OnEvent>
+				--KLHTM_OnEvent()
+				klhtm.onevent()
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="test1" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="200" y="200"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="test4">
+					<!--
+					<Color a="1.0" r="0.8" g="0.8" b="0.8"/>
+					-->
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color a="1.0" r="1" g="1" b="1"/>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="test5" inherits="GameFontNormal" outline="NONE">
+					<Size>
+						<AbsDimension x="100" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="0" y="-30"/>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="8"/>
+					</FontHeight>
+				</FontString>
+				<FontString name="test6" inherits="GameFontNormal" outline="NORMAL">
+					<Size>
+						<AbsDimension x="100" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="0" y="-45"/>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12"/>
+					</FontHeight>
+				</FontString>
+				<FontString name="test7" inherits="GameFontNormal" outline="THICK">
+					<Size>
+						<AbsDimension x="100" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="0" y="-60"/>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="16"/>
+					</FontHeight>					
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				test5:SetText("outline = none");
+				test6:SetText("outline = normal");
+				test7:SetText("outline = thick");
+			</OnLoad>
+		</Scripts>
+	</Frame>
+		
+	
+</Ui>
+
+
+
+

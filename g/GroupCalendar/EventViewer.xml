@@ -1,0 +1,333 @@
+<UI xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML/UI.xsd">
+	
+	<Script file="EventViewer.lua"/>
+	
+	<Button name="CalendarEventViewerTabTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("igMainMenuOpen");
+				PanelTemplates_Tab_OnClick(CalendarEventViewerFrame);
+				CalendarEventViewer_ShowPanel(CalendarEventViewerFrame.selectedTab);
+			</OnClick>
+		</Scripts>
+	</Button>
+	
+	<Frame name="CalendarEventViewerFrame" toplevel="true" movable="true" parent="UIParent" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="318" y="344"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="GroupCalendarFrame" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="1" y="-21"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture name="EventViewerFrameTopLeftTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EventViewerFrameTopRightTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="EventViewerFrameTopLeftTexture" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EventViewerFrameBottomLeftTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="EventViewerFrameTopLeftTexture" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="EventViewerFrameBottomRightTexture" file="Interface\AddOns\GroupCalendar\Textures\CalendarSideFrame-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="128"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="EventViewerFrameBottomLeftTexture" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" text="CalendarEventViewer_cTitle" inherits="GameFontHighlight">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-10" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="CalendarEventViewerParchment" file="Interface\AddOns\GroupCalendar\Textures\CalendarParchmentTexture">
+					<Size>
+						<AbsDimension x="315" y="294"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-24"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="EventViewerCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="CalendarEventViewerFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="5" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEventViewerDoneButton" inherits="UIPanelButtonTemplate" text="CalendarEventViewer_cDone">
+				<Size>
+					<AbsDimension x="102" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						CalendarEventViewer_DoneViewing();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="CalendarEventViewerEventFrame" hidden="true" setAllPoints="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="CalendarEventViewerEventBackground" file="">
+							<Size>
+								<AbsDimension x="315" y="294"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="2"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0.078125" bottom="0.921875"/>
+						</Texture>
+					</Layer>
+					
+					<Layer level="OVERLAY">
+						<FontString name="$parentEventTitle" justifyH="CENTER" justifyV="MIDDLE" inherits="GameFontNormalLarge">
+							<Size>
+								<AbsDimension x="280" y="22"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="-10" y="-30"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDate" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentEventTitle" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-25"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTime" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentDate" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentLevels" inherits="GameFontNormal">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentTime" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-25"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentStatus" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentTime" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-216"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="CalendarEventViewerDescription">
+						<Size>
+							<AbsDimension x="250" y="40"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-10" y="-140"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="CalendarEventViewerDescText" inherits="GameFontNormalSmall">
+									<Size>
+										<AbsDimension x="250" y="0"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="CalendarEventViewerCharacter" inherits="CalendarCharactersTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventViewerDescription" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="40" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<CheckButton name="CalendarEventViewerYes" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventViewerCharacter" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(CalendarEventViewer_cYes);
+							</OnLoad>
+							<OnClick>
+								-- CalendarEventViewerYes:SetChecked(true);
+								CalendarEventViewerNo:SetChecked(false);
+								CalendarEventViewer_UpdateCommentEnable();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="CalendarEventViewerNo" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="26" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventViewerYes" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-22"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText(CalendarEventViewer_cNo);
+							</OnLoad>
+							<OnClick>
+								CalendarEventViewerYes:SetChecked(false);
+								-- CalendarEventViewerNo:SetChecked(true);
+								CalendarEventViewer_UpdateCommentEnable();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<EditBox name="CalendarEventViewerComment" letters="50" autofocus="false" inherits="GroupCalendarInputBoxTemplate">
+						<Size>
+							<AbsDimension x="190" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CalendarEventViewerNo" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString inherits="GameFontNormalSmall" text="GroupCalendar_cCommentLabel" justifyH="RIGHT">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+				</Frames>
+			</Frame>
+			
+			<Frame name="CalendarEventViewerAttendanceFrame" hidden="true" setAllPoints="true">
+				<Frames>
+					<Frame name="CalendarEventViewerAttendance" inherits="CalendarAttendanceListTemplate" setAllPoints="true" hidden="false"/>
+				</Frames>
+			</Frame>
+			
+			<Button name="CalendarEventViewerFrameTab1" inherits="CalendarEventViewerTabTemplate" id="1" text="GroupCalendar_cEvent">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-7" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="CalendarEventViewerFrameTab2" inherits="CalendarEventViewerTabTemplate" id="2" text="GroupCalendar_cAttendance">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="CalendarEventViewerFrameTab1" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="14" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				CalendarEventViewer_OnLoad();
+			</OnLoad>
+			<OnShow>
+				CalendarEventViewer_OnShow();
+			</OnShow>
+			<OnHide>
+				CalendarEventViewer_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+</UI>
+

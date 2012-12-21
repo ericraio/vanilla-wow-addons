@@ -1,0 +1,1678 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Solitaire.lua"/>
+		
+
+	<FontString name="SolitaireFont" font="Fonts\MORPHEUS.ttf" virtual="true">
+		<FontHeight>
+			<AbsValue val="13"/>
+		</FontHeight>
+		<Color r="0" g="0" b="0"/>
+		<Shadow>
+			<Offset>
+				<AbsDimension x="1" y="-1"/>
+			</Offset>
+			<Color r="0.49" g="0.35" b="0.05"/>
+		</Shadow>
+	</FontString>
+
+	<Button name="Solitaire_CardButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="64" y="90"/>
+		</Size>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$ParentCardTexture" file="Interface\AddOns\Solitaire\Cardfacev3">
+					<Size>
+						<AbsDimension x="64" y="90"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					 
+				</Texture>
+
+				<FontString name="$ParentCardValue" inherits="SolitaireFont">
+					<FontHeight>
+						<AbsValue val="1" /> 
+					</FontHeight>
+
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="1"/>
+					
+				</FontString>
+
+			</Layer> 
+
+			<Layer level = "OVERLAY">
+				<Texture name="$ParentSuitTexture">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$ParentCheckTexture">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnClick>
+				--Solitaire_OnClick(this:GetID());
+			</OnClick>
+
+			<OnMouseDown>
+				Solitaire_SetDragCard(this:GetID());
+			</OnMouseDown>
+			
+			<OnMouseUp>
+				Solitaire_PlaceDragCard();
+			</OnMouseUp>
+
+			<OnEnter>
+				DestinationCard = this:GetID();
+			</OnEnter>
+
+			<OnLeave>
+				DestinationCard = nil;
+			</OnLeave>
+		</Scripts>
+
+	</Button>
+
+
+	<Button name="Solitaire_StackCardButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="64" y="90"/>
+		</Size>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$ParentCardTexture" file="Interface\AddOns\Solitaire\Cardfacev3">
+					<Size>
+						<AbsDimension x="64" y="90"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					 
+				</Texture>
+
+				<FontString name="$ParentCardValue" inherits="SolitaireFont">
+					<FontHeight>
+						<AbsValue val="1" /> 
+					</FontHeight>
+
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="1"/>
+					
+				</FontString>
+
+			</Layer> 
+
+			<Layer level = "OVERLAY">
+				<Texture name="$ParentSuitTexture">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$ParentCheckTexture">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnClick>
+				--Solitaire_OnClick(this:GetID());
+			</OnClick>
+
+			<OnMouseDown>
+				--Solitaire_SetDragCard(this:GetID());
+			</OnMouseDown>
+			
+			<OnMouseUp>
+				--Solitaire_StackPlaceDragCard();
+			</OnMouseUp>
+
+			<OnEnter>
+				IsStackCard = 1;
+				DestinationCard = this:GetID();
+			</OnEnter>
+
+			<OnLeave>
+				IsStackCard = nil;
+				DestinationCard = nil;
+			</OnLeave>
+		</Scripts>
+
+	</Button>
+
+
+
+	<Frame name="SolitaireFrame" movable="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="600" y="440"/>
+		</Size>
+
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="100" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+			
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-7" /> 
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="406" /> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+		
+					<Color r="0.6" g="0.6" b="0.6" a="0.5" /> 
+				</Texture>
+				
+				<Texture>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-35" /> 
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="5" /> 
+							</Offset>
+						</Anchor>
+					</Anchors>
+		
+					<Color r="0" g="0.3" b="0" a="0.5" /> 
+				</Texture>
+				
+			</Layer> 
+
+			<Layer level="OVERLAY">
+				
+				<FontString inherits="GameFontNormalLarge" text="Solitaire">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="12" y="-12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>	
+
+				<FontString name="SolitaireStackNum2" inherits="GameFontNormalLarge" text="1">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="162" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>	
+
+				<FontString name="SolitaireStackNum3" inherits="GameFontNormalLarge" text="2">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="246" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>
+
+				<FontString name="SolitaireStackNum4" inherits="GameFontNormalLarge" text="3">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="328" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>	
+
+				<FontString name="SolitaireStackNum5" inherits="GameFontNormalLarge" text="4">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="408" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>	
+
+				<FontString name="SolitaireStackNum6" inherits="GameFontNormalLarge" text="5">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="488" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>	
+
+				<FontString name="SolitaireStackNum7" inherits="GameFontNormalLarge" text="6">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="568" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="1" b="0" a="1"/>
+				</FontString>	
+
+				
+			</Layer>
+		</Layers>
+
+		<Frames>
+
+			<Button name="Solitaire_CloseButton" inherits="UIPanelCloseButton">
+				
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="-6" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Scripts>
+					<OnClick>
+		
+						SolitaireFrame:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+
+			<Button name="Solitaire_ResetButton" inherits="UIPanelButtonTemplate" text="Reset">
+				<Size>
+  					<AbsDimension x="64" y="20" /> 
+				</Size>
+			
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-36" y="-12" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+	
+		  		<NormalText inherits="GameFontNormalSmall" /> 
+  				<DisabledText inherits="GameFontDisableSmall" /> 
+  				<HighlightText inherits="GameFontHighlightSmall" />
+
+				<Scripts>
+					<OnClick>
+						Solitaire_Init();
+					</OnClick>
+				</Scripts>
+
+ 	 		</Button>
+
+
+
+			<Button name="Solitaire_SpareCardPileButton" parent="SolitaireFrame">
+				<Size>
+					<AbsDimension x="64" y="90"/>
+				</Size>
+
+				<Anchors>
+					<Anchor point="TOPLEFT" >
+						<Offset>
+							<AbsDimension x="20" y="-46" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\AddOns\Solitaire\Cardbackv2">
+							<Size>
+								<AbsDimension x="64" y="90"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+					 
+						</Texture>
+					</Layer> 
+				</Layers>
+
+				<Scripts>
+					<OnClick>
+						Solitaire_SpareCardOnClick();
+						
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!--
+			<Button name="Solitaire_SpareCardButton" parent="SolitaireFrame">
+				<Size>
+					<AbsDimension x="64" y="90"/>
+				</Size>
+
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="74" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\AddOns\Solitaire\Cardface">
+							<Size>
+								<AbsDimension x="64" y="90"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+					 
+						</Texture>
+					</Layer> 
+				</Layers>
+
+				<Scripts>
+					<OnClick>
+		
+						
+					</OnClick>
+				</Scripts>
+			</Button>
+			-->
+
+			<Button name="Solitaire_StackButton1" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="1">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="0" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+			<Button name="Solitaire_StackButton2" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="2">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="80" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_StackButton3" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="3">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="160" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_StackButton4" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="4">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="240" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_StackButton5" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="5">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="320" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+			</Button>
+
+			<Button name="Solitaire_StackButton6" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="6">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="400" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+			</Button>
+
+			<Button name="Solitaire_StackButton7" parent="SolitaireFrame" hidden="true" inherits="Solitaire_StackCardButtonTemplate" id="7">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_SpareCardPileButton">
+						<Offset>
+							<AbsDimension x="480" y="-100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+			</Button>
+
+
+<!-- Stack one -->
+			<Button name="Solitaire_CardButton1" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="1">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton2" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="2">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton3" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="3">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton4" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="4">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton5" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="5">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton6" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="6">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton7" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="7">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton8" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="8">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton9" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="9">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton10" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="10">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton11" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="11">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton12" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="12">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton13" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="13">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton1">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+<!-- Stack two -->
+			<Button name="Solitaire_CardButton14" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="14">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton15" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="15">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton16" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="16">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton17" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="17">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton18" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="18">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton19" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="19">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton20" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="20">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton21" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="21">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton22" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="22">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton23" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="23">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton24" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="24">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton25" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="25">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton26" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="26">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+<!-- Stack three -->
+			<Button name="Solitaire_CardButton27" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="27">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton28" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="28">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton29" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="29">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton30" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="30">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton31" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="31">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton32" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="32">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton33" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="33">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton34" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="34">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton35" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="35">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton36" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="36">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton37" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="37">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton38" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="38">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton39" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="39">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton3">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+<!-- Stack four -->
+			<Button name="Solitaire_CardButton40" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="40">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton41" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="41">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton42" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="42">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton43" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="43">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton44" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="44">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton45" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="45">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton46" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="46">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton47" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="47">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton48" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="48">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton49" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="49">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton50" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="50">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton51" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="51">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton52" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="52">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+<!-- Stack five -->
+			<Button name="Solitaire_CardButton53" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="53">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton54" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="54">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton55" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="55">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton56" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="56">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton57" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="57">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton58" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="58">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton59" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="59">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton60" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="60">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton61" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="61">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton62" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="62">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton63" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="63">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton64" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="64">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton65" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="65">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+<!-- Stack six -->
+			<Button name="Solitaire_CardButton66" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="66">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton67" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="67">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton68" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="68">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton69" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="69">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton70" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="70">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton71" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="71">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton72" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="72">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton73" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="73">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton74" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="74">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton75" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="75">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton76" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="76">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton77" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="77">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton78" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="78">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+
+
+<!-- Stack seven -->
+			<Button name="Solitaire_CardButton79" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="79">
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="0" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		
+			<Button name="Solitaire_CardButton80" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="80">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-14" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton81" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="81">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-28" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton82" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="82">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-42" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton83" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="83">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-56" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton84" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="84">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-70" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton85" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="85">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-84" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton86" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="86">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-98" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton87" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="87">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-112" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton88" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="88">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-126" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton89" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="89">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-140" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton90" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="90">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-154" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton91" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="91">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="-168" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+<!-- The ace stacks -->
+			<Button name="Solitaire_CardButton92" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="92">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton7">
+						<Offset>
+							<AbsDimension x="0" y="100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton93" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="93">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton6">
+						<Offset>
+							<AbsDimension x="0" y="100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton94" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="94">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton5">
+						<Offset>
+							<AbsDimension x="0" y="100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Button name="Solitaire_CardButton95" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="95">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton4">
+						<Offset>
+							<AbsDimension x="0" y="100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+<!-- The spare card -->
+
+			<Button name="Solitaire_CardButton96" parent="SolitaireFrame" inherits="Solitaire_CardButtonTemplate" id="96">
+			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Solitaire_StackButton2">
+						<Offset>
+							<AbsDimension x="0" y="100" /> 
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				
+				Solitaire_OnLoad();
+				this:SetBackdropColor(0, 1, 0, 1);
+				this:SetBackdropBorderColor(1, 1, 1, 1);
+			</OnLoad>
+
+			<OnEvent>
+				Solitaire_OnEvent(event);
+			</OnEvent>
+
+			<OnShow>
+			</OnShow>
+
+			<OnMouseDown>
+				if ( arg1 == "LeftButton") then
+					this:StartMoving();
+					this.isMoving = true;
+				end
+			</OnMouseDown>
+			
+			<OnMouseUp>
+				if ( arg1 == "LeftButton") then
+					this:StopMovingOrSizing();
+					this.isMoving = false;
+				end
+			</OnMouseUp>
+
+			<OnUpdate>
+				--Solitaire_OnUpdate(arg1);
+			</OnUpdate>
+		
+		</Scripts>
+	</Frame>
+</Ui>

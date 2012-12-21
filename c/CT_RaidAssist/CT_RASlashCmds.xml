@@ -1,0 +1,231 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RASlashCmds.lua"/>
+	<Button name="CT_RA_SlashCmdSlashTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="500" y="40"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentText" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="27" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAvailable" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDescription" justifyH="LEFT" justifyV="TOP" inherits="ChatFontNormal">
+					<Size>
+						<AbsDimension x="470" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentAvailable" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture file="Interface\QuestFrame\UI-Quest-BulletPoint">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				if ( not DEFAULT_CHAT_FRAME.editBox:IsVisible() ) then
+					DEFAULT_CHAT_FRAME.editBox:Show();
+					DEFAULT_CHAT_FRAME.editBox.setText = 1;
+					DEFAULT_CHAT_FRAME.editBox.text = this.slashCommand;
+				
+					if ( (DEFAULT_CHAT_FRAME.editBox.stickyType == "PARTY") and (GetNumPartyMembers() == 0) ) then
+						DEFAULT_CHAT_FRAME.editBox.chatType = "SAY";
+						ChatEdit_UpdateHeader(DEFAULT_CHAT_FRAME.editBox);
+					elseif ( (DEFAULT_CHAT_FRAME.editBox.stickyType == "RAID") and (GetNumRaidMembers() == 0) ) then
+						DEFAULT_CHAT_FRAME.editBox.chatType = "SAY";
+						ChatEdit_UpdateHeader(DEFAULT_CHAT_FRAME.editBox);
+					end
+				end
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\HelpFrame\HelpFrameButton-Highlight" alphaMode="ADD">
+			<TexCoords left="0" right="1.0" top="0" bottom="0.578125"/>
+		</HighlightTexture>
+	</Button>
+	<Frame name="CT_RA_SlashCmdFrame" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="550" y="500"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="Slash Commands">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDrag">
+				<Size>
+					<AbsDimension x="150" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-12" y="12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StartMoving();
+						elseif ( arg1 == "RightButton" ) then
+							this:GetParent():ClearAllPoints();
+							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+					</OnMouseUp>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Left-click to drag\nRight-click to reset");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<ScrollFrame name="$parentScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="500" y="430"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<Frame name="$parentCmds">
+						<Size>
+							<AbsDimension x="500" y="430"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Frames>
+							<Button name="$parentCmd1" inherits="CT_RA_SlashCmdSlashTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentCmd2" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd3" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd4" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd5" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd6" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd7" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd8" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd9" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd10" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd11" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd12" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd13" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd14" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd15" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd16" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd17" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd18" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd19" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd20" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd21" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd22" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd23" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd24" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd25" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd26" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd27" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd28" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd29" inherits="CT_RA_SlashCmdSlashTemplate"/>
+							<Button name="$parentCmd30" inherits="CT_RA_SlashCmdSlashTemplate"/>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+			<Button name="$parentCloseButton" hidden="false" inherits="GameMenuButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="125" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" >
+						<Offset>
+							<AbsDimension x="0" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+					<OnHide>
+						PlaySound("UChatScrollButton");
+					</OnHide>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

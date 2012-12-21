@@ -1,0 +1,577 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="DamageMeters_Globals.lua"/>
+	<Script file="localization.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="DamageMeters_Report.lua"/>
+	<Script file="DamageMeters.lua"/>
+
+	<GameTooltip name="DamageMetersTooltip" frameStrata="TOOLTIP" hidden="true" inherits="GameTooltipTemplate" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
+				this:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+
+	<Button name="DamageMeters_UIDropDownMenuButtonTemplate" inherits="UIDropDownMenuButtonTemplate" virtual="true">
+	</Button>
+
+	<StatusBar name="DamageMetersBarTemplate" inherits="TextStatusBar" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="119" y="12"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="47" y="-21"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				--this:RegisterForClicks("LeftButtonDown");
+				--TextStatusBar_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				UnitFrameManaBar_Update(this, arg1);
+			</OnEvent>
+			<OnMouseDown>
+				DamageMetersBarTemplate_OnClick();
+			</OnMouseDown>
+			<OnEnter>
+                DamageMetersBarTemplate_OnEnter();
+            </OnEnter>
+            <OnLeave>
+				DamageMetersBarTemplate_OnLeave();
+            </OnLeave>
+		</Scripts>
+		<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+	</StatusBar>
+
+	-- MailFrame
+	<Frame name="DMReportFrame" toplevel="true" parent="UIParent" enableMouse="true" hidden="false">
+		<Size>
+			<AbsDimension x="360" y="340"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+			<Offset>
+				<AbsDimension x="0" y="0"/>
+			</Offset>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="false">
+			<BackgroundInsets>
+				<!-- Just the background texture only -->
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Frames>
+			<Frame name="DMSendMailFrame">
+				<Size>
+					<AbsDimension x="260" y="512"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Frames>
+					<ScrollFrame name="DMSendMailScrollFrame" inherits="UIPanelScrollFrameTemplate">
+						<Size>
+							<!-- This also moves teh scroll bar -->
+							<AbsDimension x="325" y="316"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-12"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size>
+										<AbsDimension x="31" y="256"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.484375" top="0" bottom="1.0"/>
+								</Texture>
+								<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+									<Size>
+										<AbsDimension x="31" y="106"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="-2" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.515625" right="1.0" top="0" bottom="0.4140625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<ScrollChild>
+							<Frame name="DMSendMailScrollChildFrame" enableMouse="true">
+								<Size>
+									<!-- This moves the scroll bar -->
+									<AbsDimension x="260" y="145"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<!-- Seemingly irrelevant -->
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<EditBox name="DMReportFrame_SendMailBodyEditBox" letters="65535" multiLine="true" enableMouse="true" autoFocus="false">
+										<Size>
+											<!-- This is the width of the text area -->
+											<AbsDimension x="310" y="100"/>
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<!-- This effects how high up the text is when the scroll bar is at the top. -->
+													<AbsDimension x="10" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnTextChanged>
+												ScrollingEdit_OnTextChanged(DMSendMailScrollFrame);
+											</OnTextChanged>
+											<OnCursorChanged>
+												ScrollingEdit_OnCursorChanged(arg1, arg2-10, arg3, arg4);
+											</OnCursorChanged>
+											<OnUpdate>
+												ScrollingEdit_OnUpdate(DMSendMailScrollFrame);
+											</OnUpdate>
+											<OnEscapePressed>
+												this:ClearFocus();
+											</OnEscapePressed>
+											<OnClick>
+												this:SetFocus();
+											</OnClick>
+											<OnEditFocusLost>
+												HideUIPanel(DMReportFrame);
+											</OnEditFocusLost>
+										</Scripts>
+										<FontString inherits="GameTooltipTextSmall"/>
+									</EditBox>
+								</Frames>
+								<Scripts>
+									<OnMouseUp>
+										DMReportFrame_SendMailBodyEditBox:SetFocus();
+									</OnMouseUp> 
+								</Scripts>
+							</Frame>
+						</ScrollChild>
+					</ScrollFrame>
+				</Frames>
+			</Frame>
+
+			<Button name="DMOpenMailCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(DMReportFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="DMReportTypeButton" inherits="GameMenuButtonTemplate" text="DM_MENU_CHOOSEREPORT">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="DMSendMailFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="DMReportTypeButtonText" inherits="GameTooltipTextSmall" text="DM_MENU_CHOOSEREPORT">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOption");
+						DamageMeters_ReportTypeButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Frame name="DMReportTypeDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="DMReportTypeButton" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DamageMeters_ReportTypeDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnHide>
+				HideDropDownMenu(1);
+				HideUIPanel(DMReportFrame);
+				PlaySound("igCharacterInfoClose");
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+	<Frame name="DamageMetersHiddenFrame" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				DamageMetersHiddenFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="DamageMetersFrame" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+        <Size>
+            <AbsDimension x="131" y="81"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="4" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+        <!-- <TitleRegion setAllPoints="true"/> -->
+        <Frames>
+			<Frame setAllPoints="true">
+				<Frames>
+					<Frame setAllPoints="true">
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentText1" inherits="TextStatusBarText"/>
+								<FontString name="$parentText2" inherits="TextStatusBarText"/>
+								<FontString name="$parentText3" inherits="TextStatusBarText"/>
+								<FontString name="$parentText4" inherits="TextStatusBarText"/>
+								<FontString name="$parentText5" inherits="TextStatusBarText"/>
+								<FontString name="$parentText6" inherits="TextStatusBarText"/>
+								<FontString name="$parentText7" inherits="TextStatusBarText"/>
+								<FontString name="$parentText8" inherits="TextStatusBarText"/>
+								<FontString name="$parentText9" inherits="TextStatusBarText"/>
+								<FontString name="$parentText10" inherits="TextStatusBarText"/>
+								<FontString name="$parentText11" inherits="TextStatusBarText"/>
+								<FontString name="$parentText12" inherits="TextStatusBarText"/>
+								<FontString name="$parentText13" inherits="TextStatusBarText"/>
+								<FontString name="$parentText14" inherits="TextStatusBarText"/>
+								<FontString name="$parentText15" inherits="TextStatusBarText"/>
+								<FontString name="$parentText16" inherits="TextStatusBarText"/>
+								<FontString name="$parentText17" inherits="TextStatusBarText"/>
+								<FontString name="$parentText18" inherits="TextStatusBarText"/>
+								<FontString name="$parentText19" inherits="TextStatusBarText"/>
+								<FontString name="$parentText20" inherits="TextStatusBarText"/>
+								<FontString name="$parentText21" inherits="TextStatusBarText"/>
+								<FontString name="$parentText22" inherits="TextStatusBarText"/>
+								<FontString name="$parentText23" inherits="TextStatusBarText"/>
+								<FontString name="$parentText24" inherits="TextStatusBarText"/>
+								<FontString name="$parentText25" inherits="TextStatusBarText"/>
+								<FontString name="$parentText26" inherits="TextStatusBarText"/>
+								<FontString name="$parentText27" inherits="TextStatusBarText"/>
+								<FontString name="$parentText28" inherits="TextStatusBarText"/>
+								<FontString name="$parentText29" inherits="TextStatusBarText"/>
+								<FontString name="$parentText30" inherits="TextStatusBarText"/>
+								<FontString name="$parentText31" inherits="TextStatusBarText"/>
+								<FontString name="$parentText32" inherits="TextStatusBarText"/>
+								<FontString name="$parentText33" inherits="TextStatusBarText"/>
+								<FontString name="$parentText34" inherits="TextStatusBarText"/>
+								<FontString name="$parentText35" inherits="TextStatusBarText"/>
+								<FontString name="$parentText36" inherits="TextStatusBarText"/>
+								<FontString name="$parentText37" inherits="TextStatusBarText"/>
+								<FontString name="$parentText38" inherits="TextStatusBarText"/>
+								<FontString name="$parentText39" inherits="TextStatusBarText"/>
+								<FontString name="$parentText40" inherits="TextStatusBarText"/>
+
+								<FontString name="$parent_SendMsgQueueBarText" inherits="TextStatusBarText"/>
+								<FontString name="$parent_ProcessMsgQueueBarText" inherits="TextStatusBarText"/>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+			</Frame>
+			<StatusBar name="$parentBar1" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar2" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar3" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar4" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar5" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar6" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar7" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar8" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar9" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar10" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar11" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar12" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar13" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar14" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar15" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar16" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar17" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar18" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar19" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar20" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar21" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar22" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar23" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar24" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar25" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar26" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar27" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar28" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar29" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar30" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar30" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar31" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar32" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar33" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar34" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar35" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar36" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar37" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar38" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar39" inherits="DamageMetersBarTemplate" />
+			<StatusBar name="$parentBar40" inherits="DamageMetersBarTemplate" />
+			
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DamageMeters_FrameDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentBarDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DamageMeters_BarDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Button name="DamageMetersFrame_TitleButton" >
+				<Size>
+					<AbsDimension x="117" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="DamageMetersFrame" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="4" top="5" bottom="5"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="DamageMeters_TitleButtonText" inherits="GameTooltipTextSmall">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						DamageMetersFrame_TitleButton_OnLoad();
+					</OnLoad>
+					<OnClick>
+						DamageMetersFrame_TitleButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="DamageMetersFrame_TotalButton" >
+				<Size>
+					<AbsDimension x="117" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="DamageMetersFrame" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="3" right="4" top="5" bottom="5"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="DamageMeters_TotalButtonText" inherits="GameTooltipTextSmall">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						DamageMetersFrame_TotalButton_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<StatusBar name="$parent_ProcessMsgQueueBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="119" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent_TitleButton" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			</StatusBar>
+
+			<StatusBar name="$parent_SendMsgQueueBar" inherits="TextStatusBar">
+				<Size>
+					<AbsDimension x="119" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent_ProcessMsgQueueBar" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+			</StatusBar>
+
+        </Frames>
+		<Scripts>
+			<OnLoad>
+				DamageMetersFrame_OnLoad();
+				-- For Dragging.
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+
+			<OnUpdate>
+				DamageMetersFrame_OnUpdate();
+			</OnUpdate>		
+			<OnEvent>
+				DamageMetersFrame_OnEvent();
+			</OnEvent>
+			<OnClick>
+				DamageMetersFrame_OnClick();
+			</OnClick>
+
+			<OnEnter>
+				--DMPrint("DamageMetersFrame: OnEnter");
+			</OnEnter>
+			<OnLeave>
+				--DMPrint("DamageMetersFrame: OnLeave");
+			</OnLeave>
+			<OnMouseDown>
+				--DMPrint("DamageMetersFrame: OnMouseDown");
+				DamageMetersFrame_OnMouseDown();
+			</OnMouseDown>
+			<OnMouseUp>
+				--DMPrint("DamageMetersFrame: OnMouseUp");
+				DamageMetersFrame_OnMouseUp();
+			</OnMouseUp>
+
+			<OnDragStart>
+				DamageMetersFrame_OnDragStart();
+			</OnDragStart>
+			<OnDragStop>
+				DamageMetersFrame_OnDragStop();
+			</OnDragStop>
+		</Scripts>
+    </Frame>
+</Ui>

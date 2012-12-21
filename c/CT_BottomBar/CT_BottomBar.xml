@@ -1,0 +1,1199 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="CT_BottomBar.lua"/>
+	<Button name="CT_BottomBarDragTemplate" frameStrata="HIGH" virtual="true" hidden="true" movable="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture file="Interface\AddOns\CT_BottomBar\Images\DragButton"/>
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText("Click to drag");
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					this:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+	<Frame name="CT_BottomBarFrame" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="1024" y="43"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOM"/>
+		</Anchors>
+		<Frames>
+			<Frame name="$parentClass">
+				<Frames>
+					<Frame name="$parentBackground">
+						<Scripts>
+							<OnShow>
+								if ( this:GetParent():IsVisible() ) then
+									CT_BottomBar_HideTextures(nil);
+								end
+								CT_BarModOptions_RemoveSpaceSpecial(CT_BarModOptions_Options[UnitName("player")]["removeSpecial"]);
+							</OnShow>
+							<OnHide>
+								CT_BottomBar_HideTextures(1);
+								CT_BarModOptions_RemoveSpaceSpecial(CT_BarModOptions_Options[UnitName("player")]["removeSpecial"]);
+							</OnHide>
+						</Scripts>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						if ( getglobal(this:GetName() .. "Background"):IsVisible() ) then
+							CT_BottomBar_HideTextures(nil);
+						end
+						CT_BottomBar_HideBars(nil);
+						CT_BarModOptions_RemoveSpaceSpecial(CT_BarModOptions_Options[UnitName("player")]["removeSpecial"]);
+					</OnShow>
+					<OnHide>
+						CT_BottomBar_HideTextures(1);
+						CT_BottomBar_HideBars(1);
+						CT_BarModOptions_RemoveSpaceSpecial(CT_BarModOptions_Options[UnitName("player")]["removeSpecial"]);
+					</OnHide>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentGryphons">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentFrame">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<Texture name="$parentLeft" file="Interface\MainMenuBar\UI-MainMenuBar-EndCap-Dwarf">
+									<Size>
+										<AbsDimension x="128" y="128"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\MainMenuBar\UI-MainMenuBar-EndCap-Dwarf">
+									<Size>
+										<AbsDimension x="128" y="128"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOM"/>
+									</Anchors>
+									<TexCoords left="1.0" right="0.0" top="0.0" bottom="1.0"/>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parentBar">
+				<Size>
+					<AbsDimension x="551" y="43"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentHotbar">
+						<Size>
+							<AbsDimension x="512" y="43"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentBackgroundLeft" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="256" y="43"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="-1" y="-1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="1.0" top="0.83203125" bottom="1.0"/>
+								</Texture>
+								<Texture name="$parentBackgroundRight" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="256" y="43"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBackgroundLeft"/>
+									</Anchors>
+									<TexCoords left="0" right="1.0" top="0.58203125" bottom="0.75"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnHide>
+								for i = 1, 12, 1 do
+									getglobal("ActionButton" .. i):Hide();
+									getglobal("BonusActionButton" .. i):Hide();
+								end
+								CT_BottomBarFrameBarDrag:Hide();
+							</OnHide>
+							<OnShow>
+								if ( CT_MF_ShowFrames ) then
+									CT_BottomBarFrameBarDrag:Show();
+								end
+								for i = 1, 12, 1 do
+									if ( GetBonusBarOffset() == 0 ) then
+										getglobal("ActionButton" .. i).showgrid = 1;
+										getglobal("ActionButton" .. i):Show();
+									end
+									if ( GetBonusBarOffset() > 0 ) then
+										getglobal("BonusActionButton" .. i).showgrid = 1;
+										getglobal("BonusActionButton" .. i):Show();
+									end
+								end
+								CT_updateActionButtons();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentUpDown">
+						<Size>
+							<AbsDimension x="22" y="43"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="511" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentBackground" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="22" y="43"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+									<TexCoords left="0" right="0.0859375" top="0.33203125" bottom="0.5"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnHide>
+								ActionBarUpButton:Hide();
+								ActionBarDownButton:Hide();
+							</OnHide>
+							<OnShow>
+								ActionBarUpButton:Show();
+								ActionBarDownButton:Show();
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentNumber">
+						<Size>
+							<AbsDimension x="17" y="43"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="533" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentBackground" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="17" y="43"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+									<TexCoords left="0.0859375" right="0.14453125" top="0.33203125" bottom="0.5"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnHide>
+								MainMenuBarPageNumber:Hide();
+							</OnHide>
+							<OnShow>
+								MainMenuBarPageNumber:Show();
+							</OnShow>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parentMiniButtons">
+				<Size>
+					<AbsDimension x="230" y="43"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="551" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackgroundLeft" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+							<Size>
+								<AbsDimension x="227" y="43"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT"/>
+							</Anchors>
+							<TexCoords left="0.11328125" right="1.0" top="0.33203125" bottom="0.5"/>
+						</Texture>
+						<Texture name="$parentBackgroundRight" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+							<Size>
+								<AbsDimension x="3" y="43"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="227" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.01171875" top="0.08203125" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnHide>
+						CharacterMicroButton:Hide();
+						SpellbookMicroButton:Hide();
+						TalentMicroButton:Hide();
+						QuestLogMicroButton:Hide();
+						SocialsMicroButton:Hide();
+						WorldMapMicroButton:Hide();
+						MainMenuMicroButton:Hide();
+						HelpMicroButton:Hide();
+						CT_BottomBarFrameMiniButtonsDrag:Hide();
+					</OnHide>
+					<OnShow>
+						if ( CT_MF_ShowFrames ) then
+							CT_BottomBarFrameMiniButtonsDrag:Show();
+						end
+						CharacterMicroButton:Show();
+						SpellbookMicroButton:Show();
+						if ( UnitLevel("player") >= 10 ) then
+							TalentMicroButton:Show();
+						end
+						QuestLogMicroButton:Show();
+						SocialsMicroButton:Show();
+						WorldMapMicroButton:Show();
+						MainMenuMicroButton:Show();
+						HelpMicroButton:Show();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentLatency">
+				<Size>
+					<AbsDimension x="28" y="43"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="771" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+							<Size>
+								<AbsDimension x="28" y="43"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT"/>
+							</Anchors>
+							<TexCoords left="0.01171875" right="0.12109375" top="0.08203125" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnHide>
+						MainMenuBarPerformanceBarFrame:Hide();
+						CT_BottomBarFrameLatencyDrag:Hide();
+					</OnHide>
+					<OnShow>
+						if ( CT_MF_ShowFrames ) then
+							CT_BottomBarFrameLatencyDrag:Show();
+						end
+						MainMenuBarPerformanceBarFrame:Show();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentBags">
+				<Size>
+					<AbsDimension x="225" y="43"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="799" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBackground" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+							<Size>
+								<AbsDimension x="225" y="43"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT"/>
+							</Anchors>
+							<TexCoords left="0.12109375" right="1" top="0.08203125" bottom="0.25"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnHide>
+						CT_BottomBarFrameBagsDrag:Hide();
+						MainMenuBarBackpackButton:ClearAllPoints();
+						MainMenuBarBackpackButton:SetPoint("TOP", "UIParent", "BOTTOM", 0, -100)
+					</OnHide>
+					<OnShow>
+						if ( CT_MF_ShowFrames ) then
+							CT_BottomBarFrameBagsDrag:Show();
+						end
+						if ( CT_BottomBar_RotatedFrames[UnitName("player")]["Bags"] ) then
+							CT_BottomBar_RotateBags(1);
+						else
+							CT_BottomBar_RotateBags(-1);
+						end
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentXP">
+				<Size>
+					<AbsDimension x="1024" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentTextureFrame">
+						<Size>
+							<AbsDimension x="1024" y="12"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="$parentBackground1" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="256" y="12"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT"/>
+									</Anchors>
+									<TexCoords left="0" right="1" top="0.79296875" bottom="0.83984375"/>
+								</Texture>
+								<Texture name="$parentBackground2" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="256" y="12"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="256" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="1" top="0.54296875" bottom="0.58984375"/>
+								</Texture>
+								<Texture name="$parentBackground3" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="256" y="12"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="512" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="1" top="0.29296875" bottom="0.33984375"/>
+								</Texture>
+								<Texture name="$parentBackground4" file="Interface\MainMenuBar\UI-MainMenuBar-Dwarf">
+									<Size>
+										<AbsDimension x="256" y="12"/>
+									</Size>
+									<Anchors>
+										<Anchor point="BOTTOMLEFT">
+											<Offset>
+												<AbsDimension x="768" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="1" top="0.04296875" bottom="0.08984375"/>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnHide>
+						MainMenuExpBar:ClearAllPoints();
+						MainMenuExpBar:SetPoint("TOP", "UIParent", "BOTTOM", 0, -5);
+						CT_BottomBarFrameXPDrag:Hide();
+						ReputationWatchBar:Hide();
+					</OnHide>
+					<OnShow>
+						if ( CT_MF_ShowFrames ) then
+							CT_BottomBarFrameXPDrag:Show();
+						end
+						ReputationWatchBar_Update();
+						MainMenuExpBar:ClearAllPoints();
+						MainMenuExpBar:SetPoint("TOPLEFT", "CT_BottomBarFrameXP", "TOPLEFT", 0, -1);
+					</OnShow>
+					<OnUpdate>
+						MainMenuExpBar:SetFrameLevel(2);
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+			<Button name="$parentXPDrag" hidden="true" inherits="CT_BottomBarDragTemplate" movable="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="14" y="28"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_LinkFrameDrag(CT_BottomBarFrameXP, this, "TOPLEFT", "BOTTOM", -16, -2);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentBagsDrag" hidden="true" inherits="CT_BottomBarDragTemplate" movable="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="823" y="18"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText("Left click to drag\nRight click to rotate");
+					</OnEnter>
+					<OnMouseUp>
+						if ( arg1 == "LeftButton" ) then
+							this:StopMovingOrSizing();
+						else
+							CT_BottomBar_RotateBags();
+						end
+					</OnMouseUp>
+					<OnLoad>
+						CT_LinkFrameDrag(CT_BottomBarFrameBags, this, "TOPLEFT", "BOTTOM", -26, -2);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentMiniButtonsDrag" hidden="true" inherits="CT_BottomBarDragTemplate" movable="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="566" y="18"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText("Left click to drag\nRight click to rotate");
+					</OnEnter>
+					<OnMouseUp>
+						if ( arg1 == "LeftButton" ) then
+							this:StopMovingOrSizing();
+						else
+							CT_BottomBar_RotateMiniButtons();
+						end
+					</OnMouseUp>
+					<OnLoad>
+						CT_LinkFrameDrag(CT_BottomBarFrameMiniButtons, this, "TOPLEFT", "BOTTOM", -26, -2);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentLatencyDrag" hidden="true" inherits="CT_BottomBarDragTemplate" movable="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="784" y="18"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_LinkFrameDrag(CT_BottomBarFrameLatency, this, "TOPLEFT", "BOTTOM", -14, -2);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentBarDrag" hidden="true" inherits="CT_BottomBarDragTemplate" movable="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="23" y="18"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+						GameTooltip:SetText("Left click to drag\nRight click to rotate");
+					</OnEnter>
+					<OnMouseUp>
+						if ( arg1 == "LeftButton" ) then
+							this:StopMovingOrSizing();
+						else
+							CT_BottomBar_RotateBars();
+						end
+					</OnMouseUp>
+					<OnLoad>
+						CT_LinkFrameDrag(CT_BottomBarFrameBar, this, "TOPLEFT", "BOTTOM", -25, -2);
+					</OnLoad>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+			</OnLoad>
+			<OnEvent>
+				CT_BottomBar_InitMod();
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_BottomBar_OptionsFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="300" y="475"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="300" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="Breakable Bottom Bar">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCheckAll" inherits="GameFontNormal" text="Enable Breakable Bottom Bar">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-35"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideBarCBText" inherits="ChatFontNormal" text="Hide Hotbar">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-60"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideBarTextureCBText" inherits="ChatFontNormal" text="Hide Hotbar Texture">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-85"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideUpDownCBText" inherits="ChatFontNormal" text="Hide Hotbar Page Buttons">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-110"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideUpDownTextureCBText" inherits="ChatFontNormal" text="Hide Hotbar Page Buttons' Texture">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-135"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideMiniButtonsCBText" inherits="ChatFontNormal" text="Hide Menu Buttons">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideMiniButtonsTextureCBText" inherits="ChatFontNormal" text="Hide Menu Buttons' Texture">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-185"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideBagsCBText" inherits="ChatFontNormal" text="Hide Bags">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-210"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideBagsTextureCBText" inherits="ChatFontNormal" text="Hide Bags' Texture">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-235"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideLatencyCBText" inherits="ChatFontNormal" text="Hide Latency Meter">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-260"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideLatencyTextureCBText" inherits="ChatFontNormal" text="Hide Latency Meter Texture">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-285"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideXPCBText" inherits="ChatFontNormal" text="Hide Experience Bar">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-310"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideClassCBText" inherits="ChatFontNormal" text="Hide Pet and Class Bars">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-335"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideClassTextureCBText" inherits="ChatFontNormal" text="Hide Pet and Class Bars' Texture">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-360"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>				
+				<FontString name="$parentHideLGryphCBText" inherits="ChatFontNormal" text="Hide Left Gryphon">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-385"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHideRGryphCBText" inherits="ChatFontNormal" text="Hide Right Gryphon">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="80" y="-410"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDrag">
+				<Size>
+					<AbsDimension x="150" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-12" y="12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StartMoving();
+						elseif ( arg1 == "RightButton" ) then
+							this:GetParent():ClearAllPoints();
+							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+					</OnMouseUp>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Left-click to drag\nRight-click to reset");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<CheckButton name="$parentAllChecked" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="25" y="-25"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_EnableMod(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideUpDownCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideUpDownCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("BarUpDown", "BarNumber");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideUpDownTextureCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideUpDownTextureCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("BarUpDownBackground", "BarNumberBackground");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideMiniButtonsCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideMiniButtonsCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("MiniButtons");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideMiniButtonsTextureCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideMiniButtonsTextureCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("MiniButtonsBackgroundLeft", "MiniButtonsBackgroundRight");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideLatencyCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideLatencyCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("Latency");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideLatencyTextureCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideLatencyTextureCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("LatencyBackground");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideBarTextureCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideBarTextureCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("BarHotbarBackgroundLeft", "BarHotbarBackgroundRight");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideBarCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideBarCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("BarHotbar");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideBagsCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideBagsCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("Bags");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideBagsTextureCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideBagsTextureCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("BagsBackground");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideClassCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideClassCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("Class");
+					</OnClick>
+					<OnLoad>
+						--CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideClassTextureCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideClassTextureCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("ClassBackground");
+					</OnClick>
+					<OnLoad>
+						--CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideXPCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideXPCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("XP");
+					</OnClick>
+					<OnLoad>
+						CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideLGryphCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideLGryphCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("GryphonsFrameLeft");
+					</OnClick>
+					<OnLoad>
+						--CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentHideRGryphCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideRGryphCBText">
+						<Offset>
+							<AbsDimension x="-5" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_BottomBar_OptionsFrame_Hide("GryphonsFrameRight");
+					</OnClick>
+					<OnLoad>
+						--CT_BottomBar_OptionsFrame_AddToEnableList();
+					</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<Button name="$parentOkayButton" hidden="false" inherits="UIPanelButtonTemplate" text="Okay">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+		</Scripts>
+	</Frame>
+</Ui>

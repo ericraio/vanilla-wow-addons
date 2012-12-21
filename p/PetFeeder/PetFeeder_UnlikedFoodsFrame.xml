@@ -1,0 +1,441 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:ProjectsWoWBinInterfaceFrameXMLUI.xsd">
+
+	<Script file="PetFeeder_UnlikedFoodsFrame.lua"/>
+	<Script file="localization.lua"/>
+	
+	<!--Button Widget Template-->
+	<Button name="PetFeederUnlikedItemButtonTemplate" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="295" y="32"/>
+		</Size>
+		<Frames>
+			<Button name="$parentItem">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BORDER">
+						<Texture name="$parentIconTexture"/>
+					</Layer>
+				</Layers>
+				<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+				<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+				<Scripts>
+					<OnEnter>
+						PetFeederItemButton_OnEnter(this:GetParent():GetText());
+					</OnEnter>
+					<OnClick>
+						PetFeeder_UnlikedFoodsFrameItemButton_OnClick(arg1,this:GetParent():GetText());
+					</OnClick>					
+					<OnLeave>
+						GameTooltip:Hide();
+						--PetFeederItemButton_OnLeave();
+					</OnLeave>		
+				</Scripts>				
+			</Button>
+		</Frames>
+		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="275" y="12"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent">
+					<Offset>
+						<AbsDimension x="35" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors> 
+		</NormalText>
+		<Scripts>
+			<OnClick>
+				PetFeeder_UnlikedFoodsFrameItemButton_OnClick(arg1,this:GetText());
+			</OnClick>
+			<OnReceiveDrag>
+				PetFeeder_UnlikedFoodsFrame_OnReceiveDrag();
+			</OnReceiveDrag>			
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<HighlightText name="$parentHighlightText" inherits="GameFontHighlight" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="275" y="12"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent">
+					<Offset>
+						<AbsDimension x="35" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>	
+	</Button>
+
+-- Interface viewable objects
+
+	<Frame name="PetFeeder_UnlikedFoodsFrame" setAllPoints="true" enableMouse="true" parent="PetFeederFrame" hidden="true" id="3">
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentListFrameHorizontalBarLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="256" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-312"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture name="$parentListFrameHorizontalBarRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="75" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentListFrameHorizontalBarLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentFoodsText" hidden="false">
+				<Size>
+					<AbsDimension x="320" y="50"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormal" justifyH="CENTER" text="PETFEEDER_UNLIKED_FOODS">
+							<Size>
+								<AbsDimension x="320" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativePoint="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-58"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>					
+				</Layers>				
+			</Frame>
+			
+			<Button name="$parentClearFoodsButton">
+				<Size>
+					<AbsDimension x="96" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentFoodsText" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-86" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>getglobal(this:GetName().."_Update")();
+							this:GetParent():Hide();
+							this:GetParent():Show();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="GameFontNormal" text="PETFEEDER_CLEARFOODS"/>
+			</Button>
+
+
+<!-- Start of Buttons to use as ListBox -->
+			<Button name="$parentItem1" inherits="PetFeederUnlikedItemButtonTemplate" id="1" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentFoodsText" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="25" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem2" inherits="PetFeederUnlikedItemButtonTemplate" id="2" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem3" inherits="PetFeederUnlikedItemButtonTemplate" id="3" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem4" inherits="PetFeederUnlikedItemButtonTemplate" id="4" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem5" inherits="PetFeederUnlikedItemButtonTemplate" id="5" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem6" inherits="PetFeederUnlikedItemButtonTemplate" id="6" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem7" inherits="PetFeederUnlikedItemButtonTemplate" id="7" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem8" inherits="PetFeederUnlikedItemButtonTemplate" id="8" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem9" inherits="PetFeederUnlikedItemButtonTemplate" id="9" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem10" inherits="PetFeederUnlikedItemButtonTemplate" id="10" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem11" inherits="PetFeederUnlikedItemButtonTemplate" id="11" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem12" inherits="PetFeederUnlikedItemButtonTemplate" id="12" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem13" inherits="PetFeederUnlikedItemButtonTemplate" id="13" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem14" inherits="PetFeederUnlikedItemButtonTemplate" id="14" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+-- List box scroller pane			
+			<ScrollFrame name="$parentListScrollFrame" inherits="ClassTrainerListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="296" y="215"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentFoodsText" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-46"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(PETFEEDER_ITEM_HEIGHT, PetFeeder_UnlikedFoodsFrame_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>						
+			<Button name="$parentFeedButton">
+				<Size>
+					<AbsDimension x="96" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-140" y="105"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>PetFeeder_Feed();
+							this:GetParent():Hide();
+							this:GetParent():Show();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="GameFontNormal" text="PETFEEDER_FEED_PET"/>
+			</Button>
+			
+			<Frame name="$parentSortOption_WidgetGroup" hidden="false">
+				<Size>
+					<AbsDimension x="320" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-15" y="140"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" name="$parentFeedSortOption" text="PETFEEDER_SORT1">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="50" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			
+			
+			
+
+			<Button name="$parentSortOptionDropDown" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="50" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentSortOption_WidgetGroup">
+						<Offset>
+							<AbsDimension x="41" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PetFeeder_UnlikedFoodsFrameSortOptionDropDown_OnLoad();						
+					</OnLoad>						
+				</Scripts>
+			</Button>
+			
+			<Frame name="$parentSortOption2_WidgetGroup" hidden="false">
+				<Size>
+					<AbsDimension x="320" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSortOption_WidgetGroup" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" name="$parentFeedSortOption2" text="PETFEEDER_SORT2">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="50" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="$parentSortOption2DropDown" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="50" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentSortOption2_WidgetGroup">
+						<Offset>
+							<AbsDimension x="41" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PetFeeder_UnlikedFoodsFrameSortOption2DropDown_OnLoad();						
+					</OnLoad>						
+				</Scripts>
+			</Button>
+			
+		</Frames>		
+		<Scripts>
+			<OnReceiveDrag>
+				getglobal(this:GetName().."_OnReceiveDrag")();
+			</OnReceiveDrag>								
+			<OnShow>
+				getglobal(this:GetName().."_OnShow")();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+</Ui>

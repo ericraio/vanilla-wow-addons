@@ -1,0 +1,77 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	
+	<Script file="ui.lua"/>
+	
+	<!-- a button added to each frame, shows the character selection list when clicked -->
+	<Button name="BagnonDBUIDropDownButton" topLevel="true" virtual="true">
+		<Size x="24" y="24"/>
+		
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset x="6" y="-6"/>
+			</Anchor>
+		</Anchors>
+		
+		<Scripts>
+			<OnClick>
+				if not BagnonDBUICharacterList:IsShown() then
+					BagnonDBUI_ShowCharacterList(this:GetParent())
+				else
+					BagnonDBUICharacterList:Hide()
+				end
+			</OnClick>
+		</Scripts>
+		<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up" setAllPoints="true"/>
+		<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down" setAllPoints="true"/>
+		<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD" setAllPoints="true"/>
+	</Button>
+	
+	<!-- a player name checkbox -->
+	<CheckButton name="BagnonDBUINameBox" virtual="true">
+		<Size x="140" y="24"/>
+		
+		<ButtonText>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset x="24" y="0"/>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+
+		<NormalFont font = "GameFontNormalLarge"/>
+		<HighlightFont font="GameFontHighlightLarge"/>
+		
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check">
+			<Anchors>
+				<Anchor point="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+					<Offset x="24" y="0"/>
+				</Anchor>
+			</Anchors>
+		</CheckedTexture>
+
+		<Scripts>
+			<OnClick>
+				BagnonDBUI_ChangePlayer(this:GetParent().frame, this:GetText());
+				this:GetParent():Hide();
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+	
+	<!-- the dropdown list of character names that we have data about -->
+	<Frame name="BagnonDBUICharacterList" inherits="BagnonPopupFrame">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("BANKFRAME_OPENED");
+			</OnLoad>
+			<OnEvent>
+				if Banknon then
+					BagnonDBUI_ChangePlayer(Banknon, UnitName("player"));
+				end
+			</OnEvent>
+			<OnHide>
+				this:SetParent(UIParent);
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

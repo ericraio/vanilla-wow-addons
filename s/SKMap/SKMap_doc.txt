@@ -1,0 +1,477 @@
+Shim's Kill Map (a.k.a. SKMap) version 1.5.3
+--------------------------------------------
+
+
+
+* Overview
+----------
+SKMap is a stand-alone World of Warcraft add-on that keeps tracks of player pvp and pve deaths, player pvp kills, their location by zone, and displays them as icons on the world map.
+
+It also stores information about enemy players and guilds, generates various PvP statistics reports, allows to declare war on an enemy player or an entire guild, and more.
+
+A duel database is included.
+
+All of these features are configurable, you can enable or disable everything to match your needs.
+
+I've found that several mods already manage pvp/pve kills and deaths, but none do it in a manner I found satisfactory. Thus I developped my own and added some features I found interesting.
+
+I'd like to thank the creators of several others mods from which I was shamelessly inspired : "Map Notes Gathering" for the world map management, "CombatStats" for the parsing of the combat chat, "Kill on Sight List" for the KoS concept, and lots more.
+
+This mod works with the english, french and german versions of the WoW client. If someone wants to provide a chinese or korean localization... well, good luck :).
+
+
+
+* Installation guide
+--------------------
+Extract the .zip file in your World of Warcraft "Interface\AddOns" directory. You should have the following directories created :
+- "Interface\AddOns\SKMap", which contains the .toc, .xml, and .lua files.
+- "Interface\AddOns\SKMap\Icons", which contains all the .tga files.
+
+
+
+* Quick instructions
+--------------------
+- to display the interface, click on the "Niarly" mini-map button. Or, type in "/skm" in the chat window.
+- to declare war to an enemy : if you have him on target, you can use the small PvP target window (if it's enabled) : click on the button with the two little swords. If you are already at war with him, you can call a truce by clicking on the small heart button.
+- if you don't have an enemy on target, but you want to declare a war on him, or call a truce : open the interface, go to the "PvP" panel and select the enemy from the list. In the bottom frame, on the left, you will see again the war or truce button.
+- when you open your world map, small icons will be displayed for events recorded by SKMap. A control frame displayed on the bottom right allows to hide or show those icons. You can also do this from the interface.
+- to get information for a given enemy player or guild, open the interface and go to the "PvP" panel.
+- to get statistics reports, open the interface and go to the "Hall of Fame" panel and choose one of the reports available.
+- to configure SKMap, open the interface and go to the "Options" panel.
+
+
+
+Hereafter are the detailed SKMap features :
+
+
+* PvP kills
+-----------
+In order to keep track of pvp kills, SKMap parses combat chat messages and records which unit name did what amount of damage for each enemy player involved. These information are stored in a temporary context which is reset if no activity occurs for a given enemy in a timeframe.
+
+When an enemy death is detected, those information are used to award the kill. If the player or his group did 100% of the damage on this enemy, then a "full kill" is awarded to the player. If the player or his group did less than 100% damage, but at least 50%, then a "standard kill" is awarded to the player. If the player or his group did less than 50%, but at least some damage, then an "assist kill" is awarded to the player.
+
+I consider that a player and his group are a single entity. If your group kills an enemy, you are awarded the kill even if you did no damage at all. In my mind, a priest that spends his time keeping his group alive is as entitled to claim the victories as the damage dealers of the group.
+
+Nevertheless, as a friend requested it, I also distinguished the case "full kill" when the player is not in a group. This is what I call a "lone wolf kill".
+
+
+
+* Player deaths (PvE and PvP)
+-----------------------------
+Similarly to the PvP kills, SKMap parses combat chat messages and records which unit did what amount of damage on you. A feature I called "hate list" (similarly to what do manage the game, but more limited) is used to keep track of who you hate most from your enemies. Each time you take damage, your hate of the enemy that dealt the blow increase proportionaly to the amount of damage. With time, hate is reduced proportionaly to the time elapsed since the last hit you take for a given enemy.
+
+If no update at all is recorded for a given enemy in a timeframe, he is forgotten. He is removed from your hate list.
+
+When you die, the hate list is used to retrieve the most hated enemy. He is awarded your death.
+
+This "enemy" may be a creature or a player. If this is a player, his "killed you" count is increased. In both case, the event is recorded.
+
+Note that in some cases, the player death is neither PvE nor PvP. It's the case if you kill yourself, for instance if you fall or if you use some dumb item that drains too much of your life (why can't I stop clicking on this ??). These deaths are recorded as well, but with no killer associated.
+
+
+
+* Creature kills
+----------------
+As a friend requested, I added recording of creature kills, but limited the records to keep only the N (configurable) most recent of such events by zone, in order to prevent the record list from growing endlessly and uncontrollably.
+
+However, keeping track of which creature you kill is more complicated than it seems. Contrary to enemy players, creature names are not unique. Thus, it is not possible to keep track of which damage was done on a given creature by parsing the combat messages.
+
+So, here is what I did :
+- when a creature that you are targetting dies, and if this creature was tapped by you, then the kill is recorded as yours.
+- when a "creature xp award" message is received, the kill is also recorded as yours. Note that those two events are non exclusive and can be received in any order; thus it is important to only record once each creature kill.
+
+If a creature that you are not targetting dies, and yields no experience, then it will not be recorded.
+
+If a creature that you are not targetting dies and gives experience, it is recorded, but without additionnal information (level, elite...). We could try and guess them, as some other mods attempt to do, but I prefer it this way : no approximation.
+
+
+
+
+* World map events
+------------------
+The events discussed above (your pvp kills, your deaths - pvp, pve or other) are displayed on the world map. The zone, coordinates and date are recorded when one of these event occurs.
+
+Geographically close events are grouped on a single "Point of interest", or POI. When you move the mouse over one of these POI, the world map tooltip is displayed with the list of the associated events, sorted chronologically.
+
+Each type of event use a distinct color code. They are configurable. By default, the following colors are used :
+- "full kill" : purple
+- "solo full kill" : light purple/pink
+- "standard kill" : blue
+- "assist kill" : green
+- "player pve death" : orange
+- "player pvp death" : red
+- "player other death" : red
+
+A small frame displayed at the bottom right of the world map allows to hide or show the records. This frame can also be hidden. In this case, to show it back you will have to enable it again in the options.
+
+
+
+* PvP target info frame
+-----------------------
+This is a small frame anchored close to the Target Frame, that is displayed (if configured) when a PvP enemy player is targeted. It displays kills, deaths and meet counts related to this player, as well as the "war" state and a war/truce button that allows to declare war or offer a respite to the target enemy.
+
+Comes in two versions, a standard one and a "lite" compact one. A button allows to switch from one to the other.
+
+Two other mini frames are included to display :
+- the guild to which belong an enemy player (above the enemy name)
+- the enemy player class (below the enemy portrait)
+
+These frames can be enabled or disabled from the options.
+
+
+
+* Command line Interface
+------------------------
+
+The following commands are available from the chat window. Type them as you would tape any other chat.
+
+
+/skm war <player name>
+
+Allows to declare war to an enemy player (caution, it is case sensitive). If this player has already been recorded by SKMap, then his status is set "at WAR". Otherwise, the player name is recorded in a temporary list. If later you meet that player, he will then automatically be set to be "at WAR".
+
+
+/skm peace <player name>
+
+Allows to cancel war on an enemy player, either from the list of known enemies or from the temporary list described above.
+
+
+/skm swar
+
+Displays the unknown players war list in chat window.
+
+
+/skm cwar
+
+Clears the unknown players war list.
+
+
+/skm inf <player name> [<full name match> [<special characters match>]]
+
+This will display in the default chat frame information related to enemy players matching <player name>.
+
+If <full name match> is set to 1, then <player name> is the full player name; otherwise, this is a prefix to search for in the enemy players list. By default, the specified name is used as a prefix.
+
+If <special characters match> is set to 1, then <player name> must match special characters included in the name. Otherwise, all characters are converted to plain characaters before matching (eg, "é" or "ê" become "e",). By default, special characters are converted to plain characters.
+
+
+
+
+* Graphical Interface
+---------------------
+
+The interface can be opened by using the minimap button, or by typing "/skm" from the chat window. It is composed of 4 panels :
+- "PvP" panel
+- "Duels" panel
+- "Hall of Fame" panel
+- "Options" panel
+
+
+* Interface "PvP" panel
+-----------------------
+This panel is divided in two parts :
+- a list, which contains all known enemies or guilds, sortable by any criteria.
+- below the list, a detail view, which displays all known information about the selected player or guild.
+
+The "Players / Guilds" button on top of the list allows to switch from the players list to the guild list.
+
+The "Show at war only" check button is a filter that allows to filter out enemy players or guilds with which you are not currently at war.
+
+The detail view contains several buttons :
+
+On the left, a button allows to declare war (icon with two small swords) to an enemy or guild, or to make a truce (icon with a pink heart).
+
+On the right :
+
+The "Edit Note" button allows you to keep a personal note about a given player or guild.
+
+The "Show Guild" button switches from the player list to the guild list, and selects the guild to which belongs the currently selected player. This button is only available from the player list, and if current player belongs to a guild.
+
+The "Back" button is available from the guild list after the "Show Guild" button has been pressed. It switches back to the players list.
+
+The "Report" button creates opens the "Hall of Fame" panel and displays a report containing all PvP records related to the current enemy player or guild, sorted chronologically.
+
+The "Delete" button allows to delete an enemy player (and all associated records).
+
+
+* Interface "Duel" panel
+------------------------
+This panel is divided in two parts :
+- a list, which contains all players with which you have duelled, sortable by any criteria.
+- below the list, a detail view, which displays information about the selected player.
+
+The detail view contains several buttons :
+
+On the right :
+
+The "Edit Note" button allows you to keep a personal note about a given player.
+
+The "Delete" button allows to delete a player.
+
+
+
+* Interface "Hall of Fame" panel
+--------------------------------
+This panel is divided in two parts :
+- on the left, a book frame, which displays the statistics and other reports. Buttons on top allow to navigate from the book pages.
+- on the right, a set of buttons that allow to generate various PvP statistics. Try them out, see what they do, it's pretty straightforward :)
+
+
+* Interface "Options" panel
+---------------------------
+This panel allows to fully customize the behaviour of SKMap.
+
+You can restore the original settings by clicking on the "Defaults" button.
+
+The following options are available :
+
+. General configuration :
+
+- "Enable PvP target info frame" : if checked, a window is displayed next to the target frame when you have an enemy player on target. This window displays the number of times you've met this enemy, the number of times you killed him, and the number of times he killed you. Also display the "war" status, and a button that allows to switch between war and peace mode with this enemy.
+
+- "Reduced-size target info frame" : allows to switch between the two versions of the PvP target frame : standard (unchecked) or smaller version. Note that there is also a small button (- / +) in the PvP target frame that allows to do the same thing without having to open the interface.
+
+- "Display enemy player guild" : if checked, when an enemy player is on target, his guild is displayed above his name.
+
+- "Display enemy player class" : if checked, when an enemy player is on target, his class is displayed below the target portrait.
+
+- "Ignore inactive low level enemies" : if checked, enemy players that are below a threshold percentage of your own level will not be automatically recorded when you meet them. This is to avoid storing information about grey enemies for instance. The threshold is configurable using the slider below the check box.
+
+. Map configuration :
+
+- "Display recorded events on world map" : if checked, when you open the world map, the events recorded on the zone that you are viewed will be displayed as small icons, located at the position on which the events occured. Note that geographically close events are grouped to avoid displaying a huge unreadable mess. You can also change this option directly from the world map view, by using the small control frame provided at the bottom right of the world map.
+
+- "Show world map control frame" : if checked, a small control frame will be displayed on the bottom right of the world map (provided there are events recorded in the current zone). This control frame allows to hide or show the SKMap recorded events. You can also press a button to hide the control frame (in this case, the only way to enable it again is to go in the options !).
+
+. WAR configuration :
+
+- "WAR mouse-over sound warning" : if checked, a sound warning is played when you move your mouse over an enemy "at war", or whose guild is "at war" with you.
+
+- "WAR mouse-over message warning" : if checked, a floating message is displayed on screen when you move your mouse over an enemy "at war", or whose guild is "at war" with you.
+
+- "WAR mouse-over automatic targetting" : if checked, when you move your mouse over an enemy "at war", or whose guild is "at war" with you, then, if you do not have a curren target, this enemy will automatically be targetted.
+
+. Record configuration :
+
+- "Record player deaths" : if checked, your deaths (PvP, PvE or unknown) will be recorded if it's possible. They will then appear on the world map at the location where the event occured.
+
+- "Display player death record" : if checked, an information message will be displayed in your chat frame each time a "player death" event is recorded.
+
+- "Record enemy players kills" : if checked, your kills of enemy players will be recorded if it's possible. They will then appear on the world map at the location where the event occured.
+
+- "Display player kill record" : if checked, an information message will be displayed in your chat frame each time a "player kill" event is recorded.
+
+- "Record creature kills" : if checked, your kills of creatures will be recorded if it's possible. They will then appear on the world map at the location where the event occured. Only a maximum number of creature kill records are allowed by zone, to avoid storing huge amounts of data. This number is configurable using the slider below the check box. When a new creature kill is recorded, the oldest records will be deleted until there are no more than that number of creature kill records in the current zone.
+
+- "Display creature kill record" : if checked, an information message will be displayed in your chat frame each time a "creature kill" event is recorded.
+
+
+. Minimap configuration
+
+- "Show minimap button" : if checked, the interface minimap button is displayed. The button position around the minimap is configurable by using the slider below.
+
+
+
+
+
+* Version history
+-----------------
+* v1.6 - 2005.10.14
+- Fixed bug in player death responsibilities determination.
+- Added a new option that allows to display, each time you die, a list of top enemies responsible for your death (this option is enabled by default). Note : this list can contain both enemy players and creatures.
+
+* v1.5.2 - 2005.10.09
+- Fixed bug in french and german client : since 1.4, map records were associated to erroneous map numbers (I forgot to fix one line in the zone shift code and it messed up all :/). All erroneous indexes will automatically be fixed after this new version is installed. Sorry for the inconvenience.
+- Fixed yet another bug in zone shift algorithm (which caused old records to be lost for the french client).
+- Updated combat patterns for german localization (provided by Maischter).
+
+* v1.5.1 - 2005.10.01
+- Fixed bug in deletion of "ghost" guilds when playing with multiple characters.
+- Option "Record player deaths" has been changed to "Record player PvP deaths".
+- Added a new option : "Record player non-PvP deaths", which does the same thing as "Record player PvP deaths", but for non-PvP deaths (ie, PvE deaths, or self-induced deaths).
+- PvP kills and deaths counts are now updated even if the corresponding "record" options are disabled. These options allow to enable or disable recording of events on the world map, I never intended them to prevent updating PvP scores.
+
+* v1.5 - 2005.09.21
+- Added Arathi Basin to the battleground list.
+- Fixed Warsong Gulch for German localization : since 1.6, the correct name is "Warsongschlucht" and not "Warsong-Schlucht".
+- Fixed bug : guild information was not updated when an enemy changed guild after you first met him.
+- Added an option to regularly delete "ghost" guilds, ie guilds to which no known enemy player belong anymore (automatic data clean-up has to be enabled).
+- Changed the way the enemy player list in the interface is managed, in order to solve the performance issues with lower end systems when displaying the list. This list is now only updated when needed (ie, when some changes have been recorded since last display).
+- Added an option to enable or disable automatic updates of the enemy player list (default : automatic update enabled).
+- Added an option to define a minimum delay between two automatic updates of the enemy player list (default : no delay).
+- Added a button in the interface that allows to manually update the enemy player list.
+
+* v1.4.1 - 2005.08.11
+- Added a new command : "/skm inf <player name> [<full name match> [<special characters match>]]". This will display in the default chat frame information related to enemy players matching <player name>. If <full name match> is set to 1, then <player name> is the full player name; otherwise, this is a prefix to search for in the enemy players list. If <special characters match> is set to 1, then <player name> must match special characters included in the name (for instance, accented characters); otherwise, all characters are converted to plain characters before matching.
+- Modified sort algorithm for the interface lists : accented characters are now handled as plain characters. "Örc" will no longer come after "ZeOrc" :)
+
+* v1.4 - 2005.08.04
+- Enemy rank is now updated along with other unit information update, and not only on honor kill events.
+- Fixed bug of "battleground death" events being recorded when outside of a battleground. Battleground statistics will automatically be corrected when first entering the world.
+- Erroneous "level up" events that may have been recorded prior to SKMap version 1.2 will be automatically removed when first entering the world.
+- Provided zone shift handling (inspired from Map Notes and Gatherer) to solve fluctuating zones order for french and german clients. Please read SKMap_ZoneShift.txt document for detailed explanations.
+- Reorganized stored data indexes to save up space. Also removed superfluous stored information. This will shrink SKMap saved data by about 30%. Data will automatically be converted to the new format when first entering the world. I strongly advise you to back your "SavedVariable.lua" file up before installing SKMap 1.4, just in case.
+
+* v1.3 - 2005.07.03
+- Added options to enable automatic clean-up of unused player data (old inactive enemies for instance) at regular intervals. See new "Clean-up configuration" section in the option panel.
+- Added an option to share WAR warnings between all characters of a given account. If your current character is not at WAR with a given enemy, one of your alts may be. If it's the case, you'll be warned (provided the option is enabled).
+- Added an option to add the player note associated to an enemy to the game tooltip.
+- Some additions to the "General" statistics section.
+- Provided a new sound for the WAR warnings (was about time !). If you don't like the sound provided you can replace the WarSound.wav file by your own :)
+- Fixed honor gain message parsing (it was broken since Blizz' added the estimated honor gain), honor kills should now be taken into account again.
+- Fixed a bug in computing remaining contribution honor kills for current day.
+- Sorting criterias for the three lists (PvP - players, PvP - guilds, and Duels) are now saved persistently.
+- Added a button to reset sorting options.
+
+* v1.2 - 2005.06.18
+- New statistics available in the "Hall of Fame" panel for Battlegrounds : battleground kills and deaths by date, by map, and by date and map (Note : Battleground kills and deaths recorded before version 1.2 are not included in these statistics).
+- Redesigned option panel, with a scrollbar frame and dynamically generated option items split into expandable/collapsable sections. No more space issues :)
+- Added two options that allow to filter out WAR sound and message warnings if they happen in a too small time interval. In addition, if a WAR warning has just been issued for a given enemy and you move your cursor over that enemy again, no new message will be generated, regardless of the filter option. This should help reduce spam during PvP encounters.
+- Added an option to display the WAR warning message in the default chat frame.
+- Added an option to include to the WAR chat warning message the player note associated to current enemy.
+- Enemy "last seen" location information now correctly handles battlegrounds.
+- "Level up" events now record correct player level again.
+
+* v1.1.3 - 2005.06.13
+- Fixed data initialization problem that occurred when playing multiple characters since last World of Warcraft client update.
+
+* v1.1.2 - 2005.06.09
+- Provided a fix for Ironforge map.
+- The PvP target frame is now movable.
+- Added an option to lock or unlock PvP target frame.
+- "Class" and "Guild" target information are now also displayed for friendly players (provided the related options are checked).
+- Added an option to add enemy players information to the game tooltip.
+- Player kills and deaths that happen in battlegrounds are now counted separately from standard events. They are counted as "battleground kills", and are displayed accordingly in the interface. Battleground kills that give honor are also counted as honor kills, in the same way as non-battleground kills. Similarly, your deaths in battlegrounds are counted as "battleground deaths". Note : battleground events are *not* displayed on the world map.
+
+* v1.1.1 - 2005.05.23
+- Full german localization (english and french users do not need to download this version if they are using 1.1, there are no changes except this one).
+
+* v1.1 - 2005.05.21
+- Added management of honorable kills. In addition to the old types of kill (assist, normal, full), if the kill is "honorable", then it's flagged accordingly on the map records. A count of honorable kills is also incremented by enemy (and by guild).
+- Modified the PvP target frame so that it displays the honorable kill count, as well as the remaining kills that should give contribution points for current day for that enemy.
+- Modified the interface PvP list : the detail view now displays enemy rank, honorable kill count and remaining honorable kills for current day.
+- Added a new option that allows to completely disable storing information about new enemy players. Use with caution, this will prevent identification of enemy kills and deaths !
+- Now keep track of duels. An option allows to specify if duels should be recorded or not (true by default). The "Duels" panel in the interface shows the enemies with which you have duelled, your wins, loss, etc.
+- Added a new slider option that allows to change offset of minimap button.
+- Provided a better looking minimap button (the old alpha channel was... horrible :).
+- Added an option in the "Hall of Fame" interface panel to take "assist kills" into accounts for all statistics and reports.
+
+* v1.0.3 - 2005.05.16
+- Fixed bug that prevented from correctly processing UNIT_HEALTH event.
+- Now track kills on enemy players that happen out of range of HOSTILE_DEATH event, provided you have them on target when they die. Should be useful to hunters (but not exclusively !) :)
+- German localization by Tenvan.
+- Fixed bug in option "ignore low level enemies", threshold was not correctly computed (which caused this option to not work at all).
+- Added a new option that allows to ignore non PvP flagged enemies.
+- Changed sort algorithm to ignore blanks at the beginning of guild names (thanks to Icecat for pointing this out).
+
+* v1.0.2 - 2005.05.15
+- Added a new command : "/skm war <player name>", which allows to declare war to an enemy player (caution, it is case sensitive). If this player has already been recorded by SKMap, then his status is set "at WAR". Otherwise, the player name is recorded in a temporary list. If later you meet that player, he will then automatically be set to be "at WAR".
+- Added a new command : "/skm peace <player name>", which allows to cancel war on an enemy player, either from the list of known enemies or from the temporary list described above.
+- Added a new command : "/skm swar", which displays the unknown players war list in chat window.
+- Added a new command : "/skm cwar", which clears the unknown players war list.
+- Fixed bug : error window displaying "module SKMAP_lib.lua, line 751". That only happened the first time the mod was installed, and in 1.0.1 only.
+- Fixed a typo in french version for "Elfe de la nuit" (thanks to oreo for finding it).
+
+* v1.0.1 - 2005.05.14
+- Escape key now allows to close the interface.
+- Position of Minimap interface button is now configurable (from the options). It can also be hidden (in this case, to open again the interface you will have to type "/skm" from the chat window).
+
+* v1.0 - 2005.05.13
+- First public release !
+
+* v0.14 - 2005.05.12
+- Altered parse patterns to take into account all special cases (block, absorb and such... which can be added to the end of the message, before or after the dot. Thus, I removed all trailing dots from the patterns).
+- Fixed bug that appeared when targetting a non recorded (because of its low level) enemy.
+- Fixed interface background texture (my gamma was very dark, did not see the issue...).
+- Enemies are now recorded on mouse-over without switching target.
+- Pets can no longer be considered to be enemy players and will not appear in the player list anymore. As a side effect, some of your deaths may not be accounted to a player if SKMap never got any information about him (that is, if you never targetted him and never moved the mouse over him).
+- encapsulated calls to UnitName by another function that checks the "Unknown Entity" case and returns nil instead.
+- bug fix : added totem damage special parsing. In case of our own totem, we know it's ours, thus we handle it. In all other cases, we do not know the totem owner, thus we ignore all damage done. No more "Searing Totem" and such recorded as enemy players or mobs killing you :)
+
+* v0.13 - 2005.05.07
+- Fixed bug : remaining guild name when detargetting an enemy player.
+- Applied a fix to problem of elite mob displayed without the elite frame. Hope it works...
+- Moved record messages to localization file.
+- Added a new mini frame that displays enemy class below target frame.
+- Added a new option to show or hide the class mini frame.
+
+* v0.12 - 2005.05.04
+- Fixed bug that caused map and date reports to not take deaths into account.
+- Modified statistic reports - now they no longer take "assist kills" into account (assist kills can still be seen in the player and guild list).
+- Enemy guild report is now working.
+- A low level enemy that should be ignored but has already been recorded is now updated when you meet him again.
+- Added a "back" button to ease switching from a player guild back to the player list.
+- Now keeping track of a new type of kills : "lone wolf kills", as requested by a friend. Those are a subset of "full kills", for which the player is *not* in a group. That is, the player, and only him (or his pet), kills an enemy all by himself.
+- Fixed pvp target frame that prevented clicking on spell effects above it.
+- Added a new mini frame that displays enemy guild name above target frame.
+- French localization by PIng.
+- Set list tab as default and moved options to third tab.
+- Added a new option to show or hide the guild name mini frame.
+- Added a control frame to the world map to display or hide SKMap records.
+- Added a new option to enable or hide the world map control frame.
+
+* v0.11 - 2005.04.29
+- Now DoT applied on self also count for death responsibilities.
+- Fixed bug that caused to consider as enemies players of the fame faction when dueling.
+- Added report : "Player vs Player" (available from the enemy list).
+- Added report : "Player vs Guild" (available from guild list).
+- Added enemy player "delete" button (along with a confirmation dialog box).
+- Added edit note frame for enemy players and guilds.
+
+* v0.10 - 2005.04.25
+- Fixed some bugs in statistics.
+- Completed reports with statistics by enemy, by guild, by zone and by map.
+- Added a filter "at war only" for list frame.
+- Added an option to ignore low level enemies, and a slider to configure the threshold.
+- French localization by PIng.
+
+* v0.09 - 2005.04.21
+- French localization by PIng.
+- Fixed bug in sorting players by "at war" status.
+- Fixed "max creature record by zone" bug.
+- First version of the statistics tab ! not fully completed yet, but functional :)
+
+* v0.08 - 2005.04.19
+- Added guild column to pvp player list.
+- Added guild list, and a button to switch from player to guild list.
+- Provided slash command handling (now only toggles GUI, but will do more).
+- Reorganized option panel, now it's a bit sexier. Also added some new options.
+- Added management of guild war status on mouseover event.
+- Added detail frame in pvp tab, buttons to manage war/truce status for players and guilds.
+
+* v0.07 - 2005.04.13
+- First version of the PvP list tab in the GUI.
+- This time the bug of deleting old map entries is *really* fixed !
+- Now using format in call to date(), else the date format is OS dependent.
+- Date comparison function now returns nil if one of the dates is not valid, nil result has also to be checked.
+
+* v0.06 - 2005.04.11
+- Thanks to PIng for french localization, management of enemy guilds information, and more !
+- Fixed (I hope) the bug of deleting old map entries.
+- Fixed the bug of incorrect level recorded in level up event.
+- No longer display record messages when recording couldn't be done (in instances, dungeons...).
+- Added more configurable options.
+- First version of the Graphical UI ! the options tab is functionnal (but not very handsome yet).
+
+* v0.05 - 2005.04.08
+- Now records creatures killed by player by zone.
+- Also records player level up events.
+- Fixed bug caused by parsing player pet hits - will have to investigate further this one.
+- Some other minor bug fixes.
+
+* v0.04 - 2005.04.06
+- Fixed parsing bug that caused spell damage to be interpreted as hit damage.
+- Added management of "war" state against pvp enemies à la "koslist".
+- Created a pvp target frame that displays information related to the currently targeted enemy player, and allows to declare war or call for a truce. Two versions are provided, a standard frame and a compact one, with a button to switch from one to the other (configuration allows this frame to be displayed or not).
+- And lots more stuff, it's still an alpha.
+
+* v0.03 - 2005.04.03
+- Some bug fixes + continued development.
+- Created some icons for all cases. I know, they're somewhat ugly. I have zero skills in art :/ (feel free to provide better ones !).
+- Provided a button for the (upcoming) control panel.
+
+* v0.02 - 2005.04.02
+- New alpha version. Keeps track of who deals what damage on who, and awards responsibilities to kills to player and player kills on pvp enemies.
+
+* v0.01 - 2005.03.30
+- Initial alpha version.

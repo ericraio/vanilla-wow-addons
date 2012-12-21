@@ -1,0 +1,496 @@
+<!--
+	QuickMountEquip
+
+	by Robert Jenkins (Merrem@Perenolde), based on Totem Stomper by AlexYoshi
+-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Script file="QuickMountEquip.lua"/>
+
+	<CheckButton name="QuickMountCheckButtonTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" text="" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				QuickMountCheckButton_OnClick();
+			</OnClick>
+			<OnEnter>
+				QuickMountCheckButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				QuickMountCheckButton_OnLeave();
+			</OnLeave>			
+		</Scripts>
+	</CheckButton>
+
+	<CheckButton name="QuickMountButtonTemplate"	virtual="true" inherits="ActionButtonTemplate">
+		<Scripts>
+			<OnLoad>
+				QuickMount_ButtonLoad();
+			</OnLoad>
+			<OnShow>
+				QuickMount_ButtonUpdate(this);
+			</OnShow>
+			<OnDragStart>
+				QuickMount_ButtonDragStart();
+			</OnDragStart>
+			<OnReceiveDrag>
+				QuickMount_ButtonDragEnd();
+			</OnReceiveDrag>
+			<OnClick>
+				QuickMount_ButtonClick(arg1);
+			</OnClick>
+			<OnEnter>
+				QuickMount_ButtonEnter();
+			</OnEnter>
+			<OnLeave>
+				QuickMount_ButtonLeave();
+			</OnLeave>
+			<OnEvent>
+				QuickMount_ButtonEvent(event);
+			</OnEvent>
+		</Scripts>
+	</CheckButton>
+
+	<!-- Frame Bar Template -->
+	<Frame name="QuickMountEquipSetTemplate" virtual="true" id="1">
+		<Size>
+			<AbsDimension x="384" y="48"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parent1" inherits="QuickMountButtonTemplate" id ="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="115" y="-10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent2" inherits="QuickMountButtonTemplate" id ="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent3" inherits="QuickMountButtonTemplate" id ="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent4" inherits="QuickMountButtonTemplate" id ="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent3" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="$parent5" inherits="QuickMountButtonTemplate" id ="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+		</Frames>
+		<!-- Layers -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<!-- Portrait Texture -->
+				<Texture name="$parentPortrait">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+
+				<!-- Text Labels -->
+				<FontString name="$parentLabel" inherits="GameFontHighlightLarge" text="A">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="70" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r=".9" g=".6" b="0.3"/>
+				</FontString>
+				<FontString name="$parentEquip1Text" inherits="GameFontHighlight" text="1">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-60" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEquip2Text" inherits="GameFontHighlight" text="2">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="-16" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEquip3Text" inherits="GameFontHighlight" text="3">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="28" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEquip4Text" inherits="GameFontHighlight" text="4">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="72" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEquip5Text" inherits="GameFontHighlight" text="5">
+					<Size>
+						<AbsDimension x="100" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="116" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+
+    <Frame name="QuickMountFrame" toplevel="true" enableMouse="true" frameStrata="HIGH" movable="true" parent="UIParent" hidden="true">
+ 	<Size>
+		<AbsDimension x="384" y="514"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset>
+				<AbsDimension x="400" y="-104"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentMainIcon" file="Interface\AddOns\QuickMountEquip\MountIcon">
+				<Size>
+					<AbsDimension x="64" y="64"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="4" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+		</Layer>
+		<Layer level="ARTWORK">
+			<Texture name="$parentTopLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopLeft">
+				<Size>
+					<AbsDimension x="256" y="256"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+			</Texture>
+			<Texture name="$parentTopRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopRight">
+				<Size>
+					<AbsDimension x="128" y="256"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT"/>
+				</Anchors>
+			</Texture>
+			<Texture name="$parentBotLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-BotLeft">
+				<Size>
+					<AbsDimension x="256" y="256"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-256"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+			<Texture name="$parentBotRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-BotRight">
+				<Size>
+					<AbsDimension x="128" y="256"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-256"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+			<FontString name="$parentTitleText" inherits="GameFontHighlight" text="SOME_TITLE">
+				<Size>
+					<AbsDimension x="300" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="QuickMountFrameHelpText" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="260" y="60"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="20" y="-33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Color r="0.6" g="0.6" b="0.8"/>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+					<Offset>
+						<AbsDimension x="-30" y="-8"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parentExitButton" inherits="UIPanelButtonTemplate" text="Exit">
+			<Size>
+				<AbsDimension x="77" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parentBotRight" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-43" y="81"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					HideUIPanel(this:GetParent());
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="$parentVersion">
+			<Size>
+				<AbsDimension x="70" y="22"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER" relativeTo="$parentBotLeft" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="63" y="92"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="$parentLabel" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+					<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="RIGHT"/>
+				</Layer>	
+			</Layers>
+		</Frame>
+		<Frame name="QuickMountButtonSet1" inherits="QuickMountEquipSetTemplate">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="QuickMountFrame" relativePoint="TOP">
+					<Offset>
+						<AbsDimension x="0" y="-118"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetID("1");
+					getglobal(this:GetName().."Label"):SetText("Mount");
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="QuickMountButtonSet2" inherits="QuickMountEquipSetTemplate">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="QuickMountButtonSet1" relativePoint="BOTTOM">
+					<Offset>
+						<AbsDimension x="0" y="-8"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetID("2");
+					getglobal(this:GetName().."Label"):SetText("Unmount");
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="QuickMountOptions">
+			<Size>
+				<AbsDimension x="100" y="40"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="QuickMountButtonSet2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="40" y="-25"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="BACKGROUND">
+					<FontString name="QuickMountOptionsLabel" inherits="GameFontHighlightLarge" justifyH="LEFT"/>
+				</Layer>	
+			</Layers>
+		</Frame>
+		<CheckButton name="QuickMountCheck1" inherits="QuickMountCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="QuickMountOptions" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="10" y="5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="QuickMountCheck2" inherits="QuickMountCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="QuickMountCheck1" relativePoint="BOTTOMLEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="QuickMountCheck3" inherits="QuickMountCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="QuickMountCheck2" relativePoint="BOTTOMLEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="QuickMountCheck4" inherits="QuickMountCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="QuickMountCheck3" relativePoint="BOTTOMLEFT" />
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="QuickMountCheck5" inherits="QuickMountCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="QuickMountCheck4" relativePoint="BOTTOMLEFT" />
+			</Anchors>
+		</CheckButton>
+		<Button name="$parentResetButton" inherits="UIPanelButtonTemplate" text="Reset">
+			<Size>
+				<AbsDimension x="77" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parentBotRight" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-124" y="81"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					if ( this.reset ) then
+						-- QuickMount_Reset();
+						this.reset = nil;
+					else 
+						this.reset = 1;	
+					end
+					QuickMount_OnShow();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Scripts>
+		<OnLoad>
+			getglobal(this:GetName().."VersionLabel"):SetText("Version");
+			getglobal(this:GetName().."VersionText"):SetText(QuickMount_Version);
+			getglobal("QuickMountOptionsLabel"):SetText("Options:");
+			-- Make Frame Moveable.
+			tinsert(UISpecialFrames, "QuickMountFrame");
+			UIPanelWindows["QuickMountFrame"] = { area = "left", pushable = 11 };
+			this:RegisterForDrag("LeftButton");
+			QuickMount_OnLoad();
+		</OnLoad>
+		<OnShow>
+			QuickMount_OnShow();
+		</OnShow>
+		<OnHide>
+			QuickMount_OnHide();
+		</OnHide>
+		<OnEvent>
+			QuickMount_OnEvent(event);
+		</OnEvent>
+		<OnDragStart>
+			this:StartMoving();
+		</OnDragStart>
+		<OnDragStop>
+			this:StopMovingOrSizing();
+		</OnDragStop>
+		<OnMouseUp>
+			this:StopMovingOrSizing();
+		</OnMouseUp>
+	</Scripts>
+    </Frame>
+    <GameTooltip name="QuickMountTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true">
+	    		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+			</OnLoad>
+			<OnEvent>
+				if (event == "PLAYER_ENTERING_WORLD") then
+				   this:SetOwner(UIParent, "ANCHOR_NONE");
+				end
+			</OnEvent>
+		</Scripts>
+	</GameTooltip>
+
+</Ui>

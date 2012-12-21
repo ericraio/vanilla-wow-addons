@@ -1,0 +1,1537 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Script file="localization.lua"/>
+    <Script file="CombatStats.lua"/>
+	
+	
+	<Frame name="CombatStatFrameTemplate" virtual="true">	
+		<Size>
+            <AbsDimension x="115" y="13"/>
+        </Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			
+		</Layers>
+		<Frames>
+			<Frame name="$parentStat">
+				<Size>
+					<AbsDimension x="30" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT"/>					
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						 <FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>		
+			</Frame>
+		</Frames>
+	</Frame>
+		
+	
+	<Frame name="CombatStatsDataFrame" hidden="true" movable="true" toplevel="true"  parent="UIParent" enableMouse="true">
+		<Size>
+			<AbsDimension x="275" y="280"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="75" y="-75"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+			
+		<Frames>		
+			<Button name="CombatStatsDataFrame_Reset" inherits="GameMenuButtonTemplate" text="Reset">
+				<Size>
+					<AbsDimension x="100" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="CombatStatsDataFrame">
+						<Offset>
+							<AbsDimension x="-10" y="14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+					
+						CombatStats_Reset();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="CombatStatsDataFrame_ModifyClose" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="CombatStatsDataFrame">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+							local parent = this:GetParent(); 
+							if ( parent ) then 
+								this:SetFrameLevel(parent:GetFrameLevel()+5); 
+							 else 
+								this:SetFrameLevel(6); 
+							 end
+					</OnShow>
+				</Scripts>
+			</Button>
+			
+			<Frame name="CombatStatsAttackDropDown" inherits="UIDropDownMenuTemplate" id="133">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="CombatStatsDataFrame">
+						<Offset>
+							<AbsDimension x="-7" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CombatStatsAttackDropDown_OnLoad();
+					</OnLoad>	
+					<OnShow>
+						CombatStatsAttackDropDown_OnLoad();
+					</OnShow>							
+				</Scripts>						
+			</Frame>
+		
+			<Frame name="CombatStatsDataFrame_GeneralBreakdown">
+			
+			
+                <Size>
+                    <AbsDimension x="260" y="125"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint = "TOPLEFT" relativeTo="CombatStatsDataFrame">
+                        <Offset>
+                            <AbsDimension x="10" y="-25"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture file="Interface\PaperDollInfoFrame\UI-Character-StatBackground">
+                            <Size>
+                                <AbsDimension x="250" y="120"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0" right="0.89" top="0" bottom="0.61"/>
+                        </Texture>                      
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Frame name="CombatStats_DataFramesLabels">
+               
+                        <Size>
+                            <AbsDimension x="200" y="16"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <FontString inherits="GameFontNormalSmall" justifyH="RIGHT" text="General Attack Info.">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                            <Offset>
+                                                <AbsDimension x="3" y="0"/>
+                                            </Offset>
+                                        </Anchor>
+                                    </Anchors>
+                                </FontString>                           
+                            </Layer>
+						</Layers>
+					</Frame>
+					
+					
+					 <Frame name="CombatStatsOverallCritPct" id="41">				 
+			
+						<Size>
+							<AbsDimension x="52" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStats_DataFramesLabels" relativePoint="TOPRIGHT">  
+                         
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+                        
+                        <Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CS_TT_OVERALLPCT_TEXT);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>         
+												
+                    </Frame>
+					
+					 <Frame name="CombatStatsGeneralName" id="11">
+				
+					 
+						<Size>
+							<AbsDimension x="80" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="7" y="-5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+						
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+																		
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralNameText">					
+					 					 
+						<Size>
+							<AbsDimension x="75" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralName" relativePoint="TOPRIGHT">                              
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+                                           
+												
+                    </Frame>
+                    
+                    <Frame name="CombatStatsGeneralTotalHits" id="12">
+				
+						<Size>
+							<AbsDimension x="28" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralName" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="1" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentHits" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                     
+                    <Frame name="CombatStatsGeneralHitsText" id="14">
+				 	
+					 
+					
+						<Size>
+							<AbsDimension x="55" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralTotalHits" relativePoint="TOPRIGHT">                              
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+                                           
+												
+                    </Frame>
+                    
+                     <Frame name="CombatStatsGeneralSwings" id="15">
+			
+						<Size>
+							<AbsDimension x="30" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralHitsText" relativePoint="TOPRIGHT">                              
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+                                           
+												
+                    </Frame>
+                    
+                    <Frame name="CombatStatsGeneralSwingsText" id="16">
+					
+					 					 
+						<Size>
+							<AbsDimension x="75" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralSwings" relativePoint="TOPRIGHT">                              
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+                                           
+												
+                    </Frame>
+                    
+                    <Frame name="CombatStatsGeneralMisses" id="17">
+					
+					
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralTotalHits" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>       
+                    
+                    <Frame name="CombatStatsGeneralMissesText" id="18">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralMisses" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                                        
+                    <Frame name="CombatStatsGeneralMissesPercent" id="19">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralMissesText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralDodges" id="20">				
+											
+						<Size>
+							<AbsDimension x="48" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralMissesPercent" relativePoint="TOPRIGHT">
+                             <Offset>
+								<AbsDimension x="15" y="0"/>
+							</Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralDodgesText" id="21">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralDodges" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralDodgesPercent" id="22">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralDodgesText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                     <Frame name="CombatStatsGeneralParried" id="23">
+					
+					
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralMisses" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>      
+                    
+                    
+                     <Frame name="CombatStatsGeneralParriedText" id="24">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralParried" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralParriedPercent" id="25">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralParriedText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralBlocked" id="26">				
+											
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralParriedPercent" relativePoint="TOPRIGHT">
+                             <Offset>
+								<AbsDimension x="15" y="0"/>
+							</Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralBlockedText" id="27">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralBlocked" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralBlockedPercent" id="28">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralBlockedText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                     <Frame name="CombatStatsGeneralResisted" id="29">
+					
+					
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralParried" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>      
+                    
+                    
+                     <Frame name="CombatStatsGeneralResistedText" id="30">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralResisted" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralResistedPercent" id="31">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralResistedText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralImmuned" id="32">				
+											
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralResistedPercent" relativePoint="TOPRIGHT">
+                             <Offset>
+								<AbsDimension x="15" y="0"/>
+							</Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralImmunedText" id="33">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralImmuned" relativePoint="TOPRIGHT">
+                            <Offset>
+								<AbsDimension x="7" y="0"/>
+							</Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralImmunedPercent" id="34">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralImmunedText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    <Frame name="CombatStatsGeneralEvaded" id="35">
+					
+					
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralResisted" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>  
+                    
+                     <Frame name="CombatStatsGeneralEvadedText" id="36">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralEvaded" relativePoint="TOPRIGHT">                          
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralEvadedPercent" id="37">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralEvadedText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                     <Frame name="CombatStatsGeneralDeflected" >				
+											
+						<Size>
+							<AbsDimension x="42" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralEvadedPercent" relativePoint="TOPRIGHT">
+                             <Offset>
+								<AbsDimension x="15" y="0"/>
+							</Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralDeflectedText">
+					
+					
+						<Size>
+							<AbsDimension x="23" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralDeflected" relativePoint="TOPRIGHT">
+                            <Offset>
+								<AbsDimension x="7" y="0"/>
+							</Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+                     <Frame name="CombatStatsGeneralDeflectedPercent">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralDeflectedText" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    <Frame name="CombatStatsGeneralPercentDmg" id="38">
+					
+					
+						<Size>
+							<AbsDimension x="165" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralEvaded" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>  
+                    
+                    <Frame name="CombatStatsGeneralPercentDmgPct" id="39">				
+						
+						<Size>
+							<AbsDimension x="45" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralPercentDmg" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+						<Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CS_TT_OVERALLDMGPCT_TEXT);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+								
+                    </Frame>
+                    
+                    
+                    <Frame name="CombatStatsGeneralTimeLastCrit" id="40">
+					
+					
+						<Size>
+							<AbsDimension x="105" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralPercentDmg" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>  
+                    
+                     <Frame name="CombatStatsGeneralTimeLastCritTime">		
+              
+						<Size>
+							<AbsDimension x="125" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsGeneralTimeLastCrit" relativePoint="TOPRIGHT">
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontHighlightSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+											
+												
+                    </Frame>
+                    
+                    
+				</Frames>
+			</Frame>
+			
+			 <Frame name="CombatStatsDataFrame_Breakdown">
+			
+                <Size>
+                    <AbsDimension x="250" y="78"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" relativePoint = "BOTTOMLEFT" relativeTo="CombatStatsDataFrame">
+                        <Offset>
+                            <AbsDimension x="10" y="40"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                    
+                        <Texture file="Interface\PaperDollInfoFrame\UI-Character-StatBackground">
+                            <Size>
+                                <AbsDimension x="124" y="78"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="2" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0" right="0.89" top="0" bottom="0.61"/>
+                        </Texture>
+                        <Texture file="Interface\PaperDollInfoFrame\UI-Character-StatBackground">
+                            <Size>
+                                <AbsDimension x="124" y="78"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOPLEFT">
+                                    <Offset>
+                                        <AbsDimension x="127" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                            <TexCoords left="0" right="0.89" top="0" bottom="0.61"/>
+                        </Texture>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    
+                    <Frame name="CombatStatsDataFrame_BreakdownNonCritLabel">
+                    
+                    
+                        <Size>
+                            <AbsDimension x="90" y="13"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="1" y="-5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <FontString inherits="GameFontNormalSmall" justifyH="RIGHT" text="Non-Crit Stats">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                            <Offset>
+                                                <AbsDimension x="3" y="0"/>
+                                            </Offset>
+                                        </Anchor>
+                                    </Anchors>
+                                </FontString>                           
+                            </Layer>                             
+                        </Layers>					
+                    </Frame>
+                    
+                    <Frame name="CombatStatsAttackNonCritPct" id="42">				 
+			
+		
+						<Size>
+							<AbsDimension x="40" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsDataFrame_BreakdownNonCritLabel" relativePoint="TOPRIGHT">                              
+							<Offset>
+								<AbsDimension x="0" y="2"/>
+								<Offset>
+										<AbsDimension x="-12" y="0"/>
+								</Offset>
+                            </Offset>
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+						
+						<Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CS_TT_NONCRIT_HITSPCT_TEXT);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+                                           
+												
+                    </Frame>
+                    
+                     <Frame name="CombatStatsDataFrame_BreakdownCritLabel">
+             
+                        <Size>
+                            <AbsDimension x="90" y="13"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsAttackNonCritPct" relativePoint="TOPRIGHT">                              
+							</Anchor>                        
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <FontString inherits="GameFontNormalSmall" justifyH="RIGHT" text="Crit Stats">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                            <Offset>
+                                                <AbsDimension x="1" y="-2"/>
+                                            </Offset>
+                                        </Anchor>
+                                    </Anchors>
+                                </FontString>                           
+                            </Layer>                             
+                        </Layers>					
+                    </Frame>
+                    
+                     <Frame name="CombatStatsAttackCritPct">				 
+			
+		
+						<Size>
+							<AbsDimension x="40" y="13"/>
+						</Size>
+						
+						<Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsDataFrame_BreakdownCritLabel" relativePoint="TOPRIGHT"> 
+                                    <Offset>
+										<AbsDimension x="-12" y="0"/>
+									</Offset>                                							
+							</Anchor>
+                        </Anchors>	
+                        
+                        <Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentLabel" inherits="GameFontNormalSmall">
+									<Anchors>
+										<Anchor point="LEFT"/>
+									</Anchors>
+								</FontString>
+							</Layer>			
+						</Layers>
+                        
+                        <Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CS_TT_CRIT_HITSPCT_TEXT);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>        
+												
+                    </Frame>
+                    
+                    <Frame name="CombatStatsNonCritHits" inherits="CombatStatFrameTemplate" id="1">
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="7" y="-5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                    <Frame name="CombatStatsNonCritDamage" inherits="CombatStatFrameTemplate" id="2">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsNonCritHits" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                    <Frame name="CombatStatsNonCritMinMax" inherits="CombatStatFrameTemplate" id="3">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsNonCritDamage" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                    <Frame name="CombatStatsNonCritAvg" inherits="CombatStatFrameTemplate" id="4">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsNonCritMinMax" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                    <Frame name="CombatStatsNonCritPercentDamage" inherits="CombatStatFrameTemplate" id="5">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsNonCritAvg" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>		
+                        
+                        <Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CS_TT_NONCRIT_DMGPCT_TEXT);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+                        				
+                    </Frame>
+                    
+                    <Frame name="CombatStatsCritHits" inherits="CombatStatFrameTemplate" id="6">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsDataFrame_Breakdown" relativePoint="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="132" y="-5"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                    <Frame name="CombatStatsCritDamage" inherits="CombatStatFrameTemplate" id="7">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsCritHits" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                    <Frame name="CombatStatsCritMinMax" inherits="CombatStatFrameTemplate" id="8">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsCritDamage" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                                        
+                     <Frame name="CombatStatsCritAvg" inherits="CombatStatFrameTemplate" id="9">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsCritMinMax" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>						
+                    </Frame>
+                    
+                      <Frame name="CombatStatsCritPercentDamage" inherits="CombatStatFrameTemplate" id="10">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeTo="CombatStatsCritAvg" relativePoint="BOTTOMLEFT">
+                                <Offset>
+                                    <AbsDimension x="0" y="-1"/>
+                                </Offset>
+                            </Anchor>
+                        </Anchors>	
+                        
+                        <Scripts>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText(CS_TT_CRIT_DMGPCT_TEXT);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+                        					
+                    </Frame>
+                    
+                    
+                    
+                  </Frames>
+                 </Frame>            
+		
+			</Frames>
+			<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnMouseUp>
+						if ( this.isMoving ) then
+							this:StopMovingOrSizing();
+							this.isMoving = false;
+						end
+					</OnMouseUp>
+					<OnDragStart>
+						this:StartMoving();
+						this.isMoving = true;
+					</OnDragStart>
+					<OnDragStop>
+						this:StopMovingOrSizing();
+						this.isMoving = false;
+					</OnDragStop>
+			</Scripts>
+			
+					
+	</Frame>
+	
+	<Frame name="CombatStatsFrame" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent" inherits="GameFontNormalSmall">
+		<Size>
+			<AbsDimension x="128" y="24"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="150" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+			
+		<Frames>
+			<Button name = "CombatStatTextButton">
+			<Size>
+				<AbsDimension x="100" y="12"/>
+			</Size>
+		
+			<Anchors>
+                    		<Anchor point="CENTER">
+                        	<Offset>
+                            		<AbsDimension x="0" y="0"/>
+                        	</Offset>
+	                    	</Anchor>
+                	</Anchors>
+                	<Layers>
+                    		<Layer level="BACKGROUND">
+                    		<FontString name="CombatStatsText" inherits="GameFontNormalSmall" wraponspaces="true">
+                            	<Size>
+                                	<AbsDimension x="128" y="12"/>
+                            	</Size>
+                            	<Anchors>
+                                	<Anchor point="TOP"/>
+                            	</Anchors>
+                        	</FontString>
+                    		</Layer>
+		        </Layers>
+			<Scripts>
+
+			<OnMouseDown>
+				if ( arg1 == "RightButton" ) then
+					if ( CT_MF_ShowFrames ) then
+						this:GetParent():StartMoving();
+					end
+				else
+					CombatStatsText_OnClick();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				this:GetParent():StopMovingOrSizing();
+			</OnMouseUp>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText("Left-click to show stats.\nRight-click to drag.");
+				CombatStatsText_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+                	</Scripts>
+            		</Button>
+        	</Frames>				
+
+		<Scripts>
+			<OnLoad>
+				CombatStats_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				CombatStats_OnEvent();
+			</OnEvent>
+			<OnUpdate>
+				CombatStats_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>	
+
+</Ui>

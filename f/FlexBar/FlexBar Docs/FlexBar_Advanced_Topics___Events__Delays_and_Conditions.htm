@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<meta name="GENERATOR" content="PageBreeze Free HTML Editor (http://www.pagebreeze.com)">
+<title>FlexBar Advanced Topics - Events, Delays and Conditions</title>
+</head>
+<body bgcolor="#ffffff">
+<p align="center"><strong><em><font size="5">Advanced Topics - 
+Events, Delays and Conditions</font></em></strong></p>
+<p align="left"><strong>Introduction:</strong>  &nbsp; In addition 
+to very configurable buttons, FlexBar keeps track of&nbsp;dozens of different game 
+states and raises an event (think trigger) when they change.&nbsp; This can be 
+gaining a target, losing a buff, getting poisoned, changing forms, losing 
+health.&nbsp; Many of these events can come from many different sources - health 
+events can come from you ('player') your pet ('pet') your group mates ('party1', 
+'party2', 'party3', 'party4') or your target ('target').&nbsp; In FlexBar 
+parlance this is the Target of the event.&nbsp; It's not the best way to refer 
+to it, but it's what I started with and we're stuck with it :)</p>
+<p align="left">Taking action on these events is the core of what makes flexbar so 
+versatile - you can have your combat buttons show only when you need them, you 
+can create r-click button menus, pop-bars and a whole slew of other things by 
+taking actions on events.</p>
+<p align="left">To further enhance this capability, FlexBar can incorporate a 
+delay in executing the command and can decide to execute/not execute based on 
+game conditions at the time of the event.</p>
+<p align="left"><strong>Examples: </strong><em>Popbar, Combat Sensitive Buttons, 
+R-Click menus, Buff-warnings:</em></p>
+<p align="left">PopBar (use the Scripts editor to do this example</p>
+<p align="left">Group Button=1-12 Anchor=1<br>VerticalGroup 
+Group=1 Width=4<br>Show Group=1 On='MouseEnterGroup' Target=1<br>Hide Group=1 
+On='MouseLeaveGroup' Target=1</p>
+<p align="left">This will create a 4 button wide, 3 button high group that will 
+popup when you mouse over it and hide when you mouse away from it.&nbsp; In 
+order to move it you'll want to type /flexbar show group=1 and move it with the 
+handle without mousing into it - as once you do it will hide on the way out and 
+you won't be able to grab the handle).</p>
+<p align="left">Combat Sensitive Buttons - or show only when I might be in a 
+fight:</p>
+<p>Group Button=1-12 Anchor=1<br>VerticalGroup Group=1 
+Width=6<br>Show Group=1 On='StartCombat' Target='player'<br>Show Group=1 
+On='GainTarget' Target=['hostile' 'neutral']<br>Show Group=1 
+On='TargetReactionChanged' Target=['hostile' 'neutral']<br>Hide Group=1 On='EndCombat' Target='Player'</p>
+<p>Right Click Menus -&nbsp;a single button that pops a radial menu when 
+Right-clicked.&nbsp; The menu disappears when a button is clicked or the mouse 
+leaves the group</p>
+<p>Group Button=1-7 Anchor=1<br>CircleGroup Group=1<br>Show 
+Button=8<br>MoveRel Button=8 Trgbtn=7<br>Group Button=1-8 Anchor=8<br>Hide 
+Button=1-7<br>Advanced Button=8 State='on'<br>Show Button=1-7 
+On='RightButtonClick' Target=8<br>Hide Button=1-7 On='LeftButtonClick' 
+Target=1-7<br>Hide Button=1-7 On='RightButtonClick' Target=1-7<br>Hide 
+Button=1-7 On='MouseLeaveGroup' Target=8</p>
+<p>This will create an 8 button group with 7 buttons hidden - when you right 
+click the visible button, the others&nbsp;will pop up in a circle over it.&nbsp; 
+Drag the group by the visible button.</p>
+<p>Buff Warnings - Ever get tired of realizing in the middle of a fight that 
+you've been doing it without Blessing of Might up?</p>
+<p>Put&nbsp;Blessing of Might&nbsp; on button 1</p>
+<p>Show Button=1 On='LoseBuff' Target='Blessing of 
+Might'<br>Hide Button=1 On='GainBuff' Target='Blessing of Might'</p>
+<p><strong>Delays:&nbsp; </strong>Sometimes we want to take an action a set 
+amount of time after an event.&nbsp; An example of this is that, after a dodge 
+Overpower is usable, but only for a set amount of time (4 seconds or so).&nbsp; 
+To handle this we might put Overpower on button 1 then</p>
+<p>/flexbar Show Button=1 on='TargetCombat' Target='Dodge'</p>
+<p>/flexbar Hide Button=1 on='TargetCombat' Target='Dodge' In=40</p>
+<p>In= is the delay in tenths of a second.</p>
+<p><strong>Conditions:&nbsp; </strong>Because of the nature of events, you are 
+given only one at a time - there is no event for when an ability is both in 
+range and has enough mana.&nbsp; To do this we must check the other condition on 
+the event:</p>
+<p>/Flexbar Show Button=1 On='EnoughMana' Target=1 If='InRange&lt;1&gt;'</p>
+<p>/Flexbar Show Button=1 On='NowInRange' Target=1 If='EnoughMana&lt;1&gt;'</p>
+<p>Note that we have to put a command in for both events we are interested in to 
+cover the 2 circumstances (1.&nbsp; We were already in range and just gained 
+enough mana for the ability and 2.&nbsp; We already had enough mana and just 
+moved into range).</p>
+<p><strong>Order of Execution:</strong>&nbsp; If you look in the event list 
+(either in the event editor or through /flexbar listevents) you will see that 
+they are in a specific order - this is the order that the commands are processed 
+in on a given event -- the lower numbered commands will be processed first.</p>
+<p>Also, events &gt; delay &gt; condition is the order in a command:</p>
+<p>IE: /flexbar show button=1 on='losttarget' in=5 
+if='manabelow50&lt;"player"&gt;' will process as follows:</p>
+<p>1.&nbsp; When you first type it in, an event is added to the event list.</p>
+<p>2.&nbsp; When the event fires, the command is sent to the command processor 
+without the on= on it, at this time it executes any delay</p>
+<p>3.&nbsp; At the end of the delay the command checks the If= condition -- if 
+it is true at this time, the command executes.</p>
+<p><strong>Commands that can be executed On=, If=, 
+In=</strong>&nbsp;</p>
+<p>"show", "hide", "fade", "shade", "scale", "moveabs", "moverel", 
+"movetomouse", "remap", "echo", "use", "runscript", "runmacro", "text", "text2", 
+"raise", "settexture", "shadetext", "shadetext2"<br></p>
+</body>
+</html>

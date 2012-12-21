@@ -1,0 +1,2495 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Script file="DART_Options.lua"/>
+
+<Button name="DART_PlusMinusButton2" inherits="UIPanelButtonTemplate" virtual="true" hidden="false">
+	<Size><AbsDimension x="20" y="20"/></Size>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+		</OnLoad>
+		<OnClick>
+			DART_TextureBrowser_AdjustCoord2(arg1);
+		</OnClick>
+	</Scripts>
+</Button>
+
+<EditBox name="DART_CoordEditBoxTemplate" inherits="DiscordLib_EditBoxTemplate" virtual="true">
+	<Scripts>
+		<OnEnterPressed>
+			this:ClearFocus();
+			local value = this:GetNumber();
+			if (value) then
+				DART_Settings[DART_INDEX][DART_TEXTURE_INDEX].coords[this.subindex] = this:GetNumber();
+			elseif (this:GetText() == "") then
+				DART_Settings[DART_INDEX][DART_TEXTURE_INDEX].coords[this.subindex] = nil;
+			else
+				this:SetText(DART_Settings[DART_INDEX][DART_TEXTURE_INDEX].coords[this.subindex]);
+			end
+			DART_Initialize_Texture(DART_TEXTURE_INDEX);
+			DART_Update_Preview();
+		</OnEnterPressed>
+	</Scripts>
+</EditBox>
+
+<Button name="DART_ScrollMenu" inherits="DL_ScrollMenuTemplate">
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(0, 0, 0);
+			this:SetBackdropBorderColor(1, 0, 0);
+			this.scrollMenu = true;
+			this.updateFunc = DART_ScrollMenu_Update;
+		</OnLoad>
+	</Scripts>
+</Button>
+
+<Button name="DART_Options" inherits="DiscordLib_OptionsTemplate" hidden="true">
+	<Size><AbsDimension x="560" y="652"/></Size>
+	<Frames>
+		<Button name="$parent_CloseButton" inherits="DiscordLib_CloseButtonTemplate" frameStrata="HIGH">
+			<Scripts>
+				<OnClick>
+					DART_Options:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Frame name="DART_Divider1">
+			<Size><AbsDimension x="2" y="2"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="10" y="87"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset><AbsDimension x="-10" y="85"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parent_Texture">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="DART_Divider2">
+			<Size><AbsDimension x="2" y="2"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="160" y="87"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="162" y="10"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parent_Texture">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+		</Frame>
+
+		<Frame name="$parent_FrameFinder">
+			<Size><AbsDimension x="200" y="80"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="167" y="82"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+					<Offset><AbsDimension x="-15" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormal" justifyH="CENTER" justifyV="CENTER">
+						<Color r="1.0" g="1.0" b="1.0"/>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnUpdate>
+					DART_Update_FrameFinder();
+				</OnUpdate>
+			</Scripts>
+		</Frame>
+
+		<Button name="$parent_MiscOptions" inherits="DART_MainMenuButton">
+			<Anchors>
+				<Anchor point="BOTTOMLEFT">
+					<Offset><AbsDimension x="15" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.MiscOptions);
+				</OnLoad>
+				<OnClick>
+					DART_MiscOptions:Show();
+					DART_BaseOptions:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_TextureOptions" inherits="DART_MainMenuButton">
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parent_MiscOptions" relativePoint="TOP"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.TextureOptions);
+				</OnLoad>
+				<OnClick>
+					DART_MiscOptions:Hide();
+					DART_BaseOptions:Show();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_DragToggle" inherits="DART_MainMenuButton">
+			<Anchors>
+				<Anchor point="BOTTOM" relativeTo="$parent_TextureOptions" relativePoint="TOP"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.UnlockDragging);
+				</OnLoad>
+				<OnClick>
+					DART_Toggle_Dragging();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Scripts>
+		<OnHide>
+			DART_Options_OnHide();
+		</OnHide>
+		<OnShow>
+			DART_Options_OnShow();
+		</OnShow>
+		<OnClick>
+			DART_ScrollMenu:Hide();
+			DART_DropMenu:Hide();
+		</OnClick>
+		<OnMouseWheel>
+			DART_Options_SelectTexture_OnMouseWheel(arg1);
+		</OnMouseWheel>
+	</Scripts>
+</Button>
+
+<Button name="DART_DropMenu" inherits="DiscordLib_TooltipBackdropTemplate" hidden="true"  frameStrata="DIALOG">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_Option1" inherits="DART_MenuOptionTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="10" y="-10"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parent_Option2" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option3" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option4" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option5" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option6" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option7" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option8" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option9" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option10" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option11" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option12" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option13" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option14" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option15" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option16" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option17" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option18" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option19" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option20" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option21" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option22" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option23" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option24" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option25" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option26" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option27" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option28" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option29" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option30" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option31" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option32" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option33" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option34" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option35" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option36" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option37" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option38" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option39" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option40" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option41" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option42" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option43" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option44" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option45" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option46" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option47" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option48" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option49" inherits="DART_MenuOptionTemplate"/>
+		<Button name="$parent_Option50" inherits="DART_MenuOptionTemplate"/>
+	</Frames>
+	<Scripts>
+		<OnLoad>
+			this:SetBackdropColor(.2,.2,.2);
+			this.count = 50;
+		</OnLoad>
+		<OnEnter>
+			this.timer = nil;
+		</OnEnter>
+		<OnLeave>
+			this.timer = .5;
+		</OnLeave>
+		<OnHide>
+			if (this.timer) then
+				this.timer = .01;
+			end
+		</OnHide>
+		<OnUpdate>
+			DL_Menu_Timeout(arg1);
+		</OnUpdate>
+	</Scripts>
+</Button>
+
+<Frame name="DART_BaseOptions" parent="DART_Options" frameStrata="MEDIUM" hidden="false">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT"/>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_SelectTexture" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DART_TEXTURE_LIST";
+					DL_Set_Label(DART_TEXT.SelectTexture);
+					DL_Set_Anchor("", 170, -15, "TOP", "TOP", 1);
+				</OnLoad>
+				<OnMouseWheel>
+					DART_Options_SelectTexture_OnMouseWheel(arg1);
+				</OnMouseWheel>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Appearance" inherits="DiscordLib_PlainBackgroundTemplate" frameStrata="MEDIUM">
+			<Size><AbsDimension x="100" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="10" y="-15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<Texture name="$parent_Texture1">
+						<Size><AbsDimension x="100" y="3"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture2">
+						<Size><AbsDimension x="3" y="25"/></Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture3" hidden="true">
+						<Size><AbsDimension x="100" y="3"/></Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<NormalText name="$parentText" inherits="GameFontNormal"/>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Appearance);
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(0, 0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLoad>
+				<OnEnter>
+					this:SetBackdropColor(1, 1, 0);
+					this:SetTextColor(1, 0, 0);
+				</OnEnter>
+				<OnLeave>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLeave>
+				<OnClick>
+					DART_MainTextureOptions:Show();
+					DART_ScriptOptions:Hide();
+					DART_BaseOptions_Scripts_Texture3:Show();
+					DART_BaseOptions_Appearance_Texture3:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Scripts" inherits="DiscordLib_PlainBackgroundTemplate" frameStrata="MEDIUM">
+			<Size><AbsDimension x="100" y="25"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Appearance" relativePoint="RIGHT">
+					<Offset><AbsDimension x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="ARTWORK">
+					<Texture name="$parent_Texture1">
+						<Size><AbsDimension x="100" y="3"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture2">
+						<Size><AbsDimension x="3" y="25"/></Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture3">
+						<Size><AbsDimension x="100" y="3"/></Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+					<Texture name="$parent_Texture4">
+						<Size><AbsDimension x="340" y="3"/></Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parent_Texture3" relativePoint="RIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<NormalText name="$parentText" inherits="GameFontNormal"/>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Scripts);
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(0, 0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLoad>
+				<OnEnter>
+					this:SetBackdropColor(1, 1, 0);
+					this:SetTextColor(1, 0, 0);
+				</OnEnter>
+				<OnLeave>
+					this:SetBackdropColor(0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLeave>
+				<OnClick>
+					DART_MainTextureOptions:Hide();
+					DART_ScriptOptions:Show();
+					DART_BaseOptions_Scripts_Texture3:Hide();
+					DART_BaseOptions_Appearance_Texture3:Show();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="DART_MainTextureOptions" parent="DART_BaseOptions" frameStrata="MEDIUM" hidden="false">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT"/>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<EditBox name="$parent_Name" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="213" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "name";
+					this.initFunc = DART_Initialize_TextureList;
+					DL_Set_Label(DART_TEXT.Name);
+					DL_Set_Anchor("", 15, -45, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_TextureFile" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="213" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "texture";
+					DL_Set_Label(DART_TEXT.Texture2..":");
+					DL_Set_Anchor("_Name", 5, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+	
+		<Button name="$parent_Texture" inherits="DiscordLib_TooltipBackdropTemplate" hidden="false" frameStrata="MEDIUM">
+			<Size><AbsDimension x="105" y="105"/></Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="0" y="-70"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parent_Texture">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset><AbsDimension x="5" y="-5"/></Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset><AbsDimension x="-5" y="5"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Texture>
+					<FontString name="$parent_Text" inherits="GameFontNormal" justifyH="CENTER" text="DART_CLICKTOSET">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnClick>
+					DART_TextureBrowser:Show();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parent_CopyButton" inherits="DART_MainMenuButton" text="DART_COPYTEXT">
+			<Size><AbsDimension x="75" y="22"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_Texture" relativePoint="LEFT">
+					<Offset><AbsDimension x="-90" y="35"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DART_Options_CopySettings();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_PasteButton" inherits="DART_MainMenuButton" text="DART_PASTETEXT">
+			<Size><AbsDimension x="75" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Texture" relativePoint="RIGHT">
+					<Offset><AbsDimension x="90" y="35"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DART_Options_PasteSettings();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+			<EditBox name="$parent_X1" inherits="DART_CoordEditBoxTemplate" id="x1">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.X1);
+						DL_Set_Anchor("_CopyButton", -16.5, -5, "TOP", "BOTTOM", 1);
+						this.index = "coords";
+						this.subindex = 1;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_X1Minus" inherits="DART_PlusMinusButton2" text="-" id="1">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X1" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_X1Plus" inherits="DART_PlusMinusButton2" text="+" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X1Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_X2" inherits="DART_CoordEditBoxTemplate" id="x2">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_X1" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.X2);
+						this.index = "coords";
+						this.subindex = 2;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_X2Minus" inherits="DART_PlusMinusButton2" text="-" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X2" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_X2Plus" inherits="DART_PlusMinusButton2" text="+" id="4">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_X2Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_Y1" inherits="DART_CoordEditBoxTemplate" id="y1">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_X2" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.Y1);
+						this.index = "coords";
+						this.subindex = 3;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_Y1Minus" inherits="DART_PlusMinusButton2" text="-" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y1" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Y1Plus" inherits="DART_PlusMinusButton2" text="+" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y1Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_Y2" inherits="DART_CoordEditBoxTemplate" id="y2">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_Y1" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.Y2);
+						this.index = "coords";
+						this.subindex = 4;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_Y2Minus" inherits="DART_PlusMinusButton2" text="-" id="7">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y2" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_Y2Plus" inherits="DART_PlusMinusButton2" text="+" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_Y2Minus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+
+			<EditBox name="$parent_URx" inherits="DART_CoordEditBoxTemplate">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.URX);
+						DL_Set_Anchor("_PasteButton", -16.5, -5, "TOP", "BOTTOM", 1);
+						this.index = "coords";
+						this.subindex = 5;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_URxMinus" inherits="DART_PlusMinusButton2" text="-" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_URx" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_URxPlus" inherits="DART_PlusMinusButton2" text="+" id="10">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_URxMinus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_URy" inherits="DART_CoordEditBoxTemplate" id="x2">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_URx" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.URY);
+						this.index = "coords";
+						this.subindex = 6;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_URyMinus" inherits="DART_PlusMinusButton2" text="-" id="11">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_URy" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_URyPlus" inherits="DART_PlusMinusButton2" text="+" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_URyMinus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_LRx" inherits="DART_CoordEditBoxTemplate">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_URy" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.LRX);
+						this.index = "coords";
+						this.subindex = 7;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_LRxMinus" inherits="DART_PlusMinusButton2" text="-" id="13">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_LRx" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_LRxPlus" inherits="DART_PlusMinusButton2" text="+" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_LRxMinus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<EditBox name="$parent_LRy" inherits="DART_CoordEditBoxTemplate">
+				<Size><AbsDimension x="60" y="20"/></Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_LRx" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						DL_Set_Label(DART_TEXT.LRY);
+						this.index = "coords";
+						this.subindex = 8;
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_LRyMinus" inherits="DART_PlusMinusButton2" text="-" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_LRy" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parent_LRyPlus" inherits="DART_PlusMinusButton2" text="+" id="16">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_LRyMinus" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+
+		<Button name="$parent_TextureSelect" inherits="DART_TabButtonTemplate" frameStrata="MEDIUM">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativePoint="TOP">
+					<Offset><AbsDimension x="0" y="-195"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Texture2);
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(0, 0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+					getglobal(this:GetName().."_Texture3"):Hide();
+					getglobal(this:GetName().."_Texture4"):Hide();
+				</OnLoad>
+				<OnClick>
+					DART_MainTextureOptions_TextureSelect_Texture3:Hide();
+					DART_MainTextureOptions_TextSelect_Texture3:Show();
+					DART_MainTextureOptions_BackdropSelect_Texture3:Show();
+					DART_MainTextureOptions_ControlSelect_Texture3:Show();
+					DART_ControlOptions:Hide();
+					DART_TextureOptions:Show();
+					DART_BackdropOptions:Hide();
+					DART_TextOptions:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_ControlSelect" inherits="DART_TabButtonTemplate" frameStrata="MEDIUM">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOP">
+					<Offset><AbsDimension x="0" y="-195"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Control);
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(0, 0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+					getglobal(this:GetName().."_Texture4"):Hide();
+					getglobal(this:GetName().."_Texture2"):Hide();
+				</OnLoad>
+				<OnClick>
+					DART_MainTextureOptions_ControlSelect_Texture3:Hide();
+					DART_MainTextureOptions_TextureSelect_Texture3:Show();
+					DART_MainTextureOptions_TextSelect_Texture3:Show();
+					DART_MainTextureOptions_BackdropSelect_Texture3:Show();
+					DART_ControlOptions:Show();
+					DART_TextureOptions:Hide();
+					DART_BackdropOptions:Hide();
+					DART_TextOptions:Hide();
+					DART_ConditionMenu_Update();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_BackdropSelect" inherits="DART_TabButtonTemplate" frameStrata="MEDIUM">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_TextureSelect" relativePoint="LEFT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parent_Texture5">
+						<Size><AbsDimension x="70" y="3"/></Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parent_Texture3" relativePoint="LEFT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Backdrp);
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(0, 0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLoad>
+				<OnClick>
+					DART_MainTextureOptions_TextureSelect_Texture3:Show();
+					DART_MainTextureOptions_TextSelect_Texture3:Show();
+					DART_MainTextureOptions_BackdropSelect_Texture3:Hide();
+					DART_MainTextureOptions_ControlSelect_Texture3:Show();
+					DART_ControlOptions:Hide();
+					DART_TextureOptions:Hide();
+					DART_BackdropOptions:Show();
+					DART_TextOptions:Hide();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_TextSelect" inherits="DART_TabButtonTemplate" frameStrata="MEDIUM">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_ControlSelect" relativePoint="RIGHT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<Texture name="$parent_Texture5">
+						<Size><AbsDimension x="70" y="3"/></Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parent_Texture3" relativePoint="RIGHT"/>
+						</Anchors>
+						<Color r=".5" g="0" b="0"/>
+					</Texture>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Text2);
+					this:SetBackdropColor(0, 0, 0);
+					this:SetBackdropBorderColor(0, 0, 0, 0);
+					this:SetTextColor(1, 1, 0);
+				</OnLoad>
+				<OnClick>
+					DART_MainTextureOptions_TextureSelect_Texture3:Show();
+					DART_MainTextureOptions_TextSelect_Texture3:Hide();
+					DART_MainTextureOptions_BackdropSelect_Texture3:Show();
+					DART_MainTextureOptions_ControlSelect_Texture3:Show();
+					DART_ControlOptions:Hide();
+					DART_TextureOptions:Hide();
+					DART_BackdropOptions:Hide();
+					DART_TextOptions:Show();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="DART_MiscOptions" parent="DART_Options" frameStrata="HIGH" hidden="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT"/>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<Button name="$parent_OptionsScale" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="80" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_OPTIONS_SCALES";
+					this.miscindex = "optionsscale";
+					this.initFunc = DART_Set_OptionsScale;
+					DL_Set_Label(DART_TEXT.OptionsScale);
+					DL_Set_Anchor("", 0, -25, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Slider name="$parent_UpdateSpeed" inherits="DART_SliderTemplate" minValue="10" maxValue="60"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="0" y="-70"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.miscindex = "updatespeed";
+					this.minlock = true;
+					this.maxlock = true;
+					this.initFunc = DART_Set_OnUpdateSpeed;
+					DL_Set_Label(DART_TEXT.UpdatesPerSec);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<CheckButton name="$parent_AutoLock" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="-50" y="-95"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.miscindex = "autolock";
+					DL_Set_Label(DART_TEXT.AutoLock);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<EditBox name="$parent_NewProfile" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="200" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					DL_Set_Label(DART_TEXT.NewProfile);
+					DL_Set_Anchor("", 20, -155, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_NewProfileButton" inherits="DART_MainMenuButton">
+			<Size><AbsDimension x="70" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NewProfile" relativePoint="RIGHT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Create);
+				</OnLoad>
+				<OnClick>
+					DART_Options_NewProfile();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_SetProfile" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="200" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_PROFILE_LIST";
+					DL_Set_Label(DART_TEXT.SetProfile);
+					DL_Set_Anchor("", 20, -180, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_SetProfileButton" inherits="DART_MainMenuButton">
+			<Size><AbsDimension x="70" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_SetProfile" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Set);
+				</OnLoad>
+				<OnClick>
+					DART_Options_SetProfile();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_DeleteProfileButton" inherits="DART_MainMenuButton">
+			<Size><AbsDimension x="70" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_SetProfileButton" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.Delete);
+				</OnLoad>
+				<OnClick>
+					DART_Options_DeleteProfile();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Frame name="$parent_MaxTextures" inherits="DiscordLib_TooltipBackdropTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="25"/></Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset><AbsDimension x="0" y="-250"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Display" inherits="GameFontNormal">
+						<Color r="1" g="1" b="1"/>
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+					<FontString inherits="GameFontNormal" text="Number of Textures:">
+						<Color r="1" g="1" b="1"/>
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT">
+								<Offset><AbsDimension x="-30" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0,0,0,1);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Button inherits="DART_MainMenuButton">
+			<Size><AbsDimension x="25" y="22"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_MaxTextures" relativePoint="LEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("-");
+				</OnLoad>
+				<OnClick>
+					DART_Options_DeleteTexture();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="DART_MainMenuButton">
+			<Size><AbsDimension x="25" y="22"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_MaxTextures" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText("+");
+				</OnLoad>
+				<OnClick>
+					DART_Options_CreateTexture();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_CurrentProfile" inherits="GameFontNormal" justifyH="LEFT">
+				<Color r="1" g="1" b="1"/>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-135"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</Frame>
+
+<Frame name="DART_TextureOptions" parent="DART_MainTextureOptions" frameStrata="MEDIUM" hidden="false">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset><AbsDimension x="0" y="-195"/></Offset>
+		</Anchor>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<CheckButton name="$parent_Hide" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="15" y="-30"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "hide";
+					DL_Set_Label(DART_TEXT.Hide);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_Highlight" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Hide" relativePoint="BOTTOMLEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "highlight";
+					DL_Set_Label(DART_TEXT.Highlight);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_DisableMouse" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Highlight" relativePoint="BOTTOMLEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "disablemouse";
+					DL_Set_Label(DART_TEXT.DisableMouse);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parent_DisableMousewheel" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_DisableMouse" relativePoint="BOTTOMLEFT"/>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "disableMousewheel";
+					DL_Set_Label(DART_TEXT.DisableMousewheel);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Button name="$parent_Color" inherits="DART_ColorPickerTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_DisableMousewheel" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "color";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.TextureColor);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_HighlightColor" inherits="DART_ColorPickerTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Color" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "highlightcolor";
+					DL_Set_Label(DART_TEXT.HLColor);
+				</OnLoad>
+			</Scripts>
+		</Button>
+
+		<Slider name="$parent_Height" inherits="DART_SliderTemplate" minValue="1" maxValue="300"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="200" y="-45"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "height";
+					this.minlock = true;
+					DL_Set_Label(DART_TEXT.Height);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_Width" inherits="DART_SliderTemplate" minValue="1" maxValue="300"  valueStep="1">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Height" relativePoint="RIGHT">
+					<Offset><AbsDimension x="45" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "width";
+					this.minlock = true;
+					DL_Set_Label(DART_TEXT.Width);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_Scale" inherits="DART_SliderTemplate" minValue="0" maxValue="200"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Height" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-20"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "scale";
+					this.minlock = true;
+					this.scale = 100;
+					DL_Set_Label(DART_TEXT.Scale);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_Alpha" inherits="DART_SliderTemplate" minValue="0" maxValue="100"  valueStep="1">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_Scale" relativePoint="RIGHT">
+					<Offset><AbsDimension x="45" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "alpha";
+					this.minlock = true;
+					this.maxlock = true;
+					this.scale = 100;
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.Alpha);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_HighlightAlpha" inherits="DART_SliderTemplate" minValue="0" maxValue="100"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Scale" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-20"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "highlightalpha";
+					this.minlock = true;
+					this.maxlock = true;
+					this.scale = 100;
+					DL_Set_Label(DART_TEXT.HighlightAlpha);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+
+		<Button name="$parent_BlendMode" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="75" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_BLENDMODES";
+					this.index = "blendmode";
+					DL_Set_Label(DART_TEXT.BlendMode);
+					DL_Set_Anchor("_Alpha", 10, -20);
+				</OnLoad>
+			</Scripts>
+		</Button>
+
+		<EditBox name="$parent_Parent" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="200" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "parent";
+					DL_Set_Label(DART_TEXT.ParentFrame);
+					DL_Set_Anchor("", 230, 115, "BOTTOMLEFT", "BOTTOMLEFT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_HighlightTexture" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="200" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "highlighttexture";
+					DL_Set_Label(DART_TEXT.HLTexture);
+					DL_Set_Anchor("", 230, 90, "BOTTOMLEFT", "BOTTOMLEFT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_FrameStrata" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="115" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_FRAMESTRATAS";
+					this.index = "strata";
+					DL_Set_Label(DART_TEXT.Strata);
+					DL_Set_Anchor("", 20, 115, "BOTTOMLEFT", "BOTTOMLEFT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_DrawLayer" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="115" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_DRAWLAYERS";
+					this.index = "drawlayer";
+					DL_Set_Label(DART_TEXT.DrawLayer);
+					DL_Set_Anchor("", 20, 90, "BOTTOMLEFT", "BOTTOMLEFT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+
+		<EditBox name="$parent_AttachFrame1" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="175" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "attachframe";
+					this.subindex = 1;
+					DL_Set_Label("1: ");
+					DL_Set_Anchor("_HighlightAlpha", -160, -45);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AttachPoint1" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachpoint";
+					this.subindex = 1;
+					DL_Set_Anchor("_AttachFrame1", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_AttachTo1" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachto";
+					this.subindex = 1;
+					DL_Set_Anchor("_AttachPoint1", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_XOffset1" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "xoffset";
+					this.subindex = 1;
+					DL_Set_Anchor("_AttachTo1", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_YOffset1" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "yoffset";
+					this.subindex = 1;
+					DL_Set_Anchor("_XOffset1", -3, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<EditBox name="$parent_AttachFrame2" inherits="DART_EditBoxTemplate">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_AttachFrame1" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Size><AbsDimension x="175" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "attachframe";
+					this.subindex = 2;
+					DL_Set_Label("2: ");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AttachPoint2" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachpoint";
+					this.subindex = 2;
+					DL_Set_Anchor("_AttachFrame2", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_AttachTo2" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachto";
+					this.subindex = 2;
+					DL_Set_Anchor("_AttachPoint2", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_XOffset2" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "xoffset";
+					this.subindex = 2;
+					DL_Set_Anchor("_AttachTo2", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_YOffset2" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "yoffset";
+					this.subindex = 2;
+					DL_Set_Anchor("_XOffset2", -3, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<EditBox name="$parent_AttachFrame3" inherits="DART_EditBoxTemplate">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_AttachFrame2" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Size><AbsDimension x="175" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "attachframe";
+					this.subindex = 3;
+					DL_Set_Label("3: ");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AttachPoint3" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachpoint";
+					this.subindex = 3;
+					DL_Set_Anchor("_AttachFrame3", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_AttachTo3" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachto";
+					this.subindex = 3;
+					DL_Set_Anchor("_AttachPoint3", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_XOffset3" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "xoffset";
+					this.subindex = 3;
+					DL_Set_Anchor("_AttachTo3", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_YOffset3" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "yoffset";
+					this.subindex = 3;
+					DL_Set_Anchor("_XOffset3", -3, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<EditBox name="$parent_AttachFrame4" inherits="DART_EditBoxTemplate">
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_AttachFrame3" relativePoint="BOTTOM"/>
+			</Anchors>
+			<Size><AbsDimension x="175" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "attachframe";
+					this.subindex = 4;
+					DL_Set_Label("4: ");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AttachPoint4" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachpoint";
+					this.subindex = 4;
+					DL_Set_Anchor("_AttachFrame4", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_AttachTo4" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "attachto";
+					this.subindex = 4;
+					DL_Set_Anchor("_AttachPoint4", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_XOffset4" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "xoffset";
+					this.subindex = 4;
+					DL_Set_Anchor("_AttachTo4", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_YOffset4" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "yoffset";
+					this.subindex = 4;
+					DL_Set_Anchor("_XOffset4", -3, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<Button name="$parent_AttachPointT" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Anchors>
+				<Anchor point="TOP" relativeTo="$parent_AttachPoint4" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="4"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "text";
+					this.subindex = "attachpoint";
+					DL_Set_Label(DART_TEXT.Text);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_AttachToT" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="110" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_ANCHORS";
+					this.index = "text";
+					this.subindex = "attachto";
+					DL_Set_Anchor("_AttachPointT", -10, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_XOffsetT" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "xoffset";
+					DL_Set_Anchor("_AttachToT", 0, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_YOffsetT" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="40" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "yoffset";
+					DL_Set_Anchor("_XOffsetT", -3, 0, "LEFT", "RIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<EditBox name="$parent_FrameLevel" inherits="DART_EditBoxTemplate" letters="4">
+			<Size><AbsDimension x="47" y="20"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="55" y="-293"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "framelevel";
+					this.number = true;
+					DL_Set_Label(DART_TEXT.FrameLevel);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_FrameLevelMinus" inherits="DART_MainMenuButton" text="-">
+			<Size><AbsDimension x="15" y="15"/></Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parent_FrameLevel" relativePoint="LEFT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DART_Options_FrameLevelMinus();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button name="$parent_FrameLevelPlus" inherits="DART_MainMenuButton" text="+">
+			<Size><AbsDimension x="15" y="15"/></Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_FrameLevel" relativePoint="RIGHT"/>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DART_Options_FrameLevelPlus();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parent_NudgeIndex" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="45" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_NUDGE_INDICES";
+					this.initFunc = DART_Options_SelectNudgeIndex;
+					DL_Set_Label(DART_TEXT.MoveAnchor);
+					DL_Set_Anchor("_AttachFrame4", 120, -20);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_NudgeLeft" inherits="DART_NudgeTemplate" id="1">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NudgeIndex" relativePoint="RIGHT">
+					<Offset><AbsDimension x="5" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parent_NudgeRight" inherits="DART_NudgeTemplate" id="2">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NudgeLeft" relativePoint="RIGHT">
+					<Offset><AbsDimension x="1" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parent_NudgeUp" inherits="DART_NudgeTemplate" id="3">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NudgeRight" relativePoint="RIGHT">
+					<Offset><AbsDimension x="5" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="$parent_NudgeDown" inherits="DART_NudgeTemplate" id="4">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_NudgeUp" relativePoint="RIGHT">
+					<Offset><AbsDimension x="1" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+
+		<Frame name="DART_AnchorHeader">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_AttachFrame1" relativePoint="TOPLEFT">
+					<Offset><AbsDimension x="0" y="15"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent_YOffset1" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="0" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormal" justifyH="CENTER" text="DART_ANCHORHEADER">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="DART_AnchorHeader_Frame">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_AttachFrame1" relativePoint="TOPLEFT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent_AttachFrame1" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" justifyH="CENTER" text="DART_ANCHORHEADER_FRAME">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="DART_AnchorHeader_Point">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_AttachPoint1" relativePoint="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent_AttachPoint1" relativePoint="TOPRIGHT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" justifyH="CENTER" text="DART_ANCHORHEADER_POINT">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="DART_AnchorHeader_To">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_AttachTo1" relativePoint="TOPLEFT"/>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent_AttachTo1" relativePoint="TOPRIGHT"/>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" justifyH="CENTER" text="DART_ANCHORHEADER_TO">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="DART_AnchorHeader_X">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_XOffset1" relativePoint="TOPLEFT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent_XOffset1" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" justifyH="CENTER" text="DART_ANCHORHEADER_X">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+		<Frame name="DART_AnchorHeader_Y">
+			<Size><AbsDimension x="10" y="10"/></Size>
+			<Anchors>
+				<Anchor point="BOTTOMLEFT" relativeTo="$parent_YOffset1" relativePoint="TOPLEFT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativeTo="$parent_YOffset1" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="-7" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Layers>
+				<Layer level="OVERLAY">
+					<FontString name="$parent_Text" inherits="GameFontNormalSmall" justifyH="CENTER" text="DART_ANCHORHEADER_Y">
+						<Anchors>
+							<Anchor point="CENTER"/>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+		</Frame>
+	</Frames>
+</Frame>
+
+<Frame name="DART_BackdropOptions" parent="DART_MainTextureOptions" frameStrata="MEDIUM" hidden="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset><AbsDimension x="0" y="-195"/></Offset>
+		</Anchor>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<CheckButton name="$parent_HideBackground" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="15" y="-120"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "hidebg";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.HideBackground);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Button name="$parent_BGColor" inherits="DART_ColorPickerTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_HideBackground" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "bgcolor";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.BackgroundColor);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_BorderColor" inherits="DART_ColorPickerTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_BGColor" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "bordercolor";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.BorderColor);
+				</OnLoad>
+			</Scripts>
+		</Button>
+
+		<Slider name="$parent_BackgroundAlpha" inherits="DART_SliderTemplate" minValue="0" maxValue="100"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_BorderColor" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-30"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "bgalpha";
+					this.minlock = true;
+					this.maxlock = true;
+					this.scale = 100;
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.BackgroundAlpha);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_BorderAlpha" inherits="DART_SliderTemplate" minValue="0" maxValue="100"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_BackgroundAlpha" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-20"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "borderalpha";
+					this.minlock = true;
+					this.maxlock = true;
+					this.scale = 100;
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.BorderAlpha);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+
+		<Button name="$parent_Presets" inherits="DiscordLib_MenuControlTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="90" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_BACKDROPS";
+					this.initFunc = DART_Options_LoadPresetBackdrop;
+					DL_Set_Label(DART_TEXT.PresetBackdrops);
+					DL_Set_Anchor("", 0, -30, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_BackgroundTexture" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="400" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "bgtexture";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.BackgroundTexture);
+					DL_Set_Anchor("", 15, -60, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_BorderTexture" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="400" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "bordertexture";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.BorderTexture);
+					DL_Set_Anchor("", 15, -90, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<CheckButton name="$parent_Tile" inherits="DART_CheckBoxTemplate" frameStrata="HIGH">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_HideBackground" relativePoint="RIGHT">
+					<Offset><AbsDimension x="250" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "tile";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.Tile);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<EditBox name="$parent_TileSize" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "tileSize";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.TileSize);
+					DL_Set_Anchor("_Tile", 0, -5);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_EdgeSize" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "edgeSize";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.EdgSize);
+					DL_Set_Anchor("_Tile", 0, -30);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_InsetLeft" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "left";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.InsetLeft);
+					DL_Set_Anchor("_Tile", 0, -55);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_InsetRight" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "right";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.InsetRight);
+					DL_Set_Anchor("_Tile", 0, -80);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_InsetTop" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "top";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.InsetTop);
+					DL_Set_Anchor("_Tile", 0, -105);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_InsetBottom" inherits="DART_EditBoxTemplate" frameStrata="HIGH">
+			<Size><AbsDimension x="100" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "Backdrop";
+					this.subindex = "bottom";
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.InsetBottom);
+					DL_Set_Anchor("_Tile", 0, -130);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Slider name="$parent_Padding" inherits="DART_SliderTemplate" minValue="-10" maxValue="30"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_BorderAlpha" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-20"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "padding";
+					this.minlock = true;
+					this.updatepreview = true;
+					DL_Set_Label(DART_TEXT.Padding);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+	</Frames>
+</Frame>
+
+<Frame name="DART_TextOptions" parent="DART_MainTextureOptions" frameStrata="MEDIUM" hidden="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset><AbsDimension x="0" y="-195"/></Offset>
+		</Anchor>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<CheckButton name="$parent_HideText" inherits="DART_CheckBoxTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="15" y="-30"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "hide";
+					DL_Set_Label(DART_TEXT.HideText);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Button name="$parent_TextColor" inherits="DART_ColorPickerTemplate">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_HideText" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "color";
+					DL_Set_Label(DART_TEXT.TextColor);
+				</OnLoad>
+			</Scripts>
+		</Button>
+
+		<EditBox name="$parent_Text" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="485" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "text";
+					DL_Set_Label(DART_TEXT.Text);
+					DL_Set_Anchor("", 15, -90, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_Font" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="485" y="20"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "font";
+					DL_Set_Label(DART_TEXT.Font);
+					DL_Set_Anchor("", 15, -115, "TOPLEFT", "TOPLEFT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<Slider name="$parent_TextHeight" inherits="DART_SliderTemplate" minValue="1" maxValue="300"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativePoint="TOP">
+					<Offset><AbsDimension x="-47" y="-165"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "height";
+					this.minlock = true;
+					DL_Set_Label(DART_TEXT.TextHeight);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_TextWidth" inherits="DART_SliderTemplate" minValue="1" maxValue="300"  valueStep="1">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_TextHeight" relativePoint="RIGHT">
+					<Offset><AbsDimension x="50" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "width";
+					this.minlock = true;
+					DL_Set_Label(DART_TEXT.TextWidth);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_TextAlpha" inherits="DART_SliderTemplate" minValue="0" maxValue="100"  valueStep="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_TextHeight" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-20"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "alpha";
+					this.minlock = true;
+					this.maxlock = true;
+					this.scale = 100;
+					DL_Set_Label(DART_TEXT.TextAlpha);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_FontSize" inherits="DART_SliderTemplate" minValue="1" maxValue="30"  valueStep=".5">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parent_TextAlpha" relativePoint="RIGHT">
+					<Offset><AbsDimension x="50" y="0"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "text";
+					this.subindex = "fontsize";
+					this.minlock = true;
+					DL_Set_Label(DART_TEXT.FontSize);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+
+		<Button name="$parent_JustifyH" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="120" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_JUSTIFY_H";
+					this.index = "text";
+					this.subindex = "justifyH";
+					DL_Set_Label(DART_TEXT.JustifyH);
+					DL_Set_Anchor("", 0, -250, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_JustifyV" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="120" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DART_JUSTIFY_V";
+					this.index = "text";
+					this.subindex = "justifyV";
+					DL_Set_Label(DART_TEXT.JustifyV);
+					DL_Set_Anchor("", 0, -280, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_DrawLayer" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="115" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_DRAWLAYERS";
+					this.index = "text";
+					this.subindex = "drawlayer";
+					DL_Set_Label(DART_TEXT.DrawLayer);
+					DL_Set_Anchor("", 0, -310, "TOP", "TOP", 1);
+				</OnLoad>
+			</Scripts>
+		</Button>
+	</Frames>
+</Frame>
+
+<Frame name="DART_ControlOptions" parent="DART_MainTextureOptions" frameStrata="MEDIUM" hidden="true">
+	<Size><AbsDimension x="10" y="10"/></Size>
+	<Anchors>
+		<Anchor point="TOPLEFT">
+			<Offset><AbsDimension x="0" y="-195"/></Offset>
+		</Anchor>
+		<Anchor point="BOTTOMRIGHT"/>
+	</Anchors>
+	<Frames>
+		<ScrollFrame name="$parent_ConditionMenu" inherits="DL_ScrollFrameTemplate">
+			<Size><AbsDimension x="300" y="290"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset><AbsDimension x="15" y="-60"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."_OuterBorder_Header"):SetText(DART_TEXT.Conditions);
+				</OnLoad>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(40, DART_ConditionMenu_Update);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<CheckButton name="$parent_ConditionMenu_Button1" inherits="DART_ConditionButtonTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_ConditionMenu">
+					<Offset><AbsDimension x="5" y="-5"/></Offset>
+				</Anchor>
+			</Anchors>
+		</CheckButton>
+		<CheckButton name="$parent_ConditionMenu_Button2" inherits="DART_ConditionButtonTemplate" id="2"/>
+		<CheckButton name="$parent_ConditionMenu_Button3" inherits="DART_ConditionButtonTemplate" id="3"/>
+		<CheckButton name="$parent_ConditionMenu_Button4" inherits="DART_ConditionButtonTemplate" id="4"/>
+		<CheckButton name="$parent_ConditionMenu_Button5" inherits="DART_ConditionButtonTemplate" id="5"/>
+		<CheckButton name="$parent_ConditionMenu_Button6" inherits="DART_ConditionButtonTemplate" id="6"/>
+		<CheckButton name="$parent_ConditionMenu_Button7" inherits="DART_ConditionButtonTemplate" id="7"/>
+
+		<Button inherits="DART_MainMenuButton" text="DL_COPYTEXT" frameStrata="DIALOG">
+			<Size><AbsDimension x="100" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_ConditionMenu" relativePoint="TOPLEFT">
+					<Offset><AbsDimension x="0" y="26"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DART_Copy_ControlSettings();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<Button inherits="DART_MainMenuButton" text="DL_PASTETEXT" frameStrata="DIALOG">
+			<Size><AbsDimension x="100" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="$parent_ConditionMenu" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="27" y="26"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					DART_Paste_ControlSettings();
+				</OnClick>
+			</Scripts>
+		</Button>
+
+		<Button name="$parent_Condition" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="200" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_ConditionMenu" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="35" y="15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DL_CONDITIONS_MENU";
+					DL_Set_Label(DART_TEXT.ChooseCondition);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_ActionID" inherits="DiscordLib_MenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="150" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DL_ACTIONS";
+					this.index = "CONDITION";
+					this.subindex = "action";
+					DL_Set_Label(DART_TEXT.Action);
+					DL_Set_Anchor("_Condition", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<CheckButton name="$parent_IgnoreGlobal" inherits="DART_CheckBoxTemplate" hidden="true">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Condition" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-42"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "ignoreGlobal";
+					DL_Set_Label(DART_TEXT.IgnoreGlobal);
+				</OnLoad>
+			</Scripts>
+		</CheckButton>
+		<Frame name="$parent_Unit" inherits="DiscordLib_EditMenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="125" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DL_UNITS_LIST";
+					this.editFunc = DART_UnitEditBox_OnEnterPressed;
+					this.index = "CONDITION";
+					this.subindex = "unit";
+					DL_Set_Label(DART_TEXT.Unit);
+					DL_Set_Anchor("_Condition", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<Frame name="$parent_Unit2" inherits="DiscordLib_EditMenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="125" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DL_UNITS_LIST";
+					this.editFunc = DART_UnitEditBox_OnEnterPressed;
+					this.index = "CONDITION";
+					this.subindex = "unit2";
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Unit);
+					DL_Set_Anchor("_Condition", 0, -40);
+				</OnLoad>
+			</Scripts>
+		</Frame>
+		<EditBox name="$parent_Buff" inherits="DART_EditBoxTemplate" hidden="true">
+			<Size><AbsDimension x="120" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "buff";
+					DL_Set_Label(DART_TEXT.BuffName);
+					DL_Set_Anchor("_Condition", 0, -40);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_Text" inherits="DART_EditBoxTemplate" hidden="true">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "text";
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Text);
+					DL_Set_Anchor("_Condition", 0, -40);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_Comparison" inherits="DiscordLib_MenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="50" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_COMPARE_MENU";
+					this.index = "CONDITION";
+					this.subindex = "compare";
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Comparison);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_Number" inherits="DART_EditBoxTemplate" hidden="true">
+			<Size><AbsDimension x="100" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "number";
+					this.number = true;
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Number);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_Forms" inherits="DiscordLib_MenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="150" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_FORMS";
+					this.index = "CONDITION";
+					this.subindex = "form";
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Form);
+					DL_Set_Anchor("_Condition", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_Targets" inherits="DiscordLib_MenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="150" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_DropMenu";
+					this.table = "DL_TARGET_PARAMS";
+					this.index = "CONDITION";
+					this.subindex = "target";
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Type);
+					DL_Set_Anchor("_Condition", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</Button>
+
+		<Button name="$parent_Response" inherits="DiscordLib_MenuControlTemplate">
+			<Size><AbsDimension x="200" y="22"/></Size>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_ConditionMenu" relativePoint="TOPRIGHT">
+					<Offset><AbsDimension x="35" y="-120"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DART_RESPONSES";
+					this.initFunc = DART_Select_Response;
+					DL_Set_Label(DART_TEXT.ChooseResponse);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="$parent_ResponseTexture" inherits="DiscordLib_MenuControlTemplate" hidden="true">
+			<Size><AbsDimension x="130" y="22"/></Size>
+			<Scripts>
+				<OnLoad>
+					this:SetBackdropColor(0.0, 0.0, 0.0);
+					this.menu = "DART_ScrollMenu";
+					this.table = "DART_TEXTURE_LIST";
+					this.index = "CONDITION";
+					this.subindex = "texture";
+					DL_Set_Label(DART_TEXT.Texture);
+					DL_Set_Anchor("_Response", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Slider name="$parent_Amount" inherits="DART_SliderTemplate" minValue="1" maxValue="100"  valueStep="1" hidden="true">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Response" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-45"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "amount";
+					this.minlock = true;
+					DL_Set_Label(DART_TEXT.Amount);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<Slider name="$parent_Alpha" inherits="DART_SliderTemplate" minValue="0" maxValue="100"  valueStep="1" hidden="true">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Response" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-45"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "alpha";
+					this.minlock = true;
+					this.maxlock = true;
+					this.scale = 100;
+					DL_Set_Label(DART_TEXT.Alpha);
+				</OnLoad>
+			</Scripts>
+		</Slider>
+		<EditBox name="$parent_ResponseX" inherits="DART_EditBoxTemplate" hidden="true">
+			<Size><AbsDimension x="100" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "rx";
+					this.number = true;
+					DL_Set_Label("X:");
+					DL_Set_Anchor("_Response", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<EditBox name="$parent_ResponseY" inherits="DART_EditBoxTemplate" hidden="true">
+			<Size><AbsDimension x="100" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "ry";
+					this.number = true;
+					DL_Set_Label("Y:");
+					DL_Set_Anchor("_Response", 0, -40);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_Color" inherits="DART_ColorPickerTemplate" hidden="true">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="$parent_Response" relativePoint="BOTTOMLEFT">
+					<Offset><AbsDimension x="0" y="-15"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION"
+					this.subindex = "color";
+					DL_Set_Label(DART_TEXT.Color);
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<EditBox name="$parent_ResponseText" inherits="DART_EditBoxTemplate" hidden="true">
+			<Size><AbsDimension x="150" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "rtext";
+					DL_Set_Label(DART_TEXT.Text);
+					DL_Set_Anchor("_Response", 0, -15);
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+
+		<EditBox name="$parent_Overrides" inherits="DART_EditBoxTemplate">
+			<Size><AbsDimension x="100" y="24"/></Size>
+			<Scripts>
+				<OnLoad>
+					this.index = "CONDITION";
+					this.subindex = "overrides";
+					this.settingType = 0;
+					DL_Set_Label(DART_TEXT.Overrides);
+					DL_Set_Anchor("_ConditionMenu", 35, -255, "TOPLEFT", "TOPRIGHT");
+				</OnLoad>
+			</Scripts>
+		</EditBox>
+		<Button name="$parent_AddCondition" inherits="DART_MainMenuButton">
+			<Anchors>
+				<Anchor point="BOTTOM" relativePoint="BOTTOMRIGHT">
+					<Offset><AbsDimension x="-110" y="95"/></Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					this:SetText(DART_TEXT.AddCondition);
+				</OnLoad>
+				<OnClick>
+					DART_Add_Condition();
+				</OnClick>
+			</Scripts>
+		</Button>
+	</Frames>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="$parent_ParamLabel" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="345" y="-67"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parent_ResponseLabel" inherits="GameFontNormal">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="345" y="-202"/></Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+</Frame>
+
+</Ui>

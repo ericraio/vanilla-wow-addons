@@ -1,0 +1,138 @@
+<!--
+	AutoProfit
+	Version: 2.55
+	Notes: Check out www.gameguidesonline.com for the latest version.
+	To learn how I used the 3D model read this: (http://www.gameguidesonline.com/guides/articles/ggoarticleoctober05_02.asp)
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	
+	<Script file="AutoProfit.lua"/>
+	
+	<Frame name="AutoProfit" parent="UIParent" hidden="true">
+		<Frames>
+			<!-- <Button name="AutosellButton" parent="MerchantBuyBackItem" inherits="UIPanelButtonTemplate" text="Sell Junk"> -->
+			
+			<PlayerModel name="TreasureModel" parent="MerchantBuyBackItem">
+                <Size>
+                    <AbsDimension x="32" y="32"/>
+                </Size>
+                <Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MerchantFrame">
+                            <Offset>
+                                <AbsDimension x="-40" y="-38"/>
+                            </Offset>
+                        </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+						TreasureModel:SetModel("World/Generic/PassiveDoodads/TreasurePiles/GoldPileLarge01.m2");
+						TreasureModel:SetScale(1);
+						TreasureModel:SetPosition(-1, -.5, 0);						
+                    </OnLoad>
+                    <OnUpdate>
+						AutoProfit_RotateModel(arg1);
+                    </OnUpdate>
+					<OnShow>
+						TreasureModel:SetModel("World/Generic/PassiveDoodads/TreasurePiles/GoldPileLarge01.m2");
+						TreasureModel:SetScale(1);
+						TreasureModel:SetPosition(-1, -.5, 0);
+						rotation = 0;
+					</OnShow>
+					
+                </Scripts>
+
+            </PlayerModel>
+			
+			
+			<Button name="AutosellButton" parent="MerchantBuyBackItem">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MerchantFrame">
+						<Offset>
+							<AbsDimension x="-40" y="-38"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						rotrate = .6;
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Sell Junk Items");
+						AutoProfit_Calculate();
+						if (totalProfit > 0) then
+							SetTooltipMoney(GameTooltip, totalProfit);
+						else
+							GameTooltip:AddLine("You have no junk items in your inventory.", 1.0, 1.0, 1.0, 1);
+							rotrate = 0;
+						end
+						
+						GameTooltip:Show();						
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+						totalProfit = 0;
+						rotrate = 0;
+					</OnLeave>
+					<OnClick>
+						if (totalProfit > 0) then GameTooltip:Hide(); end
+						rotrate = 0;
+						SellJunk();
+					</OnClick>
+					<OnLoad>
+						AutoProfit_OnLoad();
+					</OnLoad>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Quickslot2">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+					</Anchors>
+				</NormalTexture>
+				<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress">
+								<Size>
+						<AbsDimension x="40" y="40"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+					</Anchors>
+				</PushedTexture>
+				<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD">
+												<Size>
+						<AbsDimension x="34" y="34"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+					</Anchors>
+				</HighlightTexture>
+			</Button>
+			
+			
+		</Frames>
+	</Frame>
+	
+	<GameTooltip name="AutoProfit_Tooltip" inherits="GameTooltipTemplate" hidden="true">
+		<Scripts>
+			<OnLoad>
+				this:SetScript("OnTooltipAddMoney", AutoProfit_AddCoin);
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+</Ui>

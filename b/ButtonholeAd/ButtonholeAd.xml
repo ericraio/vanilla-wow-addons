@@ -1,0 +1,212 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="ButtonholeAd_Classic.lua"/>
+	<Script file="ButtonholeAd_Menu.lua"/>
+	<Script file="ButtonholeAd_Expander.lua"/>
+	<Script file="ButtonholeAd.lua"/>
+	<Frame name="ButtonholeAdFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true">
+		<Scripts>
+			<OnLoad>
+				ButtonholeAd_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				ButtonholeAd_OnEvent();
+			</OnEvent>
+		</Scripts>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize><AbsValue val="32"/></TileSize>
+			<EdgeSize><AbsValue val="32"/></EdgeSize>
+		</Backdrop>
+		<Size><AbsDimension x="350" y="500"/></Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Frames>
+
+<!-- ==================== -->
+
+<Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+	<Anchors>
+		<Anchor point="BOTTOMRIGHT">
+			<Offset>
+				<AbsDimension x="-12" y="16"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnClick> ButtonholeAdFrame:Hide(); BHA_Debug("Hiding config frame"); </OnClick>
+	</Scripts>
+</Button>
+
+<CheckButton name="$parentCheckButtonClassic" inherits="OptionsCheckButtonTemplate" checked="true">
+	<Scripts>
+		<OnClick>
+			ButtonholeAd_Method = 0;
+			ButtonholeAd_UpdateMethodUI();
+		</OnClick>
+	</Scripts>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent"><Offset><AbsDimension x="25" y="-154"/></Offset></Anchor>
+	</Anchors>
+</CheckButton>
+
+<CheckButton name="$parentCheckButtonMenu" inherits="OptionsCheckButtonTemplate" checked="false">
+	<Scripts>
+		<OnClick>
+			ButtonholeAd_Method = 1;
+			ButtonholeAd_UpdateMethodUI();
+		</OnClick>
+	</Scripts>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent"><Offset><AbsDimension x="25" y="-234"/></Offset></Anchor>
+	</Anchors>
+</CheckButton>
+
+<CheckButton name="$parentCheckButtonExpander" inherits="OptionsCheckButtonTemplate" checked="false">
+	<Scripts>
+		<OnClick>
+			ButtonholeAd_Method = 2;
+			ButtonholeAd_UpdateMethodUI();
+		</OnClick>
+	</Scripts>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent"><Offset><AbsDimension x="25" y="-304"/></Offset></Anchor>
+	</Anchors>
+</CheckButton>
+
+<CheckButton name="$parentCheckButtonOff" inherits="OptionsCheckButtonTemplate" checked="false">
+	<Scripts>
+		<OnClick>
+			ButtonholeAd_Method = 3;
+			ButtonholeAd_UpdateMethodUI();
+		</OnClick>
+	</Scripts>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent"><Offset><AbsDimension x="25" y="-373"/></Offset></Anchor>
+	</Anchors>
+</CheckButton>
+
+<Slider name="$parentPosSlider" inherits="OptionsSliderTemplate">
+	<Size>
+		<AbsDimension x="290" y="17"/>
+	</Size>
+	<Anchors>
+		<Anchor point="BOTTOM" relative="$parent" relativePoint="BOTTOM">
+			<Offset>
+				<AbsDimension x="-3" y="40"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Scripts>
+		<OnLoad>
+			getglobal(this:GetName().."Text"):SetText("Button Position");
+			getglobal(this:GetName().."High"):SetText();
+			getglobal(this:GetName().."Low"):SetText();
+			this:SetMinMaxValues(0, 360);
+			this:SetValueStep(1);
+			this.tooltipText = "Where to put the Buttonhole on the Minimap";
+		</OnLoad>
+		<OnShow>
+			ButtonholeAd_UpdatePosUI();
+		</OnShow>
+		<OnValueChanged>
+			ButtonholeAd_Pos = this:GetValue();
+			getglobal(this:GetName().."Text"):SetText("Button Position" .. " - "..this:GetValue().."\194\176");
+			ButtonholeAd_UpdatePosUI();
+		</OnValueChanged>
+		<OnMouseUp>
+			BHA_Debug("Setting button position to " .. ButtonholeAd_Pos);
+		</OnMouseUp>
+	</Scripts>
+</Slider>
+
+</Frames>
+<Layers><Layer level="OVERLAY">
+
+<FontString name="$parentText" inherits="GameFontNormal" text="loading text..." justifyH="LEFT">
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="$parent"><Offset><AbsDimension x="25" y="-20"/></Offset></Anchor>
+	</Anchors>
+	<Size><AbsDimension x="325" y="425"/></Size>
+</FontString>
+	
+
+<!-- ==================== -->
+		
+		</Layer></Layers>
+	</Frame>
+
+<!-- ==================== -->
+
+	<Button name="ButtonholeAd_Minimap" toplevel="true" frameStrata="LOW" parent="Minimap" enableMouse="true" movable="false" hidden="false">
+		<Size>
+			<AbsDimension x="33" y="33"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="-100" y="-100"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="ButtonholeAd_Minimap_Texture" file="Interface\Icons\INV_Enchant_ShardRadientSmall">
+					<Size>
+						<AbsDimension x="21" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
+				</Texture>
+			</Layer>
+		<Layer level="OVERLAY">
+			<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+				<Size>
+					<AbsDimension x="56" y="56"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+			</Texture>
+		</Layer>
+		</Layers>
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp","RightButtonUp");
+			</OnLoad>
+			<OnMouseDown>
+				ButtonholeAd_Minimap_Texture:SetTexCoord(0,1,0,1);
+			</OnMouseDown>
+			<OnMouseUp>
+				ButtonholeAd_Minimap_Texture:SetTexCoord(.075,.925,.075,.925);
+			</OnMouseUp>
+			<OnClick>
+				ButtonholeAd_Minimap_OnClick(arg1);
+				ButtonholeAd_Minimap_Texture:SetTexCoord(.075,.925,.075,.925);
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+			    GameTooltip:SetText("Buttonhole Advanced");
+			    GameTooltip:AddLine("Right click for more info.");
+			    GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnMouseWheel>
+				ButtonholeAd_Classic_Wheel(arg1);
+			</OnMouseWheel>
+		</Scripts>
+	</Button>
+
+</Ui>

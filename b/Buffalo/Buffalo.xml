@@ -1,0 +1,262 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+    ..\FrameXML\UI.xsd">
+    
+<Frame name="BuffaloFrame" parent="UIParent" toplevel="true" frameStrata="LOW" hidden="true">
+		<Size>
+			<AbsDimension x="50" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-205" y="-13"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+</Frame>
+<Frame name="DebuffaloFrame" parent="UIParent" toplevel="true" frameStrata="LOW" hidden="true">
+		<Size>
+			<AbsDimension x="50" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-205" y="-13"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+</Frame>
+<Frame name="WeaponBuffaloFrame" parent="UIParent" toplevel="true" frameStrata="LOW" hidden="true">
+		<Size>
+			<AbsDimension x="50" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="UIParent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-205" y="-13"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnUpdate>
+				Buffalo:WeaponBuffaloFrame_OnUpdate(arg1)
+			</OnUpdate>
+		</Scripts>
+</Frame>
+
+
+<Button name="BuffaloButtonTemplate" virtual="true">
+	<Size>
+		<AbsDimension x="30" y="30"/>
+	</Size>
+
+	<Scripts>
+		<OnLoad>
+			this.buffFilter = "HELPFUL|HARMFUL";
+			this.timeSinceLastUpdate = 0
+			this:RegisterEvent("PLAYER_AURAS_CHANGED")
+			Buffalo.printnext=true
+			Buffalo:Test("XML OnLoad")
+		</OnLoad>
+		<OnEvent>
+			Buffalo:BuffaloButton_Update(this)
+		</OnEvent>
+		<OnUpdate>
+			Buffalo:BuffButton_OnUpdate(arg1, this);
+		</OnUpdate>
+		<OnClick>
+			Buffalo:BuffButton_OnClick(this);
+		</OnClick>
+		<OnEnter>
+			GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT");
+			GameTooltip:SetPlayerBuff(this.buffIndex);
+		</OnEnter>
+		<OnLeave>
+			GameTooltip:Hide();
+		</OnLeave>
+		<OnHide>
+			Buffalo:Debug(this:GetName())
+		</OnHide>
+	</Scripts>
+
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentIcon"/>
+			<FontString name="$parentCount" inherits="NumberFontNormal">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	
+		<Layer level="ARTWORK">
+			<FontString name="$parentDuration" inherits="GameFontNormalSmall">
+				<Size>
+					<AbsDimension x="0" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point = "TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point = "TOPRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+
+				</Anchors>
+			</FontString>
+		</Layer>
+		<Layer level="OVERLAY">
+			<FontString inherits="GameFontHighlight" name="$parent_Ghost_Label">
+				<Anchors>
+					<Anchor point = "TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="2"/>
+						</Offset>
+					</Anchor>
+					<Anchor point = "BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+
+			<Texture name="$parent_Ghost_Texture" alphaMode="ADD">
+				<Color r="0" g="0" b="0" a="1"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+		</Layer>
+	</Layers>
+</Button>
+
+<Button name="BuffaloButton" inherits="BuffaloButtonTemplate" virtual="true">
+	<Scripts>
+<!-- 		<OnLoad>
+			this.buffFilter= "HELPFUL"
+			BuffButton_OnLoad();
+		</OnLoad> -->
+		<OnMouseDown>
+			if(not Buffalo.db.profile.locked) then
+				BuffaloFrame:StartMoving()
+			end
+		</OnMouseDown>
+		<OnMouseUp>
+			if(not Buffalo.db.profile.locked) then
+				BuffaloFrame:StopMovingOrSizing()
+				Buffalo:SavePos("buff")
+			end
+		</OnMouseUp>
+	</Scripts>
+</Button>
+
+<Button name="DebuffaloButton" inherits="BuffaloButtonTemplate" virtual="true">
+	<Layers>
+		<Layer level="OVERLAY">
+			<Texture name="$parentBorder" file="Interface\Buttons\UI-Debuff-Overlays">
+				<Size>
+					<AbsDimension x="33" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Color r="0" g="0" b="0" a="0"/>
+				<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
+			</Texture>
+		</Layer>
+
+		<Layer level="ARTWORK">
+			<FontString name="$parentDuration" inherits="GameFontNormalSmall">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM"/>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnMouseDown>
+			if(not Buffalo.db.profile.locked) then
+				DebuffaloFrame:StartMoving()
+			end
+		</OnMouseDown>
+		<OnMouseUp>
+			if(not Buffalo.db.profile.locked) then
+				DebuffaloFrame:StopMovingOrSizing()
+				Buffalo:SavePos("debuff")
+			end
+		</OnMouseUp>
+	</Scripts>
+</Button>
+
+<Button name="WeaponBuffaloButton" inherits="BuffaloButtonTemplate" virtual="true">
+	<Layers>
+<!-- 		<Layer level="OVERLAY">
+			<Texture name="$parentBorder" file="Interface\Buttons\UI-TempEnchant-Border">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Texture>
+		</Layer> -->
+		<Layer level="ARTWORK">
+			<FontString name="$parentDuration" inherits="GameFontNormalSmall">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM"/>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnUpdate>
+		</OnUpdate>
+		<OnLoad>
+		</OnLoad>
+		<OnEnter>
+			BuffFrame_EnchantButton_OnEnter();
+		</OnEnter>
+		<OnLeave>
+			GameTooltip:Hide();
+		</OnLeave>
+		<OnMouseDown>
+			if(not Buffalo.db.profile.locked) then
+				WeaponBuffaloFrame:StartMoving()
+			end
+		</OnMouseDown>
+		<OnMouseUp>
+			if(not Buffalo.db.profile.locked) then
+				WeaponBuffaloFrame:StopMovingOrSizing()
+				Buffalo:SavePos("weapon")
+			end
+		</OnMouseUp>
+	</Scripts>
+</Button>
+</Ui>

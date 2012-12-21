@@ -1,0 +1,473 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Button name="GRSSInviteButtonTemplate" inherits="OptionsButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="45" y="16"/>
+		</Size>
+	</Button>
+	<Button name="GRSSInviteDeleteButtonTemplate" inherits="OptionsButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="14" y="14"/>
+		</Size>
+	</Button>
+	<Button name = "GRSSInviteRowTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="157" y="16" />
+		</Size>
+		<Frames>
+			<Frame name="$parentField" setAllPoints="true" enableMouse="true">
+				<Layers>
+					<Layer level="HIGHLIGHT">
+						<Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" setAllPoints="true">
+							<Size>
+								<AbsDimension x="157" y="11"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentItem" inherits="GRSSFont" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="157" y="11"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Button>
+	<Frame name="GRSSInvite" parent="UIParent" enableMouse="true" movable="true">
+		<Size>
+			<AbsDimension x="250" y="225" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="GRSS" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="10" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,"GRSSInvite");
+			</OnLoad>
+			<OnMouseUp>
+				 if ( this.isMoving ) then
+					this:StopMovingOrSizing();
+					this.isMoving = false;
+				 end
+			</OnMouseUp>
+			<OnMouseDown>
+			 if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+				this:StartMoving();
+				this.isMoving = true;
+			 end
+			</OnMouseDown>
+			<OnHide>
+				GRSSPrint("You can type |c00ffff00/grss invite|r to bring back the Waiting List/Auto-Invite screen");
+			 if ( this.isMoving ) then
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			 end
+			</OnHide>
+
+		</Scripts>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="4" right="4" top="4" bottom="4" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+		</Backdrop>
+		<Frames> 
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Size>
+					<AbsDimension x="27" y="27"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-60"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self,offset,16, GRSSInviteScrollBar_Update);
+						--FauxScrollFrame_OnVerticalScroll(16, GRSSInviteScrollBar_Update);
+					</OnVerticalScroll>
+					<OnShow>
+						GRSSInviteScrollBar_Update()
+					</OnShow>
+				</Scripts>
+			</ScrollFrame>
+			<Button name="$parentRow1" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow2" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow1" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow3" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow2" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow4" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow3" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow5" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow4" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow6" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow5" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow7" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow6" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow8" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow7" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow9" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow8" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentRow10" inherits="GRSSInviteRowTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRow9" relativePoint="BOTTOMLEFT"/>
+				</Anchors>
+			</Button>
+
+			
+			<Button name="$parentRow1Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow1">
+						<Offset>
+							<AbsDimension x="0" y="1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(1)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow2Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">	
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow1Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(2)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow3Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow2Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(3)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow4Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow3Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(4)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow5Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow4Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(5)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow6Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow5Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(6)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow7Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow6Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(7)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow8Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow7Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(8)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow9Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow8Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(9)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow10Invite" inherits="GRSSInviteButtonTemplate" text="Invite" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRow9Invite" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_InviteLine(10)
+					</OnClick>
+				</Scripts>		
+			</Button>
+
+			<Button name="$parentRow1Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow1Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(1)
+					</OnClick>
+				</Scripts>	
+			</Button>
+			<Button name="$parentRow2Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">	
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow2Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(2)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow3Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow3Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(3)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow4Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow4Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(4)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow5Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow5Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(5)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow6Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow6Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(6)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow7Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow7Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(7)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow8Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow8Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(8)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow9Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow9Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(9)
+					</OnClick>
+				</Scripts>		
+			</Button>
+			<Button name="$parentRow10Delete" inherits="GRSSInviteDeleteButtonTemplate" text="x" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentRow10Invite">
+						<Offset>
+							<AbsDimension x="0" y="-1" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GRSS_DeleteInviteLine(10)
+					</OnClick>
+				</Scripts>		
+			</Button>
+
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						GRSSInviteDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parentWaitingList" inherits="OptionsButtonTemplate" text="Add to Waiting List">
+				<Size>
+					<AbsDimension x="130" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDropDown">
+						<Offset>
+							<AbsDimension x="17" y="4" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						--this:Hide();
+					</OnLoad>
+					<OnClick>
+						GRSS_AddToWaitingList();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames> 
+	</Frame>	
+</Ui>
+

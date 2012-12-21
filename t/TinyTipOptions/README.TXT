@@ -1,0 +1,1 @@
+This addon adds a GUI settings window for use with TinyTip, and will only load if you use the slash command /tinytip or /ttip.

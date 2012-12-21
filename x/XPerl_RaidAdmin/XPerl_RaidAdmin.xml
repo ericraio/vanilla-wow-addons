@@ -1,0 +1,638 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+        <Script file="Localization.lua"/>
+        <Script file="Localization.deDE.lua"/>
+        <Script file="Localization.frFR.lua"/>
+        <Script file="Localization.zhCN.lua"/>
+        <Script file="XPerl_RaidAdmin.lua"/>
+        <Script file="..\XPerl\XPerl_Usage.lua"/>
+
+        <Button name="XPerl_BasicButton" virtual="true">
+                <Scripts>
+                        <OnEnter>
+                                if (this.tooltipText) then
+                                        local str1 = getglobal(this.tooltipText)
+                                        local str2
+                                        if (not str1) then
+                                                str1 = getglobal(this.tooltipText.."1")
+                                                str2 = getglobal(this.tooltipText.."2")
+                                        end
+                                        if (not str1) then
+                                                str1 = this.tooltipText
+                                                str2 = nil
+                                        end
+
+                                        GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
+
+                                        if (str2) then
+                                                GameTooltip:SetText(str1, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+                                                GameTooltip:AddLine(str2, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1)
+                                                GameTooltip:Show()
+                                        else
+                                                GameTooltip:SetText(str1, nil, nil, nil, nil, 1)
+                                        end
+                                end
+                        </OnEnter>
+                        <OnLeave>
+                                GameTooltip:Hide()
+                        </OnLeave>
+                </Scripts>
+                <NormalText inherits="GameFontHighlightSmall"/>
+                <HighlightText inherits="GameFontHighlightSmall"/>
+                <DisabledText inherits="GameFontDisableSmall"/>
+        </Button>
+
+        <Button name="XPerlDiscButtonTemplate" virtual="true" inherits="XPerl_BasicButton">
+                <Size>
+                        <AbsDimension x="32" y="32"/>
+                </Size>
+
+                <NormalTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_SaveLoad">
+                        <TexCoords left="0" right="0.4140625" top="0" bottom="0.3515625"/>
+                </NormalTexture>
+                <PushedTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_SaveLoad">
+                        <TexCoords left="0.4140625" right="0.828125" top="0" bottom="0.3515625"/>
+                </PushedTexture>
+                <DisabledTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_SaveLoad">
+                        <TexCoords left="0" right="0.4140625" top="0.359375" bottom="0.7109375"/>
+                </DisabledTexture>
+                <HighlightTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_SaveLoad" alphaMode="ADD">
+                        <TexCoords left="0.4140625" right="0.828125" top="0.3515625" bottom="0.703125"/>
+                </HighlightTexture>
+        </Button>
+
+
+        <EditBox name="XPerlEditBox" autoFocus="false" multiline="false" ignoreArrows="true" toplevel="true" historyLines="0" letters="20" hidden="false" virtual="true">
+                <Size>
+                        <AbsDimension x="50" y="20"/>
+                </Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="-5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="10" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEscapePressed>
+                                this:ClearFocus();
+			</OnEscapePressed>
+		</Scripts>
+		<FontString inherits="ChatFontNormal"/>
+	</EditBox>
+
+        <Button name="XPerlRosterLineTemplate" virtual="true">
+                <NormalText inherits="GameFontNormalSmall"/>
+                <Size>
+                        <AbsDimension x="70" y="12"/>
+                </Size>
+                <Scripts>
+                        <OnClick>
+                                local text = this:GetText()
+                                XPerl_AdminFrame_Controls_Edit:SetText(text)
+                        </OnClick>
+                </Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+        </Button>
+
+        <Frame name="XPerl_AdminFrame" parent="UIParent" movable="true">
+                <Scripts>
+                        <OnLoad>
+                                this:RegisterForDrag("LeftButton")
+                                XPerl_AdminOnLoad()
+                                this:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+                                this:SetBackdropColor(0, 0, 0, 1)
+
+                                this.Expand = function()
+                                        XPerl_AdminFrame_Controls:Show()
+                                        XPerl_AdminFrame_TitleBar_LockOpen:Show()
+                                        XPerl_AdminFrame:SetWidth(140)
+                                        XPerl_AdminFrame:SetHeight(150)
+                                end
+
+                                this.Collapse = function()
+                                        XPerl_AdminFrame_Controls:Hide()
+                                        XPerl_AdminFrame_TitleBar_LockOpen:Hide()
+                                        XPerl_AdminFrame:SetWidth(140)
+                                        XPerl_AdminFrame:SetHeight(18)
+                                end
+                        </OnLoad>
+			<OnEvent>
+                                XPerl_AdminOnEvent()
+			</OnEvent>
+                        <OnEnter>
+                                XPerl_AdminFrame:Expand()
+                        </OnEnter>
+                        <OnUpdate>
+                                XPerl_Admin_OnUpdate(arg1)
+                        </OnUpdate>
+                        <OnDragStart>
+                                if (not XPerl_Admin.Pinned or (IsAltKeyDown() and IsControlKeyDown() and IsShiftKeyDown())) then
+                                        this:StartMoving()
+                                end
+                        </OnDragStart>
+                        <OnDragStop>
+                                this:StopMovingOrSizing()
+                        </OnDragStop>
+                </Scripts>
+		<Size>
+                        <AbsDimension x="140" y="18"/>
+		</Size>
+		<Anchors>
+                        <Anchor point="CENTER"/>
+		</Anchors>
+                <Backdrop bgFile="Interface\AddOns\XPerl_RaidHelper\images\XPerl_FrameBack" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                        <EdgeSize>
+                                <AbsValue val="9"/>
+                        </EdgeSize>
+                        <TileSize>
+                                <AbsValue val="16"/>
+                        </TileSize>
+                        <BackgroundInsets>
+                                <AbsInset left="3" right="3" top="3" bottom="3"/>
+                        </BackgroundInsets>
+                </Backdrop>
+                <Frames>
+                        <Frame name="$parent_TitleBar">
+                                <Size>
+                                        <AbsDimension x="80" y="12"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT">
+                                                <Offset>
+                                                        <AbsDimension x="3" y="-3"/>
+                                                </Offset>
+                                        </Anchor>
+                                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+                                                <Offset>
+                                                        <AbsDimension x="-3" y="-13"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <Frames>
+                                        <Button name="$parent_CloseButton" inherits="UIPanelCloseButton" toplevel="true">
+                                                <Size>
+                                                        <AbsDimension x="22" y="22"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="TOPRIGHT">
+                                                                <Offset>
+                                                                        <AbsDimension x="5" y="5"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <Scripts>
+                                                        <OnClick>
+                                                                XPerl_Admin.AutoHideShow = 0
+                                                                XPerl_AdminFrame:Hide()
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+                                        <Button name="$parent_Pin" inherits="XPerl_BasicButton">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="$parent_CloseButton" relativePoint="LEFT">
+                                                                <Offset>
+                                                                        <AbsDimension x="4" y="0"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Pin">
+                                                        <TexCoords left="0" right="0.46875" top="0.5" bottom="0.453125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Pin">
+                                                        <TexCoords left="0" right="0.46875" top="0.5" bottom="0.953125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_AdminFrame_TitleBar_Pin:GetNormalTexture()
+                                                                        if (XPerl_Admin.Pinned) then
+                                                                                tex:SetTexCoord(0.5, 0.96875, 0, 0.453125)
+                                                                        else
+                                                                                tex:SetTexCoord(0, 0.46875, 0, 0.453125)
+                                                                        end
+
+                                                                        tex = XPerl_AdminFrame_TitleBar_Pin:GetPushedTexture()
+                                                                        if (XPerl_Admin.Pinned) then
+                                                                                tex:SetTexCoord(0.5, 0.96875, 0.5, 0.953125)
+                                                                        else
+                                                                                tex:SetTexCoord(0, 0.46875, 0.5, 0.953125)
+                                                                        end
+                                                                end
+                                                                this.tooltipText = XPERL_BUTTON_ADMIN_PIN
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Admin.Pinned = not XPerl_Admin.Pinned
+                                                                this:SetButtonTex()
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                        <Button name="$parent_LockOpen" inherits="XPerl_BasicButton" hidden="true">
+                                                <Size>
+                                                        <AbsDimension x="11" y="11"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="RIGHT" relativeTo="$parent_Pin" relativePoint="LEFT"/>
+                                                </Anchors>
+                                                <NormalTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.5" right="0.5703125" top="0.00390625" bottom="0.0703125"/>
+                                                </NormalTexture>
+
+                                                <PushedTexture file="Interface\Addons\XPerl_RaidHelper\Images\XPerl_Bits">
+                                                        <TexCoords left="0.5" right="0.5703125" top="0.078125" bottom="0.14453125"/>
+                                                </PushedTexture>
+
+                                                <HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD">
+                                                        <TexCoords left="0" right="0.9" top="0.1" bottom="0.9"/>
+                                                </HighlightTexture>
+
+                                                <Scripts>
+                                                        <OnLoad>
+                                                                this.SetButtonTex = function()
+                                                                        local tex = XPerl_AdminFrame_TitleBar_LockOpen:GetNormalTexture();
+                                                                        if (XPerl_Admin.LockOpen) then
+                                                                                tex:SetTexCoord(0.5, 0.5703125, 0.078125, 0.14453125);
+                                                                        else
+                                                                                tex:SetTexCoord(0.5, 0.5703125, 0.00390625, 0.0703125);
+                                                                        end
+                                                                end
+                                                                this.tooltipText = XPERL_BUTTON_ADMIN_LOCKOPEN
+                                                        </OnLoad>
+                                                        <OnClick>
+                                                                XPerl_Admin.LockOpen = not XPerl_Admin.LockOpen
+                                                                this:SetButtonTex()
+                                                        </OnClick>
+                                                </Scripts>
+                                        </Button>
+
+                                </Frames>
+                                <Layers>
+                                        <Layer level="ARTWORK">
+                                                <FontString name="$parent_Title" inherits="GameFontNormalSmall" text="X-Perl Raid Admin" justifyH="LEFT">
+                                                        <Color r="1" g="1" b="1"/>
+                                                        <Anchors>
+                                                                <Anchor point="TOPLEFT"/>
+                                                                <Anchor point="BOTTOMRIGHT"/>
+                                                        </Anchors>
+                                                </FontString>
+                                        </Layer>
+                                </Layers>
+                                <Scripts>
+                                        <OnLoad>
+                                                XPerl_AdminFrame_TitleBar_Title:SetText(XPERL_ADMIN_TITLE)
+                                        </OnLoad>
+                                </Scripts>
+                        </Frame>
+
+                        <Frame name="$parent_Controls" hidden="true">
+                                <Scripts>
+                                        <OnLoad>
+                                                XPerl_Admin_ControlsOnLoad()
+                                        </OnLoad>
+                                        <OnShow>
+                                                this:MakeList()
+                                                this:Validate()
+                                        </OnShow>
+                                        <OnUpdate>
+                                                if (not XPerl_Admin.LockOpen) then
+                                                        local f = GetMouseFocus()
+                                                        if (f) then
+                                                                while (f:GetParent() and f:GetParent() ~= UIParent) do
+                                                                        f = f:GetParent()
+                                                                end
+
+                                                                if (f ~= XPerl_AdminFrame) then
+                                                                        XPerl_AdminFrame:Collapse()
+                                                                end
+                                                        end
+                                                end
+
+                                                if (IsRaidLeader() and XPerl_AdminFrame.Valid) then
+                                                        XPerl_AdminFrame_Controls_LoadRoster:Enable()
+                                                else
+                                                        XPerl_AdminFrame_Controls_LoadRoster:Disable()
+                                                end
+                                        </OnUpdate>
+                                </Scripts>
+                                <Size>
+                                        <AbsDimension x="110" y="12"/>
+                                </Size>
+                                <Anchors>
+                                        <Anchor point="TOPLEFT" relativeTo="$parent_TitleBar" relativePoint="BOTTOMLEFT"/>
+                                        <Anchor point="BOTTOMRIGHT">
+                                                <Offset>
+                                                        <AbsDimension x="-3" y="3"/>
+                                                </Offset>
+                                        </Anchor>
+                                </Anchors>
+                                <Frames>
+                                        <Frame>
+                                                <Size>
+                                                        <AbsDimension x="80" y="12"/>
+                                                </Size>
+                                                <Anchors>
+                                                        <Anchor point="TOPLEFT"/>
+                                                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPLEFT">
+                                                                <Offset>
+                                                                        <AbsDimension x="175" y="-120"/>
+                                                                </Offset>
+                                                        </Anchor>
+                                                </Anchors>
+                                                <Frames>
+                                                        <Button name="$parent_SaveRoster" inherits="XPerlDiscButtonTemplate">
+                                                                <Size>
+                                                                        <AbsDimension x="32" y="32"/>
+                                                                </Size>
+                                                                <Anchors>
+                                                                        <Anchor point="TOPLEFT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="3" y="-5"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <NormalText inherits="GameFontHighlightSmall">
+                                                                        <Color r="0.8" g="0.2" b="0.2"/>
+                                                                </NormalText>
+                                                                <HighlightText inherits="GameFontHighlightSmall">
+                                                                        <Color r="1" g="0" b="0"/>
+                                                                </HighlightText>
+                                                                <Scripts>
+                                                                        <OnLoad>
+                                                                                this:SetText(SAVE)
+                                                                                this.tooltipText = "XPERL_BUTTON_ADMIN_SAVE"
+                                                                        </OnLoad>
+                                                                        <OnClick>
+                                                                                XPerl_SaveRoster(XPerl_AdminFrame_Controls_Edit:GetText())
+                                                                                XPerl_AdminFrame_Controls:MakeList()
+                                                                                XPerl_AdminFrame_Controls:Validate()
+                                                                        </OnClick>
+                                                                </Scripts>
+                                                        </Button>
+
+                                                        <EditBox name="$parent_Edit" inherits="XPerlEditBox">
+                                                                <Size>
+                                                                        <AbsDimension x="90" y="20"/>
+                                                                </Size>
+                                                                <Anchors>
+                                                                        <Anchor point="LEFT" relativeTo="$parent_SaveRoster" relativePoint="RIGHT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="8" y="0"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <Scripts>
+                                                                        <OnTextChanged>
+                                                                                XPerl_AdminFrame_Controls:Validate()
+                                                                                XPerl_AdminFrame_Controls:Details()
+                                                                        </OnTextChanged>
+                                                                </Scripts>
+                                                        </EditBox>
+
+                                                        <Button name="$parent_LoadRoster" inherits="XPerlDiscButtonTemplate">
+                                                                <Size>
+                                                                        <AbsDimension x="32" y="32"/>
+                                                                </Size>
+                                                                <Anchors>
+                                                                        <Anchor point="TOPLEFT" relativeTo="$parent_SaveRoster" relativePoint="BOTTOMLEFT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="0" y="-2"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <NormalText inherits="GameFontHighlightSmall">
+                                                                        <Color r="0.2" g="0.8" b="0.2"/>
+                                                                </NormalText>
+                                                                <HighlightText inherits="GameFontHighlightSmall">
+                                                                        <Color r="0" g="1" b="0"/>
+                                                                </HighlightText>
+                                                                <Scripts>
+                                                                        <OnLoad>
+                                                                                this:SetText(XPERL_LOAD)
+                                                                                this.tooltipText = "XPERL_BUTTON_ADMIN_LOAD"
+                                                                        </OnLoad>
+                                                                        <OnClick>
+                                                                                for name,roster in XPerl_Admin.SavedRosters do
+                                                                                        if (name == XPerl_AdminFrame_Controls_Edit:GetText()) then
+                                                                                                XPerl_LoadRoster(name)
+                                                                                        end
+                                                                                end
+                                                                        </OnClick>
+                                                                </Scripts>
+                                                        </Button>
+
+                                                        <Button name="$parent_StopLoad" inherits="XPerl_BasicButton" hidden="true">
+                                                                <Size>
+                                                                        <AbsDimension x="29" y="29"/>
+                                                                </Size>
+                                                                <Anchors>
+                                                                        <Anchor point="TOPLEFT" relativeTo="$parent_LoadRoster">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="0" y="-1"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <NormalTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Stop">
+                                                                        <TexCoords left="0" right="0.4921875" top="0" bottom="0.4765625"/>
+                                                                </NormalTexture>
+                                                                <PushedTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Stop">
+                                                                        <TexCoords left="0.5" right="0.9921875" top="0" bottom="0.4765625"/>
+                                                                </PushedTexture>
+                                                                <DisabledTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Stop">
+                                                                        <TexCoords left="0" right="0.4921875" top="0.5078125" bottom="0.984375"/>
+                                                                </DisabledTexture>
+                                                                <HighlightTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Stop" alphaMode="ADD">
+                                                                        <TexCoords left="0.5" right="0.9921875" top="0.5078125" bottom="0.984375"/>
+                                                                </HighlightTexture>
+
+                                                                <Scripts>
+                                                                        <OnLoad>
+                                                                                this.tooltipText = "XPERL_BUTTON_ADMIN_STOPLOAD"
+                                                                        </OnLoad>
+                                                                        <OnClick>
+                                                                                XPerl_StopLoad()
+                                                                        </OnClick>
+                                                                </Scripts>
+                                                        </Button>
+
+                                                        <Frame name="$parent_Roster">
+                                                                <Anchors>
+                                                                        <Anchor point="TOPLEFT" relativeTo="$parent_LoadRoster" relativePoint="TOPRIGHT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="3" y="0"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                        <Anchor point="BOTTOMRIGHT" relativeTo="$parent_Edit" relativePoint="BOTTOMRIGHT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="-10" y="-74"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+                                                                        <EdgeSize>
+                                                                                <AbsValue val="9"/>
+                                                                        </EdgeSize>
+                                                                </Backdrop>
+                                                                <Frames>
+                                                                        <Button name="$parent1" inherits="XPerlRosterLineTemplate" text="Line" id="1">
+                                                                                <Anchors>
+                                                                                        <Anchor point="TOPLEFT">
+                                                                                                <Offset>
+                                                                                                        <AbsDimension x="4" y="-3"/>
+                                                                                                </Offset>
+                                                                                        </Anchor>
+                                                                                </Anchors>
+                                                                        </Button>
+                                                                        <Button name="$parent2" inherits="XPerlRosterLineTemplate" text="Line" id="2">
+                                                                                <Anchors>
+                                                                                        <Anchor point="TOPLEFT" relativeTo="$parent1" relativePoint="BOTTOMLEFT"/>
+                                                                                </Anchors>
+                                                                        </Button>
+                                                                        <Button name="$parent3" inherits="XPerlRosterLineTemplate" text="Line" id="3">
+                                                                                <Anchors>
+                                                                                        <Anchor point="TOPLEFT" relativeTo="$parent2" relativePoint="BOTTOMLEFT"/>
+                                                                                </Anchors>
+                                                                        </Button>
+                                                                        <Button name="$parent4" inherits="XPerlRosterLineTemplate" text="Line" id="4">
+                                                                                <Anchors>
+                                                                                        <Anchor point="TOPLEFT" relativeTo="$parent3" relativePoint="BOTTOMLEFT"/>
+                                                                                </Anchors>
+                                                                        </Button>
+                                                                        <Button name="$parent5" inherits="XPerlRosterLineTemplate" text="Line" id="5">
+                                                                                <Anchors>
+                                                                                        <Anchor point="TOPLEFT" relativeTo="$parent4" relativePoint="BOTTOMLEFT"/>
+                                                                                </Anchors>
+                                                                        </Button>
+                                                                        <ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate">
+                                                                                <Size>
+                                                                                        <AbsDimension x="24" y="60"/>
+                                                                                </Size>
+                                                                                <Anchors>
+                                                                                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent1"/>
+                                                                                </Anchors>
+                                                                                <Scripts>
+                                                                                        <OnVerticalScroll>
+                                                                                                FauxScrollFrame_OnVerticalScroll(1, XPerl_AdminFrame_Controls.MakeList)
+                                                                                        </OnVerticalScroll>
+                                                                                        <OnMouseWheel>
+                                                                                                local f = getglobal(this:GetName().."ScrollBar")
+                                                                                                if (arg1 > 0) then
+                                                                                                        f:SetValue(f:GetValue() + 3)
+                                                                                                else
+                                                                                                        f:SetValue(f:GetValue() - 3)
+                                                                                                end
+                                                                                                XPerl_AdminFrame_Controls:MakeList()
+                                                                                                XPerl_AdminFrame_Controls:Validate()
+                                                                                        </OnMouseWheel>
+                                                                                </Scripts>
+                                                                        </ScrollFrame>
+                                                                </Frames>
+                                                        </Frame>
+
+                                                        <Button name="$parent_DeleteRoster" inherits="XPerl_BasicButton">
+                                                                <Size>
+                                                                        <AbsDimension x="32" y="32"/>
+                                                                </Size>
+                                                                <Anchors>
+                                                                        <Anchor point="TOP" relativeTo="$parent_LoadRoster" relativePoint="BOTTOM">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="0" y="-2"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <NormalTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Bin">
+                                                                        <TexCoords left="0" right="0.5" top="0" bottom="0.5"/>
+                                                                </NormalTexture>
+                                                                <PushedTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Bin">
+                                                                        <TexCoords left="0.5" right="1" top="0" bottom="0.5"/>
+                                                                </PushedTexture>
+                                                                <DisabledTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Bin">
+                                                                        <TexCoords left="0" right="0.5" top="0.5" bottom="1"/>
+                                                                </DisabledTexture>
+                                                                <HighlightTexture file="Interface\Addons\XPerl_RaidAdmin\Images\XPerl_Bin" alphaMode="ADD">
+                                                                        <TexCoords left="0.5" right="1" top="0.5" bottom="1"/>
+                                                                </HighlightTexture>
+                                                                <Scripts>
+                                                                        <OnLoad>
+                                                                                this:SetText(DELETE)
+                                                                                this.tooltipText = "XPERL_BUTTON_ADMIN_DELETE"
+                                                                        </OnLoad>
+                                                                        <OnClick>
+                                                                                if (XPerl_Admin.SavedRosters) then
+                                                                                        XPerl_Admin.SavedRosters[XPerl_AdminFrame_Controls_Edit:GetText()] = nil
+                                                                                        XPerl_AdminFrame_Controls:MakeList()
+                                                                                        XPerl_AdminFrame_Controls:Validate()
+                                                                                end
+                                                                        </OnClick>
+                                                                </Scripts>
+                                                        </Button>
+                                                        <Frame name="$parent_Details">
+                                                                <Anchors>
+                                                                        <Anchor point="TOPLEFT" relativeTo="$parent_DeleteRoster" relativePoint="BOTTOMLEFT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="0" y="-2"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                        <Anchor point="BOTTOMRIGHT" relativeTo="$parent_Roster" relativePoint="BOTTOMRIGHT">
+                                                                                <Offset>
+                                                                                        <AbsDimension x="0" y="-24"/>
+                                                                                </Offset>
+                                                                        </Anchor>
+                                                                </Anchors>
+                                                                <Layers>
+                                                                        <Layer level="ARTWORK">
+                                                                                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP" setAllPoints="true">
+                                                                                        <Color r="0.8" g="1" b="0.7"/>
+                                                                                </FontString>
+                                                                        </Layer>
+                                                                </Layers>
+                                                        </Frame>
+                                                </Frames>
+                                        </Frame>
+                                </Frames>
+                        </Frame>
+                </Frames>
+        </Frame>
+</Ui>

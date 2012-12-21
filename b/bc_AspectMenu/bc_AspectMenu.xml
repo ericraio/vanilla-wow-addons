@@ -1,0 +1,542 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+	<Script file="localization.lua"/>
+	<Script file="bc_AspectMenu.lua"/>
+   <Frame name="bc_AspectMenu"> 
+      <Scripts> 
+         <OnLoad>
+            bcAM_OnLoad();
+         </OnLoad>
+         <OnEvent>
+         	bcAM_OnEvent();
+         </OnEvent>
+         <OnUpdate>
+         	bcAM_OnUpdate(arg1);
+         </OnUpdate>
+      </Scripts>
+   </Frame>
+	<Frame name="bcAM_IconFrame" enableMouse="true" hidden="true" parent="Minimap" frameStrata="MEDIUM">
+		<Size>
+			<AbsDimension x="33" y="33"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="bcAM_IconTexture" file="Interface\Icons\Ability_Physical_Taunt">
+					<Size>
+						<AbsDimension x="26" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				bcAM_IconFrameOnEnter();
+			</OnEnter>
+			<OnMouseUp>
+				if ( arg1 == "RightButton" ) then
+					-- do nothing, for now
+				else
+					bcAM_IconFrameOnClick();
+				end
+			</OnMouseUp> 
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Button name="bcAM_PopupButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="64" y="12"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				bcAM_ButtonClick();
+			</OnClick>
+		</Scripts>
+		<NormalText inherits="GameFontNormal"/>
+		<HighlightText inherits="GameFontHighlight"/>
+		<DisabledText inherits="GameFontDisable"/>
+	</Button>
+	<Frame name="bcAM_Popup" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Frames>
+			<Button name="bcAM_TitleButton" inherits="bcAM_PopupButtonTemplate" text="BCAM_TEXT_TITLE_BUTTON">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetWidth(this:GetTextWidth() + 2 * BCAM_BORDER_WIDTH);
+					</OnLoad>
+					<OnClick>
+						bcAM_ShowOptions();
+					</OnClick>
+				</Scripts>
+				<NormalText inherits="GameFontGreen"/>
+				<HighlightText inherits="GameFontRed"/>
+				<DisabledText inherits="GameFontDisable"/>
+			</Button>
+			<Button name="bcAM_PopupButton1" inherits="bcAM_PopupButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_TitleButton" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton2" inherits="bcAM_PopupButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton3" inherits="bcAM_PopupButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton4" inherits="bcAM_PopupButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton5" inherits="bcAM_PopupButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton6" inherits="bcAM_PopupButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton7" inherits="bcAM_PopupButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton8" inherits="bcAM_PopupButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton9" inherits="bcAM_PopupButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton10" inherits="bcAM_PopupButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton9" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton11" inherits="bcAM_PopupButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton10" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="bcAM_PopupButton12" inherits="bcAM_PopupButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="bcAM_PopupButton11" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnUpdate>
+				--bcAM_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>		
+	</Frame>
+	<Frame name="bcAM_Options" toplevel="true" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="415" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<TitleRegion setAllPoints="true"/>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="375" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="1" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="BCAM_TEXT_CONFIG_TITLE" nonspacewrap="true">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset>
+								<AbsDimension x="0" y="-13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="bcAM_CheckShowOnMouse" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_SHOWONMOUSE);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_ShowOnMouse = 1;
+						else
+							bcAM_ShowOnMouse = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckShowOnClick" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="bcAM_CheckShowOnMouse" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_SHOWONCLICK);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_ShowOnClick = 1;
+						else
+							bcAM_ShowOnClick = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckShowOnButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="bcAM_CheckShowOnClick" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_SHOWONBUTTON);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_ShowOnButton = 1;
+						else
+							bcAM_ShowOnButton = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckHideOnMouse" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="210" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_HIDEONMOUSE);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_HideOnMouse = 1;
+						else
+							bcAM_HideOnMouse = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckHideOnClick" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="bcAM_CheckHideOnMouse" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_HIDEONCLICK);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_HideOnClick = 1;
+						else
+							bcAM_HideOnClick = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckHideOnButton" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="bcAM_CheckHideOnClick" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_HIDEONBUTTON);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_HideOnButton = 1;
+						else
+							bcAM_HideOnButton = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckHideOnCast" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="bcAM_CheckHideOnButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_HIDEONCAST);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_HideOnCast = 1;
+						else
+							bcAM_HideOnCast = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="bcAM_SliderPosition" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="325" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relative="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-175"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_POSITION);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 360);
+						this:SetValueStep(1);
+						this.tooltipText = BCAM_TEXT_POSITION_TIP;
+					</OnLoad>
+					<OnShow>
+						if (bcAM_Position) then
+							this:SetValue(bcAM_Position);
+						end
+					</OnShow>
+					<OnValueChanged>
+						bcAM_Position = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_POSITION.." - "..this:GetValue().."\194\176");
+						bcAM_IconFrame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - (80 * cos(this:GetValue())), (80 * sin(this:GetValue())) - 52);
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<CheckButton name="bcAM_CheckBlinkOnInactive" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-210"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_BLINKONINACTIVE);
+						OptionsFrame_DisableCheckBox(this);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_BlinkOnInactive = 1;
+						else
+							bcAM_BlinkOnInactive = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="bcAM_CheckHideWhileDead" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="210" y="-210"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_HIDEWHILEDEAD);
+					</OnLoad>
+					<OnClick>
+						if (this:GetChecked()) then
+							bcAM_HideWhileDead = 1;
+						else
+							bcAM_HideWhileDead = 0;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Slider name="bcAM_SliderBlinkDuration" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="125" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relative="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="25" y="-260"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_BLINKDURATION);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0.1, 2.0);
+						this:SetValueStep(0.1);
+						this.tooltipText = BCAM_TEXT_BLINKDURATION_TIP;
+						OptionsFrame_DisableSlider(this);
+					</OnLoad>
+					<OnShow>
+						if (bcAM_BlinkDuration) then
+							this:SetValue(bcAM_BlinkDuration);
+						end
+					</OnShow>
+					<OnValueChanged>
+						bcAM_BlinkDuration = tonumber(format("%.1f", this:GetValue()));
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_BLINKDURATION.." - "..format("%.1f", bcAM_BlinkDuration).." sec");
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider name="bcAM_SliderBlinkDelay" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="125" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relative="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="25" y="-290"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_BLINKDELAY);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0.1, 10.0);
+						this:SetValueStep(0.1);
+						this.tooltipText = BCAM_TEXT_BLINKDELAY_TIP;
+						OptionsFrame_DisableSlider(this);
+					</OnLoad>
+					<OnShow>
+						if (bcAM_BlinkDelay) then
+							this:SetValue(bcAM_BlinkDelay);
+						end
+					</OnShow>
+					<OnValueChanged>
+						bcAM_BlinkDelay = tonumber(format("%.1f", this:GetValue()));
+						getglobal(this:GetName().."Text"):SetText(BCAM_TEXT_BLINKDELAY.." - "..format("%.1f", bcAM_BlinkDelay).." sec");
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Button name="bcAM_CloseButton" text="CLOSE" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="100" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						bcAM_HideOptions();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+		</Scripts>		
+	</Frame>
+</Ui>

@@ -1,0 +1,355 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+	<Frame name="NecrosisGraphOptionMenu" frameStrata="DIALOG" movable="false" enableMouse="true" parent="NecrosisGeneralFrame">
+		<Size>
+			<AbsDimension x="350" y="452"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="NecrosisGeneralFrame"/>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="35" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="ARTWORK">	
+				<FontString name="NecrosisShowTrance_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-40"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisIconsLock_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-80"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisLock_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-100"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisBuffMenu_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisPetMenu_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="NecrosisCurseMenu_Option" inherits="GameFontNormalSmall">
+					<Color r="1.0" g="1.0" b="1.0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+							<Offset>
+								<AbsDimension x="60" y="-180"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Slider name="NecrosisButtonRotate_Slider" inherits="OptionsSliderTemplate" minValue="0" maxValue="360" valueStep="18" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this:GetValue());
+					</OnEnter>
+					<OnValueChanged>
+						NecrosisConfig.NecrosisAngle = this:GetValue();
+						local x, y = NecrosisButton:GetCenter();
+						GameTooltip:SetText(this:GetValue());
+						Necrosis_UpdateButtonsScale();
+					</OnValueChanged>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Slider name="NecrosisButtonScale_Slider" inherits="OptionsSliderTemplate" minValue="50" maxValue="150" valueStep="5" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>	
+					<OnEnter>
+						NBx, NBy = NecrosisButton:GetCenter();
+						NBx = NBx * (NecrosisConfig.NecrosisButtonScale / 100);
+						NBy = NBy * (NecrosisConfig.NecrosisButtonScale / 100);
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this:GetValue().." %");
+					</OnEnter>
+					<OnValueChanged>
+						if this:GetValue() ~= NecrosisConfig.NecrosisButtonScale then
+							NecrosisButton:ClearAllPoints();
+							GameTooltip:SetText(this:GetValue().." %");
+							NecrosisConfig.NecrosisButtonScale = this:GetValue();
+							NecrosisButton:SetPoint("CENTER", "UIParent", "BOTTOMLEFT", NBx / (NecrosisConfig.NecrosisButtonScale / 100), NBy / (NecrosisConfig.NecrosisButtonScale / 100));
+							NecrosisButton:SetScale(NecrosisConfig.NecrosisButtonScale / 100);
+							Necrosis_UpdateButtonsScale();
+						end
+					</OnValueChanged>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<Slider name="ShadowTranceScale_Slider" inherits="OptionsSliderTemplate" minValue="50" maxValue="150" valueStep="5" virtual="true">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						STx, STy = NecrosisShadowTranceButton:GetCenter();
+						STx = STx * (NecrosisConfig.ShadowTranceScale / 100);
+						STy = STy * (NecrosisConfig.ShadowTranceScale / 100);
+						AFx, AFy = NecrosisAntiFearButton:GetCenter();
+						AFx = AFx * (NecrosisConfig.ShadowTranceScale / 100);
+						AFy = AFy * (NecrosisConfig.ShadowTranceScale / 100);
+						ShowUIPanel(NecrosisShadowTranceButton);
+						ShowUIPanel(NecrosisAntiFearButton);
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this:GetValue().."%");
+					</OnEnter>
+					<OnValueChanged>
+						if this:GetValue() ~= NecrosisConfig.ShadowTranceScale then
+							GameTooltip:SetText(this:GetValue().."%");
+							NecrosisConfig.ShadowTranceScale = this:GetValue();
+							NecrosisShadowTranceButton:ClearAllPoints();
+							NecrosisShadowTranceButton:SetPoint("CENTER", "UIParent", "BOTTOMLEFT", STx / (NecrosisConfig.ShadowTranceScale / 100), STy / (NecrosisConfig.ShadowTranceScale / 100));
+							NecrosisShadowTranceButton:SetScale(NecrosisConfig.ShadowTranceScale / 100);
+							NecrosisAntiFearButton:ClearAllPoints();
+							NecrosisAntiFearButton:SetPoint("CENTER", "UIParent", "BOTTOMLEFT", AFx / (NecrosisConfig.ShadowTranceScale / 100), AFy / (NecrosisConfig.ShadowTranceScale / 100));
+							NecrosisAntiFearButton:SetScale(NecrosisConfig.ShadowTranceScale / 100);
+						end
+					</OnValueChanged>
+					<OnLeave>
+						if not NecrosisShowTrance_Button:GetChecked() then
+							HideUIPanel(NecrosisShadowTranceButton);
+							HideUIPanel(NecrosisAntiFearButton);
+						end
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Slider>
+			<CheckButton name="NecrosisShowTrance_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							ShowUIPanel(NecrosisShadowTranceButton);
+							ShowUIPanel(NecrosisAntiFearButton);
+							NecrosisShadowTranceButton:RegisterForDrag("LeftButton")
+							NecrosisAntiFearButton:RegisterForDrag("LeftButton")
+						else
+							HideUIPanel(NecrosisShadowTranceButton);
+							HideUIPanel(NecrosisAntiFearButton);
+							NecrosisShadowTranceButton:RegisterForDrag("");
+							NecrosisAntiFearButton:RegisterForDrag("");
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="NecrosisIconsLock_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.NecrosisLockServ = true;
+							Necrosis_ClearAllPoints();
+							Necrosis_UpdateButtonsScale();
+							Necrosis_NoDrag();
+							if not NecrosisConfig.NoDragAll then
+								NecrosisButton:RegisterForDrag("LeftButton");
+								NecrosisSpellTimerButton:RegisterForDrag("LeftButton");
+							end
+						else
+							NecrosisConfig.NecrosisLockServ = false;
+							Necrosis_ClearAllPoints();
+							NecrosisFirestoneButton:SetPoint("CENTER", "UIParent", "CENTER", -121,-100);
+							NecrosisSpellstoneButton:SetPoint("CENTER", "UIParent", "CENTER", -87,-100);
+							NecrosisHealthstoneButton:SetPoint("CENTER", "UIParent", "CENTER", -53,-100);
+							NecrosisSoulstoneButton:SetPoint("CENTER", "UIParent", "CENTER", -17,-100);
+							NecrosisBuffMenuButton:SetPoint("CENTER", "UIParent", "CENTER", 17,-100);
+							NecrosisMountButton:SetPoint("CENTER", "UIParent", "CENTER", 53,-100);
+							NecrosisPetMenuButton:SetPoint("CENTER", "UIParent", "CENTER", 87,-100);
+							NecrosisCurseMenuButton:SetPoint("CENTER", "UIParent", "CENTER", 121,-100);
+							Necrosis_Drag();
+							NecrosisConfig.NoDragAll = false;
+							NecrosisLock_Button:SetChecked(false);
+							NecrosisButton:RegisterForDrag("LeftButton");
+							NecrosisSpellTimerButton:RegisterForDrag("LeftButton");
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="NecrosisLock_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-95"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							Necrosis_NoDrag();
+							NecrosisButton:RegisterForDrag("");
+							NecrosisSpellTimerButton:RegisterForDrag("");
+							NecrosisConfig.NoDragAll = true;
+						else
+							if not NecrosisConfig.NecrosisLockServ then
+								Necrosis_Drag();
+							end
+							NecrosisButton:RegisterForDrag("LeftButton");
+							NecrosisSpellTimerButton:RegisterForDrag("LeftButton");
+							NecrosisConfig.NoDragAll = false;
+						end
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="NecrosisBuffMenu_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-135"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.BuffMenuPos = -34;
+						else
+							NecrosisConfig.BuffMenuPos = 34;
+						end
+						Necrosis_CreateMenu();							
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="NecrosisPetMenu_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-155"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.PetMenuPos = -34;
+						else
+							NecrosisConfig.PetMenuPos = 34;
+						end
+						Necrosis_CreateMenu();						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+						<CheckButton name="NecrosisCurseMenu_Button" enableMouse="true" inherits="UICheckButtonTemplate" checked="false">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="NecrosisGraphOptionMenu" relativeFrom="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-175"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if (this:GetChecked()) then
+							NecrosisConfig.CurseMenuPos = -34;
+						else
+							NecrosisConfig.CurseMenuPos = 34;
+						end
+						Necrosis_CreateMenu();						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+     		<Scripts>
+        		<OnLoad>
+				HideUIPanel(NecrosisGraphOptionMenu);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

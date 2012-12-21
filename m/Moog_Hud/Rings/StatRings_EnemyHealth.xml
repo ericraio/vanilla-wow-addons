@@ -1,0 +1,79 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+	<Frame name="StatRingsEnemyHealth" parent="UIParent" inherits="StatRingsRingTemplate">
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="StatRingsHealth">
+				<Offset>
+					<AbsDimension x="-15" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				StatRings_RegisterRing(this, "Enemy Health");
+      			StatRingsRingTemplate_OnLoad();
+      			
+				this:SetAlpha(0.1);
+        		
+				this:RegisterEvent("PLAYER_ENTERING_WORLD");
+				this:RegisterEvent("UNIT_HEALTH");
+				this:RegisterEvent("UNIT_MAXHEALTH");
+				this:RegisterEvent("PLAYER_TARGET_CHANGED");
+    			
+				this:UpdateColor({["r"] = 1, ["g"] = 0, ["b"] = 0});
+				if not UnitExists("target") then
+					this:SetMax(100);
+					this:SetValue(0);
+				else
+					this:SetMax(UnitHealthMax("target"));
+					this:SetValue(UnitHealth("target"));
+				end
+
+				function this:UpdateAlpha()
+					if this.startValue &lt; this.maxValue then
+						StatRingsTest_SetAlpha(self, 0.6);
+					elseif this.startValue == this.maxValue then
+						StatRingsTest_SetAlpha(self, 0.05);
+					end
+				end
+				this:AddUpdateFunction(this.UpdateAlpha);
+			</OnLoad>
+			<OnEvent>
+				if (event == "PLAYER_ENTERING_WORLD") then
+					this:UpdateColor({["r"] = 1, ["g"] = 0, ["b"] = 0});
+					this:SetValue(UnitHealth("target"));
+					return;
+				elseif event == "PLAYER_TARGET_CHANGED" then
+					if (UnitIsTapped("target") and not UnitIsTappedByPlayer("target")) then
+						this:UpdateColor({["r"] = 0.5, ["g"] = 0.5, ["b"] = 0.5});
+					else
+						this:UpdateColor({["r"] = 1, ["g"] = 0, ["b"] = 0});
+					end
+					StatRingsTest_SetAlpha(this, 0.6, 1);
+					this.alphaState = -1;
+					if not UnitExists("target") then
+						this:SetMax(100);
+						this:SetValue(0);
+						this.startValue = 0;
+					else
+						this:SetMax(UnitHealthMax("target"));
+						this:SetValue(UnitHealth("target"));
+					end
+				elseif (event == "UNIT_MAXHEALTH" and arg1 == "target") then
+					local max = UnitHealthMax("target");
+					this:SetMax(max);
+				elseif (event == "UNIT_HEALTH" and arg1 == "target") then
+					if (UnitIsTapped("target") and not UnitIsTappedByPlayer("target")) then
+						this:UpdateColor({["r"] = 0.5, ["g"] = 0.5, ["b"] = 0.5});
+					end
+					if(UnitIsDead("target")) then
+						this:SetValue(0);
+					else
+						this:SetValue(UnitHealth("target"));
+					end
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

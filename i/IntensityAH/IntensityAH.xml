@@ -1,0 +1,925 @@
+<?xml version="1.0"?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ file:///c:/Program%20Files/World%20of%20Warcraft/Interface/FrameXML/UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="IntensityAH.lua"/>
+	<Button name="IMA_AuctionButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="37" y="37"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Buttons\UI-Slot-Background">
+					<Size>
+						<AbsDimension x="39" y="39"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-2" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.640625" top="0" bottom="0.640625"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BORDER">
+				<Texture name="$parentIconTexture"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>this:RegisterForDrag("LeftButton");</OnLoad>
+			<OnReceiveDrag>IMA_ItemButton_OnClick();</OnReceiveDrag>
+			<OnDragStart>IMA_ItemButton_OnClick();</OnDragStart>
+			<OnClick>IMA_ItemButton_OnClick();</OnClick>
+			<OnEnter>GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				if ( this.item and this.bag ) then
+					GameTooltip:SetBagItem(this.bag,this.item)
+				else
+					GameTooltip:SetText(IMA_MOUSEOVER_TEXT, 1.0, 1.0, 1.0);
+				end</OnEnter>
+			<OnLeave>GameTooltip:Hide();</OnLeave>
+		</Scripts>
+		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+	</Button>
+	<Frame name="IMA_FrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="265" y="55"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentCheckButton" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="26" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="-8" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Button name="$parentItemButton" inherits="IMA_AuctionButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentCheckButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Frame name="$parentStartPrice" inherits="MoneyInputFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItemButton" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="8" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>MoneyInputFrame_SetOnvalueChangedFunc(this, IMA_AuctionsFrameAuctions_ValidateAuction);</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentBuyoutPrice" inherits="MoneyInputFrameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentStartPrice" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>MoneyInputFrame_SetOnvalueChangedFunc(this, IMA_AuctionsFrameAuctions_ValidateAuction);</OnLoad>
+				</Scripts>
+			</Frame>
+			<CheckButton name="$parentLongAuction" inherits="SendMailRadioButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentBuyoutPrice" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-32" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(this:GetName().."Text"):SetText("24");</OnLoad>
+					<OnClick>IMA_AuctionsRadioButton_OnClick(this:GetParent():GetID(),this:GetID())</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentMediumAuction" inherits="SendMailRadioButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentLongAuction" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(this:GetName().."Text"):SetText("8");</OnLoad>
+					<OnClick>IMA_AuctionsRadioButton_OnClick(this:GetParent():GetID(),this:GetID())</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentShortAuction" inherits="SendMailRadioButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentMediumAuction" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(this:GetName().."Text"):SetText("2");</OnLoad>
+					<OnClick>IMA_AuctionsRadioButton_OnClick(this:GetParent():GetID(),this:GetID())</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Frame name="$parentDepositCharge" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentShortAuction" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>this.small = 1;this.staticMoney=0;MoneyFrame_SetType("STATIC");</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="IMA_AuctionFrameMassAuction" parent="AuctionFrame" hidden="true">
+		<Size>
+			<AbsDimension x="758" y="447"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="IMA_AuctionsTitle" inherits="GameFontNormal" text="IMA_IGORS_MASS_AUCTION">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="IMA_AuctionsCloseButton" inherits="UIPanelButtonTemplate" text="CLOSE">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="66" y="14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>HideUIPanel(this:GetParent():GetParent());</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="IMA_AuctionsClearButton" inherits="UIPanelButtonTemplate" text="IMA_CLEAR">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="IMA_AuctionsCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>IMA_ClearItems();</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="IMA_AuctionsSubmitButton" inherits="UIPanelButtonTemplate" text="SUBMIT">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="IMA_AuctionsClearButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>IMA_AcceptSendFrame:Show();</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="IMA_SetAllPricesButton" inherits="UIPanelButtonTemplate" text="IMA_SET_ALL_PRICES">
+				<Size>
+					<AbsDimension x="120" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="40" y="-46"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>IMA_SetAllPricesButton_OnClick();</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="IMA_PriceSchemeDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="65" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontHighlightSmall" text="IMA_SET_PRICES_WITH">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>IMA_PriceSchemeDropDown_OnLoad();</OnLoad>
+					<OnShow>IMA_PriceSchemeDropDown_OnShow();</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="IMA_MultiplierFrame" hidden="true">
+				<Size>
+					<AbsDimension x="414" y="60"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="216" y="-35"/>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<CheckButton name="$parentPriceCheckButton" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<EditBox name="$parentPriceMultiplier" letters="4" historyLines="0" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="42" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentPriceCheckButton">
+								<Offset>
+									<AbsDimension x="106" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontHighlightSmall" text="Set Start Price %">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString inherits="GameFontHighlightSmall" text="of Base Price">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-5" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset>
+												<AbsDimension x="-10" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>this:ClearFocus();</OnEscapePressed>
+							<OnEditFocusLost>this:HighlightText(0, 0);</OnEditFocusLost>
+							<OnEditFocusGained>this:HighlightText();</OnEditFocusGained>
+						</Scripts>
+						<FontString inherits="GameFontHighlightSmall"/>
+					</EditBox>
+					<CheckButton name="$parentBuyoutCheckButton" inherits="OptionsCheckButtonTemplate">
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentPriceCheckButton">
+								<Offset>
+									<AbsDimension x="0" y="8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</CheckButton>
+					<EditBox name="$parentBuyoutMultiplier" letters="4" historyLines="0" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="42" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBuyoutCheckButton">
+								<Offset>
+									<AbsDimension x="106" y="1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontHighlightSmall" text="Set Buyout %">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString inherits="GameFontHighlightSmall" text="of Start Price">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-5" y="-2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset>
+												<AbsDimension x="-10" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="16"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>this:ClearFocus();</OnEscapePressed>
+							<OnEditFocusLost>this:HighlightText(0, 0);</OnEditFocusLost>
+							<OnEditFocusGained>this:HighlightText();</OnEditFocusGained>
+						</Scripts>
+						<FontString inherits="GameFontHighlightSmall"/>
+					</EditBox>
+				</Frames>
+			</Frame>
+			<Frame name="IMA_AllSamePriceFrame" hidden="true">
+				<Size>
+					<AbsDimension x="414" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="222" y="-49"/>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Frame name="$parentStartPrice" inherits="MoneyInputFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontHighlightSmall" text="IMA_START_PRICE">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-4" y="4"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentBuyoutPrice" inherits="MoneyInputFrameTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentStartPrice" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontHighlightSmall" text="IMA_BUYOUT_PRICE">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-4" y="4"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<EditBox name="$parentStackSize" letters="3" historyLines="0" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="37" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString inherits="GameFontHighlightSmall" text="IMA_FOR">
+									<Anchors>
+										<Anchor point="RIGHT" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString inherits="GameFontHighlightSmall" text="IMA_ITEMS">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="-8" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-5" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset>
+												<AbsDimension x="-10" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEscapePressed>this:ClearFocus();</OnEscapePressed>
+							<OnEditFocusLost>this:HighlightText(0, 0);</OnEditFocusLost>
+							<OnEditFocusGained>this:HighlightText();</OnEditFocusGained>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+				</Frames>
+			</Frame>
+			<Frame name="IMA_EasyAuctionFrame" hidden="true">
+				<Size>
+					<AbsDimension x="176" y="38"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_PriceSchemeDropDown" relativePoint="LEFT"/>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item1" inherits="IMA_FrameTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="27" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item2" inherits="IMA_FrameTemplate" id="2">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item3" inherits="IMA_FrameTemplate" id="3">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item4" inherits="IMA_FrameTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="IMA_Item1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item5" inherits="IMA_FrameTemplate" id="5">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item4" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item6" inherits="IMA_FrameTemplate" id="6">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item5" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item7" inherits="IMA_FrameTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="IMA_Item4" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item8" inherits="IMA_FrameTemplate" id="8">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item7" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item9" inherits="IMA_FrameTemplate" id="9">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item8" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item10" inherits="IMA_FrameTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="IMA_Item7" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item11" inherits="IMA_FrameTemplate" id="11">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item10" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item12" inherits="IMA_FrameTemplate" id="12">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item11" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item13" inherits="IMA_FrameTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="IMA_Item10" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item14" inherits="IMA_FrameTemplate" id="14">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item13" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item15" inherits="IMA_FrameTemplate" id="15">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item14" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item16" inherits="IMA_FrameTemplate" id="16">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="IMA_Item13" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item17" inherits="IMA_FrameTemplate" id="17">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item16" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="IMA_Item18" inherits="IMA_FrameTemplate" id="18">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="IMA_Item17" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>IMA_AuctionFrameMassAuction_OnLoad();</OnLoad>
+			<OnEvent>IMA_OnEvent();</OnEvent>
+			<OnShow>IMA_AuctionFrameMassAuction_OnShow();</OnShow>
+		</Scripts>
+	</Frame>
+
+	<!-- You either have to name it their way, or unhook Bliz fns with replacements, or maybe rename it -->
+	<Button name="AuctionFrameTab4" inherits="AuctionTabTemplate" id="4" parent="AuctionFrame" text="IMA_MASS_AUCTION">
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="AuctionFrameTab3" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="-8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>PanelTemplates_SetNumTabs(AuctionFrame, 4);</OnLoad>
+		</Scripts>
+	</Button>
+	<Frame name="IMA_AcceptSendFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="IMA_AuctionFrameMassAuction">
+		<Size>
+			<AbsDimension x="400" y="150"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="IMA_MASS_AUCTION">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo" justifyV="TOP" inherits="GameFontNormal" text="IMA_SENDINFO">
+					<Size>
+						<AbsDimension x="350" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-78"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfoString" justifyV="TOP" inherits="GameFontNormal" text="IMA_SENDINFO2">
+					<Size>
+						<AbsDimension x="350" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-30"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfoItems" justifyV="TOP" inherits="GameFontNormal" text="">
+					<Size>
+						<AbsDimension x="350" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentInfoString" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentInfo">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+						MoneyFrame_Update(this:GetName(), 0);</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parentSubmitButton" hidden="false" inherits="GameMenuButtonTemplate" text="SUBMIT">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-32" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>IMA_AcceptSendFrameSubmitButton_OnClick();</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelButton" hidden="false" inherits="GameMenuButtonTemplate" text="CANCEL">
+				<Size>
+					<AbsDimension x="60" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="32" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>IMA_AcceptSendFrameCancelButton_OnClick();</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>IMA_AcceptSendFrame_OnShow();	
+				PlaySound("AuctionWindowOpen");</OnShow>
+			<OnHide>PlaySound("AuctionWindowClose");</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="IMA_GlobalFrame" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>IMA_ProcessQueue(arg1);</OnUpdate>
+			<OnLoad>this.queue = { };
+				this.update = 0;
+				this.total = 0;
+				this.sent = 0;
+				this.sendmail = 0;
+				this.latency = 2.25;</OnLoad>
+			<OnEvent>IMA_AddSubject();</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

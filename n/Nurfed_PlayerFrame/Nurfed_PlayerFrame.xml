@@ -1,0 +1,252 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<!--
+	//////////////////////////////////////////////
+	//
+	//		Nurfed_PlayerFrame.xml
+	//		NurfedVersion++2004.10.14++
+	//
+	//		Moves the player frame to the bottom
+	//		left corner of the screen.
+	//		Adds health, mana, and experience
+	//		text, as well as hit point percentage
+	//		and rested experience bonus to the right
+	//		and below the default player frame.
+	//		Adds graphical framework to accomodate
+	//		the textual displays.
+	//		Moves the right click player window
+	//		to be viewable with the new player frame
+	//		placement.
+	//
+	//////////////////////////////////////////////
+	-->
+	<!-- Script file with text display functions and functions to move player frame and right click menu -->
+	<Script file="Nurfed_PlayerFrame.lua"/>
+	<!-- Frame displays hp, mana, and exp text, and graphic overlays, and runs needed scripting -->
+	<Frame name="Nurfed_PlayerFrame" parent="PlayerFrame">
+		<Scripts>
+			<OnLoad>
+				<!-- Moving default player frame, registering for events -->
+				Nurfed_PlayerFrameOnLoad();
+				TargetFrame:ClearAllPoints();TargetFrame:SetPoint("LEFT", "PlayerFrame", "RIGHT", 100, 0);
+			</OnLoad>
+			<OnEvent>
+				<!-- Updating display values and moving target frame if pet frame is visible -->
+				Nurfed_PlayerFrameOnEvent(event);
+			</OnEvent>
+		</Scripts>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<!-- Dark shading for right side graphic, under health and mana -->
+				<Texture name="Nurfed_PlayerFrameRightBackground">
+					<Size>
+						<AbsDimension x="81" y="42"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="PlayerFrame">
+							<Offset>
+								<AbsDimension x="75" y="-23"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame setAllPoints="true">
+				<Frames>
+					<Frame setAllPoints="true">
+						<Layers>
+							<Layer level="OVERLAY">
+								<!-- Overlay graphic to frame health, hp percentage, and mana text -->
+								<Texture name="Nurfed_PlayerFrameRight" file="Interface\AddOns\Nurfed_PlayerFrame\Nurfed_PlayerFrameRight">
+									<Size>
+										<AbsDimension x="128" y="128"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="PlayerFrame" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="220" y="-19"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+								<Texture name="Nurfed_PlayerFrameBottom" file="Interface\AddOns\Nurfed_PlayerFrame\Nurfed_PlayerFrameBottom.tga">
+									<Size>
+										<AbsDimension x="256" y="128"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="PlayerFrame" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="77" y="-60"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+								<!-- Player health text, 1234 / 1234 -->
+								<FontString name="Nurfed_PlayerHealthText" inherits="GameFontNormalSmall" text="Loading...">
+									<Size>
+										<AbsDimension x="100" y="10" />
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="PlayerFrame" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="215" y="-33"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<!-- Player health percentage, 100% -->
+								<FontString name="Nurfed_PlayerHealthPercent" inherits="GameFontNormalSmall" text="Loading...">
+									<Size>
+										<AbsDimension x="100" y="10" />
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="PlayerFrame" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="215" y="-47"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<!-- Player mana text, 1234 / 1234 -->
+								<FontString name="Nurfed_PlayerManaText" inherits="GameFontNormalSmall" text="Loading...">
+									<Size>
+										<AbsDimension x="100" y="10" />
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="PlayerFrame" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="215" y="-58"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<!-- Player experience, CurrentXP / MaxXP (+RestedXPBonus) -->
+								<FontString name="Nurfed_ExpAmount" inherits="GameFontNormalSmall" text="Loading...">
+									<Size>
+										<AbsDimension x="150" y="10" />
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativeTo="Nurfed_PlayerFrameBottom" relativePoint="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="53"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1" g="1" b="0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<StatusBar name="Nurfed_PlayerFrameExpBar" inherits="TextStatusBar">
+						<Size>
+							<AbsDimension x="230" y="12"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="Nurfed_PlayerFrameBottom" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								Nurfed_PlayerFrameExpBarOnLoad();
+							</OnLoad>
+							<OnEvent>
+								Nurfed_PlayerFrameExpBarOnEvent(event);
+							</OnEvent>
+						</Scripts>
+						<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+						<BarColor r="0.58" g="0.0" b="0.55"/>
+						<Frames>
+							<Frame name="Nurfed_PlayerFrameExpBarBackground">
+								<Scripts>
+									<OnLoad>
+										this:SetFrameLevel("1");
+									</OnLoad>
+								</Scripts>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<!-- Dark shading for the bottom graphic, under experince -->
+										<Texture name="Nurfed_PlayerFrameLowerBackground1">
+											<Size>
+												<AbsDimension x="214" y="12"/>
+											</Size>
+											<Anchors>
+												<Anchor point="BOTTOM" relativeTo="PlayerFrame">
+													<Offset>
+														<AbsDimension x="84" y="23"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<Color r="0" g="0" b="0" a="0.5"/>
+										</Texture>
+										<Texture name="Nurfed_PlayerFrameLowerBackground2">
+											<Size>
+												<AbsDimension x="10" y="6"/>
+											</Size>
+											<Anchors>
+												<Anchor point="BOTTOM" relativeTo="PlayerFrame">
+													<Offset>
+														<AbsDimension x="-28" y="22"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<Color r="0" g="0" b="0" a="0.5"/>
+										</Texture>
+									</Layer>
+								</Layers>
+							</Frame>
+						</Frames>
+					</StatusBar>
+				</Frames>
+			</Frame>.
+			<!-- Transparent button frame to catch all clicks that would otherwise fall through to the default player button -->
+			<Button name="Nurfed_PlayerFrameClickCatcher" parent="Nurfed_PlayerFrame">
+				<Size>
+					<AbsDimension x="305" y="100"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PlayerFrame" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						<!-- Register for clicks -->
+						Nurfed_PlayerFrameClickCatchOnLoad();
+					</OnLoad>
+					<OnClick>
+						<!-- Handle clicks in the same way as the default window -->
+						Nurfed_PlayerFrameClickCatch(arg1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="Nurfed_PlayerFrameRestedTooltip" parent="Nurfed_PlayerFrame">
+				<Size>
+					<AbsDimension x="50" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="Nurfed_ExpAmount" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel("10");
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Total experience to be\ngained from rested state.", 1.0, 1.0, 1.0);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

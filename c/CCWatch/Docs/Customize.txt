@@ -1,0 +1,150 @@
+
+1/ Quick CCWatch insight
+
+With the addition of the "ALL TARGET", and "Last Targets" monitoring, CCWatch has a side effect change behavior.
+StunWatch originally focused on YOUR effects on your current target, trying to sort it between same target names with a specific event : UNIT_AURA.
+It means it checked for the "Texture" (that is the icon of the effect) to be present on your current target when an aura (buff/debuff) change occured on it, to avoid overlapping effect on your target if another mob with the same name was affected in the surroundings.
+CCWatch inherited this behaviour, and specialization on your CC.
+The texture compared are only the ones in your spellbook, hence if you are a warlock you won't be able to check that a druid CC effect is present on your target,
+hence letting think CCWatch that the effect is already gone, or that retargetting has occured.
+(Well in fact it's theory, because a side effect in SW code made that if the effect is supported but you don't have the skill, hence have no texture, it will be happy with a nil comparison.
+Quite a few CCWatch effects use this side effect, when the skill name is different from the effect name.
+Again, from a Rogue only point of view it was ok.)
+
+Anyway, in the two new cases, the monitoring of surrounding effects, this precise check is bypassed, as now the monitoring occurs on whatever (in case of "Last Targets" from the list of the most recent target (up to 5)).
+
+This means that in case of multiple mobs with same name, broken effects on one might break the effect the current another, because there is no way to identify a target between two of the same name (no pop ID or whatever), which SW would have obsviously used already.
+
+2/ Basic Custom effects
+
+CCWatch now has a 'learn' capability.
+Next versions might have an option for a mode with 'autolearn' new effects, that is, something that will ask you at the end of a fight if you want to add effects it seen.
+(Some kind of easy effect name and possibly duration setting. Don't know if it worth the hassle...).
+
+For now, you can with the "/ccw config" dialog use the Learn tab to change existing effects (with moderation, see below), or add new ones.
+CCWatch now has 3 effects categories :
+- CC (original one)
+- Debuff
+- Buff
+That is, 3 pack of 5 bar to place anywhere on the screen.
+
+Hence, you might add a new effect with its name, duration, type, group (ie: bar number) and diminishing return type (atm set to player only).
+You can also remove or edit effect added or already existing.
+Note that this learn interface is basic, and do not allow you advanced stuff such as different ranks handling or talent skill modification (such as increased durations).
+Its purpose is to allow you to define effects that will suit YOU.
+If you change the duration of genuine CCWatch effects relying on ranks it will just have no effect, has the duration come from a different source.
+So don't bother doing it, even if atm there is no hint in the GUI to difference them.
+
+With this you are able to define effect suiting your character, that is setting an absolute duration, whatever your rank is.
+Be careful tho, that effects are cross characters, which is a benefit for global target effect so you don't redefine them for each character you play,
+but is a pain if you want to add a skill several character share at different ranks, because every skill redefinition with override each other.
+
+If you want to add more flexible effects, you have to make it manually; here is how to do :
+
+3/ Advanced Custom Effects
+
+To add an effect, the most basic thing to do is :
+- Create a string in "localization.lua" (and/or in localization.xx.lua)
+- Copy/paste an already defined skill in "CCWatch_ConfigCC.lua"
+
+for instance, I want to add a skill "Uber stun" which have a duration of 25 seconds.
+
+CCWATCH_UBERSTUN = "Uber Stun Effect"
+
+Copy/paste this :
+CCWATCH.CCS[CCWATCH_GOUGE] = {
+	GROUP = 2,
+	ETYPE = 0,
+	LENGTH = 5.5,
+	DIMINISHES = 2,
+
+	TARGET = "",
+	PLAYER = nil,
+	TIMER_START = 0,
+	TIMER_END = 0,
+	DIMINISH = 1,
+	MONITOR = true
+}
+
+and change into :
+CCWATCH.CCS[CCWATCH_UBERSTUN] = {
+	GROUP = 2, -- Might want to change default bar used
+	ETYPE = 0,  -- Type CC (see at the begining of the file for details)
+	LENGTH = 25,	-- Duration
+	DIMINISHES = 2,
+
+	TARGET = "",
+	PLAYER = nil,
+	TIMER_START = 0,
+	TIMER_END = 0,
+	DIMINISH = 1,
+	MONITOR = true
+}
+
+And that's done.
+
+
+Now, and for the rank problem already related, there might be some typical problem at adding/changing/localizating an effect, because a talent/effet might :
+1/ have an effect string different from its name
+2/ have a duration increased by a specific talent
+3/ have several ranks
+
+If there is no 3/, the 1/ is no bother. The string in CCWatch will just be the effect name and not the skill name, as seen in the example above.
+If there is a 3/ and a 1/, then 2 strings will be needed in "localization.lua", and a rank array will need to be added in "CCWatch_Globals.lua".
+See the Hunter "Freeze Trap" (spell) and "Freeze Trap Effect" (effect string) case.
+
+In our case, say "Uber Stun" has 3 ranks of 15, 20 and 25 seconds : 
+CCWATCH_UBERSTUN_SPELL = "Uber Stun"
+CCWATCH_UBERSTUN = "Uber Stun Effect"
+
+and in CCWatch_Globals.lua :
+Copy/paste this :
+CCWATCH_SPELLS[CCWATCH_SAP] = {
+	RANKS = 3,
+	DURATION = {25, 35, 45}
+}
+
+into this :
+CCWATCH_SPELLS[CCWATCH_UBERSTUN_SPELL] = {
+	RANKS = 3,
+	DURATION = {15, 20, 25},
+	EFFECTNAME = CCWATCH_UBERSTUN	-- this line is needed for the target only mode in SW compatibility (texture comparison behavior)
+}
+
+Now, if ever there is a 2/, it is far more painful as a specific function in CCWatch.lua will be needed.
+Say we have a talent, in page 2 of or talent book, which is the 10th cell (counting talent from upper left corner),
+and that one point in this talent improve the rank by 30%, and the next one by 10% (hence giving 30, 40, 50, ...).
+Copy/Paste :
+function CCWatch_UpdateImpTrap(bPrint)
+	local talentname, texture, _, _, rank, _, _, _ = GetTalentInfo( 3, 7 );
+	if texture then
+		if rank ~= 0 then
+			if bPrint then
+				CCWatch_AddMessage(talentname.." "..CCWATCH_RANK.." "..rank.." "..CCWATCH_DETECTED);
+			end
+			CCWATCH.CCS[CCWATCH_FREEZINGTRAP].LENGTH = CCWATCH.CCS[CCWATCH_FREEZINGTRAP].LENGTH * (1 + rank * 0.15);
+		end
+	end
+end
+
+into :
+function CCWatch_UpdateImpUberStun(bPrint)
+	local talentname, texture, _, _, rank, _, _, _ = GetTalentInfo( 2, 10 );
+	if texture then
+		if rank ~= 0 then
+			if bPrint then
+				CCWatch_AddMessage(talentname.." "..CCWATCH_RANK.." "..rank.." "..CCWATCH_DETECTED);
+			end
+			CCWATCH.CCS[CCWATCH_UBERSTUN].LENGTH = CCWATCH.CCS[CCWATCH_UBERSTUNP].LENGTH * (1.20 + rank * 0.10 );
+		end
+	end
+end
+
+And you need to add a call to these functions in the CCWatch_UpdateClassSpells function in CCWatch.lua :
+
+Locate your class (if not present add the english capsed if comparison (for shaman it would be 'if eclass == "SHAMAN").
+Add the line
+	CCWatch_GetSpellRank(CCWATCH_UBERSTUN_SPELL, CCWATCH_UBERSTUN, bPrint);
+	CCWatch_UpdateImpUberStun(bPrint);
+
+Then at any update call or initialization, it will retrieve the correct rank duration, and then applies the talent modification to it.

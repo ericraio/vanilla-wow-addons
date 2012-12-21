@@ -1,0 +1,89 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RAMeters.lua"/>
+	<Script file="CT_RAMeters_Localization.lua"/>
+	<Frame name="CT_RAMetersFrame" hidden="true" movable="true" parent="UIParent">
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="125" y="50"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle" inherits="GameFontNormal" hidden="false" text="RaidStatus">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText" justifyH="CENTER" inherits="ChatFontNormal" hidden="false" text="No stats to track">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="70" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						CT_RAMeters_DropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" setAllPoints="true" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnLoad>
+				CT_RAMeters_OnLoad();
+				this.update = 2;
+			</OnLoad>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" and ( not CT_RAMenu_Options["temp"]["StatusMeters"] or not CT_RAMenu_Options["temp"]["StatusMeters"]["Lock"] ) ) then
+					this:StartMoving();
+				elseif ( arg1 == "RightButton" ) then
+					ToggleDropDownMenu(1, nil, getglobal(this:GetName() .. "DropDown"), this:GetName(), 47, 15);
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if ( arg1 == "LeftButton" ) then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+			<OnHide>
+				this:StopMovingOrSizing();
+			</OnHide>
+			<OnUpdate>
+				CT_RAMeters_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

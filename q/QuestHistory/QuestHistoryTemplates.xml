@@ -1,0 +1,208 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<!-- QuestHistory Templates -->
+	<Frame name="QuestHistoryListFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="535" y="14"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentAcceptedText" inherits="GameFontNormal" justifyH="CENTER" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="40" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTitleText" inherits="GameFontNormal" justifyH="LEFT" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="195" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentAcceptedText" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentLevelText" inherits="GameFontNormal" justifyH="CENTER" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="45" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCategoryText" inherits="GameFontNormal" justifyH="CENTER" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="150" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLevelText" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTagText" inherits="GameFontNormal" justifyH="CENTER" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="50" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCategoryText" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCompletedText" inherits="GameFontNormal" justifyH="RIGHT" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="60" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTagText" relativePoint="RIGHT"/>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentCheckMark" file="Interface\Buttons\UI-CheckBox-Check" hidden="true">
+					<Size>
+						<AbsDimension x="15" y="15"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentCompletedText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				QuestHistoryListFrame_OnClick(arg1);
+			</OnClick>
+			<OnEnter>
+				QuestHistoryListFrame_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				QuestHistoryTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Button name="QuestHistorySortButtonTemplate" inherits="UIPanelButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				QuestHistory_SortButton_OnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="QuestHistoryDetailItemTemplate" inherits="QuestItemTemplate" virtual="true">
+		<Scripts>
+			<OnEnter>
+				QuestHistoryDetailRewardItem_OnEnter();
+			</OnEnter>
+			<OnClick>
+				QuestHistoryDetailRewardItem_OnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Button name="QuestHistoryColorSwatchTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentSwatchBg">
+					<Size>
+						<AbsDimension x="14" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				QuestHistory_StatusColorType = this.status;
+				ColorPickerFrame:SetFrameLevel(this:GetFrameLevel() + 2);
+				ColorPickerOkayButton:SetFrameLevel(this:GetFrameLevel() + 3);
+				ColorPickerCancelButton:SetFrameLevel(this:GetFrameLevel() + 3);
+				UIDropDownMenuButton_OpenColorPicker(this);
+			</OnClick>
+			<OnEnter>
+				getglobal(this:GetName().."SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText(QUESTHISTORY_OPTION_TOOLTIP_SELECT_COLOR, nil, nil, nil, nil, 1);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+	</Button>
+	<EditBox name="QuestHistoryEditFrameEditBoxTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-2" y="2"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="4" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="2"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="2"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="-7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEscapePressed>
+				HideUIPanel(QuestHistoryEditFrame);
+			</OnEscapePressed>
+			<OnTabPressed>
+				QuestHistoryEditBox_OnTabPressed();
+			</OnTabPressed>
+			<OnEnterPressed>
+				QuestHistoryEditBox_OnTabPressed();
+			</OnEnterPressed>
+		</Scripts>
+		<FontString inherits="GameFontHighlightSmall"/>
+	</EditBox>
+</Ui>

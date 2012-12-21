@@ -1,0 +1,34 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RADebuffs.lua"/>
+	<Frame name="CT_RADebuffsFrame" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("SPELLCAST_FAILED");
+				this:RegisterEvent("SPELLCAST_INTERRUPTED");
+				this:RegisterEvent("SPELLCAST_STOP");
+				this:RegisterEvent("PLAYER_ENTER_COMBAT");
+				this:RegisterEvent("PLAYER_LEAVE_COMBAT");
+				CT_RADebuff_GetActionButtonCures();
+			</OnLoad>
+			<OnEvent>
+				if ( event == "SPELLCAST_FAILED" ) then
+					if ( CT_RADebuff_CastingSpell ) then
+						CT_RADebuff_Blacklist[CT_RADebuff_CastingSpell] = CT_RADebuff_BlacklistTime;
+					end
+				elseif ( event == "SPELLCAST_INTERRUPTED" ) then
+					CT_RADebuff_GlobalCD = nil;
+				elseif ( event == "SPELLCAST_STOP" ) then
+					CT_RADebuff_CastingSpell = nil;
+				elseif ( event == "PLAYER_ENTER_COMBAT" ) then
+					CT_RADebuff_InCombat = 1;
+				elseif ( event == "PLAYER_LEAVE_COMBAT" ) then
+					CT_RADebuff_InCombat = nil;
+				end
+			</OnEvent>
+			<OnUpdate>
+				CT_RADebuff_ProcessBlacklist(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+</Ui>

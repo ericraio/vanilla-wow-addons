@@ -1,0 +1,112 @@
+﻿--zhCN localization by hk2717 
+
+local L = AceLibrary("AceLocale-2.0"):new("ag_UnitFrames")
+
+L:RegisterTranslations("zhCN", function()
+    return {
+		["Fonts\\FRIZQT__.TTF"]	= "Fonts\\FZXHJW.ttf",
+		["Interface\\AddOns\\ag_UnitFrames\\fonts\\barframes.ttf"] = "Fonts\\FZXHJW.ttf",
+	
+		["addonname"]			= "ag_UnitFrames",	
+		
+		["config"]				= "设置",	
+		["configdesc"]			= "打开设置菜单",	
+
+		["reset"]				= "重置",	
+		["resetdesc"]			= "重置当前设置",	
+		
+		["player"]				= "玩家",
+		["pet"]					= "玩家宠物",
+		["party"]				= "小队",
+		["partypet"]			= "小队宠物",
+		["target"]				= "目标",
+		["targettarget"]		= "目标的目标",
+		["raid"]				= "团队",
+		["raidpet"]				= "团队宠物",
+		
+		["dead"] 				= "死亡",
+		["ghost"] 				= "灵魂",
+		["disc"] 				= "离线",
+		
+		["frame"] 				= "框体",
+		["aurasettings"] 		= "AURA设置",
+		["layoutsettings"] 		= "外观设置",
+		["unitsettings"] 		= "头像设置",
+		
+		["units"] 				= "头像",
+		["borders"] 			= "边框",
+		["barstyle"] 			= "状态条材质",
+--		["highlightselected"]	= "Hightlight Selected",
+		["targetshowhostile"]	= "敌对颜色",
+		["pvpicon"]				= "显示PvP图标",
+		["groupicon"]			= "显示队长图标",
+		["lock"]				= "锁定框体",
+		
+		["framestyle"]			= "框体布局",
+		["widthadjust"]			= "Width Adjust",
+		["aurastyle"]			= "AURA布局",
+		["aurapos"]				= "AURA位置",
+		["statustext"]			= "状态条文本",
+		["scale"]				= "缩放",
+		["longbars"]			= "延展状态条",
+		["classcolorbar"]		= "职业颜色.生命条",
+		["raidcolorname"]		= "职业颜色.名字",
+		["showcombat"]			= "显示战斗文本",
+		["aurafilter"]			= "AURA过滤",
+		["debuffcoloring"]		= "高亮显示不良效果",
+		["hidemana"]			= "隐藏法力条",
+		["hideframe"]			= "隐藏框体",
+		["showincombat"]		= "Show In-Combat Icon",
+		["showresting"]			= "Show Resting Icon",
+		["showraidicon"]		= "Show Raid Target Icon",
+		["showxp"]				= "显示经验条",
+		["raidhideparty"]		= "在团队中时隐藏框体",
+		["raidgrouping"]		= "团队头像组合",
+		
+		["bysubgroup"]			= "小队",
+		["byclass"]				= "职业",
+		["byrole"]				= "治疗/坦克/DPS",
+		["onebiggroup"]			= "全部组合",
+		["nogroup"]				= "不组合",
+
+		["partygrouping"]		= "小队头像组合",
+		["petgrouping"]			= "宠物头像组合",
+
+		["withplayer"]			= "与玩家头像组合",
+		["withoutplayer"]		= "不与玩家头像组合",		
+		
+		["oneline"]				= "单排",
+		["twolines"]			= "双排",	
+		["hide"]				= "隐藏",	
+        
+        ["UnitDesc"]			= "分别设置各个框体的属性",
+        ["BordersDesc"]			= "设置头像边框",
+        ["BarStyleDesc"]		= "设置状态条材质",
+        ["ShowPVPIconDesc"]		= "勾选则显示PVP图标",
+        ["ShowGroupIconsDesc"]	= "勾选则显示队长图标",
+        ["LockedDesc"]		    = "锁定所有框体",
+        ["FrameStyleDesc"]		= "设置框体布局方案",
+        ["StatusTextDesc"]		= "设置状态条上显示的信息文本",
+        ["ScaleDesc"]		    = "设置框体缩放比例",
+        ["widthadjustDesc"]		= "Adjust the frame width",		
+        ["ClassColorBarsDesc"]	= "勾选则以职业不同决定生命条颜色",
+        ["RaidColorNameDesc"]	= "勾选则以职业不同决定名字颜色",
+        ["ShowCombatDesc"]		= "勾选则在框体上显示战斗文本",
+        ["LongBarsDesc"]		= "勾选则状态条可延展超过框体边框",
+        ["HideManaDesc"]		= "勾选则隐藏法力条",
+        ["HideFrameDesc"]		= "勾选则隐藏整个框体",
+        ["AuraStyleDesc"]		= "设置AURA布局方案",
+        ["AuraPosDesc"] 		= "设置AURA排布位置",
+        ["DebuffColoringDesc"]	= "勾选则以不良效果种类改变框体颜色",
+        ["AuraFilterDesc"]		= "勾选则只显示你能施放或驱散的效果",
+	["ShowInCombatDesc"] = "Check to show in-combat icon",
+	["ShowRaidIconDesc"] = "Check to show raid target icon",
+	["ShowRestingDesc"] = "Check to show resting icon",
+        ["ShowXPDesc"]		    = "勾选则显示经验条",
+        ["PetGroupingDesc"]		= "设置宠物头像组合",
+        ["TargetHostileDesc"]	= "勾选则以敌对态度不同决定生命条颜色",
+        ["RaidHidePartyDesc"]	= "勾选则在团队中隐藏小队头像",
+        ["PartyGroupingDesc"]	= "设置小队头像组合",
+        ["RaidGroupingDesc"]	= "设置团队头像组合",
+    }
+end)

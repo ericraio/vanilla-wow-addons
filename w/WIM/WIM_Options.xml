@@ -1,0 +1,4362 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<Script file="WIM_Options.lua"/>
+
+	<Frame name="WIM_Options_PanelTemplate" virtual="true">
+        <Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="3" right="3" top="6" bottom="6" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="8" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="8" />
+			</EdgeSize>
+		</Backdrop>
+	</Frame>
+	
+	
+	<Frame name="WIM_Options_TitlePanelTemplate" virtual="true">
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5" />
+			</BackgroundInsets>
+				<TileSize>
+					<AbsValue val="16" />
+				</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+			<Color r="0.7529412" g="0.7529412" b="1" />
+			<BorderColor r="0.7529412" g="0.7529412" b="1" />
+		</Backdrop>
+	</Frame>
+	
+	
+	<Slider name="WIM_Options_SliderTemplate" orientation="HORIZONTAL" virtual="true" enableMouse="true">
+		<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="8"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="8"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="3" right="3" top="6" bottom="6"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTitle"  font="Fonts\FRIZQT__.TTF" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<FontString name="$parentEditBox" inherits="GameFontNormalSmall" text="Test">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="7" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentLow" inherits="GameFontHighlightSmall" text="LOW">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="2" y="3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentHigh" inherits="GameFontHighlightSmall" text="HIGH">
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<ThumbTexture name="$parentThumb" file="Interface\Buttons\UI-SliderBar-Button-Horizontal">
+			<Size>
+				<AbsDimension x="32" y="32"/>
+			</Size>
+		</ThumbTexture>
+		<Scripts>
+			<OnShow>
+				local sliderMin, sliderMax = this:GetMinMaxValues();
+				getglobal(this:GetName().."Low"):SetText(sliderMin);
+				getglobal(this:GetName().."High"):SetText(sliderMax);
+			</OnShow>
+		</Scripts>
+	</Slider>
+
+
+	<Frame name="WIM_Options_PickColorTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Frames>
+			<Button name="$parent_ColorSwatch">
+				<Size>
+					<AbsDimension x="18" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						WIM_Options_OpenColorPicker(this:GetParent());
+					</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Button name="WIM_AliasButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAlias" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="150" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				WIM_Alias_Selected = this.theAliasName;
+				WIM_AliasScrollBar_Update();
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="298" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="5" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<Button name="WIM_FilterButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="230" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentAction" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="80" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				WIM_Filter_Selected = this.theFilterName;
+				WIM_FilteringScrollBar_Update();
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="298" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="5" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<Button name="WIM_HistoryButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="300" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="200" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMessageCount" inherits="GameFontHighlightSmall" justifyH="RIGHT">
+					<Size>
+						<AbsDimension x="80" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnClick>
+				WIM_History_Selected = this.theName;
+				WIM_HistoryScrollBar_Update();
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnClick>
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="298" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="5" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+
+	<Frame name="WIM_Options" movable="true" alpha="1" enableMouse="true" toplevel="true" frameStrata="DIALOG" parent="UIParent" hidden="true"  clampedToScreen="true">
+		<Size>
+			<AbsDimension x="600" y="580" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTitleBorder" file="Interface\DialogFrame\UI-DialogBox-Header">
+				<Size>
+					<AbsDimension x="160" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="5" />
+					</Offset>
+					</Anchor>
+				</Anchors>
+				<TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+				</Texture>
+				<FontString name="$parentTitleString" font="Fonts\FRIZQT__.TTF" text="WIM Options">
+					<Size>
+						<AbsDimension x="140" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-4" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parentEnableWIM">
+				<Size>
+					<AbsDimension x="25" y="25" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-15" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Enable WIM">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="1" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						WIM_Options_EnableWIMClicked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<!-- Display Settings Frame -->
+			<Frame name="$parentDisplay" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="193" y="530" />
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset>
+							<AbsDimension x="-16" y="0" />
+						</Offset>
+					</Anchor>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-40" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- Title Frame -->
+					<Frame name="$parentCaption" inherits="WIM_Options_TitlePanelTemplate">
+						<Size>
+							<AbsDimension x="193" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Display Options">
+									<Anchors>
+										<Anchor point="TOP">
+											<Offset>
+												<AbsDimension x="0" y="-8" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="1" b="1" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<!-- End Title Frame -->
+					<!-- Color Swatches -->
+					<Frame name="$parentIncomingWisp" inherits="WIM_Options_PickColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="15" y="-40" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Incoming Whispers">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentOutgoingWisp" inherits="WIM_Options_PickColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentIncomingWisp" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Outgoing Whispers">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentSystemMessage" inherits="WIM_Options_PickColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentOutgoingWisp" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-15" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="System Messages">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentErrorMessage" inherits="WIM_Options_PickColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSystemMessage" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-3" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Error Messages">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Frame name="$parentWebAddress" inherits="WIM_Options_PickColorTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentErrorMessage" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-15" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Web Address Link">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<!-- End Color Swatches -->
+					<CheckButton name="$parentShowShortcutBar">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentWebAddress" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-3" y="-20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show shortcut bar.">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_ShowShortcutBarClicked();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText("This settings limits the\nwindow's minimum height.");
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowTimeStamps">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentShowShortcutBar" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show timestamps.">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_ShowTimeStampsClicked();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowCharacterInfo">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentShowTimeStamps" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show character info:">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_CharacerInfoClicked();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText("Changes will be made to new\nmessage windows only.\n|cffffffff(Requires background /who query.)|r");
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowCharacterInfoClassIcon">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentShowCharacterInfo" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="25" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Class Icons">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_CharacerInfoClassIconClicked();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText("Changes will be made to new\nmessage windows only.");
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>					
+					<CheckButton name="$parentShowCharacterInfoClassColor">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentShowCharacterInfoClassIcon" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Class Colors">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_CharacerInfoClassColorClicked();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText("Changes will be made to new\nmessage windows only.");
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowCharacterInfoDetails">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentShowCharacterInfoClassColor" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Character Details">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_CharacerInfoDetailsClicked();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText("Changes will be made to new\nmessage windows only.");
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					
+					
+					<!-- Font Size Slider -->
+					<Slider name="$parentFontSize" inherits="WIM_Options_SliderTemplate" minValue="10" maxValue="20" valueStep="1">
+						<Size>
+							<AbsDimension x="140" y="17"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="WIM_OptionsDisplay" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="15" y="150" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								WIM_Data.fontSize = this:GetValue();
+								WIM_SetAllWindowProps();
+								getglobal(this:GetName().."EditBox"):SetText(this:GetValue());
+								WIM_HistoryFrameMessageListScrollingMessageFrame:SetFont("Fonts\\FRIZQT__.TTF",WIM_Data.fontSize);
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Slider name="$parentWindowSize" inherits="WIM_Options_SliderTemplate" minValue="25" maxValue="200" valueStep="1">
+						<Size>
+							<AbsDimension x="140" y="17"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentFontSize" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-35" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								WIM_Data.windowSize = (this:GetValue() / 100);
+								WIM_SetAllWindowProps();
+								getglobal(this:GetName().."EditBox"):SetText(this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Slider name="$parentWindowAlpha" inherits="WIM_Options_SliderTemplate" minValue="10" maxValue="100" valueStep="1">
+						<Size>
+							<AbsDimension x="140" y="17"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentWindowSize" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-35" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								WIM_Data.windowAlpha = (this:GetValue() / 100);
+								WIM_SetAllWindowProps();
+								getglobal(this:GetName().."EditBox"):SetText(this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<!-- End Size Slider -->
+				</Frames>
+			</Frame>
+			<!-- end of Display Settings -->
+			<!-- MiniMap Options Frame -->
+			<Frame name="$parentMiniMap" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="350" y="125" />
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="15" y="0" />
+						</Offset>
+					</Anchor>
+					<Anchor point="TOP" relativeTo="$parentDisplay" relativePoint="TOP" />
+					<Anchor point="RIGHT" relativeTo="$parentDisplay" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- Title Frame -->
+					<Frame name="$parentCaption" inherits="WIM_Options_TitlePanelTemplate">
+						<Size>
+							<AbsDimension x="350" y="30" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-3" />
+								</Offset>
+							</Anchor>
+							<Anchor point="RIGHT" relativeTo="$parent" RelativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Minimap Icon">
+									<Anchors>
+										<Anchor point="TOP">
+											<Offset>
+												<AbsDimension x="0" y="-8" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="1" b="1" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+					<!-- End Title Frame -->
+					<!-- CheckButton: Hide Minimap Icon -->
+					<CheckButton name="$parentEnabled">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-35" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show Minimap Icon">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_ShowMiniMapClick();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentFreeMoving">
+						<Size>
+							<AbsDimension x="25" y="25" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentEnabled" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="200" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Free moving">
+									<Anchors>
+										<Anchor point="LEFT">
+											<Offset>
+												<AbsDimension x="30" y="1" />
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if ( this:GetChecked() ) then
+									PlaySound("igMainMenuOptionCheckBoxOff");
+								else
+									PlaySound("igMainMenuOptionCheckBoxOn");
+								end
+								WIM_Options_FreeMoving_Clicked();
+							</OnClick>
+							<OnEnter>
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetText("When enabled, Shift-Left-Clicking\nthe minimap icon, allows you to\ndrag it around your screen.");
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</CheckButton>
+					<Slider name="$parentIconPosition" inherits="WIM_Options_SliderTemplate" minValue="0" maxValue="360" valueStep="1">
+						<Size>
+							<AbsDimension x="285" y="17"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="WIM_OptionsMiniMap" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="40" y="-80" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnValueChanged>
+								WIM_Icon_Move(this:GetValue());
+								getglobal(this:GetName().."EditBox"):SetText(this:GetValue());
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+			
+			<!-- next minimap child -->
+				</Frames>
+			</Frame>
+			
+			
+			<!-- Option Tabs -->
+			<Button name="$parentOptionTab1" inherits="TabButtonTemplate" text=" General " alpha=".8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentMiniMap" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="10" y="8" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						WIM_Options_General_Click();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth()+10);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentOptionTab2" inherits="TabButtonTemplate" text=" Windows " alpha=".8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionTab1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						WIM_Options_Windows_Click();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth()+10);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentOptionTab3" inherits="TabButtonTemplate" text=" Filters " alpha=".8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionTab2" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						WIM_Options_Filter_Click();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth()+10);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentOptionTab4" inherits="TabButtonTemplate" text=" History " alpha=".8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionTab3" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						WIM_Options_History_Click();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth()+10);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<!-- End Option Tabs -->
+			<!-- Tabbed Frame -->
+			<Frame name="$parentTabbedFrame" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="350" y="250"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentOptionTab1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="2" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOM" relativeTo="$parentDisplay" relativePoint="BOTTOM"/>
+					<Anchor point="LEFT" relativeTo="$parentMiniMap" relativePoint="LEFT"/>
+					<Anchor point="RIGHT" relativeTo="$parentDisplay" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<!-- General Frame -->
+					<Frame name="$parentGeneral" hidden="true">
+						<Size>
+							<AbsDimension x="350" y="200" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<!-- General Options -->
+							<CheckButton name="$parentAutoFocus">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-35" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Auto focus window on popup.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_AutoFocusClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentKeepFocus">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentAutoFocus" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Keep focus after sending a message.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_KeepFocusClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentShowToolTips">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentKeepFocus" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show tooltips.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_ShowToolTipsClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentPopOnSend">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentShowToolTips" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Popup window when sending whispers.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_PopOnSendClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentPopNew">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentPopOnSend" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Popup window when receiving new whispers.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_PopNewClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentPopUpdate">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentPopNew" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="25" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Popup window when receiving replies.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_PopUpdateClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentPopCombat">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentPopUpdate" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Disable popups while in combat.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_PopCombatClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentSupress">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentPopNew" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-55" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Supress whispers from default chat frame.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_SupressWispsClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentPlaySoundWisp">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentSupress" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Play sound when message received.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_PlaySoundWispClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentSortOrderAlpha">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentPlaySoundWisp" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Sort conversation list alphabetically.">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_SortOrderAlphaClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							
+							
+							
+							
+							
+							
+							<!-- End General Options -->
+						</Frames>
+					</Frame>
+					<!-- End General Frame -->
+					<!-- Whisper Frame -->
+					<Frame name="$parentWindow" hidden="true">
+						<Size>
+							<AbsDimension x="350" y="200" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<!-- Window Options -->
+							
+							<CheckButton name="$parentWindowCascade">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-35" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Enable cascading. Direction:">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_WindowCascadeClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							
+							
+							<Button name="$parentWindowAnchor" inherits="UIPanelButtonTemplate" text="Set Locaion">
+								<Size>
+									<AbsDimension x="120" y="28"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentWindowCascade" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-20"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										WIM_Options_WindowAnchorToggle_Click();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Frame name="$parentCascadeDirection" inherits="UIDropDownMenuTemplate" enableMouse="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentWindowCascade" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="200" y="2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<!-- Ensure that the correct information is displayed
+									Also setup the different options and function for selecting options-->
+									<OnShow>
+										WIM_Options_CascadeDirection_OnShow();
+									</OnShow>
+									<OnEnter>
+										--GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+										--GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+							</Frame>
+							<Slider name="$parentWindowWidth" inherits="WIM_Options_SliderTemplate" minValue="250" maxValue="800" valueStep="1">
+								<Size>
+									<AbsDimension x="285" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentWindowAnchor" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-30" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										WIM_Data.winSize.width = this:GetValue();
+										getglobal(this:GetName().."EditBox"):SetText(this:GetValue());
+										WIM_SetAllWindowProps();
+									</OnValueChanged>
+								</Scripts>
+							</Slider>
+							<Slider name="$parentWindowHeight" inherits="WIM_Options_SliderTemplate" minValue="130" maxValue="600" valueStep="1">
+								<Size>
+									<AbsDimension x="285" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentWindowWidth" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-30" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										WIM_Data.winSize.height = this:GetValue();
+										getglobal(this:GetName().."EditBox"):SetText(this:GetValue());
+										WIM_SetAllWindowProps();
+									</OnValueChanged>
+								</Scripts>
+							</Slider>
+							<!-- End Window Options -->
+						</Frames>
+					</Frame>
+					<!-- Filter Frame -->
+					<Frame name="$parentFilter" hidden="true">
+						<Size>
+							<AbsDimension x="350" y="200" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<!-- Alias Frame -->
+							<Frame name="$parentAlias">
+								<Size>
+									<AbsDimension x="100" y="175" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<AbsDimension x="0" y="0" />
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<CheckButton name="$parentEnabled">
+										<Size>
+											<AbsDimension x="25" y="25" />
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="10" y="-25" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+										<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+										<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+										<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+										<Layers>
+											<Layer level="OVERLAY">
+												<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Enable Aliasing">
+													<Anchors>
+														<Anchor point="LEFT">
+															<Offset>
+																<AbsDimension x="30" y="1" />
+															</Offset>
+														</Anchor>
+													</Anchors>
+													<FontHeight>
+														<AbsValue val="12" />
+													</FontHeight>
+													<Color r="1" g="0.8196079" b="0" />
+													<Shadow>
+														<Color r="0" g="0" b="0" />
+														<Offset>
+															<AbsDimension x="1" y="-1" />
+														</Offset>
+													</Shadow>
+												</FontString>
+											</Layer>
+										</Layers>
+										<Scripts>
+											<OnClick>
+												if ( this:GetChecked() ) then
+													PlaySound("igMainMenuOptionCheckBoxOff");
+												else
+													PlaySound("igMainMenuOptionCheckBoxOn");
+												end
+												WIM_Options_AliasEnabledClicked();
+											</OnClick>
+										</Scripts>
+									</CheckButton>
+									<CheckButton name="$parentShowAsComment">
+										<Size>
+											<AbsDimension x="25" y="25" />
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentEnabled" relativePoint="TOPLEFT">
+												<Offset>
+													<AbsDimension x="170" y="0" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+										<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+										<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+										<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+										<Layers>
+											<Layer level="OVERLAY">
+												<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show as comment">
+													<Anchors>
+														<Anchor point="LEFT">
+															<Offset>
+																<AbsDimension x="30" y="1" />
+															</Offset>
+														</Anchor>
+													</Anchors>
+													<FontHeight>
+														<AbsValue val="12" />
+													</FontHeight>
+													<Color r="1" g="0.8196079" b="0" />
+													<Shadow>
+														<Color r="0" g="0" b="0" />
+														<Offset>
+															<AbsDimension x="1" y="-1" />
+														</Offset>
+													</Shadow>
+												</FontString>
+											</Layer>
+										</Layers>
+										<Scripts>
+											<OnClick>
+												if ( this:GetChecked() ) then
+													PlaySound("igMainMenuOptionCheckBoxOff");
+												else
+													PlaySound("igMainMenuOptionCheckBoxOn");
+												end
+												WIM_Options_AliasShowAsCommentClicked();
+											</OnClick>
+										</Scripts>
+									</CheckButton>
+									<Button name="$parentColumnHeader1" inherits="WhoFrameColumnHeaderTemplate" text="Name">
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="10" y="-50"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												WhoFrameColumn_SetWidth(155);
+												this.sortType = "name";
+											</OnLoad>
+											<OnClick>
+											
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Button name="$parentColumnHeader2" inherits="WhoFrameColumnHeaderTemplate" text="Alias">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader1" relativePoint="TOPRIGHT">
+												<Offset>
+													<AbsDimension x="0" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												WhoFrameColumn_SetWidth(155);
+												this.sortType = "alias";
+											</OnLoad>
+											<OnClick>
+											
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Frame name="$parentPanel" inherits="WIM_Options_PanelTemplate">
+										<Size>
+											<AbsDimension x="340" y="100" />
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader1" relativePoint="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="-2" y="4" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Frames>
+											<ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT">
+														<Offset>
+															<AbsDimension x="0" y="-8"/>
+														</Offset>
+													</Anchor>
+													<Anchor point="BOTTOMRIGHT">
+														<Offset>
+															<AbsDimension x="-30" y="8"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+
+												<Scripts>
+													<OnVerticalScroll>
+														FauxScrollFrame_OnVerticalScroll(16, WIM_AliasScrollBar_Update); 
+													</OnVerticalScroll>
+													<OnShow>
+														WIM_AliasScrollBar_Update();
+													</OnShow>
+												</Scripts>
+											</ScrollFrame>
+											<Button name="$parentButton1" inherits="WIM_AliasButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton2" inherits="WIM_AliasButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton3" inherits="WIM_AliasButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton4" inherits="WIM_AliasButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton5" inherits="WIM_AliasButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentAdd" inherits="UIPanelButtonTemplate" text="Add">
+												<Size>
+													<AbsDimension x="85" y="22"/>
+												</Size>
+												<Anchors>
+													<Anchor point="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="-20"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														PlaySound("igMainMenuClose");
+														WIM_Options_AliasWindowTitleString:SetText("Add New Alias");
+														WIM_Options_AliasWindow_Name:SetText("");
+														WIM_Options_AliasWindow_Alias:SetText("");
+														WIM_Options_AliasWindow.prevName = "";
+														WIM_Options_AliasWindow.theMode = "add";
+														WIM_Options_AliasWindow:Show();
+														WIM_Options_AliasWindow_Name:SetFocus();
+													</OnClick>
+												</Scripts>
+											</Button>
+											<Button name="$parentRemove" inherits="UIPanelButtonTemplate" text="Remove">
+												<Size>
+													<AbsDimension x="85" y="22"/>
+												</Size>
+												<Anchors>
+													<Anchor point="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="90" y="-20"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														PlaySound("igMainMenuClose");
+														if(WIM_Alias_Selected ~= "") then
+															WIM_Alias[WIM_Alias_Selected] = nil;
+															WIM_Alias_Selected = "";
+															WIM_AliasScrollBar_Update();
+														end
+													</OnClick>
+												</Scripts>
+											</Button>
+											<Button name="$parentEdit" inherits="UIPanelButtonTemplate" text="Edit">
+												<Size>
+													<AbsDimension x="85" y="22"/>
+												</Size>
+												<Anchors>
+													<Anchor point="BOTTOMRIGHT">
+														<Offset>
+															<AbsDimension x="0" y="-20"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														PlaySound("igMainMenuClose");
+														if(WIM_Alias_Selected ~= "") then
+															WIM_Options_AliasWindowTitleString:SetText("Edit Alias");
+															WIM_Options_AliasWindow.theMode = "edit";
+															WIM_Options_AliasWindow.prevName = WIM_Alias_Selected;
+															WIM_Options_AliasWindow_Name:SetText(WIM_Alias_Selected);
+															WIM_Options_AliasWindow_Alias:SetText(WIM_Alias[WIM_Alias_Selected]);
+															WIM_Options_AliasWindow_Alias:HighlightText(0);
+															WIM_Options_AliasWindow:Show();
+															WIM_Options_AliasWindow_Alias:SetFocus();
+														end
+													</OnClick>
+												</Scripts>
+											</Button>
+											
+											
+											
+										</Frames>
+									</Frame>
+								</Frames>
+							</Frame>
+							<!-- End Alias Frame -->
+							<!-- Filtering Frame -->
+							<Frame name="$parentFiltering">
+								<Size>
+									<AbsDimension x="100" y="100" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentAlias" relativePoint="BOTTOMLEFT">
+										<AbsDimension x="0" y="0" />
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<CheckButton name="$parentEnabled">
+										<Size>
+											<AbsDimension x="25" y="25" />
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="10" y="-35" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+										<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+										<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+										<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+										<Layers>
+											<Layer level="OVERLAY">
+												<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Enable Filtering">
+													<Anchors>
+														<Anchor point="LEFT">
+															<Offset>
+																<AbsDimension x="30" y="1" />
+															</Offset>
+														</Anchor>
+													</Anchors>
+													<FontHeight>
+														<AbsValue val="12" />
+													</FontHeight>
+													<Color r="1" g="0.8196079" b="0" />
+													<Shadow>
+														<Color r="0" g="0" b="0" />
+														<Offset>
+															<AbsDimension x="1" y="-1" />
+														</Offset>
+													</Shadow>
+												</FontString>
+											</Layer>
+										</Layers>
+										<Scripts>
+											<OnClick>
+												if ( this:GetChecked() ) then
+													PlaySound("igMainMenuOptionCheckBoxOff");
+												else
+													PlaySound("igMainMenuOptionCheckBoxOn");
+												end
+												WIM_Options_FilteringEnabledClicked();
+											</OnClick>
+										</Scripts>
+									</CheckButton>
+									<Button name="$parentColumnHeader1" inherits="WhoFrameColumnHeaderTemplate" text="Keywords/Phrases">
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="10" y="-60"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												WhoFrameColumn_SetWidth(230);
+												this.sortType = "name";
+											</OnLoad>
+											<OnClick>
+											
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Button name="$parentColumnHeader2" inherits="WhoFrameColumnHeaderTemplate" text="Action">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader1" relativePoint="TOPRIGHT">
+												<Offset>
+													<AbsDimension x="0" y="0"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												WhoFrameColumn_SetWidth(80);
+												this.sortType = "action";
+											</OnLoad>
+											<OnClick>
+											
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Frame name="$parentPanel" inherits="WIM_Options_PanelTemplate">
+										<Size>
+											<AbsDimension x="340" y="100" />
+										</Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader1" relativePoint="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="-2" y="4" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Frames>
+											<ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT">
+														<Offset>
+															<AbsDimension x="0" y="-8"/>
+														</Offset>
+													</Anchor>
+													<Anchor point="BOTTOMRIGHT">
+														<Offset>
+															<AbsDimension x="-30" y="8"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+
+												<Scripts>
+													<OnVerticalScroll>
+														FauxScrollFrame_OnVerticalScroll(16, WIM_FilteringScrollBar_Update); 
+													</OnVerticalScroll>
+													<OnShow>
+														WIM_FilteringScrollBar_Update();
+													</OnShow>
+												</Scripts>
+											</ScrollFrame>
+											<Button name="$parentButton1" inherits="WIM_FilterButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton2" inherits="WIM_FilterButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton3" inherits="WIM_FilterButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton4" inherits="WIM_FilterButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentButton5" inherits="WIM_FilterButtonTemplate">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="0" />
+														</Offset>
+													</Anchor>
+												</Anchors>
+											</Button>
+											<Button name="$parentAdd" inherits="UIPanelButtonTemplate" text="Add">
+												<Size>
+													<AbsDimension x="85" y="22"/>
+												</Size>
+												<Anchors>
+													<Anchor point="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="0" y="-20"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														PlaySound("igMainMenuClose");
+														WIM_Options_FilterWindowTitleString:SetText("Add New Filter");
+														WIM_Options_FilterWindow_Name:SetText("");
+														WIM_Options_FilterWindow.prevName = "";
+														WIM_Options_FilterWindow.theMode = "add";
+														WIM_Options_FilterWindow_ActionIgnore:SetChecked(true);
+														WIM_Options_FilterWindow:Show();
+														WIM_Options_FilterWindow_Name:SetFocus();
+													</OnClick>
+												</Scripts>
+											</Button>
+											<Button name="$parentRemove" inherits="UIPanelButtonTemplate" text="Remove">
+												<Size>
+													<AbsDimension x="85" y="22"/>
+												</Size>
+												<Anchors>
+													<Anchor point="BOTTOMLEFT">
+														<Offset>
+															<AbsDimension x="90" y="-20"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														PlaySound("igMainMenuClose");
+														if(WIM_Filter_Selected ~= "") then
+															WIM_Filters[WIM_Filter_Selected] = nil;
+															WIM_Filter_Selected = "";
+															WIM_FilteringScrollBar_Update();
+														end
+													</OnClick>
+												</Scripts>
+											</Button>
+											<Button name="$parentEdit" inherits="UIPanelButtonTemplate" text="Edit">
+												<Size>
+													<AbsDimension x="85" y="22"/>
+												</Size>
+												<Anchors>
+													<Anchor point="BOTTOMRIGHT">
+														<Offset>
+															<AbsDimension x="0" y="-20"/>
+														</Offset>
+													</Anchor>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														PlaySound("igMainMenuClose");
+														if(WIM_Filter_Selected ~= "") then
+															WIM_Options_FilterWindowTitleString:SetText("Edit Filter");
+															WIM_Options_FilterWindow.theMode = "edit";
+															WIM_Options_FilterWindow.prevName = WIM_Filter_Selected;
+															WIM_Options_FilterWindow_Name:SetText(WIM_Filter_Selected);
+															if(WIM_Filters[WIM_Filter_Selected] == "Ignore") then
+																WIM_Options_FilterWindow_ActionIgnore:SetChecked(true);
+															else
+																WIM_Options_FilterWindow_ActionBlock:SetChecked(true);
+															end
+															WIM_Options_FilterWindow:Show();
+														end
+													</OnClick>
+												</Scripts>
+											</Button>
+											
+											
+											
+										</Frames>
+									</Frame>
+								</Frames>
+							</Frame>
+							<!-- End Filtering Frame -->
+						</Frames>
+					</Frame>
+					<!-- End Filter Frame -->
+					<!-- History Frame -->
+					<Frame name="$parentHistory" hidden="true">
+						<Size>
+							<AbsDimension x="350" y="200" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="10" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<!-- History Options -->
+							<CheckButton name="$parentEnabled">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-25" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Enable History">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistoryEnabledClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentRecordEveryone">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentEnabled" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-10" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Record Everyone">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistoryRecordEveryoneClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentRecordFriends">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentRecordEveryone" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="25" y="0" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Record Friends">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistoryRecordFriendsClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentRecordGuild">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentRecordFriends" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Record Guild">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistoryRecordGuildClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<Frame name="$parentColorIn" inherits="WIM_Options_PickColorTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentRecordEveryone" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="180" y="-3" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Incoming messages">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame>
+							<Frame name="$parentColorOut" inherits="WIM_Options_PickColorTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentColorIn" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-5" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Outgoing messages">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame>
+							<CheckButton name="$parentShowInMessage">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentRecordEveryone" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-50" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Show history in message:">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistoryShowInMessageClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentSetMaxToStore">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentShowInMessage" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-5" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Set maximum messages per user:">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistorySetMaxToStoreClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentSetAutoDelete">
+								<Size>
+									<AbsDimension x="25" y="25" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentSetMaxToStore" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-5" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+								<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+								<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+								<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+								<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled" />
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Delete messages older than a:">
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="30" y="1" />
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<FontHeight>
+												<AbsValue val="12" />
+											</FontHeight>
+											<Color r="1" g="0.8196079" b="0" />
+											<Shadow>
+												<Color r="0" g="0" b="0" />
+												<Offset>
+													<AbsDimension x="1" y="-1" />
+												</Offset>
+											</Shadow>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										if ( this:GetChecked() ) then
+											PlaySound("igMainMenuOptionCheckBoxOff");
+										else
+											PlaySound("igMainMenuOptionCheckBoxOn");
+										end
+										WIM_Options_HistorySetAutoDeleteClicked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<Frame name="$parentMessageCount" inherits="UIDropDownMenuTemplate" enableMouse="true">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="$parentShowInMessage" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="300" y="2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<!-- Ensure that the correct information is displayed
+									Also setup the different options and function for selecting options-->
+									<OnShow>
+										WIM_Options_HistoryMessageCount_OnShow();
+									</OnShow>
+									<OnEnter>
+										--GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+										--GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+							</Frame>
+							<Frame name="$parentMaxCount" inherits="UIDropDownMenuTemplate" enableMouse="true">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="$parentSetMaxToStore" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="350" y="2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<!-- Ensure that the correct information is displayed
+									Also setup the different options and function for selecting options-->
+									<OnShow>
+										WIM_Options_HistoryMaxCount_OnShow();
+									</OnShow>
+									<OnEnter>
+										--GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+										--GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+							</Frame>
+							<Frame name="$parentAutoDeleteTime" inherits="UIDropDownMenuTemplate" enableMouse="true">
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="$parentSetAutoDelete" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="342" y="2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<!-- Ensure that the correct information is displayed
+									Also setup the different options and function for selecting options-->
+									<OnShow>
+										WIM_Options_HistoryAutoDeleteTime_OnShow();
+									</OnShow>
+									<OnEnter>
+										--GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+										--GameTooltip:SetText(this.tooltip, nil, nil, nil, nil, 1);
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+							</Frame>
+							<Button name="$parentColumnHeader1" inherits="WhoFrameColumnHeaderTemplate" text="Recorded Users">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-235"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(200);
+										this.sortType = "name";
+									</OnLoad>
+									<OnClick>
+									
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentColumnHeader2" inherits="WhoFrameColumnHeaderTemplate" text="Saved Messages">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader1" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										WhoFrameColumn_SetWidth(110);
+										this.sortType = "messages";
+									</OnLoad>
+									<OnClick>
+									
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Frame name="$parentPanel" inherits="WIM_Options_PanelTemplate">
+								<Size>
+									<AbsDimension x="340" y="100" />
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="$parentColumnHeader1" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="-2" y="4" />
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<ScrollFrame name="$parentScrollBar" inherits="FauxScrollFrameTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT">
+												<Offset>
+													<AbsDimension x="0" y="-8"/>
+												</Offset>
+											</Anchor>
+											<Anchor point="BOTTOMRIGHT">
+												<Offset>
+													<AbsDimension x="-30" y="8"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+											<Scripts>
+											<OnVerticalScroll>
+												FauxScrollFrame_OnVerticalScroll(16, WIM_HistoryScrollBar_Update); 
+											</OnVerticalScroll>
+											<OnShow>
+												WIM_HistoryScrollBar_Update();
+											</OnShow>
+										</Scripts>
+									</ScrollFrame>
+									<Button name="$parentButton1" inherits="WIM_HistoryButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+												<Offset>
+													<AbsDimension x="0" y="0" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+									</Button>
+									<Button name="$parentButton2" inherits="WIM_HistoryButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="0" y="0" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+									</Button>
+									<Button name="$parentButton3" inherits="WIM_HistoryButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="0" y="0" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+									</Button>
+									<Button name="$parentButton4" inherits="WIM_HistoryButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="0" y="0" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+									</Button>
+									<Button name="$parentButton5" inherits="WIM_HistoryButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="0" y="0" />
+												</Offset>
+											</Anchor>
+										</Anchors>
+									</Button>
+									<Button name="$parentDeleteUser" inherits="UIPanelButtonTemplate" text="Delete User">
+										<Size>
+											<AbsDimension x="90" y="22"/>
+										</Size>
+										<Anchors>
+											<Anchor point="BOTTOMLEFT">
+												<Offset>
+													<AbsDimension x="0" y="-20"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												PlaySound("igMainMenuClose");
+												if(WIM_History_Selected ~= "") then
+													WIM_History[WIM_History_Selected] = nil;
+													WIM_History_Selected = "";
+													WIM_HistoryScrollBar_Update();
+												end
+											</OnClick>
+										</Scripts>
+									</Button>
+									<Button name="$parentViewHistory" inherits="UIPanelButtonTemplate" text="View History">
+										<Size>
+											<AbsDimension x="100" y="22"/>
+										</Size>
+										<Anchors>
+											<Anchor point="BOTTOMRIGHT">
+												<Offset>
+													<AbsDimension x="0" y="-20"/>
+												</Offset>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												PlaySound("igMainMenuClose");
+												WIM_HistoryView_Name_Selected = WIM_History_Selected;
+												WIM_HistoryView_Filter_Selected = "";
+												if(WIM_HistoryFrame:IsVisible()) then
+													WIM_HistoryViewNameScrollBar_Update();
+													WIM_HistoryViewFiltersScrollBar_Update();
+												else
+													WIM_HistoryFrame:Show();
+												end
+											</OnClick>
+										</Scripts>
+									</Button>
+								</Frames>
+							</Frame>
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							<!-- End History Options -->
+						</Frames>
+					</Frame>
+					<!-- End History Frame -->
+				</Frames>
+				<!-- End Whisper Frame -->
+			</Frame>
+			<!-- End Tabbed Frame -->
+			
+			
+			
+			
+			
+			<Button name="$parentExitButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName());
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnShow>
+				PlaySound("igMainMenuOpen");
+				WIM_Options_OnShow();
+			</OnShow>
+			<OnHide>
+				PlaySound("igMainMenuClose");
+				GameTooltip:Hide();
+				WIM_WindowAnchor:Hide();
+			</OnHide>
+			<OnDragStart>
+				this:StartMoving();
+				this.isMoving = true;
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	
+	
+	<Frame name="WIM_Options_AliasWindow" movable="false" alpha="1" enableMouse="true" toplevel="true" frameStrata="TOOLTIP" parent="UIParent" hidden="true"  clampedToScreen="true">
+		<Size>
+			<AbsDimension x="250" y="220" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="WIM_Options">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTitleBorder" file="Interface\DialogFrame\UI-DialogBox-Header">
+				<Size>
+					<AbsDimension x="160" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="5" />
+					</Offset>
+					</Anchor>
+				</Anchors>
+				<TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+				</Texture>
+				<FontString name="$parentTitleString" font="Fonts\FRIZQT__.TTF" text="Add New Alias">
+					<Size>
+						<AbsDimension x="140" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-4" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentPanel1" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="200" y="40" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-50" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString font="Fonts\FRIZQT__.TTF" text="Character Name">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="WIM_Options_AliasWindow_Name" enableMouse="true" ignoreArrows="false" frameStrata="TOOLTIP" toplevel="true" letters="16" autoFocus="false">
+						<Size>
+							<AbsDimension x="190" y="35" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString font="Fonts\ARIALN.TTF">
+							<FontHeight>
+								<AbsValue val="16" />
+							</FontHeight>
+							<Color r="1" g="1" b="1" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<Scripts>
+							<OnEscapePressed>
+								this:Hide();
+								this:Show();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+				</Frames>
+			</Frame>
+			<Frame name="$parentPanel2" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="200" y="40" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentPanel1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString font="Fonts\FRIZQT__.TTF" text="Character Alias">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<FontString name="WIM_Options_AliasWindow_Error" font="Fonts\FRIZQT__.TTF" text="">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="WIM_Options_AliasWindow_Alias" enableMouse="true" ignoreArrows="false" frameStrata="TOOLTIP" toplevel="true" letters="16" autoFocus="false">
+						<Size>
+							<AbsDimension x="190" y="35" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString font="Fonts\ARIALN.TTF">
+							<FontHeight>
+								<AbsValue val="16" />
+							</FontHeight>
+							<Color r="1" g="1" b="1" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<Scripts>
+							<OnEscapePressed>
+								this:Hide();
+								this:Show();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+				</Frames>
+			</Frame>
+		
+		
+		
+		
+		
+			<Button name="$parentCancel" inherits="UIPanelButtonTemplate" text="Cancel">
+				<Size>
+					<AbsDimension x="85" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-25" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuClose");
+						WIM_Options_AliasWindow:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentOK" inherits="UIPanelButtonTemplate" text="OK">
+				<Size>
+					<AbsDimension x="85" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						WIM_Options_AliasWindow_Click();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName());
+			</OnLoad>
+			<OnShow>
+				WIM_Options_AliasWindow_Error:SetText("");
+				WIM_Options:SetAlpha(.35);
+				WIM_Options:EnableMouse(false);
+				PlaySound("igMainMenuOpen");
+			</OnShow>
+			<OnHide>
+				WIM_Options:SetAlpha(1);
+				WIM_Options:EnableMouse(true);
+				WIM_Options_AliasWindow.prevName = "";
+				PlaySound("igMainMenuClose");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	
+	<Frame name="WIM_Options_FilterWindow" movable="false" alpha="1" enableMouse="true" toplevel="true" frameStrata="TOOLTIP" parent="UIParent" hidden="true"  clampedToScreen="true">
+		<Size>
+			<AbsDimension x="400" y="220" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="WIM_Options">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTitleBorder" file="Interface\DialogFrame\UI-DialogBox-Header">
+				<Size>
+					<AbsDimension x="160" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="5" />
+					</Offset>
+					</Anchor>
+				</Anchors>
+				<TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+				</Texture>
+				<FontString name="$parentTitleString" font="Fonts\FRIZQT__.TTF" text="Add New Filter">
+					<Size>
+						<AbsDimension x="140" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-4" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<FontString name="$parentActionString" font="Fonts\FRIZQT__.TTF" text="Perform the following action:">
+					<Size>
+						<AbsDimension x="200" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="13" y="-110" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<FontString name="WIM_Options_FilterWindow_Error" font="Fonts\FRIZQT__.TTF" text="ERROR: Example Error Message" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="300" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-90" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentPanel1" inherits="WIM_Options_PanelTemplate">
+				<Size>
+					<AbsDimension x="350" y="40" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-50" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString font="Fonts\FRIZQT__.TTF" text="Keyword/Phrase to Filter">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="WIM_Options_FilterWindow_Name" enableMouse="true" ignoreArrows="false" frameStrata="TOOLTIP" toplevel="true" letters="150" autoFocus="false">
+						<Size>
+							<AbsDimension x="325" y="35" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<FontString font="Fonts\ARIALN.TTF">
+							<FontHeight>
+								<AbsValue val="16" />
+							</FontHeight>
+							<Color r="1" g="1" b="1" />
+							<Shadow>
+								<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+						<Scripts>
+							<OnEscapePressed>
+								this:Hide();
+								this:Show();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+				</Frames>
+			</Frame>
+		
+			<CheckButton name="WIM_Options_FilterWindow_ActionIgnore">
+				<Size>
+					<AbsDimension x="25" y="25" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="220" y="-105" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Ignore">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="1" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+							<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						WIM_Options_FilteringIgnoreClicked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="WIM_Options_FilterWindow_ActionBlock">
+				<Size>
+					<AbsDimension x="25" y="25" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="WIM_Options_FilterWindow_ActionIgnore" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up" />
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down" />
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD" />
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check" />
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" font="Fonts\FRIZQT__.TTF" text="Block">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="30" y="1" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<FontHeight>
+								<AbsValue val="12" />
+							</FontHeight>
+							<Color r="1" g="0.8196079" b="0" />
+							<Shadow>
+							<Color r="0" g="0" b="0" />
+								<Offset>
+									<AbsDimension x="1" y="-1" />
+								</Offset>
+							</Shadow>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if ( this:GetChecked() ) then
+							PlaySound("igMainMenuOptionCheckBoxOff");
+						else
+							PlaySound("igMainMenuOptionCheckBoxOn");
+						end
+						WIM_Options_FilteringBlockClicked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		
+		
+		
+			<Button name="$parentCancel" inherits="UIPanelButtonTemplate" text="Cancel">
+				<Size>
+					<AbsDimension x="85" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-25" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuClose");
+						WIM_Options_FilterWindow:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentOK" inherits="UIPanelButtonTemplate" text="OK">
+				<Size>
+					<AbsDimension x="85" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						WIM_Options_FilterWindow_Click();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName());
+			</OnLoad>
+			<OnShow>
+				WIM_Options_FilterWindow_Error:SetText("");
+				WIM_Options:SetAlpha(.35);
+				WIM_Options:EnableMouse(false);
+				PlaySound("igMainMenuOpen");
+				WIM_Options_FilteringIgnoreClicked();
+				WIM_Options_FilteringBlockClicked();
+			</OnShow>
+			<OnHide>
+				WIM_Options_FilterWindow.prevName = "";
+				WIM_Options:SetAlpha(1);
+				WIM_Options:EnableMouse(true);
+				PlaySound("igMainMenuClose");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	
+	<Frame name="WIM_WindowAnchor" movable="true" enableMouse="true" toplevel="true" frameStrata="TOOLTIP" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="16" y="16"/> 
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="100" y="-125"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\AddOns\WIM\Images\DragButton">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnShow>
+				PlaySound("igMainMenuOptionCheckBoxOn");
+			</OnShow>
+			<OnHide>
+				PlaySound("igMainMenuOptionCheckBoxOff");
+			</OnHide>
+			<OnDragStart>
+				this:StartMoving();
+				this.isMoving = true;
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+				WIM_Data.winLoc.left = this:GetLeft();
+				WIM_Data.winLoc.top = this:GetTop();
+				WIM_CascadeStep = 0;
+			</OnDragStop>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText("Drag to set default spawn\nposition for message windows.");
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	
+	
+	
+	<Frame name="WIM_ToggleWindow" inherits="WIM_Options_PanelTemplate" hidden="true" frameStrata="TOOLTIP" toplevel="true">
+		<Size>
+			<AbsDimension x="276" y="78" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="200" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parentIconBorder" file="Interface\MailFrame\MailItemBorder">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentIconNew" file="Interface\AddOns\WIM\Images\toggle_new">
+					<Size>
+						<AbsDimension x="39" y="39" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIconBorder" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentIconRead" file="Interface\AddOns\WIM\Images\toggle_read">
+					<Size>
+						<AbsDimension x="39" y="39" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIconBorder" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-3" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentUser" font="Fonts\FRIZQT__.TTF" text="Pazza">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIconNew" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="20" y="-1" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="18" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+					<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<FontString name="$parentStatus" font="Fonts\FRIZQT__.TTF" text="No new messages.">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentIconNew" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="20" y="-22" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="10" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+					<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+				<FontString name="$parentCount" font="Fonts\FRIZQT__.TTF" text="Recent Conversation 1 or 20">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="10" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+					<Color r=".8" g=".8" b=".8" />
+					<Shadow>
+					<Color r="0" g="0" b="0" />
+						<Offset>
+							<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnUpdate>
+				WIM_ToggleWindow_OnUpdate(arg1);
+			</OnUpdate>
+			<OnShow>
+				WIM_ToggleWindow_Timer = 0;
+			</OnShow>
+			<OnHide>
+				WIM_ToggleWindow_Timer = 0;
+				WIM_ToggleWindow_Index = 1;
+				WIM_PostMessage(this.theUser, "", 5, "", "");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	
+	<Frame name="WIM_Help" movable="true" alpha="1" enableMouse="true" toplevel="true" frameStrata="DIALOG" parent="UIParent" hidden="true"  clampedToScreen="true">
+		<Size>
+			<AbsDimension x="600" y="480" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="UIParent">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer>
+				<Texture name="$parentTitleBorder" file="Interface\DialogFrame\UI-DialogBox-Header">
+				<Size>
+					<AbsDimension x="160" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					<Offset>
+						<AbsDimension x="0" y="5" />
+					</Offset>
+					</Anchor>
+				</Anchors>
+				<TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+				</Texture>
+				<FontString name="$parentTitleString" font="Fonts\FRIZQT__.TTF" text="WIM Documentation">
+					<Size>
+						<AbsDimension x="140" y="0" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-4" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="12" />
+					</FontHeight>
+					<Color r="1" g="0.8196079" b="0" />
+					<Shadow>
+						<Color r="0" g="0" b="0" />
+						<Offset>
+						<AbsDimension x="1" y="-1" />
+						</Offset>
+					</Shadow>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentExitButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight"/>
+				<Scripts>
+					<OnLoad>
+						this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parentFrame" inherits="WIM_Options_PanelTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-60" />
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="10" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Button name="$parentTab1" inherits="TabButtonTemplate" text=" Description " alpha=".8">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						WIM_Help_Description_Click();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth()+10);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentTab2" inherits="TabButtonTemplate" text=" Version History " alpha=".8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTab1" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("igMainMenuOptionCheckBoxOn");
+						WIM_Help_ChangeLog_Click();
+					</OnClick>
+					<OnLoad>
+						<!-- Size it properly -->
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth()+10);
+					</OnLoad>
+				</Scripts>
+			</Button>
+		
+			<ScrollFrame name="WIM_HelpScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-20"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parentFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<Frame name="$parentScrollChild" frameStrata="HIGH">
+						<Size>
+							<AbsDimension x="10" y="10"/>
+						</Size>
+						<Frames>
+							<SimpleHTML name="$parentText">
+								<Size>
+									<AbsDimension x="500" y="304"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+									<Anchor point="BOTTOMRIGHT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<FontString font="Fonts\FRIZQT__.TTF" justifyH="LEFT">
+									<FontHeight>
+										<AbsValue val="12" />
+									</FontHeight>
+									<Color r="1" g="0.8196079" b="0" />
+									<Shadow>
+										<Color r="0" g="0" b="0" />
+										<Offset>
+											<AbsDimension x="1" y="-1" />
+										</Offset>
+									</Shadow>
+								</FontString>
+							</SimpleHTML>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+			</ScrollFrame>
+		
+		
+		
+		
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName());
+				this:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnShow>
+				WIM_Help_Description_Click();
+				PlaySound("igMainMenuOpen");
+			</OnShow>
+			<OnHide>
+				PlaySound("igMainMenuClose");
+			</OnHide>
+			<OnDragStart>
+				this:StartMoving();
+				this.isMoving = true;
+			</OnDragStart>
+			<OnDragStop>
+				this:StopMovingOrSizing();
+				this.isMoving = false;
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	
+	
+</Ui>

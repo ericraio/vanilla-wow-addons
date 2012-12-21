@@ -1,0 +1,613 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	
+	<!--
+	<FontString name="SW_Font" font="Fonts\FRIZQT__.TTF" virtual="true">
+		<FontHeight>
+			<AbsValue val="10" />
+		</FontHeight>
+		<Color r="1.0" g="1.0" b="1.0" />
+	</FontString>
+	<FontString name="SW_FontBar" font="Fonts\FRIZQT__.TTF" virtual="true">
+		<FontHeight>
+			<AbsValue val="9" />
+		</FontHeight>
+		<Color r="1.0" g="1.0" b="1.0" />
+	</FontString>
+	-->
+	
+	<FontString name="SW_Font" inherits="GameFontNormalSmall" virtual="true">
+		<FontHeight>
+			<AbsValue val="10" />
+		</FontHeight>
+		<Color r="1.0" g="1.0" b="1.0" />
+	</FontString>
+	<FontString name="SW_FontBar" inherits="GameFontNormalSmall" virtual="true">
+		<FontHeight>
+			<AbsValue val="9" />
+		</FontHeight>
+		<Color r="1.0" g="1.0" b="1.0" />
+	</FontString>
+	
+	<!-- A simple frame just defined with a border -->
+	<Frame name="SW_Frame" hidden="true" virtual="true">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+			tile="true">
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16" />
+			</EdgeSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5" />
+			</BackgroundInsets>
+		</Backdrop>
+	</Frame>
+	<Frame name="SW_Frame_Tab" inherits="SW_Frame" virtual="true" hidden="true">
+		<Scripts>
+			<OnMouseUp>SW_TabClick(this);</OnMouseUp>
+		</Scripts>
+		<Size>
+			<AbsDimension x="100" y="32" />
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT">
+				<Offset>
+					<AbsDimension x="4" y="-25" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Text" inherits="GameFontNormal" text="SW">
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="SW_ColorSwatch" virtual="true" hidden="false">
+		<Scripts>
+			<OnLoad>SW_InitColorSwatch(this);</OnLoad>
+		</Scripts>
+		<Size>
+			<AbsDimension x="80" y="20" />
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="tmp text">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="22" y="-4" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_Button" hidden="false">
+				<Size>
+					<AbsDimension x="20" y="20" />
+				</Size>
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+					tile="true">
+					<TileSize>
+						<AbsValue val="16" />
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="16" />
+					</EdgeSize>
+					<BackgroundInsets>
+						<AbsInset left="10" right="10" top="10" bottom="10" />
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnEnter>
+						this:SetBackdropBorderColor(1,0,0,1);
+						local strName = this:GetParent():GetName();
+						if SW_GS_Tooltips[strName] ~= nil then
+							
+							GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+							GameTooltip:SetText(SW_GS_Tooltips[strName],nil,nil,nil,nil,1);
+						end
+					</OnEnter>
+					<OnLeave>
+						this:SetBackdropBorderColor(1,1,1,1);
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						local oP = this:GetParent();
+						
+						SW_DoColorPicker(oP.TargetColor, oP.What, oP:GetName(), oP.CallOnUpdate);
+					</OnClick>
+				</Scripts>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_Color" file="Interface\AddOns\SW_Stats\images\swatch" alphaMode="ADD">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="3" y="-3" />
+									</Offset>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="-3" y="3" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+		</Frames>
+	</Frame>
+	<Frame name="SW_Frame_EditTxt" virtual="true" hidden="false">
+		<Scripts>
+			<OnLoad>
+				SW_InitEditBox(this);
+			</OnLoad>
+		</Scripts>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="tmp text">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="90" y="-5" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_Button" inherits="GameMenuButtonTemplate" text="Change">
+				<Size>
+					<AbsDimension x="80" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" />
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						local strName = this:GetParent():GetName();
+						if SW_GS_Tooltips[strName] ~= nil then
+							GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+							GameTooltip:SetText(SW_GS_Tooltips[strName],nil,nil,nil,nil,1);
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						if this:GetParent().maxLetters ~= nil then
+							StaticPopupDialogs["SW_ChangeTxt"]["maxLetters"] = this:GetParent().maxLetters;
+						else
+							StaticPopupDialogs["SW_ChangeTxt"]["maxLetters"] = 30;
+						end
+						StaticPopupDialogs["SW_ChangeTxt"]["SWUpdateFunc"] = this:GetParent().SWUpdateFunc;
+						StaticPopupDialogs["SW_ChangeTxt"]["SWUpdateInfo"] = this:GetParent().SWUpdateInfo;
+						StaticPopupDialogs["SW_ChangeTxt"]["SWCallingFrame"] = this:GetParent();
+						StaticPopupDialogs["SW_ChangeTxt"]["text"] = this:GetParent().PopupText;
+						StaticPopup_Show ("SW_ChangeTxt");
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<CheckButton name="SW_OptChk_TT" inherits="UICheckButtonTemplate" virtual="true" hidden="false">
+		<Scripts>
+			<OnEnter>
+				local strName = this:GetName();
+				if SW_GS_Tooltips[strName] ~= nil then
+					GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+					GameTooltip:SetText(SW_GS_Tooltips[strName],nil,nil,nil,nil,1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>		
+	</CheckButton>
+	<Frame name="SW_OptSlider" inherits="OptionsSliderTemplate" virtual="true" hidden="false">
+		<Scripts>
+			<OnEnter>
+				local strName = this:GetName();
+				if SW_GS_Tooltips[strName] ~= nil then
+					GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+					GameTooltip:SetText(SW_GS_Tooltips[strName],nil,nil,nil,nil,1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnShow>
+				local barSettings = SW_GetBarSettings(this:GetParent().caller);
+				this:SetValue(barSettings[this.linkedSetting]);
+				getglobal(this:GetName().."Text"):SetText(this.preTxt..this:GetValue());
+			</OnShow>
+			<OnValueChanged>
+				local oP = this:GetParent();
+				local barSettings = SW_GetBarSettings(oP.caller);
+				getglobal(this:GetName().."Text"):SetText(this.preTxt..this:GetValue());
+				barSettings[this.linkedSetting] = this:GetValue();
+				SW_BarsLayout(oP.caller);
+			</OnValueChanged>
+		</Scripts>
+	</Frame>
+	<Frame name="SW_Frame_Title" inherits="SW_Frame" virtual="true" hidden="false">
+		<Scripts>
+			<OnMouseUp>
+				if ( this:GetParent().isMoving ) then
+					this:GetParent():StopMovingOrSizing();
+					this:GetParent().isMoving = false;
+				end
+				</OnMouseUp>
+			<OnMouseDown>
+				if ( ( ( not this:GetParent().isLocked ) or ( this:GetParent().isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:GetParent():StartMoving();
+					this:GetParent().isMoving = true;
+				end
+				</OnMouseDown>
+			<OnHide>
+				if ( this.isMoving ) then
+					this:GetParent():StopMovingOrSizing();
+					this:GetParent().isMoving = false;
+				end
+				</OnHide>
+		</Scripts>
+		<Size>
+			<AbsDimension x="150" y="32" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="TOP">
+				<Offset>
+					<AbsDimension x="0" y="0" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parent_Text" inherits="GameFontNormal" text="SW">
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Color r="0" g="0" b="0" a="1" />
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4" y="-4" />
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-4" y="4" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parent_CloseX" inherits="SW_RoundButton" hidden="false">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-5" y="-5" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseUp>HideUIPanel(this:GetParent():GetParent());</OnMouseUp>
+					<OnLoad>SW_RoundButtonRegister(this, {1,0,0,1}, "X");
+						this:SetIcons("Interface\\AddOns\\SW_Stats\\images\\bIconSX","Interface\\AddOns\\SW_Stats\\images\\bIconSXH");
+						table.insert(SW_Registered_BF_TitleButtons, this:GetName());
+					</OnLoad>
+				</Scripts>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="SW_Frame_Resize" virtual="true">
+		<Scripts>
+			<OnMouseUp>
+				if ( this:GetParent().isResizing ) then
+					this:GetParent():StopMovingOrSizing();
+					this:GetParent().isResizing = false;
+					SW_SomethingResizing = false;
+				end
+				</OnMouseUp>
+			<OnMouseDown>
+				if ( ( ( not this:GetParent().isLocked ) or ( this:GetParent().isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:GetParent():StartSizing("BOTTOMRIGHT");
+					this:GetParent().isResizing = true;
+					SW_SomethingResizing = true;
+				end
+				</OnMouseDown>
+			<OnHide>
+				if ( this.isMoving ) then
+					this:GetParent():StopMovingOrSizing();
+					this:GetParent().isResizing = false;
+					SW_SomethingResizing = false;
+				end
+				</OnHide>
+		</Scripts>
+		<Size>
+			<AbsDimension x="16" y="16" />
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="-6" y="6" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\AddOns\SW_Stats\images\corner" alphaMode="ADD">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0" />
+							</Offset>
+						</Anchor>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	<!-- A frame with ScrollingMessage and gui buttons like scroll up down bottom etc-->
+	<Frame name="SW_Msg_Frame" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="4" y="-4" />
+				</Offset>
+			</Anchor>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="-4" y="4" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<ScrollingMessageFrame name="$parent_MsgFrame" displayDuration="1.0" hidden="false" maxLines="256">
+				<Scripts>
+					<OnLoad> 
+						if this.EnableFading == nil then
+							this:SetFading(false);
+						else
+							this:EnableFading(false);
+						end
+						
+					</OnLoad>
+				</Scripts>
+				<Anchors>
+					<Anchor point="TOPLEFT" />
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<FontString inherits="GameFontNormalSmall" justifyH="LEFT" />
+			</ScrollingMessageFrame>
+			<Button name="$parent_MsgUp">
+				<Size>
+					<AbsDimension x="20" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="37" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local scTarget = this:GetParent():GetName().."_MsgFrame";
+						getglobal(scTarget):ScrollUp();
+					</OnClick>
+					<OnUpdate>
+						if (this:GetButtonState() == "PUSHED") then
+								local scTarget = this:GetParent():GetName().."_MsgFrame";
+								getglobal(scTarget):ScrollUp();
+						end
+					</OnUpdate>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Up" />
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Down" />
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollUp-Disabled" />
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD" />
+			</Button>
+			<Button name="$parent_MsgDown">
+				<Size>
+					<AbsDimension x="20" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local scTarget = this:GetParent():GetName().."_MsgFrame";
+						getglobal(scTarget):ScrollDown();
+					</OnClick>
+					<OnUpdate>
+						if (this:GetButtonState() == "PUSHED") then
+							local scTarget = this:GetParent():GetName().."_MsgFrame";
+							getglobal(scTarget):ScrollDown();
+						end
+					</OnUpdate>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up" />
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down" />
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Disabled" />
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD" />
+			</Button>
+			<Button name="$parent_MsgBottom">
+				<Size>
+					<AbsDimension x="20" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-4" y="4" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local scTarget = this:GetParent():GetName().."_MsgFrame";
+						getglobal(scTarget):ScrollToBottom();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Up" />
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Down" />
+				<DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Disabled" />
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD" />
+			</Button>
+		</Frames>
+	</Frame>
+	<CheckButton name="SW_Chk_Template" inherits="UICheckButtonTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="20" y="20" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent" />
+		</Anchors>
+		<Scripts>
+			<OnClick>SW_ChkClick(this);</OnClick>
+			<OnEnter>
+				local strName = this:GetName();
+				if SW_GS_Tooltips[strName] ~= nil then
+					GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+					GameTooltip:SetText(SW_GS_Tooltips[strName],nil,nil,nil,nil,1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+	<Frame name="SW_Console_Text" inherits="SW_Msg_Frame" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="4" y="-10" />
+				</Offset>
+			</Anchor>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="2" y="10" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SW_Console_Inner" hidden="true" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="4" y="-10" />
+				</Offset>
+			</Anchor>
+			<Anchor point="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="2" y="10" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+	<Frame name="SW_RoundButton" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="16" y="16" />
+		</Size>
+		<Scripts>
+			<OnLeave>
+				if not this.IconMode then
+					this.HighlightF:Hide();
+					this.NormalF:Show();
+				end
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnEnter>
+				if not this.IconMode then
+					this.HighlightF:Show();
+					this.NormalF:Hide();
+				end
+				local strName = this:GetName();
+				if SW_GS_Tooltips[strName] ~= nil then
+					GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+					GameTooltip:SetText(SW_GS_Tooltips[strName],nil,nil,nil,nil,1);
+				end
+			</OnEnter>
+			<OnLoad>
+				SW_InitRoundButton(this);
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<Frame name="$parent_Normal" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" />
+					<Anchor point="BOTTOMRIGHT" />
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_Texture" file="Interface\AddOns\SW_Stats\images\buttonD"></Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<FontString name="$parent_Text" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</FontString>
+						<Texture name="$parent_TextureIcon" file="Interface\AddOns\SW_Stats\images\bIconS"></Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="$parent_Highlight" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" />
+					<Anchor point="BOTTOMRIGHT" />
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_Texture" file="Interface\AddOns\SW_Stats\images\buttonL"></Texture>
+					</Layer>
+					<Layer level="ARTWORK">
+						<FontString name="$parent_Text" inherits="GameFontNormalSmall" text="E">
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</FontString>
+						<Texture name="$parent_TextureIcon" file="Interface\AddOns\SW_Stats\images\bIconSH"></Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+</Ui>

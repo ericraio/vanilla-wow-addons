@@ -1,0 +1,189 @@
+<?xml-stylesheet type="text/xsl" href="/css/wowui.xsl"?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+  <Script file="localisation.lua"/>
+  <Script file="LevelRange.lua"/>
+
+  <!-- Hook OnLoad and OnEvent -->
+  <Frame name="LevelRangeFrame" parent="UIParent" hidden="true">
+    <Scripts>
+      <OnLoad>
+        LevelRange_OnLoad();
+      </OnLoad>
+      <OnEvent>
+        LevelRange_OnEvent(event);
+      </OnEvent>
+    </Scripts>
+  </Frame>
+
+  <!-- Create a new tooltip for this AddOn, so the original WorldMap tip still works -->
+  <GameTooltip name="LevelRangeTooltip" parent="WorldMapFrame" hidden="true"
+               frameStrata="TOOLTIP" inherits="GameTooltipTemplate">
+    <Scripts>
+      <OnLoad>
+          this:SetBackdropBorderColor(
+              TOOLTIP_DEFAULT_COLOR.r,
+              TOOLTIP_DEFAULT_COLOR.g,
+              TOOLTIP_DEFAULT_COLOR.b,
+              0
+          );
+          this:SetBackdropColor(
+              TOOLTIP_DEFAULT_BACKGROUND_COLOR.r,
+              TOOLTIP_DEFAULT_BACKGROUND_COLOR.g,
+              TOOLTIP_DEFAULT_BACKGROUND_COLOR.b,
+              0
+          );
+      </OnLoad>
+    </Scripts>
+  </GameTooltip>
+  <!-- Configuration checkbox template -->
+  <CheckButton name="LevelRangeOptionsCheckButtonTemplate"
+               inherits="UICheckButtonTemplate" virtual="true">
+    <Scripts>
+      <OnClick>
+        if (this:GetChecked()) then
+            PlaySound("igMainMenuOptionCheckBoxOff");
+        else
+            PlaySound("igMainMenuOptionCheckBoxOn");
+        end
+        LevelRangeOptionsCheckButton_OnClick();
+      </OnClick>
+      <OnEnter>
+        if (this.tooltipText) then
+            GameTooltip_AddNewbieTip(this.tooltipText, 1, 1, 1);
+        end
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+    </Scripts>
+  </CheckButton>
+
+  <!-- Configuration window -->
+  <Frame name="LevelRangeOptionsFrame" toplevel="true" frameStrata="DIALOG"
+         movable="true" enableMouse="true" hidden="true" parent="UIParent"
+         enableKeyboard="true">
+    <Size>
+      <AbsDimension x="350" y="195"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+              edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture name="LevelRangeOptionsFrameHeader"
+                 file="Interface\DialogFrame\UI-DialogBox-Header">
+          <Size>
+            <AbsDimension x="300" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="12"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+        <FontString inherits="GameFontNormal" name="LevelRangeOptionsFrameTitle"
+                    text="LevelRange Options">
+          <Anchors>
+            <Anchor point="TOP" relativeTo="LevelRangeOptionsFrameHeader">
+              <Offset>
+                <AbsDimension x="0" y="-14"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      
+      <!-- Option #1; row 1, column 1 -->
+      <CheckButton name="$parentOpt1"
+                   inherits="LevelRangeOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="25" y="-25"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #2; row 2, column 1 -->
+      <CheckButton name="$parentOpt2"
+                   inherits="LevelRangeOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="45" y="-55"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #3; row 3, column 1 -->
+      <CheckButton name="$parentOpt3"
+                   inherits="LevelRangeOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="45" y="-85"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <!-- Option #4; row 4, column 1 -->
+      <CheckButton name="$parentOpt4"
+                   inherits="LevelRangeOptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="45" y="-115"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+      </CheckButton>
+
+      <Button name="LevelRangeOptionsFrameClose"
+              inherits="OptionsButtonTemplate" text="Close">
+        <Anchors>
+          <Anchor point="BOTTOM">
+            <Offset>
+              <AbsDimension x="0" y="16"/>
+            </Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+         <OnClick>
+            PlaySound("gsTitleOptionOK");
+            HideUIPanel(LevelRangeOptionsFrame);
+          </OnClick>
+        </Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnShow>
+        LevelRangeOptionsFrame_OnShow();
+      </OnShow>
+      <OnHide>
+        LevelRangeOptionsFrame_OnHide();
+      </OnHide>
+    </Scripts>
+  </Frame>
+</Ui>

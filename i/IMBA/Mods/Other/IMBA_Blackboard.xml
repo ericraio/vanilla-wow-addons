@@ -1,0 +1,1423 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="IMBA_Blackboard.lua"/>
+
+	<Button name="IMBA_Blacboard_ButtonTemplate" virtual="true">
+		<NormalTexture file="Interface\AddOns\IMBA\textures\icons\Button"/>
+		<HighlightTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="add"/>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_Selected" file="Interface\Buttons\CheckButtonHilight" alphaMode="add" hidden="true"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>						
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<Frame name="IMBA_Blackboard_TextTemplate" virtual="true" enableMouse="true" movable="true">
+		<Size>
+			<AbsDimension x="20" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parent_Text" inherits="GameFontWhite">
+					<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parent_BG" file="Interface\AddOns\IMBA\textures\plainbackdrop">
+					<Size>
+						<AbsDimension x="20" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Editbox name="$parent_Editbox">
+				<Size>
+					<AbsDimension x="10" y="12"/>
+				</Size>
+				<FontString inherits="GameFontWhite"/>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.LockText=getglobal(this:GetParent():GetName().."_Text")
+						this.BG=getglobal(this:GetParent():GetName().."_BG")
+						this:SetAutoFocus(false);
+						this.hasFocus=false;
+					</OnLoad>
+					<OnTextChanged>
+						this.LockText:SetText(this:GetText())
+						this:GetParent():SetWidth(math.max(this.LockText:GetStringWidth(),10)+4)
+						this.BG:SetWidth(math.max(this.LockText:GetStringWidth(),10)+4)
+						this:SetWidth(this.LockText:GetStringWidth()+25)
+						this:GetParent():Update();						
+					</OnTextChanged>
+					<OnEscapePressed>
+						this:ClearFocus();
+						IMBA_Blackboard_SendText(this:GetParent():GetID());
+					</OnEscapePressed>
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+						this.hasFocus=false;
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						this.hasFocus=true;
+					</OnEditFocusGained>
+				</Scripts>
+			</Editbox>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetParent():GetFrameLevel()+2);
+				IMBA_Blackboard_TextTemplate_OnLoad(this);
+			</OnLoad>
+			<OnMouseUp>
+				if ( this.isMoving ) then
+					this:StopMovingOrSizing();
+					this:Update();
+					this.isMoving = false;
+					IMBA_Blackboard_SendText(this:GetID());
+				end
+			</OnMouseUp>
+			<OnMouseDown>
+				if IMBA_Blackboard_Mode==4 then
+					this:Hide();
+					IMBA_Blackboard_AddTextBox_Num=IMBA_Blackboard_AddTextBox_Num-1;
+					IMBA_Blackboard_SendClearText(this:GetID());
+				end
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:StartMoving();
+					this.isMoving = true;
+				end
+			</OnMouseDown>			
+			<OnUpdate>
+				if ( this.isMoving ) then
+					this:Update();
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_Blackboard_RaidIconTemplate" virtual="true" enableMouse="true" movable="true">
+		<Size>
+			<AbsDimension x="28" y="28"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parent_Icon">
+					<Size>
+						<AbsDimension x="28" y="28"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetParent():GetFrameLevel()+1);
+				IMBA_Blackboard_RaidIconTemplate_OnLoad(this);
+			</OnLoad>
+			<OnMouseUp>
+				if ( this.isMoving ) then
+					this:StopMovingOrSizing();
+					this:Update();
+					this.isMoving = false;
+					IMBA_Blackboard_SendRaidIcon(this:GetID());
+				end
+			</OnMouseUp>
+			<OnMouseDown>
+				if IMBA_Blackboard_Mode==4 then
+					this:Hide();
+					IMBA_Blackboard_SendClearIcon(this:GetID());
+				end
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:StartMoving();
+					this.isMoving = true;
+				end
+			</OnMouseDown>
+			<OnUpdate>
+				if ( this.isMoving ) then
+					this:Update();
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="IMBA_Blackboard" parent="UIParent" enableMouse="true" movable="true" hidden="true" frameStrata="HIGH">
+		<Size>
+			<AbsDimension x="500" y="386"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			
+			<Button name="$parent_New" inherits="OptionsButtonTemplate" text="New">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_NewImage();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_Load" inherits="OptionsButtonTemplate" text="Load">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_New" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_BlackboardLoad:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_Save" inherits="OptionsButtonTemplate" text="Save">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_Load" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_BlackboardSave:Show();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_Sync" inherits="OptionsButtonTemplate" text="Sync">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_Save" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						local Image=IMBA_Blackboard_SaveData()
+						IMBA_Blackboard_LoadData(Image);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Frame name="$parent_MapZoneDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Sync" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-18" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontHighlightSmall" text="Map Zone">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						IMBA_Blackboard_MapZoneDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parent_MapImageDropDown" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_MapZoneDropDown" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontHighlightSmall" text="Map Image">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="20" y="7"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						IMBA_Blackboard_MapImageDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Button name="$parent_ButtonCursor" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Sync" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-1" y="-78"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<NormalTexture file="Interface\AddOns\IMBA\textures\icons\ButtonCursor"/>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=1;
+						IMBA_Blackboard_CursorMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonPencil" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_ButtonCursor" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<NormalTexture file="Interface\AddOns\IMBA\textures\icons\ButtonPencil"/>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=2;
+						IMBA_Blackboard_PencilMode()
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonType" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_ButtonPencil" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<NormalTexture file="Interface\AddOns\IMBA\textures\icons\ButtonLetters"/>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=3;
+						IMBA_Blackboard_TextMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonEraser" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent_ButtonType" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="1" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<NormalTexture file="Interface\AddOns\IMBA\textures\icons\ButtonEraser"/>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=4;
+						IMBA_Blackboard_EraserMode()
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon1" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonCursor" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=5;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_1"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon2" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonPencil" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=6;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_2"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon3" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonType" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=7;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_3"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon4" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonEraser" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=8;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_4"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon5" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonRaidIcon1" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=9;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_5"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon6" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonRaidIcon2" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=10;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_6"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon7" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonRaidIcon3" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=11;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_7"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_ButtonRaidIcon8" inherits="IMBA_Blacboard_ButtonTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent_ButtonRaidIcon4" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Icon"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_Mode=12;
+						IMBA_Blackboard_RaidIconMode();
+						IMBA_Blackboard_UnselectAll()
+						getglobal(this:GetName().."_Selected"):Show()
+					</OnClick>
+					<OnLoad>
+						local icon = UnitPopupButtons["RAID_TARGET_8"];
+						getglobal(this:GetName().."_Icon"):SetTexture(icon.icon);
+						getglobal(this:GetName().."_Icon"):SetTexCoord(icon.tCoordLeft,icon.tCoordRight,icon.tCoordTop,icon.tCoordBottom);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parent_Color1" inherits="IMBA_ColorButton">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_ButtonRaidIcon5">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="64" y="64"/>
+				</Size>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."_BG"):SetWidth(56);
+						getglobal(this:GetName().."_BG"):SetHeight(56);
+						getglobal(this:GetName().."_BG"):SetVertexColor(1,1,1);
+						this.AttachFrame="IMBA_Blackboard"
+						this.color={r=1.0, g=1.0, b=1.0, a=1.0};
+						this.callback=IMBA_BlackboardColor1Changed;
+					</OnLoad>
+				</Scripts>				
+			</Button>
+			<Button name="$parent_Color2" inherits="IMBA_ColorButton">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent_Color1">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="64" y="64"/>
+				</Size>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."_BG"):SetWidth(56);
+						getglobal(this:GetName().."_BG"):SetHeight(56);
+						getglobal(this:GetName().."_BG"):SetVertexColor(0,0,0);
+						this.AttachFrame="IMBA_Blackboard"
+						this.color={r=0.0, g=0.0, b=0.0, a=1.0};
+						this.callback=IMBA_BlackboardColor2Changed;
+					</OnLoad>
+				</Scripts>				
+			</Button>
+
+			<Button name="$parent_SwapColors" inherits="OptionsButtonTemplate" text="Swap Colors">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Color1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="128" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_SwapColors();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Frame name="$parent_Canvas" enableMouse="true">
+				<Size>
+					<AbsDimension x="350" y="350"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_BG"/>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."_BG"):SetTexture(IMBA_MapImages[1].image);
+					</OnLoad>
+					<OnMouseUp>
+						IMBA_Blackboard_Canvas_MouseDown=false;
+						if (IMBA_Blackboard_Mode>=5) then
+							local RaidIcon=getglobal("IMBA_Blackboard_Canvas_RaidIcon"..IMBA_Blackboard_Mode-4)
+							if ( RaidIcon.isMoving ) then
+								RaidIcon:StopMovingOrSizing();
+								RaidIcon:Update();
+								RaidIcon.isMoving = false;
+								IMBA_Blackboard_SendRaidIcon(IMBA_Blackboard_Mode-4);
+							end
+						end
+					</OnMouseUp>
+					<OnMouseDown>
+						IMBA_Blackboard_Canvas_MouseDown=true;
+					</OnMouseDown>
+					<OnUpdate>
+						IMBA_Blackboard_Canvas_OnUpdate();
+					</OnUpdate>
+				</Scripts>
+				<Frames>
+					<Frame name="$parent_RaidIcon1" id="1" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon2" id="2" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon3" id="3" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon4" id="4" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon5" id="5" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon6" id="6" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon7" id="7" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+					<Frame name="$parent_RaidIcon8" id="8" inherits="IMBA_Blackboard_RaidIconTemplate" hidden="true"/>
+
+					<Frame name="$parent_Text1" id="1" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text2" id="2" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text3" id="3" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text4" id="4" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text5" id="5" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text6" id="6" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text7" id="7" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text8" id="8" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text9" id="9" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text10" id="10" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text11" id="11" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text12" id="12" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text13" id="13" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text14" id="14" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text15" id="15" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text16" id="16" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text17" id="17" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text18" id="18" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text19" id="19" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+					<Frame name="$parent_Text20" id="20" inherits="IMBA_Blackboard_TextTemplate" hidden="true"/>
+				</Frames>
+			</Frame>
+
+			<Frame name="$parent_Title" inherits="IMBA_MainTitleTemplate">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent_Canvas" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+
+
+
+			<Frame name="$parent_Close" enableMouse="true">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Image" file="Interface\AddOns\IMBA\textures\close.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(1, 1, 1, 1);
+						this:SetBackdropColor(0.0,0.0,0.0,0);
+					</OnLoad>
+					<OnMouseDown>
+						IMBA_Blackboard:Hide();
+					</OnMouseDown>
+				</Scripts>
+			</Frame>			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				IMBA_Blackboard_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+			</OnUpdate>
+			<OnMouseUp>
+				if ( this.isMoving ) then
+					this:StopMovingOrSizing();
+					this.isMoving = false;
+				end
+			</OnMouseUp>
+			<OnMouseDown>
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:StartMoving();
+					this.isMoving = true;
+				end
+			</OnMouseDown>
+			<OnHide>
+			 if ( this.isMoving ) then
+			  this:StopMovingOrSizing();
+			  this.isMoving = false;
+			 end
+			</OnHide>
+			
+			<OnEvent>
+				IMBA_Blackboard_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
+
+
+
+
+
+
+	<Frame name="IMBA_BlackboardSave" parent="UIParent" enableMouse="true" movable="true" hidden="true" frameStrata="DIALOG">
+		<Size>
+			<AbsDimension x="250" y="82"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parent_Title">
+				<Size>
+					<AbsDimension x="160" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString font="Fonts\FRIZQT__.TTF" text="Save Blackboard Image As" justifyH="CENTER">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Shadow>
+								<Offset><AbsDimension x="1" y="-1"/></Offset>
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+							<FontHeight>
+								<AbsValue val="14" /> 
+							</FontHeight>
+							<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="$parent_ImageName">
+				<Size>
+					<AbsDimension x="160" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="20" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString font="Fonts\FRIZQT__.TTF" text="Name:" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="-12" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Shadow>
+								<Offset><AbsDimension x="1" y="-1"/></Offset>
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+							<FontHeight>
+								<AbsValue val="12" /> 
+							</FontHeight>
+							<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+						</FontString>
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="160" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<FontString font="Fonts\FRIZQT__.TTF">
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="12" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+				<Scripts>
+					<OnShow>
+						this:SetAutoFocus(false);
+						this:SetFocus();
+						this:SetText("");
+					</OnShow>
+					<OnEscapePressed>
+						this:ClearFocus();
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+			<Button name="$parent_Save" inherits="OptionsButtonTemplate" text="Save">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-44" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="80" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_SaveImage();
+						IMBA_BlackboardSave:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_Cancel" inherits="OptionsButtonTemplate" text="Cancel">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="44" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="80" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_BlackboardSave:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parent_Close" enableMouse="true">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Image" file="Interface\AddOns\Whiteboard\textures\close.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."_Image"):SetVertexColor(1,1,1,1);
+						this:SetBackdropBorderColor(1, 1, 1, 1);
+						this:SetBackdropColor(0.0,0.0,0.0,0);
+					</OnLoad>
+					<OnMouseDown>
+						IMBA_BlackboardSave:Hide();
+					</OnMouseDown>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(1, 1, 1, 1);
+				this:SetBackdropColor(0.0,0.0,0.0,0.6);
+			</OnLoad>
+			<OnMouseUp>
+				if ( this.isMoving ) then
+					this:StopMovingOrSizing();
+					this.isMoving = false;
+				end
+			</OnMouseUp>
+			<OnMouseDown>
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:StartMoving();
+					this.isMoving = true;
+				end
+			</OnMouseDown>
+			<OnHide>
+			 if ( this.isMoving ) then
+			  this:StopMovingOrSizing();
+			  this.isMoving = false;
+			 end
+			</OnHide>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="IMBA_Blackboard_FilenameTemplate" virtual="true" enableMouse="true">
+		<Size>
+			<AbsDimension x="200" y="14"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parent_Text" font="Fonts\FRIZQT__.TTF" text="Temp File Name" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="4" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Shadow>
+						<Offset><AbsDimension x="1" y="-1"/></Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<FontHeight>
+						<AbsValue val="12" /> 
+					</FontHeight>
+					<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+				</FontString>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parent_Selected" file="Interface\Buttons\UI-Listbox-Highlight" alphaMode="ADD" hidden="true">
+					<Size>
+						<AbsDimension x="200" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parent_Over" file="Interface\Buttons\UI-Listbox-Highlight2" alphaMode="ADD" hidden="true">
+					<Size>
+						<AbsDimension x="200" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName().."_Over"):Show()
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName().."_Over"):Hide()
+			</OnLeave>
+			<OnLoad>
+				getglobal(this:GetName().."_Over"):SetVertexColor(0.0,1.0,0.0,0.5);
+			</OnLoad>
+			<OnMouseDown>
+				IMBA_Blackboard_LoadImageClicked(this:GetID())
+			</OnMouseDown>
+		</Scripts>
+	</Frame>
+
+
+	<Frame name="IMBA_BlackboardLoad" parent="UIParent" enableMouse="true" movable="true" hidden="true" frameStrata="DIALOG">
+		<Size>
+			<AbsDimension x="250" y="210"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parent_Title">
+				<Size>
+					<AbsDimension x="160" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString font="Fonts\FRIZQT__.TTF" text="Load Blackboard Image" justifyH="CENTER">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Shadow>
+								<Offset><AbsDimension x="1" y="-1"/></Offset>
+								<Color r="0" g="0" b="0"/>
+							</Shadow>
+							<FontHeight>
+								<AbsValue val="14" /> 
+							</FontHeight>
+							<Color r="1.0" g="1.0" b="1.0" a="0.9"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="$parent_Image1" id="1" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>				
+			</Frame>
+			<Frame name="$parent_Image2" id="2" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image1">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_Image3" id="3" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image2">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_Image4" id="4" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image3">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_Image5" id="5" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image4">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_Image6" id="6" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image5">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_Image7" id="7" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image6">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parent_Image8" id="8" inherits="IMBA_Blackboard_FilenameTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parent_Image7">
+						<Offset>
+							<AbsDimension x="0" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<ScrollFrame name="$parent_ScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="240" y="150"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-32" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(25, IMBA_Blackboard_LoadImage_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="$parent_Load" inherits="OptionsButtonTemplate" text="Load">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-75" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="70" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_LoadImage()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_Delete" inherits="OptionsButtonTemplate" text="Delete">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="70" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_Blackboard_DeleteImage()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_Cancel" inherits="OptionsButtonTemplate" text="Cancel">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="75" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="70" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						IMBA_BlackboardLoad:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parent_Close" enableMouse="true">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parent_Image" file="Interface\AddOns\Whiteboard\textures\close.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPRIGHT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."_Image"):SetVertexColor(1,1,1,1);
+						this:SetBackdropBorderColor(1, 1, 1, 1);
+						this:SetBackdropColor(0.0,0.0,0.0,0);
+					</OnLoad>
+					<OnMouseDown>
+						IMBA_BlackboardLoad:Hide();
+					</OnMouseDown>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				IMBA_Blackboard_LoadImage_Update()
+			</OnShow>
+			<OnLoad>
+				this:SetBackdropBorderColor(1, 1, 1, 1);
+				this:SetBackdropColor(0.0,0.0,0.0,0.6);
+			</OnLoad>
+			<OnMouseUp>
+				if ( this.isMoving ) then
+					this:StopMovingOrSizing();
+					this.isMoving = false;
+				end
+			</OnMouseUp>
+			<OnMouseDown>
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then
+					this:StartMoving();
+					this.isMoving = true;
+				end
+			</OnMouseDown>
+			<OnHide>
+			 if ( this.isMoving ) then
+			  this:StopMovingOrSizing();
+			  this.isMoving = false;
+			 end
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

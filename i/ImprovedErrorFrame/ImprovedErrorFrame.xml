@@ -1,0 +1,188 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="localization.lua"/>
+	<Script file="localization.de.lua"/>
+	<Script file="localization.fr.lua"/>
+	<Script file="ImprovedErrorFrame.lua"/>
+	<Frame name="ImprovedErrorFrameFrame" inherits="DialogBoxFrame">
+		<Size>
+			<AbsDimension x="360" y="270"/>
+		</Size>
+		<!-- Header -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentHeaderText" inherits="GameFontNormal" text="IEF_TITLE_TEXT">
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentHeader" relativePoint="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="12" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="ImprovedErrorFrameReportButton">
+				<Size>
+					<AbsDimension x="128" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="80" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+						ImprovedErrorFrame_Report_OnClick(ImprovedErrorFrame.errorMessageList);
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="DialogButtonNormalText" text="IEF_REPORT"/>
+				<HighlightText inherits="DialogButtonHighlightText" text="IEF_REPORT"/>
+			</Button>
+			<Button name="ImprovedErrorFrameCloseButton">
+				<Size>
+					<AbsDimension x="128" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-80" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="DialogButtonNormalText" text="IEF_CLOSE"/>
+				<HighlightText inherits="DialogButtonHighlightText" text="IEF_CLOSE"/>
+			</Button>
+			<ScrollFrame name="ScriptErrorsScrollFrameOne" hidden="true" inherits="ClassTrainerDetailScrollFrameTemplate" toplevel="true">
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-10" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="305" y="200"/>
+				</Size>
+				<ScrollChild>
+					<EditBox name="ScriptErrorsScrollFrameOneText" multiLine="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="300" y="304"/>
+						</Size>
+						<FontString inherits="ChatFontNormal"/>
+						<Scripts>
+							<OnTextChanged>
+								if (ScriptErrorsScrollFrameOneText:GetText() ~= ImprovedErrorFrame.messagePrint) then
+									ScriptErrorsScrollFrameOneText:SetText(ImprovedErrorFrame.messagePrint);
+									ScriptErrorsScrollFrameOneText:ClearFocus();
+								end
+								
+								local scrollBar = getglobal(this:GetParent():GetName().."ScrollBar")
+								this:GetParent():UpdateScrollChildRect();
+								local min, max = scrollBar:GetMinMaxValues();
+								if ( max > 0 and (this.max ~= max) ) then
+									this.max = max;
+									scrollBar:SetValue(max);
+								end
+							</OnTextChanged>
+							<OnEscapePressed>
+								ImprovedErrorFrameFrame:Hide();
+							</OnEscapePressed>
+						</Scripts>
+					</EditBox>
+				</ScrollChild>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				ImprovedErrorFrame.onLoad();
+			</OnLoad>
+			<OnEvent>
+				ImprovedErrorFrame.onEvent(event);
+			</OnEvent>
+			<OnHide>
+				local errorMessageList = ImprovedErrorFrame.errorMessageList;
+				for i = 1, table.getn(errorMessageList), 1 do
+					local curMes = errorMessageList[i];
+					if (curMes.status == IEF_MSG_SHOWN) then
+						curMes.status = IEF_MSG_VIEWED;
+					end
+				end
+				ImprovedErrorFrame.updateStatus();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Button name="IEFMinimapButton" movable="true" parent="MinimapBackdrop" hidden="true">
+		<Size>
+			<AbsDimension x="33" y="33"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativeTo="Minimap" relativePoint="CENTER">
+				<Offset>
+					<AbsDimension x="12" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				ImprovedErrorFrame.Button.onLoad();
+			</OnLoad>
+			<OnEvent>
+				ImprovedErrorFrame.Button.onEvent(event);
+			</OnEvent>
+			<OnMouseDown>
+				IEFMinimapButton_OnMouseDown();
+			</OnMouseDown>
+			<OnMouseUp>
+				IEFMinimapButton_OnMouseUp();
+			</OnMouseUp>
+			<OnHide>
+				IEFMinimapButton_OnHide();
+			</OnHide>
+			<OnUpdate>
+				ImprovedErrorFrame.Button.onUpdate();
+			</OnUpdate>
+			<OnEnter>
+				if ( GetCVar("UberTooltips") == "1" ) then
+					GameTooltip_SetDefaultAnchor(GameTooltip, UIParent);
+					GameTooltip:SetText(IEF_TOOLTIP);
+				end
+			</OnEnter>							
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\AddOns\ImprovedErrorFrame\Skin\ErrorButton-Up"/>
+		<PushedTexture file="Interface\AddOns\ImprovedErrorFrame\Skin\ErrorButton-Down"/>
+		<DisabledTexture file="Interface\AddOns\ImprovedErrorFrame\Skin\ErrorButton-Disabled"/>
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+		<NormalText inherits="GameFontRed" text=""/>
+		<HighlightText inherits="GameFontRed" text=""/>
+	</Button>
+</Ui>

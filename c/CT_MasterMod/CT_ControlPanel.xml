@@ -1,0 +1,985 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_ControlPanel.lua"/>
+	<CheckButton name="CT_CPTabTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\SpellBook\SpellBook-SkillLineTab">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-3" y="11"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick>
+				CT_CPTab_OnClick();
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText(this.tooltiptext);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalTexture/>
+		<HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+	</CheckButton>
+	<Button name="CT_CPTabButtonTemplate" virtual="true" hidden="true">
+        <Size>
+            <AbsDimension x="128" y="64"/>
+        </Size>
+		<HitRectInsets>
+			<AbsInset left="15" right="14" top="13" bottom="15"/>
+		</HitRectInsets>
+	  <Scripts>
+			<OnClick>
+				CT_CPSetTab(this:GetID());
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetText(this.tooltiptext, 1.0,1.0,1.0 );
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<NormalText inherits="GameFontNormalSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="3"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalText>
+		<HighlightText inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="3"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>
+		<DisabledText inherits="GameFontHighlightSmall">
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="6"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledText>
+		<NormalTexture file="Interface\SpellBook\UI-SpellBook-Tab-Unselected"/>
+        <HighlightTexture file="Interface\SpellBook\UI-SpellbookPanel-Tab-Highlight"/>
+    </Button>
+	<CheckButton name="CT_CPButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="37" y="37"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIconTexture" setAllPoints="true" hidden="true"/>
+				<FontString name="$parentName" inherits="GameFontNormal" hidden="true" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="103" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="4" y="4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSubName" inherits="SubSpellFont" hidden="true" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="103" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentName" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				this.tooltiptext = "";
+				CT_CPButton_OnLoad();
+			</OnLoad>
+			<OnClick>
+				CT_CPButton_OnClick();
+			</OnClick>
+			<OnShow>
+				--CT_CPButton_UpdateButton();
+			</OnShow>
+			<OnEnter>
+				CT_CPButton_OnEnter();
+			</OnEnter>
+			<OnLeave>
+				this.updateTooltip = nil;
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnUpdate>
+				CT_CPButton_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+		<NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
+			<Size>
+				<AbsDimension x="64" y="64"/>
+			</Size>
+			<Anchors>
+				<Anchor point="CENTER">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<PushedTexture file="Interface\Buttons\UI-Quickslot-Depress"/>
+		<HighlightTexture name="$parentHighlight" file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/>
+	</CheckButton>
+	<Frame name="CT_CPFrame" movable="true" toplevel="true" frameStrata="DIALOG" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="70"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\Spellbook\Spellbook-Icon">
+					<Size>
+						<AbsDimension x="58" y="58"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-8"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\Spellbook\UI-SpellbookPanel-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Spellbook\UI-SpellbookPanel-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Spellbook\UI-SpellbookPanel-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\Spellbook\UI-SpellbookPanel-BotRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+				<FontString name="CT_CPTitleText" inherits="GameFontNormal" text="CT_MASTERMOD_CPTITLE">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="6" y="230"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_CPTabText" inherits="GameFontNormal" text="General">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="6" y="190"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_CPWelcomeText" hidden="true" inherits="GameFontNormal" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="270" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="34" y="-85"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_CPGeneralMoveText" hidden="true" inherits="GameFontNormal" justifyH="LEFT" text="CT_CPGENERALMOVE">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relative="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="125" y="145"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="CT_CPPageText" inherits="GameFontNormal">
+					<Size>
+						<AbsDimension x="102" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="-14" y="96"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="CT_CPMoveButton" hidden="false">
+				<Size>
+					<AbsDimension x="250" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-55" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StartMoving();
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						if ( arg1 == "LeftButton" ) then
+							this:GetParent():StopMovingOrSizing();
+						end
+					</OnMouseUp>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText("Click to drag");
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="CT_CPTabButton1" inherits="CT_CPTabButtonTemplate">
+                		<Anchors>
+                   		 <Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+		                        <Offset>
+                		            <AbsDimension x="79" y="61"/>
+		                        </Offset>
+                		    </Anchor>
+		                </Anchors>
+				<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab1-Selected"/>
+			</Button>
+		<Button name="CT_CPTabButton2" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton1" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab1-Selected"/>
+            </Button>
+
+		<Button name="CT_CPTabButton3" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton2" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab3-Selected"/>
+            </Button>
+
+			<Button name="CT_CPTabButton4" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton3" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab3-Selected"/>
+            </Button>
+
+			<Button name="CT_CPTabButton5" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton4" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab3-Selected"/>
+            </Button>
+
+			<Button name="CT_CPTabButton6" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton5" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab3-Selected"/>
+            </Button>
+
+			<Button name="CT_CPTabButton7" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton6" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab3-Selected"/>
+            </Button>
+
+			<Button name="CT_CPTabButton8" inherits="CT_CPTabButtonTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="CT_CPTabButton7" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-20" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+		<DisabledTexture file="Interface\SpellBook\UI-SpellBook-Tab3-Selected"/>
+            </Button>
+			<Button name="CT_CPPrevPage">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="50" y="105"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormal" justifyH="LEFT" text="PREV">
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="CT_CPPrevPage" relativePoint="RIGHT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						CT_CPFrame_ChangePage(-1);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="CT_CPNextPage">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="314" y="105"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontNormal" justifyH="RIGHT" text="NEXT">
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="CT_CPNextPage" relativePoint="LEFT"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						CT_CPFrame_ChangePage(1);
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Button name="CT_CPCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="CT_CPFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-44" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<CheckButton name="CT_CPButton1" inherits="CT_CPButtonTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="34" y="-85"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton2" inherits="CT_CPButtonTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton1">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton3" inherits="CT_CPButtonTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton4" inherits="CT_CPButtonTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton3">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton5" inherits="CT_CPButtonTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton6" inherits="CT_CPButtonTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton5">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton7" inherits="CT_CPButtonTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton8" inherits="CT_CPButtonTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton7">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton9" inherits="CT_CPButtonTemplate" id="9">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton10" inherits="CT_CPButtonTemplate" id="10">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton9">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton11" inherits="CT_CPButtonTemplate" id="11">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton12" inherits="CT_CPButtonTemplate" id="12">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton11">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton13" inherits="CT_CPButtonTemplate" id="13">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPButton14" inherits="CT_CPButtonTemplate" id="14">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPButton13">
+						<Offset>
+							<AbsDimension x="157" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab1" inherits="CT_CPTabTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-32" y="-65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab2" inherits="CT_CPTabTemplate" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab3" inherits="CT_CPTabTemplate" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab4" inherits="CT_CPTabTemplate" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab5" inherits="CT_CPTabTemplate" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab6" inherits="CT_CPTabTemplate" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab7" inherits="CT_CPTabTemplate" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<CheckButton name="CT_CPTab8" inherits="CT_CPTabTemplate" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CT_CPTab7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-17"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</CheckButton>
+			<Frame name="CT_CPFlashFrame" hidden="false">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="SpellBookSkillLineTab1">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="CT_CPTab1Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab1"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab2Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab2"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab3Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab3"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab4Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab4"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab5Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab5"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab6Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab6"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab7Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab7"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPTab8Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPTab8"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton1Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton1"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton2Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton2"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton3Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton3"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton4Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton4"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton5Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton5"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton6Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton6"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton7Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton7"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton8Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton8"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton9Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton9"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton10Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton10"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton11Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton11"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton12Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton12"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton13Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton13"/>
+							</Anchors>
+						</Texture>
+						<Texture name="CT_CPButton14Flash" file="Interface\Buttons\CheckButtonGlow" alphaMode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="80" y="80"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="CT_CPButton14"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="CT_CPGeneralMoveCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="CT_CPGeneralMoveText" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_UnlockCP(this:GetChecked());
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<!-- Thanks to bc_TrackingMenu for this slider code -->
+			<Slider name="CT_CPGeneralSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="290" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relative="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-10" y="100"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText(CT_MASTERMOD_BUTTONPLACEMENT);
+						getglobal(this:GetName().."High"):SetText();
+						getglobal(this:GetName().."Low"):SetText();
+						this:SetMinMaxValues(0, 360);
+						this:SetValueStep(1);
+						this.tooltipText = CT_MASTERMOD_BUTTONPLACEMENTTOOLTIP;
+					</OnLoad>
+					<OnShow>
+						if (CT_CPBPosition) then
+							this:SetValue(CT_CPBPosition);
+						end
+					</OnShow>
+					<OnValueChanged>
+						CT_CPBPosition = this:GetValue();
+						getglobal(this:GetName().."Text"):SetText(CT_MASTERMOD_BUTTONPLACEMENT .. " - "..this:GetValue().."\194\176");
+						CT_OptionButton:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - (80 * cos(this:GetValue())), (80 * sin(this:GetValue())) - 52);
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				CT_CPFrame_OnLoad();
+			</OnLoad>
+			<OnShow>
+				CT_CPFrame_OnShow();
+			</OnShow>
+			<OnEvent>
+				CT_CPGeneralMoveCB:SetChecked(CT_CPMovable);
+				CT_UnlockCP(CT_CPMovable);
+			</OnEvent>
+			<OnHide>
+				this:StopMovingOrSizing();
+				CT_CPFrame_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_CPModSliderFrame" parent="CT_CPFrame" hidden="true">
+		<Size>
+			<AbsDimension x="195" y="50"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" setAllPoints="true" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(0, 0, 1, 0.75);
+				this:SetFrameLevel(3);
+			</OnLoad>
+		</Scripts>
+		<Frames>
+			<Slider name="$parentSlider" inherits="OptionsSliderTemplate">
+				<Size>
+					<AbsDimension x="150" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="CENTER"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(4);
+					</OnLoad>
+					<OnValueChanged>
+						if ( this.onChangeFunc ) then
+							this.onChangeFunc(this.id, this:GetValue());
+						end
+						if ( this.showValueInTitle ) then
+							getglobal(this:GetName() .. "Text"):SetText(this.title .. " - " .. format(this.showValueInTitle, floor(this:GetValue()*100)/100));
+						else
+							getglobal(this:GetName() .. "Text"):SetText(this.title);
+						end
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+		</Frames>
+	</Frame>
+</Ui>

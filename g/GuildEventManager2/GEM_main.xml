@@ -1,0 +1,332 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="GEM_main.lua"/>
+	
+	<Button name="GEMMinimapButton" parent="Minimap" toplevel="true" hidden="true">
+		<Size>
+			<AbsDimension x="36" y="36"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonDown", "RightButtonDown");
+			</OnLoad>
+			<OnClick>
+				if (arg1 == "LeftButton") then
+					GEM_Toggle();
+				else
+					GEM_Toggle();
+				end
+			</OnClick>
+			<OnEnter> 
+				GameTooltip:SetOwner(this, "ANCHOR_LEFT");
+				GameTooltip:ClearLines();
+				GameTooltip:SetText(GEM_TITLE); 
+				if(table.getn(GEM_NewEvents) ~= 0) then
+					GameTooltip:AddLine(GEM_TEXT_NEW_EVENTS_AVAILABLE..table.getn(GEM_NewEvents)); 
+				end
+				GameTooltip:Show(); 
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture" file="Interface\Icons\Spell_Nature_TimeStop">
+					<Size>
+						<AbsDimension x="22" y="22"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="6" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontHighlight" justifyH="CENTER">
+					<Size>
+						<AbsDimension x="16" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="8" y="-8"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size>
+						<AbsDimension x="57" y="57"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<Frame name="GEMTabFrame" hidden="true" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="512" y="440"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-40"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnEscapePressed>
+				this:Hide();
+			</OnEscapePressed>
+			<OnMouseUp>
+				GEMMain_OnMouseUp();
+			</OnMouseUp>
+			<OnMouseDown>
+				GEMMain_OnMouseDown(arg1);
+			</OnMouseDown>
+			<OnHide>
+				GEMMain_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+	
+	<EditBox name="GEMEditBoxTemplate" letters="200" autoFocus="false" historyLines="256" virtual="true" >
+		<Size>
+			<AbsDimension x="200" y="26"/>
+		</Size>
+		<TextInsets>
+				<AbsInset  left="0" right="5" />
+		</TextInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="8" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+					<Size>
+						<AbsDimension x="10" y="26"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		
+		<FontString inherits="ChatFontNormal" bytes="256"/>
+				
+		<Scripts>
+			<OnShow>
+				this:ClearFocus();
+			</OnShow>
+			<OnEnterPressed>
+				this:ClearFocus();
+			</OnEnterPressed>
+			<OnEscapePressed>
+				this:ClearFocus();
+			</OnEscapePressed>
+		</Scripts>
+	</EditBox>
+	
+	<Frame name="GEMMainFrame" parent="UIParent" hidden="true" toplevel="true" enableMouse="true" movable="true">
+			<Size>
+				<AbsDimension x="512" y="542"/>
+			</Size>
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="-50"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+				<EdgeSize>
+					<AbsValue val="16"/>
+				</EdgeSize>
+				<TileSize>
+					<AbsValue val="16"/>
+				</TileSize>
+				<BackgroundInsets>
+					<AbsInset left="3" right="5" top="3" bottom="5"/>
+				</BackgroundInsets>
+			</Backdrop>
+			<Layers>
+				<Layer level="ARTWORK">
+					<FontString name="$parentTitle" inherits="GameFontNormal" text="GEM_TITLE">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="GEMMainFrame" relativeFrom="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</FontString>
+				</Layer>
+			</Layers>
+			<Frames>
+					<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="GEMMainFrame">
+								<Offset>
+									<AbsDimension x="2" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					
+					
+					<Button name="$parentTab1" inherits="CharacterFrameTabButtonTemplate" id="1" text="GEM_TAB_LIST">
+						<Anchors>
+							<Anchor point="CENTER" relativePoint="BOTTOMLEFT" relativeTo="GEMMainFrame">
+								<Offset>
+									<AbsDimension x="65" y="-14"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>GEMNew_CheckResetEdit();GEMMain_SelectTab(1);</OnClick>
+						</Scripts>
+					</Button>
+			
+					<Button name="$parentTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="GEM_TAB_NEW">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-14" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>GEMMain_SelectTab(2);</OnClick>
+						</Scripts>
+					</Button>
+					
+					<Button name="$parentTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="GEM_TAB_PLAYERS">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-14" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>GEMMain_SelectTab(3);</OnClick>
+						</Scripts>
+					</Button>
+					
+					<Button name="$parentTab4" inherits="CharacterFrameTabButtonTemplate" id="4" text="GEM_TAB_OPTIONS">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-14" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>GEMNew_CheckResetEdit();GEMMain_SelectTab(4);</OnClick>
+						</Scripts>
+					</Button>
+					
+					<Button name="$parentTab5" inherits="CharacterFrameTabButtonTemplate" id="5" text="Debug">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentTab4" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-14" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>GEMMain_SelectTab(5);</OnClick>
+						</Scripts>
+					</Button>
+					
+			</Frames>
+			<Scripts>
+				<OnLoad>
+					GEMMain_OnLoad();
+				</OnLoad>
+				<OnShow>
+					GEMMain_OnShow();
+				</OnShow>
+				<OnEscapePressed>
+					this:Hide();
+				</OnEscapePressed>
+				<OnMouseUp>
+					GEMMain_OnMouseUp();
+				</OnMouseUp>
+				<OnMouseDown>
+					GEMMain_OnMouseDown(arg1);
+				</OnMouseDown>
+				<OnHide>
+					GEMMain_OnHide();
+				</OnHide>
+		</Scripts>
+	</Frame>
+        
+	<Button name="GEM_HelpTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="18" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="[?]">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 0.82, 0);
+				GEM_Help_SetTooltip();
+				GameTooltip:SetText(this.text, 1, 0.72, 0, nil);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 1, 1);
+				GameTooltip:Hide();						
+			</OnLeave>
+			<OnLoad>
+				this.text = "";
+				GEM_Help_LoadText();
+			</OnLoad>
+		</Scripts>
+	</Button>
+        
+</Ui>

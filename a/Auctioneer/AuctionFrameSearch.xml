@@ -1,0 +1,1046 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+<!--
+	Version: 3.6.1 (Platypus)
+	Revision: $Id: AuctionFrameSearch.xml 782 2006-04-01 05:30:22Z vindicator $
+
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+	<Script file="AuctionFrameSearch.lua"/>
+
+	<Frame name="SearchParametersTemplate" virtual="true">
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="27" y="-150"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="155" y="265"/>
+		</Size>
+	</Frame>
+
+	<Button name="SearchListItemTemplate" inherits="ListItemTemplate" virtual="true">
+		<Scripts>
+			--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for adding cursor support.
+			local scrollFrame = nil
+			local index = nil;
+			<OnEnter>
+				scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
+				index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
+				AuctionFrameSearch_ListItem_OnEnter(index);
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+				ResetCursor();
+				scrollFrame = nil;
+				index = nil;
+			</OnLeave>
+			<OnClick>
+				AuctionFrameSearch_ListItem_OnClick(index);
+			</OnClick>
+			<OnUpdate>
+				if (index) then
+					if (IsControlKeyDown()) then
+						ShowInspectCursor()
+					elseif (IsShiftKeyDown() and IsAltKeyDown()) then
+						SetCursor("BUY_CURSOR")
+					else
+						ResetCursor()
+					end
+				end
+			</OnUpdate>
+		</Scripts>
+		<HighlightTexture name="$parentHighlight" file="Interface\HelpFrame\HelpFrameButton-Highlight" alphaMode="ADD">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<TexCoords left="0" right="1.0" top="0" bottom="0.578125"/>
+		</HighlightTexture>
+	</Button>
+
+	<Frame name="AuctionFrameSearch" inherits="AuctionFrameTemplate" hidden="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentTitle" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentTabText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="85" y="-85"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="27" y="-107"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="$parentSavedSearchText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="190" y="-52"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+				<FontString name="$parentPendingBidStatusText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="200" y="22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentSaveSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="150" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSavedSearchText" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+					</OnTabPressed>
+					<OnEnterPressed>
+						AuctionFrameSearch_SaveSearchButton_OnClick(this);
+					</OnEnterPressed>
+				</Scripts>
+			</EditBox>
+			<Frame name="$parentSavedSearchDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSaveSearchEdit" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-13" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Left"):Hide();
+						getglobal(this:GetName().."Middle"):Hide();
+						getglobal(this:GetName().."Right"):Hide();
+						getglobal(this:GetName().."Text"):Hide();
+						UIDropDownMenu_SetWidth(getglobal(this:GetParent():GetName().."SaveSearchEdit"):GetWidth());
+						AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_SavedSearchDropDown_Initialize);
+						AuctioneerDropDownMenu_SetSelectedID(this, 1);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parentSaveSearchButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSaveSearchEdit" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="24" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AuctionFrameSearch_SaveSearchButton_OnClick(this);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentRemoveSearchButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSaveSearchButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AuctionFrameSearch_RemoveSearchButton_OnClick(this);
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Frame name="$parentSearchDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSearchText" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-20" y="-4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(130);
+						getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Bid Search Frame -->
+			<Frame name="$parentBid" inherits="SearchParametersTemplate">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentMinProfitText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMinPercentLessText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
+									<Offset>
+										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTimeLeftText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinPercentLessText">
+									<Offset>
+										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentCategoryText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentTimeLeftText">
+									<Offset>
+										<AbsDimension x="0" y="-42"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMinQualityText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentCategoryText">
+									<Offset>
+										<AbsDimension x="0" y="-42"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinQualityText">
+									<Offset>
+										<AbsDimension x="0" y="-42"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentMinProfit" inherits="AuctioneerMoneyInputFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								MoneyInputFrame_SetCopper(this, 5000);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<EditBox name="$parentMinPercentLessEdit" letters="5" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="40" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinPercentLessText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetNumber(30);
+							</OnLoad>
+							<OnEditFocusLost>
+								this:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								this:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+					</EditBox>
+					<Frame name="$parentTimeLeftDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentTimeLeftText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_TimeLeftDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 2);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentCategoryDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentCategoryText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentMinQualityDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinQualityText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<EditBox name="$parentSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSearchText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTabPressed>
+								getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+							</OnTabPressed>
+							<OnEnterPressed>
+								AuctionFrameSearchBid_SearchButton_OnClick(this);
+							</OnEnterPressed>
+						</Scripts>
+					</EditBox>
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="13" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AuctionFrameSearchBid_SearchButton_OnClick(this);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
+						getglobal(this:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(this:GetName().."TimeLeftText"):SetText(_AUCT('UiMaximumTimeLeftLabel'));
+						getglobal(this:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
+						getglobal(this:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
+						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Buyout Search Frame -->
+			<Frame name="$parentBuyout" inherits="SearchParametersTemplate">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentMinProfitText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMinPercentLessText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
+									<Offset>
+										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentCategoryText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinPercentLessText">
+									<Offset>
+										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMinQualityText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentCategoryText">
+									<Offset>
+										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinQualityText">
+									<Offset>
+										<AbsDimension x="0" y="-42"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentMinProfit" inherits="AuctioneerMoneyInputFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								MoneyInputFrame_SetCopper(this, 5000);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<EditBox name="$parentMinPercentLessEdit" letters="5" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="40" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinPercentLessText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetNumber(30);
+							</OnLoad>
+							<OnEditFocusLost>
+								this:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								this:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+					</EditBox>
+					<Frame name="$parentCategoryDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentCategoryText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentMinQualityDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinQualityText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<EditBox name="$parentSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSearchText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTabPressed>
+								getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+							</OnTabPressed>
+							<OnEnterPressed>
+								AuctionFrameSearchBuyout_SearchButton_OnClick(this);
+							</OnEnterPressed>
+						</Scripts>
+					</EditBox>
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="13" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AuctionFrameSearchBuyout_SearchButton_OnClick(this);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
+						getglobal(this:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(this:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
+						getglobal(this:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
+						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Compete Search Frame -->
+			<Frame name="$parentCompete" inherits="SearchParametersTemplate">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentUndercutText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentUndercut" inherits="AuctioneerMoneyInputFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentUndercutText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								MoneyInputFrame_SetCopper(this, 500);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="13" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AuctionFrameSearchCompete_SearchButton_OnClick(this);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."UndercutText"):SetText(_AUCT('UiMinimumUndercutLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Plain Search Frame -->
+			<Frame name="$parentPlain" inherits="SearchParametersTemplate">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentMaxPriceText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentCategoryText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMaxPriceText">
+									<Offset>
+										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMinQualityText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentCategoryText">
+									<Offset>
+										<AbsDimension x="0" y="-42"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinQualityText">
+									<Offset>
+										<AbsDimension x="0" y="-42"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentMaxPrice" inherits="AuctioneerMoneyInputFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMaxPriceText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								MoneyInputFrame_SetCopper(this, 0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentCategoryDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentCategoryText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<Frame name="$parentMinQualityDropDown" inherits="UIDropDownMenuTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinQualityText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="-20" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(130);
+								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<EditBox name="$parentSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSearchText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnTabPressed>
+								getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+							</OnTabPressed>
+							<OnEnterPressed>
+								AuctionFrameSearchPlain_SearchButton_OnClick(this);
+							</OnEnterPressed>
+						</Scripts>
+					</EditBox>
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="13" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AuctionFrameSearchPlain_SearchButton_OnClick(this);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."MaxPriceText"):SetText(_AUCT('UiMaximumPriceLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(this:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
+						getglobal(this:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
+						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Results List -->
+			<Frame name="$parentList" inherits="ListTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="187" y="-77"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="610" y="334"/>
+				</Size>
+				<Frames>
+					<Button name="$parentItem1" inherits="SearchListItemTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentColumn1Sort" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="4" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem2" inherits="SearchListItemTemplate" id="2">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem3" inherits="SearchListItemTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem4" inherits="SearchListItemTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem5" inherits="SearchListItemTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem6" inherits="SearchListItemTemplate" id="6">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem7" inherits="SearchListItemTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem6" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem8" inherits="SearchListItemTemplate" id="8">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem7" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem9" inherits="SearchListItemTemplate" id="9">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem8" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem10" inherits="SearchListItemTemplate" id="10">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem9" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem11" inherits="SearchListItemTemplate" id="11">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem10" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem12" inherits="SearchListItemTemplate" id="12">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem11" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem13" inherits="SearchListItemTemplate" id="13">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem12" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem14" inherits="SearchListItemTemplate" id="14">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem13" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem15" inherits="SearchListItemTemplate" id="15">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem14" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem16" inherits="SearchListItemTemplate" id="16">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem15" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem17" inherits="SearchListItemTemplate" id="17">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem16" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem18" inherits="SearchListItemTemplate" id="18">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem17" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentItem19" inherits="SearchListItemTemplate" id="19">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentItem18" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+			<Button name="$parentBuyoutButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AuctionFrameSearch_BuyoutButton_OnClick(this);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentBidButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentBuyoutButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AuctionFrameSearch_BidButton_OnClick(this);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Title"):SetText(_AUCT('UiSearchAuctions'));
+				getglobal(this:GetName().."TabText"):SetText(_AUCT('UiSearch'));
+				getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchDropDownLabel'));
+				getglobal(this:GetName().."BidButton"):SetText(_AUCT('UiBid'));
+				getglobal(this:GetName().."BuyoutButton"):SetText(_AUCT('UiBuyout'));
+				getglobal(this:GetName().."SavedSearchText"):SetText(_AUCT('UiSavedSearchLabel'));
+				getglobal(this:GetName().."SaveSearchButton"):SetText(_AUCT('UiSaveSearchButton'));
+				getglobal(this:GetName().."RemoveSearchButton"):SetText(_AUCT('UiRemoveSearchButton'));
+				AuctionFrameSearch_OnLoad();
+			</OnLoad>
+			<OnShow>
+				AuctionFrameSearch_OnShow();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Button name="AuctionFrameTabSearch" inherits="AuctionTabTemplate" hidden="true">
+		<Scripts>
+			<OnLoad>
+				this:SetText(_AUCT('UiSearchAuctions'));
+			</OnLoad>
+		</Scripts>
+	</Button>
+</Ui>

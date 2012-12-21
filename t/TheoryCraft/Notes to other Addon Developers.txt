@@ -1,0 +1,96 @@
+To be able to get data from TC, just call (in order of speed):
+TheoryCraft_GetSpellDataByFrame(tooltip)
+TheoryCraft_GetSpellDataByName(spellname, spellrank)
+TheoryCraft_GetSpellDataByDescription(description)	(extremely slow if no data for that spell is already generated)
+
+If there is data for the spell, it will be returned.  If not it'll generate it 
+(if possible), and save it so that future accesses are quick (until the table needs to be reset, eg on 
+equipping more spell damage gear).  The following is an example to get the minimum damage done by a spell:
+
+local spelldata = TheoryCraft_GetSpellDataByName("Immolate", 5)
+Print(spelldata.mindamage)
+
+All values are returned unrounded.
+
+Please Note that TheoryCraft_GetSpellDataByDescription is extremely slow at generating data if it's not already
+present in the array, as it has to set tooltips for every single spell in your spellbook and compare them
+to the description given.  I do not expect this function to be used much.
+
+The following are accessible (or nil, depending on the spell)
+
+description
+mindamage
+maxdamage
+critdmgchance
+critdmgmin
+critdmgmax
+critdmgminminusignite
+critdmgmaxminusignite
+averagedamnocrit
+averagedam
+manacost		(true mana cost, includes regen)
+basemanacost
+dpm
+withdotdpm
+dps
+withdotdps
+maxoomdam
+maxevocoomdam
+sealunbuffed
+sealbuffed
+nextagidam
+nextcritdam
+nexthitdam
+nextpendam
+nextagidps  		(hunter's autoshoot only)
+nextcritdps 		(hunter's autoshoot only)
+nexthitdps  		(hunter's autoshoot only)
+nextagidamequive
+nextcritdamequive
+nexthitdamequive
+nextpendamequive
+nextagidpsequive  	(hunter's autoshoot only)
+nextcritdpsequive 	(hunter's autoshoot only)
+nexthitdpsequive  	(hunter's autoshoot only)
+rotationdps
+regendam
+icregendam
+damcoef
+damcoef2		(dot coef)
+plusdam
+finaldam
+dameff
+penetration
+dpsafterresists
+lifetapdps
+lifetapdpm
+showonbutton		(if a tooltip is generated due to mouseover, but it is not supposed to be shown on buttons, this
+			 will be false)
+
+And all of the above with dam/dmg replaced by heal, eg minheal, maxheal, hpm
+
+When any of the above values change, or action bars change, TC will reset the table
+TheoryCraft_UpdatedButtons to blank.  So if you want to know whenever it gets changed, simply set a unique key in the 
+table to true, and every OnUpdate check that it's still true.  When it isn't, a spell's data has changed.
+
+You shouldn't need to regenerate the data, but if so call TheoryCraft_GenerateAll().
+
+Other global functions include :-
+
+	TheoryCraft_UpdateTalents(genall) 
+	TheoryCraft_UpdateGear(target, genall)    If target ~= "player", will do nothing
+	TheoryCraft_UpdateBuffs(target, genall)
+	TheoryCraft_LoadStats()
+
+If genall is true on any of the above, then TheoryCraft_LoadStats() and TheoryCraft_GenerateAll() will not be called
+even if they need to be.  Normally these will only be called if an array changes, however you may wish to call
+UpdateGear, and UpdateBuffs without wanting each to call GenerateAll(), so in that case you would pass genall as
+true in both cases.  If genall is false they'll call LoadStats as well, and call GenerateAll() automatically if
+either the stats array or the buffs/gear array changes.
+
+Finally there is a global function called TheoryCraft_AddToCustom(linkid). Just pass this one an item link and it'll
+add it to the custom outfit.
+
+If you need anymore help/info or any modifications just contact me on curse :).
+
+- Aelian

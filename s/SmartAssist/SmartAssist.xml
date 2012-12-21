@@ -1,0 +1,161 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+	<Script file="localisation.lua"/> 
+	<Script file="SmartAssist.lua"/> 
+	
+	<Frame name="SAWarningFrame" hidden="true" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="64" y="64"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+		
+			<Frame setAllPoints="true">
+				<Layers>
+	            	<Layer level="OVERLAY">
+	        	        <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER" text="|cFFFF0000PASSIVE|r">
+							<Size><AbsDimension x="64" y="10"/></Size>
+							<Anchors>
+                        		<Anchor point="BOTTOM">
+                    	        	<Offset><AbsDimension x="0" y="-12"/></Offset>
+                	        	</Anchor>
+            	        	</Anchors>
+	        	        </FontString>
+	    	        </Layer>
+		        </Layers>
+		    </Frame>
+		
+		
+			<Button name="SAWarningButton">
+				<Size>
+					<AbsDimension x="64" y="64"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\Icons\Spell_Nature_Polymorph"/>
+				<PushedTexture file="Interface\Icons\Spell_Nature_Polymorph"/>
+				<!--<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>-->
+				<Scripts>
+					<OnLoad>
+						this:RegisterForDrag("LeftButton");
+					</OnLoad>
+					<OnUpdate>
+						SA_WarnOnUpdate(arg1);
+					</OnUpdate>
+					<OnDragStart>
+						SAWarningFrame:StartMoving();
+					</OnDragStart>
+					<OnDragStop>
+						SAWarningFrame:StopMovingOrSizing();
+					</OnDragStop>
+					<OnMouseUp>
+						SAWarningFrame:StopMovingOrSizing();
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<!-- Frame to handle all core events --> 
+	<Frame name="SmartAssistFrame" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true"> 
+		<Size>
+			<AbsDimension x="180" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP"/>
+		</Anchors>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="SmartAssistText" inherits="GameFontNormal" wraponspaces="true">
+					<Size>
+						<AbsDimension x="180" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+   
+		<Scripts> 
+	        <OnLoad> 
+	        	SA_OnLoad();
+    	        this:RegisterEvent("VARIABLES_LOADED"); 
+            	this:RegisterEvent("CHAT_MSG_TEXT_EMOTE");
+            	this:RegisterEvent("UNIT_HEALTH");
+            	this:RegisterEvent("PLAYER_TARGET_CHANGED");
+            	<!-- for party sync testing -->
+            	this:RegisterEvent("CHAT_MSG_SYSTEM");
+            	this:RegisterEvent("PARTY_MEMBERS_CHANGED");
+            	<!-- spell stop events -->
+            	this:RegisterEvent("SPELLCAST_STOP");
+            	this:RegisterEvent("SPELLCAST_INTERRUPTED");
+            	this:RegisterEvent("SPELLCAST_FAILED");
+         	</OnLoad> 
+         	<OnEvent> 
+	            if (event == "VARIABLES_LOADED") then 
+                	SA_VariablesLoaded(); 
+            	elseif (event == "CHAT_MSG_TEXT_EMOTE") then
+	                SA_EmoteAssist(arg1);
+            	elseif (event == "UNIT_HEALTH") then
+            		SA_UnitHealth(arg1);
+				elseif (event == "PLAYER_TARGET_CHANGED") then
+					SA_PlayerTargetChanged();
+				end
+            	<!-- experimental testing below -->
+            	--[[
+            	if (event == "CHAT_MSG_SYSTEM") then
+            		SA_Debug("chat_msg_system arg1="..arg1);
+					if (string.find(arg1, "has left the") ~= nil or string.find(arg1, "joins the party.")) then
+						SA_Debug("PARTY/RAID CHANGED!");
+					end
+				end
+				if (event == "PARTY_MEMBERS_CHANGED") then
+					-- note: this seems to get called once per every player when joinin to group
+					SA_Debug("got event PARTY_MEMBERS_CHANGED");
+				end
+				--]]
+         	</OnEvent>
+		</Scripts> 
+	</Frame> 
+   
+	<MessageFrame name="SAMsgFrame" insertMode="TOP" parent="UIParent" frameStrata="LOW" toplevel="true">
+		<Size>
+	 		<AbsDimension x="512" y="60"/>
+    	</Size>
+    	<Anchors>
+       		<Anchor point="CENTER">
+		   		<Offset>
+		     		<AbsDimension x="0" y="190"/>
+		   		</Offset>
+			</Anchor>
+    	</Anchors>
+     	<FontString inherits="SubZoneTextFont" justifyH="CENTER"/>
+   	</MessageFrame>	
+   
+</Ui>

@@ -1,0 +1,833 @@
+<Ui>
+	<Script file="tradeDispenser.lua"/>
+	<Frame name="tDItemTemp" inherits="TradeItemTemplate" virtual="true">
+		<Frames>
+			<Button name="$parentItemButton" inherits="ItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						tradeDispenserClick(this:GetParent():GetID());
+					</OnClick>
+					<OnDragStart>
+						tradeDispenserClick(this:GetParent():GetID());
+					</OnDragStart>
+					<OnReceiveDrag>
+						tradeDispenserClick(this:GetParent():GetID());
+					</OnReceiveDrag>
+					<OnLoad>
+						this:RegisterForDrag("LeftButton");
+						this:SetFrameLevel(this:GetFrameLevel() + 2);
+						getglobal(this:GetParent():GetName().."Name"):SetText("")
+					</OnLoad>
+					<OnEnter>
+						CursorUpdate();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+						ResetCursor();
+					</OnLeave>
+					<OnUpdate>
+						CursorOnUpdate();
+					</OnUpdate>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	
+	
+	
+	
+	<Button name="tDProfilesTemp"  inherits="UIPanelButtonGrayTemplate" virtual="true">
+		<Size>	<AbsDimension x="123" y="17"/>	</Size>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetParent():GetParent():GetFrameLevel()+4);
+				this:SetText(tD_Loc.profile[this:GetID()]);
+			</OnLoad>
+			<OnClick>
+				tradeDispenserPlaySound(this)
+				local f=getglobal(this:GetParent():GetParent():GetName().."DDTitleLbL");
+				local col = tradeDispenserProfileColors[this:GetID()];
+				f:SetText(this:GetText())
+				f:SetTextColor(col.r,col.g,col.b)
+				this:GetParent():Hide()
+				tD_CharDatas.ActualProfile=this:GetID()
+				tradeDispenserUpdate()
+			</OnClick>			
+		</Scripts>
+	</Button>
+	
+
+	<Frame name="tDProfileDDTemp" virtual="true">
+		<Size>	<AbsDimension x="105" y="25"/>	</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize><AbsValue val="2"/></TileSize>
+			<EdgeSize><AbsValue val="0"/></EdgeSize>
+		</Backdrop>	
+		<Layers>
+			<Layer level="ARTWORK">		<!-- TITLE -->
+				<FontString name="$parentLbL" inherits="GameFontNormal" text="Show Profile">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="0" y="18"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_DDbtn">
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("MINIMAPCLOSE")
+						local f = getglobal(this:GetParent():GetName().."DDframe");
+						if (f:IsShown()) then 	f:Hide() 	else	f:Show()	end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this:GetParent(),"ANCHOR_TOPRIGHT",200,0);	
+						tradeDispenserDrawTooltip(tD_Loc.settings.Hint)
+					</OnEnter>
+					<OnLeave>	GameTooltip:Hide();	</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"></NormalTexture>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"></PushedTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"></HighlightTexture>
+			</Button>
+			<Frame name="$parentDDTitle" hidden="false">
+				<Size><AbsDimension x="102" y="22"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent_DDbtn" relativePoint="RIGHT">
+						<Offset><AbsDimension x="-1" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2" />
+					</BackgroundInsets>
+					<TileSize><AbsValue val="12" /></TileSize>
+					<EdgeSize><AbsValue val="2" /></EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">		<!-- Selected value -->
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="DummyProfile">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="3" y="1"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0, 0, 0, 0);
+						this:SetBackdropColor(0,0,0, 0);
+					</OnLoad>
+					<OnShow>
+						local s = 1
+						if (tD_CharDatas.ActualProfile) then
+							s = tD_CharDatas.ActualProfile
+						end
+						local col = tradeDispenserProfileColors[s];
+						local f = getglobal(this:GetName().."LbL")
+						f:SetTextColor(col.r, col.g, col.b);
+						f:SetText(tD_Loc.profile[s]);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentDDframe" hidden="true"  enableMouse="true">
+				<Size><AbsDimension x="150" y="242"/></Size>	
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="-18" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="11" right="12" top="12" bottom="11"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="32"/>
+					</EdgeSize>
+				</Backdrop>
+		<!-- ######################  SUB-FRAMES of DROP-DOWN  (clickable) ###################### -->
+				<Frames>
+					<Button name="$parentSub1"  inherits="tDProfilesTemp" id="1" text="all" >
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset><AbsDimension x="0" y="-15"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub2"  inherits="tDProfilesTemp" id="2" text="warrior" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub1" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="-5"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub3"  inherits="tDProfilesTemp" id="3" text="rogue" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub2" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub4"  inherits="tDProfilesTemp" id="4" text="hunter" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub3" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub5"  inherits="tDProfilesTemp" id="5" text="warlock" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub4" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>					
+					<Button name="$parentSub6"  inherits="tDProfilesTemp" id="6" text="mage" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub5" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub7"  inherits="tDProfilesTemp" id="7" text="druid" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub6" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub8"  inherits="tDProfilesTemp" id="8" text="priest" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub7" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub9"  inherits="tDProfilesTemp" id="9" text="combo" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub8" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub10"  inherits="tDProfilesTemp" id="10" text="melee" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub9" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="-5"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub11"  inherits="tDProfilesTemp" id="11" text="mana" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub10" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub12"  inherits="tDProfilesTemp" id="12" text="healer" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub11" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>					
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetParent():GetFrameLevel()+3);
+					</OnLoad>
+					<OnShow>
+						local i;
+						for i=1,12 do 
+							local col = tradeDispenserProfileColors[i];
+							local f=getglobal(this:GetName().."Sub"..i);
+							f:SetTextColor(col.r, col.g, col.b);
+							f:Show();
+						end 
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				local f=getglobal(this:GetName().."LbL");
+				f:SetText(tD_Loc.profile.title);
+				f:SetTextColor(1,1,1);
+				this:SetBackdropBorderColor(0, 0, 0, 0);
+				this:SetBackdropColor(0, 0, 0, 0);
+			</OnLoad>		
+		</Scripts>
+	</Frame>	
+
+
+
+	<Button name="tDRacksTemp"  inherits="UIPanelButtonGrayTemplate" virtual="true">
+		<Size>	<AbsDimension x="123" y="17"/>	</Size>
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetParent():GetParent():GetFrameLevel()+4);
+				this:SetText(tradeDispenserRackColor[this:GetID()].text..tD_Loc.rack..this:GetID());
+			</OnLoad>
+			<OnClick>
+				tradeDispenserPlaySound(this)
+				local f=getglobal(this:GetParent():GetParent():GetName().."DDTitleLbL");
+				f:SetText(tradeDispenserRackColor[this:GetID()].text..this:GetText())
+				this:GetParent():Hide()
+				tD_CharDatas.ActualRack=this:GetID()
+				tradeDispenserVerbose(3,"Rack set to "..tD_CharDatas.ActualRack);
+				tradeDispenserUpdate()
+			</OnClick>			
+		</Scripts>
+	</Button>	
+	
+	
+	<Frame name="tDRackDDTemp" virtual="true">
+		<Size>	<AbsDimension x="105" y="25"/>	</Size>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</BackgroundInsets>
+			<TileSize><AbsValue val="2"/></TileSize>
+			<EdgeSize><AbsValue val="0"/></EdgeSize>
+		</Backdrop>	
+		<Layers>
+			<Layer level="ARTWORK">		<!-- TITLE -->
+				<FontString name="$parentLbL" inherits="GameFontNormal" text="Show Rack">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="0" y="18"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_DDbtn">
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="0" y="2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound("MINIMAPCLOSE")
+						local f = getglobal(this:GetParent():GetName().."DDframe");
+						if (f:IsShown()) then 	f:Hide() 	else	f:Show()	end
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up"></NormalTexture>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down"></PushedTexture>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"></HighlightTexture>
+			</Button>
+			<Frame name="$parentDDTitle" hidden="false">
+				<Size><AbsDimension x="102" y="22"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent_DDbtn" relativePoint="RIGHT">
+						<Offset><AbsDimension x="-1" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2" />
+					</BackgroundInsets>
+					<TileSize><AbsValue val="12" /></TileSize>
+					<EdgeSize><AbsValue val="2" /></EdgeSize>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">		<!-- Selected value -->
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="DummyProfile">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="3" y="1"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0, 0, 0, 0);
+						this:SetBackdropColor(0,0,0, 0);
+					</OnLoad>
+					<OnShow>
+						local s = 1
+						if (tD_CharDatas.ActualRack) then	s = tD_CharDatas.ActualRack 	end
+						getglobal(this:GetName().."LbL"):SetText(tradeDispenserRackColor[s].text..tD_Loc.rack..s);
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentDDframe" hidden="true"  enableMouse="true">
+				<Size><AbsDimension x="150" y="82"/></Size>	
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset><AbsDimension x="-18" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+					<BackgroundInsets>
+						<AbsInset left="11" right="12" top="12" bottom="11"/>
+					</BackgroundInsets>
+					<TileSize>
+						<AbsValue val="32"/>
+					</TileSize>
+					<EdgeSize>
+						<AbsValue val="32"/>
+					</EdgeSize>
+				</Backdrop>
+		<!-- ######################  SUB-FRAMES of DROP-DOWN  (clickable) ###################### -->
+				<Frames>
+					<Button name="$parentSub1"  inherits="tDRacksTemp" id="1" text="all" >
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset><AbsDimension x="0" y="-15"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub2"  inherits="tDRacksTemp" id="2" text="warrior" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub1" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentSub3"  inherits="tDRacksTemp" id="3" text="rogue" >
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentSub2" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+					</Button>					
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetParent():GetFrameLevel()+3);
+					</OnLoad>
+					<OnShow>
+						local i;
+						for i=1,3 do 
+							local f=getglobal(this:GetName().."Sub"..i);
+							f:SetTextColor(1, 0.8, 0);
+							f:Show();
+						end 
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				local f=getglobal(this:GetName().."LbL");
+				f:SetText(tD_Loc.RackTitle);
+				f:SetTextColor(1,1,1);
+				this:SetBackdropBorderColor(0, 0, 0, 0);
+				this:SetBackdropColor(0, 0, 0, 0);
+			</OnLoad>		
+		</Scripts>
+	</Frame>
+	
+	
+	
+	
+	
+	<Frame name="tradeDispenser" parent="UIParent"  hidden="true" enableMouse="true" movable="true">	
+		<Size>	<AbsDimension x="300" y="384"/>	</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset><AbsDimension x="0" y="0"/>	</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>	<AbsValue val="32"/>  </TileSize>
+			<EdgeSize>	<AbsValue val="32"/>  </EdgeSize>
+		</Backdrop>
+		<Layers> 
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBkg1" file="Interface\AddOns\tradeDispenser\artwork\MainFrame_Background">
+					<Size><AbsDimension x="286" y="125"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="6" y="-6"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>		
+				<Texture name="$parentBkg2" file="Interface\AddOns\tradeDispenser\artwork\MainFrame_Background">
+					<Size><AbsDimension x="286" y="125"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="6" y="-131"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>	
+				<Texture name="$parentBkg3" file="Interface\AddOns\tradeDispenser\artwork\MainFrame_Background">
+					<Size><AbsDimension x="286" y="120"/></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="6" y="-256"/></Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>		
+			</Layer>		
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size><AbsDimension x="380" y="64"/></Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset> <AbsDimension x="0" y="12"/> </Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentLbL" inherits="GameFontNormal" text="tradeDispenser title">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeader">
+							<Offset> <AbsDimension x="0" y="-14"/> </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMoneyLbL" inherits="GameFontNormalSmall" text="Insert Money and Items">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset><AbsDimension x="126" y="-31"/></Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>			
+		<Frames>		
+			<Frame name="$parentMoneyFrame" inherits="MoneyInputFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="8" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						MoneyInputFrame_SetMode(this, "compact");
+						MoneyInputFrame_SetOnvalueChangedFunc(this, tradeDispenserUpdateMoney);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<CheckButton name="$parentGuildcharge" inherits="UICheckButtonTemplate">		
+				<Size><AbsDimension x="24" y="24"/></Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentMoneyFrame" relativePoint="BOTTOMLEFT">
+						<Offset><AbsDimension x="-5" y="-2"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">	
+						<FontString name="$parentLbL" inherits="GameFontNormalSmall" text="Free for Guild/Raid">
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset><AbsDimension x="25" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>				
+				<Scripts>
+					<OnShow>
+						getglobal(this:GetName().."LbL"):SetText(tD_Loc.control.FreeCheckBox);
+						this:SetChecked(tD_CharDatas.Free4Guild);
+					</OnShow>
+					<OnClick>
+						tradeDispenserPlaySound(this);
+						tD_CharDatas.Free4Guild = not tD_CharDatas.Free4Guild;
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(this:GetParent(),"ANCHOR_TOPRIGHT",0,10);
+						tradeDispenserDrawTooltip(tD_Loc.control.Free4Guild)			
+					</OnEnter>
+					<OnLeave>		GameTooltip:Hide();		</OnLeave>
+				</Scripts>
+			</CheckButton>			
+			
+			<Frame name="$parentItem1" inherits="tDItemTemp" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentMoneyFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-36"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentItem2" inherits="tDItemTemp" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentItem3" inherits="tDItemTemp" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentItem4" inherits="tDItemTemp" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentItem5" inherits="tDItemTemp" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentItem6" inherits="tDItemTemp" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentItem5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Button name="$parentState" inherits="UIPanelButtonTemplate" text="Enabled">
+				<Size>	<AbsDimension x="104" y="38"/>	</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="18" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						tD_Temp.isEnabled = not tD_Temp.isEnabled
+						tD_Temp.broadcastSlice = 2
+						tradeDispenser_Eventhandler()
+						tradeDispenserUpdate()
+						tradeDispenser_OSD_buttons()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentHide" inherits="UIPanelButtonTemplate" text="Hide">
+				<Size>
+					<AbsDimension x="104" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent">
+						<Offset><AbsDimension x="18" y="22"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(tD_Loc.buttons.hide);
+					</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						tradeDispenserMessages:Hide();
+						tD_Temp.isVisible = false;
+						tradeDispenserUpdate();
+						tradeDispenserOSD_OnUpdate()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentWhisperBtn" inherits="UIPanelButtonTemplate" text="Whispers">
+				<Size>
+					<AbsDimension x="104" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentHide" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="19"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>this:SetText(tD_Loc.buttons.whispers)</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (tradeDispenserMessages:IsShown()) then
+							tradeDispenserMessages:Hide();
+						else
+							tradeDispenserMessages:Show();
+							tD_Temp.isVisible = false;
+							tradeDispenserUpdate();
+						end
+					</OnClick>
+				</Scripts>
+			</Button>		
+			<Button name="$parentSettingsBtn" inherits="UIPanelButtonTemplate" text="Settings">
+				<Size>
+					<AbsDimension x="104" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentWhisperBtn" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>this:SetText(tD_Loc.buttons.settings)</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (tradeDispenserSettings:IsShown()) then
+							tradeDispenserSettings:Hide();
+							tradeDispenserSettingsBtn:UnlockHighlight();
+						else
+							tradeDispenserSettings:Show();
+							tradeDispenserSettingsBtn:LockHighlight();
+						end
+						tradeDispenser_Banlist_Update()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentTradeControlBtn" inherits="UIPanelButtonTemplate" text="TradeControl">
+				<Size>
+					<AbsDimension x="104" y="26"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentSettingsBtn" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>this:SetText(tD_Loc.buttons.tradecontrol)</OnLoad>
+					<OnClick>
+						tradeDispenserPlaySound(this)
+						if (tradeDispenserTradeControl:IsShown()) then
+							tradeDispenserTradeControl:Hide();
+							tradeDispenserTradeControlBtn:UnlockHighlight();
+						else
+							tradeDispenserTradeControl:Show();
+							tradeDispenserTradeControlBtn:LockHighlight();
+						end
+						tradeDispenser_EditBoxUpdate();		<!-- function found in tD_Settings.lua  -->
+					</OnClick>
+				</Scripts>
+			</Button>	
+			
+			
+			<Frame name="$parentProfile" inherits="tDProfileDDTemp" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-182"/></Offset>
+					</Anchor>
+				</Anchors>			
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="12" y="29"/>	</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset><AbsDimension x="-4" y="2"/></Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="85" y="29"/></Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="12" y="29"/>	</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>			
+			<Frame name="$parentRack" inherits="tDRackDDTemp" hidden="false"> 
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset><AbsDimension x="20" y="-122"/></Offset>
+					</Anchor>
+				</Anchors>			
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="12" y="29"/>	</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset><AbsDimension x="-4" y="2"/></Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.09375" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="85" y="29"/></Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.09375" right="0.90625" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-FilterBorder">
+							<Size><AbsDimension x="12" y="29"/>	</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.90625" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."LbL"):SetText(tD_Loc.configtitle)
+				getglobal(this:GetName().."MoneyLbL"):SetText(tD_Loc.configItems)
+				tradeDispenserOnLoad()
+				this:SetBackdropBorderColor(1, 1, 1,1)
+				this:SetBackdropColor(0, 0, 0.2, 0)
+			</OnLoad>
+			<OnEvent>
+				tradeDispenserOnEvent(event)
+			</OnEvent>
+			<OnShow>PlaySound("igAbilityOpen");  tradeDispenserSetFaction();</OnShow>
+			<OnMouseDown> this:StartMoving();  </OnMouseDown>
+			<OnMouseUp>  this:StopMovingOrSizing(); </OnMouseUp>
+			<OnDragStop> this:StopMovingOrSizing(); </OnDragStop>			
+		</Scripts>
+	</Frame>
+
+</Ui>

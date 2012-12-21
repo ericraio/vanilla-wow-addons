@@ -1,0 +1,1288 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+    ..\..\..\FrameXML\UI.xsd">
+
+	<Frame name="Powa_Frame" hidden="false">
+		<Scripts>
+	      		<OnLoad>
+	       			Powa_OnLoad();
+	      		</OnLoad>
+	      		<OnEvent>
+	        		Powa_OnEvent(event, arg1, arg2, arg3);
+	      		</OnEvent>
+		        <OnUpdate>
+					Powa_OnUpdate(arg1)
+		        </OnUpdate>  
+		</Scripts>
+  	</Frame>
+
+	<GameTooltip name="Powa_Tooltip" frameStrata="TOOLTIP" hidden="false" parent="UIParent" inherits="GameTooltipTemplate">
+		<Anchors>
+			<Anchor point="BOTTOM" relativePoint="TOP">
+				<Offset><AbsDimension x="0" y="100"/></Offset>
+			</Anchor>
+		</Anchors>
+	</GameTooltip>
+	
+	<Slider name="PowaBarSliderTemplate" inherits="OptionsSliderTemplate" virtual="true">
+		<Scripts>
+			<OnEnter>
+				if (this.aide) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.aide, nil, nil, nil, nil, 1);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Slider>
+
+	<CheckButton name="PowaCheckTemplate" inherits="OptionsCheckButtonTemplate" virtual="true">
+		<HitRectInsets>
+			<AbsInset left="0" right="0" top="0" bottom="0"/>
+		</HitRectInsets>
+	</CheckButton>
+
+-- ------------------------------------------------------------------------------------------------
+
+	<Frame name="PowaBarConfigFrame" movable="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" enableKeyboard="true">
+		<Size>
+          <AbsDimension x="320" y="515" />
+        </Size>
+        <Anchors>
+          <Anchor point="CENTER" relativeTo="UIParent">
+           <Offset>
+            <AbsDimension x="0" y="50" />
+           </Offset>
+          </Anchor>
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+          <BackgroundInsets>
+           <AbsInset left="11" right="12" top="12" bottom="11" />
+          </BackgroundInsets>
+          <TileSize>
+           <AbsValue val="32" />
+          </TileSize>
+          <EdgeSize>
+           <AbsValue val="32" />
+          </EdgeSize>
+        </Backdrop>
+		<Scripts>
+			<OnMouseDown>
+				PowaBar_MouseDown( arg1, "PowaBarConfigFrame" );
+			</OnMouseDown>
+			
+			<OnMouseUp>
+				PowaBar_MouseUp( arg1, "PowaBarConfigFrame" );
+			</OnMouseUp>
+		</Scripts>
+
+		-- BLOCK DE TITRE
+	    <Layers>
+		  <Layer>
+			<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+	          <Size>
+		        <AbsDimension x="180" y="32" />
+			  </Size>
+	          <Anchors>
+		        <Anchor point="TOP">
+			      <Offset>
+				    <AbsDimension x="0" y="8" />
+	              </Offset>
+		        </Anchor>
+			  </Anchors>
+	          <TexCoords left="0.2" right="0.8" top="0" bottom="0.6" />
+		    </Texture>
+			-- TITRE		
+			<FontString name="PowaHeader" inherits="GameFontNormalSmall" text="POWER AURAS">
+		      <Size>
+			    <AbsDimension x="140" y="0" />
+	          </Size>
+		      <Anchors>
+			    <Anchor point="TOP">
+				  <Offset>
+					<AbsDimension x="0" y="-4" />
+	              </Offset>
+		        </Anchor>
+			  </Anchors>
+	          <FontHeight>
+		        <AbsValue val="14" />
+			  </FontHeight>
+	        </FontString>
+	      </Layer>
+		</Layers>
+	-- --------------------------------------------------------------------------------------------------------------------
+		<Frames>
+			-- bouton fermer
+			<Button name="PowaCloseButton">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="PowaBarConfigFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-8" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_OptionClose();
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+			</Button>
+			-- bouton Liste
+			<Button name="PowaListButton" inherits="OptionsButtonTemplate" text="Liste >>">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="PowaBarConfigFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ShowList();
+					</OnClick>
+				</Scripts>
+			</Button>
+			-- bouton tester
+			<Button name="PowaTestButton" inherits="OptionsButtonTemplate" text="Tester">
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="PowaBarConfigFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="110" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_OptionTest();
+					</OnClick>
+				</Scripts>
+			</Button>
+			-- bouton tout masquer
+			<Button name="PowaHideAllButton" inherits="OptionsButtonTemplate" text="Tout Cacher">
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="PowaBarConfigFrame" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_OptionHideAll();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			-- rectangle noir EDITOR
+			<Frame name="PowaBarConfigFrameEditor">
+				<Size>
+					<AbsDimension x="290" y="315"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="false">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.7, 0.7, 0.7);
+						this:SetBackdropColor(0.0, 0.0, 0.0);
+					</OnLoad>
+				</Scripts>
+			    <Layers>
+					<Layer>
+					-- texture
+			        <Texture name="AuraTexture" file="Interface\AddOns\PowerAuras\Aura1.tga">
+			          <Size>
+			            <AbsDimension x="107" y="107" />
+			          </Size>
+			          <Anchors>
+			            <Anchor point="TOPLEFT">
+			              <Offset>
+			                <AbsDimension x="22" y="-40" />
+			              </Offset>
+			            </Anchor>
+			          </Anchors>
+			        </Texture>
+					-- Numero de l'effet
+					<FontString name="powa_Text" inherits="GameFontNormal" wraponspaces="true" text="">
+						<Size>
+							<AbsDimension x="100" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetText(PowaText.nomTitre.." 1");
+							</OnLoad>
+						</Scripts>
+					</FontString>
+					</Layer>
+			    </Layers>
+				<Frames>
+
+			-- fleche gauche
+			<Button name="powa_previous">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="powa_Text" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ChangePagePrev()
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			-- fleche droite
+			<Button name="powa_next">
+				<Size>
+					<AbsDimension x="30" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="powa_Text" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Powa_ChangePageNext()
+						PlaySound("igMainMenuOptionCheckBoxOff");
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			-- slider Texture
+			<Slider name="PowaBarAuraTextureSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="AuraTexture" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-21" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.aide = PowaText.aideTexture;
+						this:SetMinMaxValues(1,20);
+						this:SetValue(1);
+						this:SetValueStep(1);
+						getglobal("PowaBarAuraTextureSliderText"):SetText(PowaText.nomTexture.." : 1");
+						getglobal("PowaBarAuraTextureSliderLow"):SetText("1");
+						getglobal("PowaBarAuraTextureSliderHigh"):SetText("20");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraTextureSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Alpha
+			<Slider name="PowaBarAuraAlphaSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="AuraTexture" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="20" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0.1,1.0);
+						this:SetValue(1.0);
+						this:SetValueStep(0.05);
+						getglobal("PowaBarAuraAlphaSliderText"):SetText(PowaText.nomAlpha.." : 1.0");
+						getglobal("PowaBarAuraAlphaSliderLow"):SetText("0.1");
+						getglobal("PowaBarAuraAlphaSliderHigh"):SetText("1.0");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraAlphaSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider coord X
+			<Slider name="PowaBarAuraCoordXSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraAlphaSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(-100,100);
+						this:SetValue(0);
+						this:SetValueStep(5);
+						getglobal("PowaBarAuraCoordXSliderText"):SetText(PowaText.nomPos.." X : 0");
+						getglobal("PowaBarAuraCoordXSliderLow"):SetText("-100");
+						getglobal("PowaBarAuraCoordXSliderHigh"):SetText("100");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraCoordXSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider coord Y
+			<Slider name="PowaBarAuraCoordSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraCoordXSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(-200,100);
+						this:SetValue(-30);
+						this:SetValueStep(5);
+						getglobal("PowaBarAuraCoordSliderText"):SetText(PowaText.nomPos.." Y : -30");
+						getglobal("PowaBarAuraCoordSliderLow"):SetText("-200");
+						getglobal("PowaBarAuraCoordSliderHigh"):SetText("100");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraCoordSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider taille
+			<Slider name="PowaBarAuraSizeSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraCoordSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0.1,2.0);
+						this:SetValue(1.0);
+						this:SetValueStep(0.05);
+						getglobal("PowaBarAuraSizeSliderText"):SetText(PowaText.nomTaille.." : 1.0");
+						getglobal("PowaBarAuraSizeSliderLow"):SetText("0.1");
+						getglobal("PowaBarAuraSizeSliderHigh"):SetText("2.0");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraSizeSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Symetrie
+			<Slider name="PowaBarAuraSymSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraTextureSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0,3);
+						this:SetValue(0);
+						this:SetValueStep(1);
+						getglobal("PowaBarAuraSymSliderText"):SetText(PowaText.nomSymetrie.." : "..PowaText.aucune);
+						getglobal("PowaBarAuraSymSliderLow"):SetText(PowaText.aucune);
+						getglobal("PowaBarAuraSymSliderHigh"):SetText("XY");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraSymSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Anim1
+			<Slider name="PowaBarAuraAnim1Slider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraSymSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.aide = PowaText.aideAnim1;
+						this:SetMinMaxValues(1,9);
+						this:SetValue(1);
+						this:SetValueStep(1);
+						getglobal("PowaBarAuraAnim1SliderText"):SetText(PowaText.nomAnim2.." : 1");
+						getglobal("PowaBarAuraAnim1SliderLow"):SetText("1");
+						getglobal("PowaBarAuraAnim1SliderHigh"):SetText("9");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraAnim1SliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Anim Speed
+			<Slider name="PowaBarAuraAnimSpeedSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraAnim1Slider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetMinMaxValues(0.50,2.00);
+						this:SetValue(1.0);
+						this:SetValueStep(0.05);
+						getglobal("PowaBarAuraAnimSpeedSliderText"):SetText(PowaText.nomSpeed.." : 100%");
+						getglobal("PowaBarAuraAnimSpeedSliderLow"):SetText("50");
+						getglobal("PowaBarAuraAnimSpeedSliderHigh"):SetText("200");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraAnimSpeedSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Deformation
+			<Slider name="PowaBarAuraDeformSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraSizeSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.aide = PowaText.aideDeform;
+						this:SetMinMaxValues(0.5,1.5);
+						this:SetValue(1);
+						this:SetValueStep(0.05);
+						getglobal("PowaBarAuraDeformSliderText"):SetText(PowaText.nomDeform.." : 1");
+						getglobal("PowaBarAuraDeformSliderLow"):SetText(PowaText.largeur);
+						getglobal("PowaBarAuraDeformSliderHigh"):SetText(PowaText.hauteur);
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraDeformSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Anim2
+			<Slider name="PowaBarAuraAnim2Slider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraDeformSlider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.aide = PowaText.aideAnim2;
+						this:SetMinMaxValues(0,9);
+						this:SetValue(0);
+						this:SetValueStep(1);
+						getglobal("PowaBarAuraAnim2SliderText"):SetText(PowaText.nomAnim2.." : 0");
+						getglobal("PowaBarAuraAnim2SliderLow"):SetText(PowaText.aucune);
+						getglobal("PowaBarAuraAnim2SliderHigh"):SetText("9");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraAnim2SliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider Anim de depart (cachee)
+			<Slider name="PowaBarAuraAnimBeginSlider" inherits="PowaBarSliderTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraAnim2Slider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+--						this.aide = PowaText.aideAnim2;
+						this:SetMinMaxValues(0,10);
+						this:SetValue(0);
+						this:SetValueStep(1);
+						getglobal("PowaBarAuraAnimBeginSliderText"):SetText(PowaText.nomBegin.." : 0");
+						getglobal("PowaBarAuraAnimBeginSliderLow"):SetText(PowaText.aucune);
+						getglobal("PowaBarAuraAnimBeginSliderHigh"):SetText("10");
+					</OnLoad>
+					<OnValueChanged>
+--						PowaBarAuraAnimBeginSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- slider duree
+			<Slider name="PowaBarAuraDurationSlider" inherits="PowaBarSliderTemplate">
+				<Size>
+					<AbsDimension x="130" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarAuraAnim2Slider" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-22" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.aide = PowaText.aideDuration;
+						this:SetMinMaxValues(0,30);
+						this:SetValue(0);
+						this:SetValueStep(1);
+						getglobal("PowaBarAuraDurationSliderText"):SetText(PowaText.nomDuration.." : 0 sec");
+						getglobal("PowaBarAuraDurationSliderLow"):SetText(PowaText.aucune);
+						getglobal("PowaBarAuraDurationSliderHigh"):SetText("30");
+					</OnLoad>
+					<OnValueChanged>
+						PowaBarAuraAnimDurationSliderChanged();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			-- COLOR PICKER
+			<Button name="PowaColor">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="AuraTexture" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-10" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parent_SwatchBg">
+							<Size>
+								<AbsDimension x="14" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."_SwatchBg").r = 1.0;
+						getglobal(this:GetName().."_SwatchBg").g = 1.0;
+						getglobal(this:GetName().."_SwatchBg").b = 1.0;
+					</OnLoad>
+					<OnClick>
+						Powa_OpenColorPicker();
+					</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(PowaText.aideColor, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."_SwatchBg"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+			-- BUFF NAME
+			<EditBox name="PowaBarBuffName" autoFocus="false" inherits="InputBoxTemplate">
+				<Size>
+					<AbsDimension x="270" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="PowaBarConfigFrameEditor" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="2" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<FontString inherits="ChatFontNormal" bytes="200"/>
+				<Scripts>
+					<OnLoad>
+						this:SetMaxLetters(200)
+						this.aide = PowaText.aideBuff;
+					</OnLoad>
+					<OnEnterPressed>
+						this:ClearFocus()
+					</OnEnterPressed>
+					<OnTextChanged>
+						PowaTextChanged()
+					</OnTextChanged>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+						GameTooltip:SetText(this.aide, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="PowaBarBuffNameText" inherits="GameFontNormalSmall" justifyH="LEFT" text="">
+							<Size>
+								<AbsDimension x="120" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativeTo="PowaBarBuffName" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</EditBox>
+
+			<CheckButton name="PowaDebuffButton" inherits="PowaCheckTemplate">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PowaBarBuffName" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-7" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = PowaText.aideDebuff;
+						getglobal("PowaDebuffButtonText"):SetText(PowaText.nomCheckDebuff);
+					</OnLoad>
+					<OnClick>
+						PowaDebuffChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="PowaInverseButton" inherits="PowaCheckTemplate">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PowaDebuffButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = PowaText.aideInverse;
+						getglobal("PowaInverseButtonText"):SetText(PowaText.nomCheckInverse);
+					</OnLoad>
+					<OnClick>
+						PowaInverseChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="PowaShowTimerButton" inherits="PowaCheckTemplate">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PowaInverseButton" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = PowaText.aideShowTimer;
+						getglobal("PowaShowTimerButtonText"):SetText(PowaText.nomCheckShowTimer);
+					</OnLoad>
+					<OnClick>
+						PowaShowTimerChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			
+			<CheckButton name="PowaDebuffTypeButton" inherits="PowaCheckTemplate">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PowaDebuffButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="60" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this.tooltipText = PowaText.aideDebuffType;
+						getglobal("PowaDebuffTypeButtonText"):SetText(PowaText.nomCheckDebuffType);
+					</OnLoad>
+					<OnClick>
+						PowaDebuffTypeChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>	
+
+		  </Frames>
+
+		</Frame>
+
+			-- Tab 1
+			<Button name="PowaTab1" inherits="TabButtonTemplate" text="Effect Editor">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="PowaBarConfigFrameEditor">
+						<Offset>
+							<AbsDimension x="5" y="-2" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(PowaTab2);
+						getglobal("PowaBarConfigFrameOptions"):Hide();
+						getglobal("PowaBarConfigFrameEditor"):Show();
+					</OnClick>
+					<OnLoad>
+						getglobal("PowaTab1Text"):SetText(PowaText.nomEffectEditor);
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 31);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			-- Tab 2
+			<Button name="PowaTab2" inherits="TabButtonTemplate" text="Advanced Options">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="PowaTab1">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PanelTemplates_SelectTab(this);
+						PanelTemplates_DeselectTab(PowaTab1);
+						getglobal("PowaBarConfigFrameOptions"):Show();
+						getglobal("PowaBarConfigFrameEditor"):Hide();
+						Powa_UpdateOptions();
+					</OnClick>
+					<OnLoad>
+						getglobal("PowaTab2Text"):SetText(PowaText.nomAdvOptions);
+						PanelTemplates_DeselectTab(PowaTab2);
+						PanelTemplates_TabResize(0, this);
+						getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 31);
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+-- ---------------------------------------------------------------------------------------------------------------------------------------
+
+			-- rectangle noir ADV OPTIONS
+			<Frame name="PowaBarConfigFrameOptions" hidden="true">
+				<Size>
+					<AbsDimension x="290" y="250"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="false">
+					<EdgeSize>
+						<AbsValue val="12"/>
+					</EdgeSize>
+					<BackgroundInsets>
+						<AbsInset left="2" right="2" top="2" bottom="2"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropBorderColor(0.7, 0.7, 0.7);
+						this:SetBackdropColor(0.0, 0.0, 0.0);
+					</OnLoad>
+				</Scripts>
+			    <Layers>
+				  <Layer>
+					<FontString name="PowaTimerBuffText" inherits="GameFontGreen" text="Buff Timer">
+				      <Size>
+					    <AbsDimension x="130" y="16" />
+			          </Size>
+				      <Anchors>
+					    <Anchor point="TOPLEFT">
+						  <Offset>
+							<AbsDimension x="10" y="-15" />
+			              </Offset>
+						</Anchor>
+					  </Anchors>
+			          <FontHeight>
+						<AbsValue val="18" />
+					  </FontHeight>
+			        </FontString>
+					<FontString name="PowaTimerDebuffText" inherits="GameFontRed" text="Debuff Timer">
+				      <Size>
+					    <AbsDimension x="130" y="16" />
+			          </Size>
+				      <Anchors>
+					    <Anchor point="TOPRIGHT">
+						  <Offset>
+							<AbsDimension x="-10" y="-15" />
+			              </Offset>
+						</Anchor>
+					  </Anchors>
+			          <FontHeight>
+						<AbsValue val="18" />
+					  </FontHeight>
+			        </FontString>
+					<FontString name="PowaAuthorText" inherits="GameFontDisable" text="Created by -Sinsthar-        [Ziya / Tiven, on Kirin Tor (FR)]">
+				      <Size>
+					    <AbsDimension x="180" y="30" />
+			          </Size>
+				      <Anchors>
+					    <Anchor point="BOTTOM">
+						  <Offset>
+							<AbsDimension x="0" y="-172" />
+			              </Offset>
+						</Anchor>
+					  </Anchors>
+			          <FontHeight>
+						<AbsValue val="15" />
+					  </FontHeight>
+			        </FontString>
+				  </Layer>
+				</Layers>
+				<Frames>
+					-- slider Alpha
+					<Slider name="PowaTimerAlphaSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="PowaBarConfigFrameOptions" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-50" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(0.1,1.0);
+								this:SetValue(1.0);
+								this:SetValueStep(0.05);
+								getglobal("PowaTimerAlphaSliderText"):SetText(PowaText.nomAlpha.." : 1.0");
+								getglobal("PowaTimerAlphaSliderLow"):SetText("0.1");
+								getglobal("PowaTimerAlphaSliderHigh"):SetText("1.0");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimerAlphaSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- slider coord X
+					<Slider name="PowaTimerCoordXSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaTimerAlphaSlider" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(-150,150);
+								this:SetValue(0);
+								this:SetValueStep(5);
+								getglobal("PowaTimerCoordXSliderText"):SetText(PowaText.nomPos.." X : 0");
+								getglobal("PowaTimerCoordXSliderLow"):SetText("-150");
+								getglobal("PowaTimerCoordXSliderHigh"):SetText("150");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimerCoordXSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- slider coord Y
+					<Slider name="PowaTimerCoordSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaTimerCoordXSlider" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(-200,100);
+								this:SetValue(0);
+								this:SetValueStep(5);
+								getglobal("PowaTimerCoordSliderText"):SetText(PowaText.nomPos.." Y : 0");
+								getglobal("PowaTimerCoordSliderLow"):SetText("-200");
+								getglobal("PowaTimerCoordSliderHigh"):SetText("100");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimerCoordSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- slider taille
+					<Slider name="PowaTimerSizeSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaTimerCoordSlider" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(0.5,2.0);
+								this:SetValue(1.0);
+								this:SetValueStep(0.05);
+								getglobal("PowaTimerSizeSliderText"):SetText(PowaText.nomTaille.." : 1.0");
+								getglobal("PowaTimerSizeSliderLow"):SetText("0.5");
+								getglobal("PowaTimerSizeSliderHigh"):SetText("2.0");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimerSizeSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- afficher ou pas les centiemes
+					<CheckButton name="PowaBuffTimerCentsButton" inherits="PowaCheckTemplate">
+						<Size>
+							<AbsDimension x="25" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="PowaTimerSizeSlider" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal("PowaBuffTimerCentsButtonText"):SetText(PowaText.nomCentiemes);
+							</OnLoad>
+							<OnClick>
+								PowaBuffTimerCentsChecked();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					-- ---------------------------------------------------------------------------------------------
+					-- slider Alpha 2
+					<Slider name="PowaTimer2AlphaSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="PowaBarConfigFrameOptions" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-10" y="-50" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(0.1,1.0);
+								this:SetValue(1.0);
+								this:SetValueStep(0.05);
+								getglobal("PowaTimer2AlphaSliderText"):SetText(PowaText.nomAlpha.." : 1.0");
+								getglobal("PowaTimer2AlphaSliderLow"):SetText("0.1");
+								getglobal("PowaTimer2AlphaSliderHigh"):SetText("1.0");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimer2AlphaSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- slider coord X 2
+					<Slider name="PowaTimer2CoordXSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaTimer2AlphaSlider" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(-150,150);
+								this:SetValue(0);
+								this:SetValueStep(5);
+								getglobal("PowaTimer2CoordXSliderText"):SetText(PowaText.nomPos.." X : 0");
+								getglobal("PowaTimer2CoordXSliderLow"):SetText("-150");
+								getglobal("PowaTimer2CoordXSliderHigh"):SetText("150");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimer2CoordXSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- slider coord Y
+					<Slider name="PowaTimer2CoordSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaTimer2CoordXSlider" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(-200,100);
+								this:SetValue(0);
+								this:SetValueStep(5);
+								getglobal("PowaTimer2CoordSliderText"):SetText(PowaText.nomPos.." Y : 0");
+								getglobal("PowaTimer2CoordSliderLow"):SetText("-200");
+								getglobal("PowaTimer2CoordSliderHigh"):SetText("100");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimer2CoordSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- slider taille
+					<Slider name="PowaTimer2SizeSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="130" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaTimer2CoordSlider" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-27" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this:SetMinMaxValues(0.5,2.0);
+								this:SetValue(1.0);
+								this:SetValueStep(0.05);
+								getglobal("PowaTimer2SizeSliderText"):SetText(PowaText.nomTaille.." : 1.0");
+								getglobal("PowaTimer2SizeSliderLow"):SetText("0.5");
+								getglobal("PowaTimer2SizeSliderHigh"):SetText("2.0");
+							</OnLoad>
+							<OnValueChanged>
+								PowaTimer2SizeSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					-- afficher ou pas les centiemes
+					<CheckButton name="PowaDebuffTimerCentsButton" inherits="PowaCheckTemplate">
+						<Size>
+							<AbsDimension x="25" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="PowaTimer2SizeSlider" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal("PowaDebuffTimerCentsButtonText"):SetText(PowaText.nomCentiemes);
+							</OnLoad>
+							<OnClick>
+								PowaDebuffTimerCentsChecked();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					-- options generales
+					<Frame name="PowaBarConfigFrame2Options">
+						<Size>
+							<AbsDimension x="290" y="100"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PowaBarConfigFrameOptions" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-33"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" 	tile="false">
+							<EdgeSize>
+								<AbsValue val="12"/>
+							</EdgeSize>
+							<BackgroundInsets>
+								<AbsInset left="2" right="2" top="2" bottom="2"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropBorderColor(0.7, 0.7, 0.7);
+								this:SetBackdropColor(0.0, 0.0, 0.0);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<CheckButton name="PowaDisableButton" inherits="PowaCheckTemplate">
+						<Size>
+							<AbsDimension x="25" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="PowaBarConfigFrameOptions" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.tooltipText = PowaText.aideDisable;
+								getglobal("PowaDisableButtonText"):SetText(PowaText.nomDisable);
+								getglobal("PowaDisableButtonText"):SetTextColor(1.0,0.1,0.1);
+							</OnLoad>
+							<OnClick>
+								PowaDisableChecked();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="PowaQuickHideButton" inherits="PowaCheckTemplate">
+						<Size>
+							<AbsDimension x="25" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="PowaDisableButton" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-15"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.tooltipText = PowaText.aideQuickHide;
+								getglobal("PowaQuickHideButtonText"):SetText(PowaText.nomCheckQuickHide);
+							</OnLoad>
+							<OnClick>
+								PowaQuickHideChecked();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					-- slider max textures
+					<Slider name="PowaMaxTexSlider" inherits="PowaBarSliderTemplate">
+						<Size>
+							<AbsDimension x="260" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOM" relativeTo="PowaBarConfigFrame2Options" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="20" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								this.aide = PowaText.aideMaxTex;
+								this:SetMinMaxValues(1,50);
+								this:SetValue(20);
+								this:SetValueStep(1);
+								getglobal("PowaMaxTexSliderText"):SetText(PowaText.nomMaxTex.." : 20");
+								getglobal("PowaMaxTexSliderLow"):SetText("1");
+								getglobal("PowaMaxTexSliderHigh"):SetText("50");
+							</OnLoad>
+							<OnValueChanged>
+								PowaMaxTexSliderChanged();
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+
+				</Frames>
+
+			</Frame>
+
+	  </Frames>
+
+    </Frame>
+
+</Ui>

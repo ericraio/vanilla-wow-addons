@@ -1,0 +1,1129 @@
+<Ui	xmlns="http://www.blizzard.com/wow/ui/"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	
+	<Script	file="MI2_Config.lua" />
+
+	<!-- ============================================================ -->
+	<!-- Template for one line of the search result scroll list       -->
+	<Button name="MI2_SearchResultLineTemplate" virtual="true">
+		<Size> <AbsDimension x="360" y="14"/> </Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentHighlight" file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" setAllPoints="true" hidden="true"/>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentIndex" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Size> <AbsDimension x="30" y="12"/> </Size>
+					<Anchors>
+						<Anchor point="LEFT"> <Offset> <AbsDimension x="0" y="0"/> </Offset> </Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentValue" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Size> <AbsDimension x="70" y="12"/> </Size>
+					<Anchors>
+						<Anchor point="LEFT"> <Offset> <AbsDimension x="35" y="0"/> </Offset> </Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size> <AbsDimension x="250" y="12"/> </Size>
+					<Anchors>
+						<Anchor point="LEFT"> <Offset> <AbsDimension x="115" y="0"/> </Offset> </Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter> getglobal(this:GetName().."Highlight"):Show(); MI2_ShowSearchResultTooltip(); </OnEnter>
+			<OnLeave> getglobal(this:GetName().."Highlight"):Hide(); GameTooltip:Hide(); </OnLeave> 
+		</Scripts>
+		<NormalText name="$parentNormalText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+	</Button>
+
+	<!-- ============================================================ -->
+	<!-- Template for frame	around option groups + title above frame  -->
+	<Frame name="MI2_OptionsFrameTemplate" inherits="OptionFrameBoxTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+				this:SetBackdropColor(0.15,	0.15, 0.15);
+				getglobal(this:GetName().."Title"):SetText(MI2_FRAME_TEXTS[this:GetName()]);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<!-- ============================================================ -->
+	<!-- Template for all checkboxes used in options dialog			  -->
+	<!-- defines size, text	and	all	otherevent related actions		  -->
+	<CheckButton name="MI2_CheckboxTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<Size> <AbsDimension x="24"	y="24" /> </Size>
+		<HitRectInsets>	<AbsInset left="0" right="-50"	top="0"	bottom="0"/> </HitRectInsets>
+		<Scripts>
+			<OnLoad>  getglobal(this:GetName().."Text"):SetText(MI2_OPTIONS[this:GetName()].text); </OnLoad>
+			<OnClick> MI2_SlashParse( this:GetName(), false); </OnClick>
+			<OnEnter> MI2_ShowOptionHelpTooltip(); </OnEnter>
+			<OnLeave> GameTooltip:Hide(); </OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<!-- ==============================================================	-->
+	<!-- Template for all search options checkboxes						-->
+	<CheckButton name="MI2_SearchCheckboxTemplate" inherits="UICheckButtonTemplate" virtual="true">
+		<Size> <AbsDimension x="24"	y="24" /> </Size>
+		<HitRectInsets>	<AbsInset left="0" right="-40"	top="0"	bottom="0"/> </HitRectInsets>
+		<Scripts>
+			<OnLoad>  getglobal(this:GetName().."Text"):SetText(MI2_OPTIONS[this:GetName()].text); </OnLoad>
+			<OnClick> MI2_SearchCheckboxClicked();	</OnClick>
+			<OnEnter> MI2_ShowOptionHelpTooltip(); </OnEnter>
+			<OnLeave> GameTooltip:Hide(); </OnLeave>
+		</Scripts>
+	</CheckButton>
+
+	<!-- ============================================================ -->
+	<!-- Template for all push buttons options dialog				  -->
+	<!-- defines text and all other	event related actions			  -->
+	<Button	name="MI2_PushButtonTemplate" inherits="OptionsButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>  getglobal(this:GetName()):SetText(MI2_OPTIONS[this:GetName()].text) </OnLoad>
+			<OnClick> MI2_SlashParse(this:GetName(), false) </OnClick>
+			<OnEnter> MI2_ShowOptionHelpTooltip() </OnEnter>
+			<OnLeave> GameTooltip:Hide() </OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-- ============================================================ -->
+	<!-- Template for all sliders in options dialog					  -->
+	<!-- defines text and all other	event related actions			  -->
+	<Slider	name="MI2_SliderTemplate" inherits="OptionsSliderTemplate" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentValueText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset> <AbsDimension x="2" y="-4"/> </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>  
+				getglobal(this:GetName().."Text"):SetText(MI2_OPTIONS[this:GetName()].text); 
+				getglobal(this:GetName().."Low"):Hide();
+				getglobal(this:GetName().."High"):Hide();
+				this:SetValueStep( 1 );
+				MI2_OPTIONS[this:GetName()].val = 1
+			</OnLoad>
+			<OnEnter> MI2_ShowOptionHelpTooltip(); </OnEnter>
+			<OnLeave> GameTooltip:Hide(); </OnLeave>
+			<OnValueChanged> 
+				MI2_SlashParse(this:GetName().." "..math.floor(this:GetValue()), false)
+				local valTxtFrame = getglobal( this:GetName().."ValueText" )
+				valTxtFrame:SetText( tostring(math.floor(this:GetValue())) )
+			</OnValueChanged>
+		</Scripts>
+	</Slider>
+
+	<Button	name="MI2_DropDownTemplate" inherits="UIDropDownMenuTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString	name="$parentTitle"	inherits="GameFontNormalSmall" text="Font">
+					<Anchors>
+						<Anchor	point="BOTTOMLEFT" relativePoint="TOPLEFT">
+							<Offset> <AbsDimension x="20" y="0"/> </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				UIDropDownMenu_SetWidth( 120 )
+				getglobal(this:GetName().."Title"):SetText( MI2_OPTIONS[this:GetName()].text )
+				UIDropDownMenu_Initialize( this, MI2_DropDown_Initialize )
+				MI2_OPTIONS[this:GetName()].dd = 1
+			</OnLoad>
+			<OnShow> MI2_DropDown_OnShow() </OnShow>
+			<OnEnter> MI2_ShowOptionHelpTooltip() </OnEnter>
+			<OnLeave> GameTooltip:Hide() </OnLeave>
+		</Scripts>
+	</Button>
+
+	<!-- ============================================================ -->
+	<!-- Template for value edit boxes in search options dialog		  -->
+	<!-- the edit box is prefixed with a description text			  -->
+	<EditBox name="MI2_EditBox_Template" autoFocus="false" inherits="InputBoxTemplate" virtual="true">
+		<Size> <AbsDimension x="30" y="24"/> </Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString	name="$parentDesc" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Anchors> <Anchor	point="BOTTOMRIGHT"	relativePoint="BOTTOMLEFT">
+						<Offset> <AbsDimension x="-10" y="5"/> </Offset>
+					</Anchor> </Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnterPressed>	this:ClearFocus();	</OnEnterPressed>
+			<OnEscapePressed>	this:ClearFocus();	</OnEscapePressed>
+			<OnLoad>	getglobal(this:GetName().."Desc"):SetText(MI2_OPTIONS[this:GetName()].text); </OnLoad>
+			<OnEnter>	MI2_ShowOptionHelpTooltip(); </OnEnter>
+			<OnLeave>	GameTooltip:Hide();			</OnLeave>
+		</Scripts>
+	</EditBox>
+
+	<!-- ============================================================ -->
+	<!-- Template for value edit boxes in search options dialog		  -->
+	<!-- the edit box is prefixed with a description text			  -->
+	<EditBox name="MI2_ValueEditBox_Template" letters="2" numeric="true" inherits="MI2_EditBox_Template" virtual="true">
+		<Scripts>
+			<OnTextChanged>	MI2_SearchValueChanged(); </OnTextChanged>
+		</Scripts>
+	</EditBox>
+
+	<!-- ============================================================ -->
+	<!-- Template for text edit boxes in search options dialog		  -->
+	<!-- the edit box is prefixed with a description text			  -->
+	<EditBox name="MI2_TextEditBox_Template" letters="28" inherits="MI2_EditBox_Template" virtual="true">
+		<Size> <AbsDimension x="135" y="24"/> </Size>
+		<Scripts>
+			<OnTextChanged>	MI2_SearchTextChanged() </OnTextChanged>
+		</Scripts>
+	</EditBox>
+
+	<!-- ============================================================ -->
+	<!-- Template for text edit boxes in options dialog		          -->
+	<!-- the edit box is prefixed with a description text			  -->
+	<EditBox name="MI2_OptionsEditBox_Template" letters="28" inherits="MI2_EditBox_Template" virtual="true">
+		<Scripts>
+			<OnLoad>
+				getglobal(this:GetName().."Desc"):ClearAllPoints()
+				getglobal(this:GetName().."Desc"):SetPoint( "TOPLEFT", 0, 10 )
+				getglobal(this:GetName().."Desc"):SetText(MI2_OPTIONS[this:GetName()].text)
+				MI2_OPTIONS[this:GetName()].txt = 1
+			</OnLoad>
+			<OnTextChanged>	MI2_SlashParse(this:GetName().." "..this:GetText(), false) </OnTextChanged>
+		</Scripts>
+	</EditBox>
+
+	<!-- ============================================================ -->
+	<!-- Template for TAB button in the options dialog				  -->
+	<!-- TAB buttons select the options page to display				  -->
+	<Button	name="MI2_TabButtonTemplate" inherits="TabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick> MI2_TabButton_OnClick( this:GetName()	); </OnClick>
+			<OnEnter> MI2_ShowOptionHelpTooltip(); </OnEnter>
+			<OnLeave> GameTooltip:Hide(); </OnLeave>
+			<OnLoad>  
+				getglobal(this:GetName()):SetText(MI2_OPTIONS[this:GetName()].text); 
+				PanelTemplates_TabResize(0);
+			</OnLoad>
+		</Scripts>
+	</Button>
+
+	<!-- ============================================================ -->
+	<!-- ============================================================ -->
+	<!--				   MobInfo-2 Options Dialog	Box				  -->
+	<!-- ============================================================ -->
+	<Frame name="frmMIConfig" parent="UIParent"	enableMouse="true" movable="true" frameStrata="DIALOG"
+		hidden="true" toplevel="true">
+
+		<!-- dialog	size & position	-->
+		<Size>	  <AbsDimension	x="480"	y="520"	/> </Size>
+		<Anchors> <Anchor point="CENTER" />		   </Anchors>
+
+		<!-- dialog	box	background -->
+		<Backdrop name="bdMI" bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+			tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11"	right="12" top="12"	bottom="11"	/>
+				<Size> <AbsDimension x="128" y="17"	/> </Size>
+			</BackgroundInsets>
+			<TileSize> <AbsValue val="32" /> </TileSize>
+			<EdgeSize> <AbsValue val="32" /> </EdgeSize>
+		</Backdrop>
+
+		<!-- ======================================================== -->
+		<!-- dialog	box	title										  -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size> <AbsDimension x="320" y="64"	/> </Size>
+					<Anchors>
+						<Anchor	point="TOP">
+							<Offset> <AbsDimension x="0" y="12"	/> </Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString	name="txtMIConfigTitle"	inherits="GameFontNormal">
+					<Anchors>
+						<Anchor	point="TOP"	relativeTo="frmMIConfig">
+							<Offset> <AbsDimension x="0" y="-2"	/> </Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<!-- ==================================================== -->
+			<!-- inner main	options	frame with tabs	and	subframes	  -->
+			<Frame name="MI2_MainOptionsFrame" inherits="MI2_OptionsFrameTemplate">
+				<Size> <AbsDimension x="448" y="420" />	</Size>
+				<Anchors>
+					<Anchor	point="TOPLEFT">
+						<Offset> <AbsDimension x="15" y="-50" /> </Offset>
+					</Anchor>
+				</Anchors>
+
+				<Frames>
+					<!-- ================================================ -->
+					<!-- TAB buttons controlling subframe show/hide		  -->
+					<Button	name="$parentTab1" inherits="MI2_TabButtonTemplate"	id="1">
+						<Anchors>
+							<Anchor	point="TOPLEFT"	relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset> <AbsDimension x="5" y="30"/> </Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button	name="$parentTab2" inherits="MI2_TabButtonTemplate"	id="2">
+						<Anchors>
+							<Anchor	point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+								<Offset> <AbsDimension x="2" y="0"/> </Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button	name="$parentTab3" inherits="MI2_TabButtonTemplate"	id="3">
+						<Anchors>
+							<Anchor	point="LEFT" relativeTo="$parentTab2" relativePoint="RIGHT">
+								<Offset> <AbsDimension x="2" y="0"/> </Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button	name="$parentTab4" inherits="MI2_TabButtonTemplate"	id="4">
+						<Anchors>
+							<Anchor	point="LEFT" relativeTo="$parentTab3" relativePoint="RIGHT">
+								<Offset> <AbsDimension x="2" y="0"/> </Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<!-- ==================================================== -->
+					<!-- subframe with all Tooltip related options			  -->
+					<Frame name="MI2_FrmTooltipOptions"	inherits="MI2_OptionsFrameTemplate"	>
+						<Size> <AbsDimension x="220" y="380" />	</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset> <AbsDimension x="10" y="-30" /> </Offset>
+							</Anchor>
+						</Anchors>
+
+						<Frames>
+							<!-- ================================================= -->
+							<!-- show/hide controls	within tooltip options frame   -->
+							<CheckButton name="MI2_OptShowClass" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset> <AbsDimension x="10" y="-10" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowHealth" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowClass">
+										<Offset> <AbsDimension x="0" y="-30" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowMana" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowHealth" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="65" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowXp" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowHealth">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowNo2lev" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowXp" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="65" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowDamage" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowXp">
+										<Offset> <AbsDimension x="0" y="-30" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowCombined"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowDamage">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowKills" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowCombined">
+										<Offset> <AbsDimension x="0" y="-30" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowLoots" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowKills" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="65" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowCloth" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowKills">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowEmpty" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowCloth" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="65" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowTotal" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowCloth">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowCoin"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowTotal" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="65" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowIV" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowTotal">
+										<Offset> <AbsDimension x="0" y="-30" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowQuality" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowIV">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowLocation" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowQuality">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowItems" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowLocation">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowClothSkin" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowItems">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+
+							<!-- ==================================================== -->
+							<!-- buttons controlling the tooltip show options		  -->
+							<Button	name="MI2_OptDefault" inherits="MI2_PushButtonTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset> <AbsDimension x="225" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptMinimal" inherits="MI2_PushButtonTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptDefault">
+										<Offset> <AbsDimension x="0" y="-25" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptAllOn"	inherits="MI2_PushButtonTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptMinimal">
+										<Offset> <AbsDimension x="0" y="-25" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptAllOff" inherits="MI2_PushButtonTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptAllOn">
+										<Offset> <AbsDimension x="0" y="-25" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+
+							<!-- ================================================= -->
+							<!-- MobInfo DISABLE Button                            -->
+							<CheckButton name="MI2_OptDisableMobInfo" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptAllOff" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+
+							<!-- ==================================================== -->
+							<!-- buttons controlling overall tooltip options		  -->
+							<CheckButton name="MI2_OptCompactMode"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptDisableMobInfo" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-20" />	</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptCombinedMode"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptCompactMode">
+										<Offset> <AbsDimension x="0" y="-20" />	</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptKeypressMode"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptCombinedMode">
+										<Offset> <AbsDimension x="0" y="-20" />	</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptShowBlankLines" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptKeypressMode">
+										<Offset> <AbsDimension x="0" y="-20" />	</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptItemTooltip"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptShowBlankLines">
+										<Offset> <AbsDimension x="0" y="-40" />	</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<EditBox name="MI2_OptItemFilter" inherits="MI2_OptionsEditBox_Template">
+								<Size> <AbsDimension x="160" y="24"/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptItemTooltip" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="5" y="-15"/> </Offset>
+									</Anchor>
+								</Anchors>
+							</EditBox>
+						</Frames>
+					</Frame>
+			
+					<!-- ==================================================== -->
+					<!-- subframe with Mob Health options					  -->
+					<Frame name="MI2_FrmHealthOptions" inherits="MI2_OptionsFrameTemplate" hidden="true" >
+						<Size> <AbsDimension x="420" y="320" />	</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT"	>
+								<Offset> <AbsDimension x="10" y="-30" /> </Offset>
+							</Anchor>
+						</Anchors>
+						
+						<!-- ================================================ -->
+						<!-- controls within MobHealth options subframe		  -->
+						<Frames>
+							<CheckButton name="MI2_OptStableMax" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset> <AbsDimension x="10" y="-10" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+
+							<Button	name="MI2_OptTargetFont" inherits="MI2_DropDownTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptStableMax" relativePoint="BOTTOMLEFT">
+										<Offset><AbsDimension x="0"	y="-20"/></Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+
+							<Slider	name="MI2_OptTargetFontSize" inherits="MI2_SliderTemplate">
+								<Size> <AbsDimension x="140" y="20"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptTargetFont"	relativePoint="TOPRIGHT">
+										<Offset><AbsDimension x="30" y="0" /></Offset>
+									</Anchor>
+								</Anchors>
+							</Slider>
+							
+							<!-- ================================================ -->
+							<!-- health	value options box						  -->
+							<Frame name="MI2_FrmHealthValueOptions"	inherits="MI2_OptionsFrameTemplate"	>
+								<Size> <AbsDimension x="400" y="80"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptTargetFont"	relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-25" />	</Offset>
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<CheckButton name="MI2_OptTargetHealth"	inherits="MI2_CheckboxTemplate">
+										<Anchors>
+											<Anchor	point="TOPLEFT">
+												<Offset> <AbsDimension x="10" y="-10" /> </Offset>
+											</Anchor>
+										</Anchors>
+									</CheckButton>
+									<CheckButton name="MI2_OptHealthPercent" inherits="MI2_CheckboxTemplate">
+										<Anchors>
+											<Anchor	point="TOPLEFT"	relativeTo="MI2_OptTargetHealth" relativePoint="BOTTOMLEFT">
+												<Offset> <AbsDimension x="0" y="-5"	/> </Offset>
+											</Anchor>
+										</Anchors>
+									</CheckButton>
+									<Slider	name="MI2_OptHealthPosX" inherits="MI2_SliderTemplate">
+										<Size> <AbsDimension x="225" y="20"	/> </Size>
+										<Anchors>
+											<Anchor	point="TOPLEFT"	>
+												<Offset><AbsDimension x="150" y="-20" /></Offset>
+											</Anchor>
+										</Anchors>
+									</Slider>
+									<Slider	name="MI2_OptHealthPosY" inherits="MI2_SliderTemplate">
+										<Size> <AbsDimension x="225" y="20"	/> </Size>
+										<Anchors>
+											<Anchor	point="TOPLEFT"	relativeTo="MI2_OptHealthPosX" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension x="0"	y="-10"	/></Offset>
+											</Anchor>
+										</Anchors>
+									</Slider>
+								</Frames>
+							</Frame>
+
+							<!-- ================================================ -->
+							<!-- mana value	options	box							  -->
+							<Frame name="MI2_FrmManaValueOptions" inherits="MI2_OptionsFrameTemplate" >
+								<Size> <AbsDimension x="400" y="80"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_FrmHealthValueOptions" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-35" />	</Offset>
+									</Anchor>
+								</Anchors>
+								<Frames>
+									<CheckButton name="MI2_OptTargetMana" inherits="MI2_CheckboxTemplate">
+										<Anchors>
+											<Anchor	point="TOPLEFT">
+												<Offset> <AbsDimension x="10" y="-10" /> </Offset>
+											</Anchor>
+										</Anchors>
+									</CheckButton>
+									<CheckButton name="MI2_OptManaPercent" inherits="MI2_CheckboxTemplate">
+										<Anchors>
+											<Anchor	point="TOPLEFT"	relativeTo="MI2_OptTargetMana" relativePoint="BOTTOMLEFT">
+												<Offset> <AbsDimension x="0" y="-5"	/> </Offset>
+											</Anchor>
+										</Anchors>
+									</CheckButton>
+									<Slider	name="MI2_OptManaPosX" inherits="MI2_SliderTemplate">
+										<Size> <AbsDimension x="225" y="20"	/> </Size>
+										<Anchors>
+											<Anchor	point="TOPLEFT"	>
+												<Offset><AbsDimension x="150" y="-20" /></Offset>
+											</Anchor>
+										</Anchors>
+									</Slider>
+									<Slider	name="MI2_OptManaPosY" inherits="MI2_SliderTemplate">
+										<Size> <AbsDimension x="225" y="20"	/> </Size>
+										<Anchors>
+											<Anchor	point="TOPLEFT"	relativeTo="MI2_OptManaPosX" relativePoint="BOTTOMLEFT">
+												<Offset><AbsDimension x="0"	y="-10"	/></Offset>
+											</Anchor>
+										</Anchors>
+									</Slider>
+								</Frames>
+							</Frame>
+						</Frames>
+					</Frame>
+
+					<!-- ==================================================== -->
+					<!-- subframe with database options						  -->
+					<Frame name="MI2_FrmDatabaseOptions" inherits="MI2_OptionsFrameTemplate" hidden="true" >
+						<Size> <AbsDimension x="400" y="250" />	</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset> <AbsDimension x="20" y="-25" /> </Offset>
+							</Anchor>
+						</Anchors>
+						
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString	name="MI2_TxtMobDbSize"	inherits="GameFontNormalSmall">
+									<Anchors> <Anchor point="TOPLEFT">
+											<Offset> <AbsDimension x="10" y="-15"/>	</Offset>
+									</Anchor> </Anchors>
+								</FontString>
+								<FontString	name="MI2_TxtHealthDbSize" inherits="GameFontNormalSmall">
+									<Anchors> <Anchor point="TOPLEFT" relativeTo="MI2_TxtMobDbSize" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-15"/> </Offset>
+									</Anchor> </Anchors>
+								</FontString>
+								<FontString	name="MI2_TxtPlayerDbSize" inherits="GameFontNormalSmall">
+									<Anchors> <Anchor point="TOPLEFT" relativeTo="MI2_TxtHealthDbSize" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-15"/> </Offset>
+									</Anchor> </Anchors>
+								</FontString>
+								<FontString	name="MI2_TxtTargetIndex" inherits="GameFontNormalSmall">
+									<Anchors> <Anchor point="TOPLEFT" relativeTo="MI2_TxtPlayerDbSize" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-15"/> </Offset>
+									</Anchor> </Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+
+						<!-- ================================================ -->
+						<!-- controls within database options subframe		  -->
+						<Frames>
+							<Button	name="MI2_OptClearMobDb" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="150" y="20"/> </Size>
+								<Anchors>
+									<Anchor	point="BOTTOMLEFT" relativeTo="MI2_TxtMobDbSize" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="220" y="-2" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptClearHealthDb" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="150" y="20"/> </Size>
+								<Anchors>
+									<Anchor	point="BOTTOMLEFT" relativeTo="MI2_TxtHealthDbSize" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="220" y="-2" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptClearPlayerDb" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="150" y="20"/> </Size>
+								<Anchors>
+									<Anchor	point="BOTTOMLEFT" relativeTo="MI2_TxtPlayerDbSize" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="220" y="-2" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptClearTarget" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="150" y="20"/> </Size>
+								<Anchors>
+									<Anchor	point="BOTTOMLEFT" relativeTo="MI2_TxtTargetIndex" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="220" y="-2" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<CheckButton name="MI2_OptSaveBasicInfo" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_TxtTargetIndex">
+										<Offset> <AbsDimension x="0" y="-15" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptSaveCharData" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSaveBasicInfo">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptSaveLocation" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSaveCharData">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptSaveItems" inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSaveLocation">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<Button	name="MI2_OptItemsQuality" inherits="MI2_DropDownTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSaveItems" relativePoint="BOTTOMLEFT">
+										<Offset><AbsDimension x="220" y="28"/></Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<CheckButton name="MI2_OptSavePlayerHp"	inherits="MI2_CheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSaveItems">
+										<Offset> <AbsDimension x="0" y="-20" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<Button	name="MI2_OptTrimDownMobData" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="220" y="24"/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptSavePlayerHp" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="80" y="-5" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+
+							<Frame name="MI2_FrmImportDatabase" inherits="MI2_OptionsFrameTemplate" >
+								<Size> <AbsDimension x="400" y="90"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSavePlayerHp" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="-10" y="-80" />	</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<FontString	name="MI2_TxtImportStatus"	inherits="GameFontNormalSmall">
+											<Anchors> <Anchor point="TOPLEFT">
+												<Offset> <AbsDimension x="10" y="-20"/>	</Offset>
+											</Anchor> </Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<Frames>
+									<Button	name="MI2_OptImportMobData" inherits="MI2_PushButtonTemplate">
+										<Size> <AbsDimension x="160" y="24"/> </Size>
+										<Anchors>
+											<Anchor	point="TOPLEFT">
+												<Offset> <AbsDimension x="10" y="-45" /> </Offset>
+											</Anchor>
+										</Anchors>
+									</Button>
+									<CheckButton name="MI2_OptImportOnlyNew" inherits="MI2_CheckboxTemplate">
+										<Anchors>
+											<Anchor	point="TOPLEFT"	relativeTo="MI2_OptImportMobData" relativePoint="TOPRIGHT">
+												<Offset> <AbsDimension x="10" y="0" /> </Offset>
+											</Anchor>
+										</Anchors>
+									</CheckButton>
+								</Frames>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnShow> MI2_DbOptionsFrameOnShow(); </OnShow>
+						</Scripts>
+					</Frame>
+
+					<!-- ==================================================== -->
+					<!-- subframe with search options						  -->
+					<Frame name="MI2_FrmSearchOptions" hidden="true" >
+						<Size> <AbsDimension x="420" y="400" />	</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset> <AbsDimension x="10" y="0" /> </Offset>
+							</Anchor>
+						</Anchors>
+
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString	name="MI2_TxtSearchLevel" inherits="GameFontNormal" text="MI_TXT_SEARCH_LEVEL">
+									<Anchors> <Anchor point="TOPLEFT">
+										<Offset> <AbsDimension x="10" y="-20"/>	</Offset>
+									</Anchor> </Anchors>
+								</FontString>
+								<FontString	name="MI2_TxtSearchLoots" inherits="GameFontNormal" text="MI_TXT_SEARCH_LOOTS">
+									<Anchors> <Anchor point="TOPLEFT" relativeTo="MI2_TxtSearchLevel" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="160" y="0"/> </Offset>
+									</Anchor> </Anchors>
+								</FontString>
+								<FontString	name="MI2_TxtSearchMobType" inherits="GameFontNormal" text="MI_TXT_SEARCH_MOBTYPE">
+									<Anchors> <Anchor point="TOPLEFT" relativeTo="MI2_TxtSearchLevel" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-20"/> </Offset>
+									</Anchor> </Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+
+						<!-- ================================================ -->
+						<!-- controls within search options subframe		  -->
+						<Frames>
+							<EditBox name="MI2_OptSearchMinLevel" inherits="MI2_ValueEditBox_Template">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_TxtSearchLevel" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="40" y="6"/>	</Offset>
+									</Anchor>
+								</Anchors>
+							</EditBox>
+							<EditBox name="MI2_OptSearchMaxLevel" inherits="MI2_ValueEditBox_Template">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSearchMinLevel" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="40" y="0"/> </Offset>
+									</Anchor>
+								</Anchors>
+							</EditBox>
+							<CheckButton name="MI2_OptSearchNormal" inherits="MI2_SearchCheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_TxtSearchMobType" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="10" y="6" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptSearchElite" inherits="MI2_SearchCheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSearchNormal" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="45" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="MI2_OptSearchBoss" inherits="MI2_SearchCheckboxTemplate">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSearchElite" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="35" y="0" /> </Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<EditBox name="MI2_OptSearchMinLoots" inherits="MI2_ValueEditBox_Template">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_TxtSearchLoots" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="40" y="6"/>	</Offset>
+									</Anchor>
+								</Anchors>
+							</EditBox>
+							<EditBox name="MI2_OptSearchMobName" inherits="MI2_TextEditBox_Template" letters="28">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_TxtSearchMobType" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="70" y="-10"/> </Offset>
+									</Anchor>
+								</Anchors>
+							</EditBox>
+							<EditBox name="MI2_OptSearchItemName" inherits="MI2_TextEditBox_Template">
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSearchMobName" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="80" y="0"/> </Offset>
+									</Anchor>
+								</Anchors>
+							</EditBox>
+							<Button	name="MI2_OptSortByValue" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="180" y="24"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_TxtSearchMobType" relativePoint="BOTTOMLEFT">
+										<Offset> <AbsDimension x="0" y="-50"/>	</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_OptSortByItem" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="180" y="24"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT"	relativeTo="MI2_OptSortByValue" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="20" y="0"/>	</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+
+							<Frame name="MI2_SearchResultFrame" inherits="OptionFrameBoxTemplate">
+								<Size> <AbsDimension x="410" y="230" />	</Size>
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_OptSortByValue"  relativePoint="BOTTOMLEFT"> 
+										<Offset> <AbsDimension x="-5" y="-40"/>	</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts> <OnLoad> this:SetBackdropColor(0,0,0) </OnLoad> </Scripts>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<FontString	name="MI2_TxtSearchCount" inherits="GameFontNormalSmall">
+											<Anchors> <Anchor point="TOPLEFT"> <Offset> <AbsDimension x="210" y="10"/> </Offset> </Anchor> </Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							<Frames>
+
+							<!-- ==================================================== -->
+							<!-- TAB buttons controlling search result list content	  -->
+							<Button	name="$parentTab1" inherits="MI2_TabButtonTemplate"	id="1">
+								<Anchors>
+									<Anchor	point="TOPLEFT">
+										<Offset> <AbsDimension x="5" y="30"/> </Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts> <OnClick> MI2_SearchTab_OnClick( this:GetName() ); </OnClick> </Scripts>
+							</Button>
+							<Button	name="$parentTab2" inherits="MI2_TabButtonTemplate"	id="2">
+								<Anchors>
+									<Anchor	point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+										<Offset> <AbsDimension x="2" y="0"/> </Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts> <OnClick> MI2_SearchTab_OnClick( this:GetName() ); </OnClick> </Scripts>
+							</Button>
+
+							<Button	name="MI2_OptDeleteSearch" inherits="MI2_PushButtonTemplate">
+								<Size> <AbsDimension x="100" y="22"	/> </Size>
+								<Anchors>
+									<Anchor	point="TOPRIGHT" relativePoint="TOPRIGHT">
+										<Offset> <AbsDimension x="0" y="24"/> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+
+							<!-- ==================================================== -->
+							<!-- search result scroll slider                       	  -->
+							<ScrollFrame name="MI2_SearchResultSlider" inherits="FauxScrollFrameTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT"> <Offset> <AbsDimension x="10" y="-10"/> </Offset> </Anchor>
+									<Anchor point="BOTTOMRIGHT"> <Offset> <AbsDimension x="-30" y="10"/> </Offset> </Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll( 14, MI2_SearchResult_Update );
+									</OnVerticalScroll>
+									<OnShow>
+										<!-- MyModScrollBar_Update() -->
+									</OnShow>
+								</Scripts>
+							</ScrollFrame>
+
+							<!-- ==================================================== -->
+							<!-- search result text lines                          	  -->
+							<Button	name="MI2_SearchResult1" inherits="MI2_SearchResultLineTemplate" id="1">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResultSlider">
+										<Offset> <AbsDimension x="0" y="0"/> </Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult2" inherits="MI2_SearchResultLineTemplate" id="2">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult1" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult3" inherits="MI2_SearchResultLineTemplate" id="3">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult2" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult4" inherits="MI2_SearchResultLineTemplate" id="4">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult3" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult5" inherits="MI2_SearchResultLineTemplate" id="5">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult4" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult6" inherits="MI2_SearchResultLineTemplate" id="6">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult5" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult7" inherits="MI2_SearchResultLineTemplate" id="7">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult6" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult8" inherits="MI2_SearchResultLineTemplate" id="8">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult7" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult9" inherits="MI2_SearchResultLineTemplate" id="9">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult8" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult10" inherits="MI2_SearchResultLineTemplate" id="10">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult9" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult11" inherits="MI2_SearchResultLineTemplate" id="11">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult10" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult12" inherits="MI2_SearchResultLineTemplate" id="12">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult11" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult13" inherits="MI2_SearchResultLineTemplate" id="13">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult12" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult14" inherits="MI2_SearchResultLineTemplate" id="14">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult13" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							<Button	name="MI2_SearchResult15" inherits="MI2_SearchResultLineTemplate" id="15">
+								<Anchors>
+									<Anchor	point="TOPLEFT" relativeTo="MI2_SearchResult14" relativePoint="BOTTOMLEFT"> </Anchor>
+								</Anchors>
+							</Button>
+							</Frames>
+							</Frame>
+ 						</Frames>
+						<Scripts>
+							<OnShow> MI2_SearchOptionsOnShow(); </OnShow>
+						</Scripts>
+					</Frame>
+
+					<!-- ================================================ -->
+					<!-- subframe with mob health disabled message		  -->
+					<Frame name="MI2_FrmHealthDisabledInfo"	inherits="MI2_OptionsFrameTemplate"	hidden="true" >
+						<Size> <AbsDimension x="350" y="240" />	</Size>
+						<Anchors>
+							<Anchor	point="TOPLEFT">
+								<Offset> <AbsDimension x="40" y="-40" /> </Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString	name="$parentMessage" inherits="GameFontNormalLarge" text="MI_TXT_MH_DISABLED2">
+									<Size> <AbsDimension x="330" y="200" />	</Size>
+									<Color r="0.0" g="1.0" b="1.0"/> 
+									<Anchors>
+										<Anchor	point="TOPLEFT">
+											<Offset> <AbsDimension x="10" y="0"/> </Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+			</Frame>
+
+			<!-- ==================================================== -->
+			<!-- main "Done" button	for	dialog						  -->
+			<Button	name="MI2_OptBtnDone" inherits="MI2_PushButtonTemplate">
+				<Anchors>
+					<Anchor	point="BOTTOM">
+						<Offset> <AbsDimension x="0" y="20"	/> </Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick> miConfig_btnMIDone_OnClick() </OnClick>
+				</Scripts>
+			</Button>
+
+		</Frames>
+		
+		<Scripts>
+			<OnLoad> MI2_OptionsFrameOnLoad(); </OnLoad>
+			<OnShow> MI2_OptionsFrameOnShow(); </OnShow>
+			<OnMouseDown> miConfig_OnMouseDown(arg1); </OnMouseDown>
+			<OnMouseUp>	miConfig_OnMouseUp(arg1); </OnMouseUp>
+		</Scripts>
+	</Frame>
+</Ui>

@@ -1,0 +1,183 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+	..\FrameXML\UI.xsd">
+	<Script file="AggroAlert.lua"/>
+
+
+	<Frame name="AggroAlertCore"> 
+	      <Scripts> 
+		<OnLoad> 
+			AggroAlert_OnLoad();
+		</OnLoad> 
+		<OnEvent>
+			AggroAlert_OnEvent(event, arg1, arg2, arg3);
+		</OnEvent>
+	      </Scripts> 
+	</Frame> 
+	
+    <FontString name="AggroAlertFont" font="Fonts\ARIALN.TTF" outline="NORMAL" virtual="true">
+        <FontHeight>
+        <AbsValue val="30"/>
+        </FontHeight>
+		<Color r="1" g="0.2" b="0"/>
+	</FontString>
+
+	<Frame name="AggroAlert_Frame" toplevel="true" enableMouse="true" movable = "true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="240" y="23"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT">
+			</Anchor>
+		</Anchors>
+		
+		<TitleRegion/>
+		<Backdrop name="AggroAlert_Backdrop" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="AggroAlert_Text" inherits="GameFontNormal" text="Sathanas">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="AggroAlert_Frame" relativePoint="LEFT"> 
+							<Offset>
+								<AbsDimension x="15" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				
+			</Layer>
+			
+            <Layer level="ARTWORK">
+					<Texture name="AggroAlert_Bubble" file="Interface\Minimap\MiniMap-TrackingBorder" hidden="true">
+							<Size>
+								<AbsDimension x="55" y="55"/>
+			         				</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativeTo="AggroAlert_Frame" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="4" y="-12"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+				        </Layer>
+				        			
+            <Layer level="OVERLAY">
+					<Texture name="AggroAlert_Skull" file="Interface\TargetingFrame\UI-TargetingFrame-Skull" hidden="true">
+							<Size>
+								<AbsDimension x="24" y="24"/>
+			         				</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativeTo="AggroAlert_Bubble" relativePoint="CENTER">
+											<Offset>
+												<AbsDimension x="-10" y="10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+				        </Layer>
+				        
+            <Layer level="OVERLAY">
+					<Texture name="AggroAlert_Swords" file="Interface\CharacterFrame\UI-StateIcon" alphamode="ADD" hidden="true">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+			         				</Size>
+									<Anchors>
+										<Anchor point="CENTER" relativeTo="AggroAlert_Bubble" relativePoint="CENTER">
+											<Offset>
+												<AbsDimension x="-10" y="10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.5" right="1.0" top="0" bottom="0.5"/>
+								</Texture>
+				        </Layer>
+		</Layers>
+		
+		<Frames>
+		</Frames>
+		
+		<Scripts>
+			<OnMouseDown>
+				if(arg1 == "LeftButton") and (IsShiftKeyDown()) then
+					this:StartMoving();
+				elseif (arg1 == "LeftButton") then
+				    AggroAlert_TargetUnit();
+				end
+			</OnMouseDown>
+			
+			<OnMouseUp>
+				if(arg1 == "LeftButton") then
+					this:StopMovingOrSizing();
+				end
+			</OnMouseUp>
+		</Scripts>
+</Frame>
+
+    <Frame name="AggroAlert_BarFrame" parent="AggroAlert_Frame" frameStrata="LOW">
+        <Size>
+            <AbsDimension x="300" y="16"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeTo="AggroAlert_Frame" relativePoint="TOPLEFT"/>
+        </Anchors>
+        <Frames>
+            <StatusBar name="AggroAlert_Bar" minValue="0" maxValue="100" defaultValue="100">
+                <Size>
+                    <AbsDimension x="50" y="16"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="AggroAlert_Frame" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="3" y="-3"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+                <BarColor r="0.0" g="1" b="0.0"/>
+            </StatusBar>
+        </Frames>
+    </Frame>  
+
+	<Frame name="AggroAlert_BigWarning" toplevel="true" parent="UIParent" hidden="false">
+		<Size>
+			<AbsDimension x="512" y="128"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" >
+				<Offset>
+				    <AbsDimension x="0" y="284"/>
+				</Offset>
+			</Anchor>
+		</Anchors>	
+		
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="AggroAlert_BigWarning_Text" inherits="AggroAlertFont" text="Alexisa smells like cats!">
+                    <Size>
+                        <AbsDimension x="512" y="128"/>
+                    </Size>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="AggroAlert_BigWarning" relativePoint="Center"/> 
+					</Anchors>
+				</FontString>			
+			</Layer>
+		</Layers>		
+		<Scripts>
+		    <OnLoad>
+		        AggroAlertFadingFrame_OnLoad();
+		    </OnLoad>
+			<OnUpdate>
+				AggroAlertFadingFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+    </Frame>
+    
+</Ui>

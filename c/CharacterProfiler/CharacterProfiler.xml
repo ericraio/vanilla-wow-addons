@@ -1,0 +1,69 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="rpgo-lib.lua"/>
+    <Script file="localization.lua"/>
+	<Script file="CharacterProfiler.lua"/>
+	<Frame name="rpgoCPframe" enableMouse="true" hidden="false" parent="CharacterNameFrame">
+		<Scripts>
+			<OnLoad>
+				rpgoCP_OnLoad();
+			</OnLoad>
+			<OnHide>
+				rpgoCP_EventHandler('RPGOCP_SCAN');
+			</OnHide>
+			<OnEvent>
+				rpgoCP_EventHandler(event,arg1,arg2);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Button name="rpgoCPframeUISaveButton" parent="PaperDollFrame" toplevel="true" inherits="UIPanelButtonTemplate" text="RPGO_CP_TEXT_SAVE">
+		<Size>
+			<AbsDimension x="40" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="74" y="-35"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>
+				rpgoCP_EventHandler('RPGOCP_EXPORT');
+			</OnClick>
+			<OnEnter>
+				rpgo_SetTooltip();
+				GameTooltip:SetText("Click to export your CharacterProfile");
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Button>
+	<Frame name="rpgoCPtrade" parent="TradeSkillFrame" frameStrata="LOW" toplevel="true" enableMouse="true" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				if(TradeSkillFrame and TradeSkillFrame:IsVisible()) then
+					rpgoCP_EventHandler('TRADE_SKILL_UPDATE',arg1);
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="rpgoCPcraft" parent="CraftFrame" frameStrata="LOW" toplevel="true" enableMouse="true" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				if(CraftFrame and CraftFrame:IsVisible()) then
+					rpgoCP_EventHandler('CRAFT_UPDATE',arg1);
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<GameTooltip name="rpgoCPtooltip" frameStrata="TOOLTIP" inherits="GameTooltipTemplate" hidden="true">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(UIParent,"ANCHOR_NONE");
+				--this:SetOwner(WorldFrame, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
+</Ui>

@@ -1,0 +1,425 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="ZepShipMaster.lua"/>
+	<Script file="data.lua"/>
+	<Script file="data.de.lua"/>
+	<Script file="data.kr.lua"/>
+	<CheckButton name="ZSMCheckButtonTemplate" virtual="true">
+		
+		<Size>
+			<AbsDimension x="25" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString inherits="GameFontNormalSmall" name="$parentText">
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-2" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+	</CheckButton>		
+	<Frame name="ZSMHeaderFrame" frameStrata="BACKGROUND" enableMouse="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="170" y="24"/>
+		</Size>		
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="3" right="4" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="MEDIUM">	
+				<FontString name="$parentAddonName" inherits="GameFontNormal" text="Zeppelin Master"  justifyH="LEFT">
+					<Size>
+						<AbsDimension x="200" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="25" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>	
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="10" y="16"/>
+				</Size>					
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-6" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("X");
+					</OnLoad>
+					<OnClick>
+						ZSM_Close_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentMinimizeButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="10" y="16"/>
+				</Size>					
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentCloseButton">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("^");
+					</OnLoad>
+					<OnClick>
+						ZSM_Minimize_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>	
+			<Button name="$parentOptionsButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="10" y="16"/>
+				</Size>					
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentMinimizeButton">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText("!");
+					</OnLoad>
+					<OnClick>
+						ZSM_Options_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>				
+		</Frames>
+		<Scripts>
+			<OnLoad>				
+				this:SetBackdropColor(103/255,2/255, 6/255, 1);
+				this:SetBackdropBorderColor(1, 0, 0, 0.5);
+			</OnLoad>			
+			<OnMouseUp> 
+				if ( this.isMoving ) then 
+				this:StopMovingOrSizing(); this.isMoving = false;
+				end 
+			</OnMouseUp>
+			<OnMouseDown> 
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then 
+				this:StartMoving(); this.isMoving = true; 				
+				end 
+			</OnMouseDown>			
+		</Scripts>
+	</Frame>
+	
+		
+	<Frame name="ZSMFrame" frameStrata="BACKGROUND" enableMouse="true" parent="ZSMHeaderFrame" hidden="true">
+		<Size>
+			<AbsDimension x="210" y="95"/>
+		</Size>		
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="ZSMHeaderFrame">
+				<Offset>
+					<AbsDimension x="0" y="5"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="3" right="4" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="MEDIUM">	
+				<FontString name="$parentPlat1Name" inherits="GameFontNormal" text="-- Unknown --"  justifyH="CENTER">
+					<Size>
+						<AbsDimension x="100" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="9" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPlat2Name" inherits="GameFontNormal" text="-- Unknown --"  justifyH="CENTER">
+					<Size>
+						<AbsDimension x="100" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentPlat1Name">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>					
+				<FontString name="$parentPlat1ArrivalDepature" inherits="GameFontNormal" text="-- Unknown --"  justifyH="CENTER">
+					<Size>
+						<AbsDimension x="100" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="TOPLEFT"  relativePoint="BOTTOMLEFT" relativeTo="$parentPlat1Name">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentPlat2ArrivalDepature" inherits="GameFontNormal" text="-- Unknown --"  justifyH="CENTER">
+					<Size>
+						<AbsDimension x="100" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentPlat2Name">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>						
+				
+			</Layer>
+		</Layers>		
+		<Frames>
+			<Button name="$parentTransportSelect" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parentPlat1ArrivalDepature">
+						<Offset>
+							<AbsDimension x="-4" y="-22"/>
+						</Offset>
+					</Anchor>
+				</Anchors>																		
+				<Scripts>
+					<OnShow>
+						ZSM_TransportSelect_OnShow();
+					</OnShow>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropColor(1,0, 0, 0.3);
+				this:SetBackdropBorderColor(1, 0, 0, 0.5);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="ZSMOptionsFrame" frameStrata="HIGH" enableMouse="true" movable="true" parent="ZSMHeaderFrame" hidden="true">
+		<Size>
+			<AbsDimension x="410" y="140"/>
+		</Size>		
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>	
+		<Layers>
+			<Layer level="MEDIUM">
+				<FontString name="$parentOptionsTitle" inherits="GameFontNormal" text="ZM Options"  justifyH="Left">
+					<Size>
+						<AbsDimension x="200" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="9" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentCredit" inherits="GameFontNormal" text="(Idea + Beta Testing by Xula) ZM by Sammysnake"  justifyH="Right">
+					<Size>
+						<AbsDimension x="280" y="18"/>
+					</Size>	
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-9" y="10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>	
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parentOptZoneGUI" inherits="ZSMCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT"  relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad> 
+						getglobal(this:GetName().."Text"):SetText(ZSM_STR_OPT_ZONEGUI); 
+					</OnLoad>
+					<!--					<OnClick> DKPSystemButton_Toggle(); </OnClick> -->
+				</Scripts>
+			</CheckButton>		
+			<CheckButton name="$parentOptFactionSpecific" inherits="ZSMCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"  relativePoint="BOTTOMLEFT" relativeTo="$parentOptZoneGUI">
+						<Offset>
+							<AbsDimension x="0" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad> 
+						getglobal(this:GetName().."Text"):SetText(ZSM_STR_OPT_FACTION); 
+					</OnLoad>
+					<!--					<OnClick> DKPSystemButton_Toggle(); </OnClick> -->
+				</Scripts>
+			</CheckButton>		
+			<CheckButton name="$parentOptZoneSpecific" inherits="ZSMCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"  relativePoint="BOTTOMLEFT" relativeTo="$parentOptFactionSpecific">
+						<Offset>
+							<AbsDimension x="0" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad> 
+						getglobal(this:GetName().."Text"):SetText(ZSM_STR_OPT_ZONE); 
+					</OnLoad>
+					<!--					<OnClick> DKPSystemButton_Toggle(); </OnClick> -->
+				</Scripts>
+			</CheckButton>			
+			<CheckButton name="$parentOptCityAlias" inherits="ZSMCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"  relativePoint="BOTTOMLEFT" relativeTo="$parentOptZoneSpecific">
+						<Offset>
+							<AbsDimension x="0" y="3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad> 
+						getglobal(this:GetName().."Text"):SetText(ZSM_STR_OPT_ALIAS); 
+					</OnLoad>
+					<!--					<OnClick> DKPSystemButton_Toggle(); </OnClick> -->
+				</Scripts>
+			</CheckButton>	
+			<Button name="$parentSaveOptionsButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="50" y="20"/>
+				</Size>					
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="18" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(ZSM_STR_SAVE);
+					</OnLoad>
+					<OnClick>
+						ZSM_OptionsSave_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCloseOptionsButton" inherits="UIPanelButtonTemplate">
+				<Size>
+					<AbsDimension x="50" y="20"/>
+				</Size>					
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSaveOptionsButton">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetText(ZSM_STR_CLOSE);
+					</OnLoad>
+					<OnClick>
+						ZSM_OptionsClose_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>			
+		</Frames>
+		<Scripts>
+			<OnMouseUp> 
+				if ( this.isMoving ) then 
+				this:StopMovingOrSizing(); this.isMoving = false;
+				end 
+			</OnMouseUp>
+			<OnMouseDown> 
+				if ( ( ( not this.isLocked ) or ( this.isLocked == 0 ) ) and ( arg1 == "LeftButton" ) ) then 
+				this:StartMoving(); this.isMoving = true; 				
+				end 
+			</OnMouseDown>			
+		</Scripts>
+	</Frame>
+	<Frame name="ZSMDataTrackerFrame" frameStrata="BACKGROUND" parent="UIParent">
+		<Size>
+			<AbsDimension x="0" y="0"/>
+		</Size>		
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		
+		<Scripts>
+			<OnLoad>
+				ZSM_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				ZSM_OnEvent( event );
+			</OnEvent>			
+			<OnUpdate>
+				ZSM_OnUpdate( arg1 );
+			</OnUpdate>		
+		</Scripts>		
+	</Frame>
+</Ui>

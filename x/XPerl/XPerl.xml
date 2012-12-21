@@ -1,0 +1,75 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+        <Script file="XPerl.lua"/>
+
+        <GameTooltip name="XPerlBuffStatusTooltip" frameStrata="LOW" toplevel="true" movable="true" parent="UIParent" inherits="GameTooltipTemplate"/>
+
+        <Button name="XPerl_MinimapButton_Frame" toplevel="true" frameStrata="MEDIUM" parent="Minimap" enableMouse="true" movable="true">
+		<Size>
+			<AbsDimension x="33" y="33"/>
+		</Size>
+		<Anchors>
+                        <Anchor point="CENTER" relativeTo="Minimap" relativePoint="RIGHT"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+                                <Texture name="XPerl_MinitmapButton_Icon" file="Interface\Icons\INV_Misc_Gem_Pearl_02">
+					<Size>
+						<AbsDimension x="21" y="21"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="7" y="-6"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
+				</Texture>
+			</Layer>
+                        <Layer level="BORDER">
+                                <Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+                                        <Size>
+                                                <AbsDimension x="56" y="56"/>
+                                        </Size>
+                                        <Anchors>
+                                                <Anchor point="TOPLEFT"/>
+                                        </Anchors>
+                                </Texture>
+                        </Layer>
+		</Layers>
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+		<Scripts>
+			<OnLoad>
+                                this:RegisterEvent("VARIABLES_LOADED")
+				this:RegisterForClicks("LeftButtonUp","RightButtonUp")
+                                this:RegisterForDrag("RightButton")
+			</OnLoad>
+                        <OnEvent>
+                                XPerl_MinimapButton_Init()
+                                XPerl_MinimapButton_UpdatePosition()
+                        </OnEvent>
+			<OnEnter>
+                                XPerl_MinimapButton_OnEnter()
+			</OnEnter>
+			<OnMouseDown>
+                                XPerl_MinitmapButton_Icon:SetTexCoord(0,1,0,1)
+			</OnMouseDown>
+			<OnMouseUp>
+                                XPerl_MinitmapButton_Icon:SetTexCoord(.075,.925,.075,.925)
+			</OnMouseUp>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+                        <OnDragStart>
+                                this:SetScript("OnUpdate", XPerl_MinimapButton_Dragging)
+                        </OnDragStart>
+                        <OnDragStop>
+                                this:SetScript("OnUpdate", nil)
+                        </OnDragStop>
+			<OnClick>
+                                XPerl_Toggle()
+                                XPerl_MinitmapButton_Icon:SetTexCoord(.075,.925,.075,.925)
+			</OnClick>
+		</Scripts>
+	</Button>
+</Ui>

@@ -1,0 +1,579 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="GEM_Players.lua"/>
+
+  <!-- column header template -->
+  <Button name="GEMPlayersFrameColumnHeaderTemplate" virtual="true">
+  	<Size>
+		<AbsDimension x="10" y="24"/>
+	</Size>
+	<Layers>
+		<Layer level="BACKGROUND">
+			<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="5" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<TexCoords left="0" right="0.078125" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="53" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75"/>
+			</Texture>
+			<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+				<Size>
+					<AbsDimension x="4" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+				</Anchors>
+				<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75"/>
+			</Texture>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick>
+			PlaySound("igMainMenuOptionCheckBoxOn");
+			GEMPlayers_SortBy(this.sortType, this.sortDir);
+			this.sortDir = not this.sortDir;
+		</OnClick>
+	</Scripts>
+	<NormalText inherits="GameFontHighlightSmall">
+		<Anchors>
+			<Anchor point="LEFT">
+				<Offset>
+					<AbsDimension x="8" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</NormalText>
+  </Button>
+  
+  <Button name="GEMPlayerItemTemplate" virtual="true">
+ 	<Size>
+		<AbsDimension x="465" y="16"/>
+	</Size>
+	<Layers>
+		<Layer level="BORDER">
+			<FontString name="$parentName" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="98" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="2" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentGuild" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="118" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentLocation" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="128" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentGuild" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentLevel" inherits="GameFontHighlightSmall" justifyH="CENTER">
+				<Size>
+					<AbsDimension x="38" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLocation" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentClass" inherits="GameFontHighlightSmall" justifyH="LEFT">
+				<Size>
+					<AbsDimension x="93" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentLevel" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD">
+		<Size>
+			<AbsDimension x="465" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="0" y="-2"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</HighlightTexture>
+	<Scripts>
+		<OnClick>
+			GEMPlayers_PlayerOnClick();
+		</OnClick>
+		<OnEnter>
+			GEMPlayers_PlayerOnHover();
+		</OnEnter>
+		<OnLeave>
+			GameTooltip:Hide();
+		</OnLeave>
+	</Scripts>
+  </Button>
+
+  <Frame name="GEMPlayersFrame" parent="GEMMainFrame" inherits="GEMTabFrame">
+	<Layers>
+		<Layer level="BACKGROUND">
+			<FontString name="GEMPlayersFrameSeeOfflineString" inherits="GameFontHighlightSmall" justifyH="LEFT" text="GEM_TEXT_PLAYERS_SEEOFFLINE">
+				<Size>
+					<AbsDimension x="120" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="GEMPlayersFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="40" y="-37"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="GEMPlayersFrameCountString" inherits="GameFontNormalSmall" justifyH="LEFT" text="">
+				<Size>
+					<AbsDimension x="140" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="GEMPlayersFrameSeeOfflineString" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Frames>
+		<Button name="GEMPlayersFrameColumnHeader1" inherits="GEMPlayersFrameColumnHeaderTemplate" text="GEM_HEADER_PLAYERS_NAME">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="15" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(100);
+				    this.sortDir = true;
+				    this.sortType = GEM_PLAYERS_SORTBY_NAME;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMPlayersFrameColumnHeader2" inherits="GEMPlayersFrameColumnHeaderTemplate" text="GEM_HEADER_PLAYERS_GUILD">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMPlayersFrameColumnHeader1" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(120);
+    				    this.sortDir = true;
+				    this.sortType = GEM_PLAYERS_SORTBY_GUILD;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMPlayersFrameColumnHeader3" inherits="GEMPlayersFrameColumnHeaderTemplate" text="GEM_HEADER_PLAYERS_LOCATION">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMPlayersFrameColumnHeader2" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(130);
+    				    this.sortDir = true;
+				    this.sortType = GEM_PLAYERS_SORTBY_LOCATION;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMPlayersFrameColumnHeader4" inherits="GEMPlayersFrameColumnHeaderTemplate" text="GEM_HEADER_PLAYERS_LEVEL">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMPlayersFrameColumnHeader3" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(40);
+    				    this.sortDir = true;
+				    this.sortType = GEM_PLAYERS_SORTBY_LEVEL;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMPlayersFrameColumnHeader5" inherits="GEMPlayersFrameColumnHeaderTemplate" text="GEM_HEADER_PLAYERS_CLASS">
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="GEMPlayersFrameColumnHeader4" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="-2" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+				    GEMSetColumnWidth(95);
+    				    this.sortDir = true;
+				    this.sortType = GEM_PLAYERS_SORTBY_CLASS;
+				</OnLoad>
+			</Scripts>
+		</Button>
+		<Button name="GEMPlayerItem1" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayersFrameColumnHeader1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem2" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem1" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem3" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem2" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem4" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem3" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem5" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem4" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem6" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem5" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem7" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem6" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem8" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem7" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem9" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem8" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem10" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem9" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem11" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem10" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem12" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem11" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem13" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem12" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem14" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem13" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem15" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem14" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem16" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem15" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem17" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem16" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem18" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem17" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem19" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem18" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem20" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem19" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem21" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem20" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem22" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem21" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem23" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem22" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem24" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem23" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<Button name="GEMPlayerItem25" inherits="GEMPlayerItemTemplate" id="1">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativeTo="GEMPlayerItem24" relativePoint="BOTTOMLEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<ScrollFrame name="GEMPlayerItemScrollFrame" inherits="FauxScrollFrameTemplate">
+			<Size>
+				<AbsDimension x="455" y="400" />
+			</Size>
+			<Anchors>
+				<Anchor point="TOPRIGHT" relativeTo="GEMPlayersFrameColumnHeader5" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-23" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnVerticalScroll>
+					FauxScrollFrame_OnVerticalScroll(10, GEMPlayers_UpdatePlayersList);
+				</OnVerticalScroll>
+			</Scripts>
+		</ScrollFrame>
+		<Button name="GEM_Help_PlayersTab_Members" inherits="GEM_HelpTemplate" id="2">
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="GEMPlayersFrameColumnHeader5">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Button>
+		<!--  bottom buttons -->
+		<Button name="GEMPlayersFrameWhisper" inherits="UIPanelButtonTemplate" text="WHISPER_MESSAGE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT" relativeTo="GEMPlayersFrame" relativePoint="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-7" y="-40"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMPlayers_WhisperOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		
+		<Button name="GEMPlayersFrameInvite" inherits="UIPanelButtonTemplate" text="GROUP_INVITE">
+			<Size>
+				<AbsDimension x="90" y="21"/>
+			</Size>
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="GEMPlayersFrameWhisper" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="0" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<Scripts>
+				<OnClick>
+					GEMPlayers_InviteOnClick();
+				</OnClick>
+			</Scripts>
+		</Button>
+		<CheckButton name="GEMPlayersFrameSeeOffline" inherits="OptionsCheckButtonTemplate">
+			<Anchors>
+				<Anchor point="RIGHT" relativeTo="GEMPlayersFrameSeeOfflineString" relativePoint="LEFT">
+					<Offset>
+						<AbsDimension x="0" y="-2"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<HitRectInsets>
+				<AbsInset left="0" right="0" top="0" bottom="0"/>
+			</HitRectInsets>
+			<Size>
+				<AbsDimension x="26" y="26"/>
+			</Size>
+			<Scripts>
+				<OnClick>
+					GEMPlayers_OnSeeOfflineClick();
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+	</Frames>
+	<Scripts>
+		<OnShow>
+			GEMPlayers_OnShow();
+		</OnShow>
+		<OnLoad>
+			GEMPlayers_OnLoad();
+		</OnLoad>
+	</Scripts>
+  </Frame>
+
+</Ui>

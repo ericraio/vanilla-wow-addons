@@ -1,0 +1,364 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:ProjectsWoWBinInterfaceFrameXMLUI.xsd">
+
+	<Script file="PetFeeder_OptionsFrame.lua"/>
+	<Script file="localization.lua"/>
+	
+	<!--Button Widget Template-->
+	<Button name="PetFeederItemButtonTemplate" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="295" y="15"/>
+		</Size>
+		<NormalText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="275" y="12"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors> 
+		</NormalText>
+		<Scripts>
+			<OnClick>
+				PetFeederItemButton_OnClick(arg1);
+			</OnClick>
+			<OnReceiveDrag>
+				PetFeeder_OnReceiveDrag();						
+			</OnReceiveDrag>								
+		</Scripts>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+		<HighlightText name="$parentHighlightText" inherits="GameFontHighlight" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="275" y="12"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="20" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightText>	
+	</Button>
+
+	<CheckButton name="PetFeeder_Template_CheckBt" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT"/>
+		</Anchors>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<DisabledTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<NormalText inherits="GameFontNormalSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+		</NormalText>
+		<HighlightText inherits="GameFontHighlightSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+		</HighlightText>
+		<DisabledText inherits="GameFontDisableSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+		</DisabledText>
+		<PushedTextOffset>
+			<AbsDimension x="2" y="-2"/>
+		</PushedTextOffset>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		<Scripts>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+				if ( this.tooltipRequirement ) then
+					GameTooltip:AddLine(this.tooltipRequirement, "", 1.0, 1.0, 1.0);
+					GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnClick>
+				getglobal(this:GetName().."_Update")(this:GetChecked());
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+-- Interface viewable objects
+
+	<Frame name="PetFeeder_OptionsFrame" setAllPoints="true" enableMouse="true" parent="PetFeederFrame" hidden="true" id="1">
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="75"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="KillLog_ListFrameHorizontalBarLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="256" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="15" y="-312"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture name="KillLog_ListFrameHorizontalBarRight" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size>
+						<AbsDimension x="75" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="KillLog_ListFrameHorizontalBarLeft" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="PetFeeder_PF_Enabled_CheckBt" text="PETFEEDER_ENABLE" inherits="PetFeeder_Template_CheckBt" parent="PetFeeder_OptionsFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="60" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>getglobal(this:GetName()):SetChecked(PeetFeederPlayer_Config.Enabled);</OnShow>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="PetFeeder_PF_AutoFindFood_CheckBt" text="PETFEEDER_AUTODETECT" inherits="PetFeeder_Template_CheckBt" parent="PetFeeder_OptionsFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="PetFeeder_PF_Enabled_CheckBt">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>getglobal(this:GetName()):SetChecked(PeetFeederPlayer_Config.AutoFindFood);</OnShow>
+				</Scripts>
+			</CheckButton>			
+			<CheckButton name="PetFeeder_PF_Alerts_CheckBt" text="PETFEEDER_ENABLE_ALERTS" inherits="PetFeeder_Template_CheckBt" parent="PetFeeder_OptionsFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="PetFeeder_PF_Enabled_CheckBt">
+						<Offset>
+							<AbsDimension x="135" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>getglobal(this:GetName()):SetChecked(PeetFeederPlayer_Config.Alert);</OnShow>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="PetFeeder_PF_SkipBuffFoods_CheckBt" text="PETFEEDER_SKIPBUFF_FOODS" inherits="PetFeeder_Template_CheckBt" parent="PetFeeder_OptionsFrame">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="PetFeeder_PF_AutoFindFood_CheckBt">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>getglobal(this:GetName()):SetChecked(PeetFeederPlayer_Config.skipBuffFoods);</OnShow>
+				</Scripts>
+			</CheckButton>						
+			<Frame name="PetFeeder_Threshold_WidgetGroup" hidden="false">
+				<Size>
+					<AbsDimension x="320" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PetFeeder_PF_SkipBuffFoods_CheckBt" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-37" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormalSmall" name="$parentFeedThreshold" text="PETFEEDER_FEEDING_THRESHOLD">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-18"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="PetFeederFrameDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="PetFeeder_Threshold_WidgetGroup">
+						<Offset>
+							<AbsDimension x="31" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PetFeederFrameDropDown_OnLoad();
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+-- Sorting			
+			<Frame name="$parentSortOption_WidgetGroup" hidden="false">
+				<Size>
+					<AbsDimension x="320" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PetFeeder_Threshold_WidgetGroup" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="15" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" name="$parentFeedSortOption" text="PETFEEDER_FOODS">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="30" y="16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontNormalSmall" name="$parentFeedSortOption" text="PETFEEDER_SORT1">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="50" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="$parentSortOptionDropDown" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="50" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentSortOption_WidgetGroup">
+						<Offset>
+							<AbsDimension x="41" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PetFeeder_OptionsFrameSortOptionDropDown_OnLoad();						
+					</OnLoad>						
+				</Scripts>
+			</Button>
+			
+			<Frame name="$parentSortOption2_WidgetGroup" hidden="false">
+				<Size>
+					<AbsDimension x="320" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSortOption_WidgetGroup" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontNormalSmall" name="$parentFeedSortOption2" text="PETFEEDER_SORT2">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="50" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="$parentSortOption2DropDown" inherits="UIDropDownMenuTemplate">
+				<Size>
+					<AbsDimension x="50" y="45"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentSortOption2_WidgetGroup">
+						<Offset>
+							<AbsDimension x="41" y="9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PetFeeder_OptionsFrameSortOption2DropDown_OnLoad();						
+					</OnLoad>						
+				</Scripts>
+			</Button>			
+			
+			<Button name="$parentFeedButton">
+				<Size>
+					<AbsDimension x="96" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-140" y="105"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>PetFeeder_Feed();
+							this:GetParent():Hide();
+							this:GetParent():Show();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<NormalText inherits="GameFontNormal" text="PETFEEDER_FEED_PET"/>
+			</Button>
+			
+		</Frames>		
+		<Scripts>
+			<OnShow>
+				PetFeeder_OptionsFrame_OnShow();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+</Ui>

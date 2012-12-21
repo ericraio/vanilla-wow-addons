@@ -1,0 +1,19 @@
+-------------------------------------------------------------------------------
+--                               TitanCritLine                               --
+--                                  Readme                                   --
+-------------------------------------------------------------------------------
+-- First off, I would like to thank Sordit for the CritLine concept!         --
+-- It was his idea that sparked my interest in this project, and since then  --
+-- I have been up many nights trying to make this a great UI Mod.            --
+--                                                                           --
+--                                                                           --
+-- Sordit's Stand-Alone Version:                                             --
+-- http://ui.worldofwar.net/ui.php?id=810                                    --
+--                                                                           --
+-- Uggh's Titan Plugin Version:                                              --
+-- http://ui.worldofwar.net/ui.php?id=849                                    --
+--                                                                           --
+-- Titan [CritLine] Community Forum:                                         --
+-- http://com5.runboard.com/bcritline                                        --
+--                                                                           --
+-------------------------------------------------------------------------------

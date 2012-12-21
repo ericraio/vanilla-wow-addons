@@ -1,0 +1,277 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="AutoDingConfig.lua"/>
+	
+	<Frame name="AutoDingConfigFrame" parent="UIParent" enableMouse="true" movable="true" frameStrata="DIALOG" hidden="true" toplevel="true">
+    	<Size>
+			<AbsDimension x="400" y="250"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>	
+		
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="txtADConfigTitle" inherits="GameTooltipHeaderText">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="txtADEditHeader" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-130"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="txtADEditTips" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-180"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name ="butADChannel" inherits="OptionsButtonTemplate" enableMouse="true">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="AutoDingConfigFrame" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-50" y="135"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="Channel currently exporting:">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-20" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip:SetOwner(this, "ANCHOR_TOPLEFT");
+						GameTooltip:SetText("Use /ad channel *name*", nil, nil, nil, nil, 1);
+						GameTooltip:AddLine("to set channel, as", nil, nil, nil, nil, 1);
+						GameTooltip:AddLine("I can't do dropdowns.",nil, nil, nil, nil, 1);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<CheckButton name="cbxADEnable" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("On/Off?");
+					</OnLoad>
+					<OnClick>
+						 UniAutoDing_Command("toggle")
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="cbxADPartyDing" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("Always ding to Party if grouped?");
+					</OnLoad>
+					<OnClick>
+						 UniAutoDing_Command("party")
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="cbxADScreenshot" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="24" y="-70"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Text"):SetText("Take Delayed Screenshot on Dinging?");
+					</OnLoad>
+					<OnClick>
+						 UniAutoDing_Command("screenie")						
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="btnADDone" inherits="OptionsButtonTemplate" text="Done">
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="-50" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						AutoDingConfig_btnUTDone_OnClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="btnADDefault" inherits="OptionsButtonTemplate" text="Default">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="260" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						UniAutoDing_ResetVars();
+						AutoDingConfig_SetValues();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			
+
+			<EditBox name="AutoDing_EditBox" letters="250" historyLines="0" autoFocus="false" virtual="true">
+				<Size>
+					<AbsDimension x="330" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-150" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormal" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>		
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-8" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="325" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnTextChanged>
+						AutoDing_UpdateString();
+					</OnTextChanged>
+					<OnEditFocusLost>
+						this:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEnterPressed>
+						this:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						this:ClearFocus();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+		</Frames>	
+		<Scripts>	
+			<OnLoad>
+			   AutoDingConfig_OnLoad();
+			</OnLoad>
+			<OnShow>
+				AutoDingConfig_OnShow();
+			</OnShow>
+			<OnHide>
+				AutoDingConfig_OnHide();
+			</OnHide>
+			<OnMouseDown>
+				AutoDingConfig_OnMouseDown(arg1);
+			</OnMouseDown>
+			<OnMouseUp>
+				AutoDingConfig_OnMouseUp(arg1);
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+</Ui>

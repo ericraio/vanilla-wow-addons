@@ -1,0 +1,20 @@
+IMA_SET_PRICES_WITH = "Set Prices With";
+IMA_CLEAR = "Clear";
+IMA_IGORS_MASS_AUCTION = "Intensitys MassAuction";
+IMA_MASS_AUCTION = "MassAuction";
+IMA_SENDINFO = "Are you sure you want to place these auctions? Total deposit will be:";
+IMA_SENDINFO2 = "You are placing:";
+IMA_ERROR = "An error occured in Intensity's MassAuction. Please submit a bug report wherever you got this mod";
+IMA_ITEMS = "Item(s)";
+IMA_POSTING_ITEM = "Posting item ";
+IMA_OF = " of ";
+IMA_DEFAULT = "Default";
+IMA_VALUE_MULTIPLIER = "Value Multiplier";
+IMA_ALL_SAME_PRICE = "All Same Price";
+IMA_EASY_AUCTION = "EasyAuction";
+IMA_START_PRICE = "Start Price";
+IMA_BUYOUT_PRICE = "Buyout Price";
+IMA_FOR = "for";
+IMA_SET_ALL_PRICES = "Set All Prices";
+IMA_MOUSEOVER_TEXT = "Drag or Alt+click items to add them";
+

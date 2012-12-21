@@ -1,0 +1,320 @@
+<!--$Id: templates.xml 7996 2006-08-14 17:02:54Z hk2717 $-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/FrameXML\UI.xsd">
+   
+   <Button name="OneBankItemButtonTemplate" inherits="BankItemButtonGenericTemplate" virtual="true">
+    	<Scripts>
+    		<OnLoad>
+				BankFrameItemButton_OnLoad()
+				this:SetNormalTexture("Interface\\AddOns\\OneBag\\BagSlot")
+    		</OnLoad>
+            <OnShow>
+                BankFrameItemButton_OnUpdate()
+            </OnShow>
+    	</Scripts>
+        <Frames>
+            <Model name="$parentCooldown" inherits="CooldownFrameTemplate">
+				<Size x="39" y="39"/>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors> 
+			</Model>
+        </Frames>
+    </Button>
+   
+   <Button name="OneBagItemButtonTemplate"  inherits="ContainerFrameItemButtonTemplate" virtual="true">
+    	<Scripts>
+    		<OnLoad>
+    			ContainerFrameItemButton_OnLoad()
+				this:SetNormalTexture("Interface\\AddOns\\OneBag\\BagSlot")
+    		</OnLoad>
+    	</Scripts>
+    </Button> 
+	
+	<CheckButton name="OneBagBagTemplate" inherits="BagSlotButtonTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("BAGMENUBUTTONPRESS")
+				PutItemInBag(this:GetID())
+				
+				if not this:GetChecked() then
+					OneBag:UnhighlightBagSlots(this:GetID()-19)
+					if OneBag.frame.bags[this:GetID()-19] then
+						OneBag.frame.bags[this:GetID()-19].colorLocked = false
+					end
+				else
+					if OneBag.frame.bags[this:GetID()-19] then
+						OneBag.frame.bags[this:GetID()-19].colorLocked = true
+					end
+				end
+				OneBag:OrganizeFrame(true)
+			</OnClick>
+			<OnEnter>
+				OneBag:HighlightBagSlots(this:GetID()-19)
+                BagSlotButton_OnEnter()
+			</OnEnter>
+			<OnLeave>
+				if not this:GetChecked() then
+					OneBag:UnhighlightBagSlots(this:GetID()-19)
+					if OneBag.frame.bags[this:GetID()-19] then
+						OneBag.frame.bags[this:GetID()-19].colorLocked = false
+					end
+				else
+					if OneBag.frame.bags[this:GetID()-19] then
+						OneBag.frame.bags[this:GetID()-19].colorLocked = true
+					end
+				end
+                this.updateTooltip = nil
+                GameTooltip:Hide()
+				ResetCursor()
+			</OnLeave>
+		</Scripts>
+	</CheckButton>
+	
+	<CheckButton name="OneBankBagTemplate" inherits="BankItemButtonBagTemplate" virtual="true">
+		<Scripts>
+			<OnClick>
+				PlaySound("BAGMENUBUTTONPRESS")
+				PutItemInBag(this:GetInventorySlot())
+				
+				if not this:GetChecked() and OneBank.frame.bags[this:GetID()] then
+					OneBank:UnhighlightBagSlots(this:GetID())
+					OneBank.frame.bags[this:GetID()].colorLocked = false
+				elseif OneBank.frame.bags[this:GetID()] then
+					OneBank.frame.bags[this:GetID()].colorLocked = true
+				end
+			</OnClick>
+			<OnEnter>
+				OneBank:HighlightBagSlots(this:GetID())
+                GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
+                if ( not GameTooltip:SetInventoryItem("player", this:GetInventorySlot()) ) then
+					if ( this.isBag ) then
+						GameTooltip:SetText(this.tooltipText)
+					end
+				end
+				CursorUpdate()
+			</OnEnter>
+			<OnLeave>
+				if not this:GetChecked() and OneBank.frame.bags[this:GetID()] then
+					OneBank:UnhighlightBagSlots(this:GetID())
+					OneBank.frame.bags[this:GetID()].colorLocked = false
+				elseif OneBank.frame.bags[this:GetID()] then
+					OneBank.frame.bags[this:GetID()].colorLocked = true
+				end
+                GameTooltip:Hide()
+				ResetCursor()
+			</OnLeave>
+		</Scripts>
+		<CheckedTexture alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+	</CheckButton>
+	
+	<Frame name="OneBagBaseFrameTemplate" virtual="true" toplevel="true" frameStrata="LOW" enableMouse="true" movable="true" hidden="true">
+		<Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+        <Scripts>
+			<OnShow>
+				this.handler:OnBaseShow()
+			</OnShow>
+            <OnHide>
+                this.handler:OnBaseHide()
+            </OnHide>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="OneBagFrameTemplate" inherits="OneBagBaseFrameTemplate"  virtual="true">
+		<Frames>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentConfigButton" inherits="UIPanelButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCloseButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="60" y="20"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						this:GetParent().handler:OpenMenu()
+					</OnClick>
+					<OnLoad>
+						this:SetText(ONEBAG_LOCALE_MENU)
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="$parentBagButton">
+				<Size>
+					<AbsDimension x="32" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="3" y="-9"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						local bagFrame = this:GetParent().bagFrame
+						if bagFrame:IsVisible() then
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
+							bagFrame:Hide()
+						else
+							this:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
+							this:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
+							bagFrame:Show()
+						end
+					</OnClick>
+					<OnLoad>
+						getglobal(this:GetParent():GetName() .. "Name"):ClearAllPoints()
+						getglobal(this:GetParent():GetName() .. "Name"):SetPoint("LEFT", this:GetName(), "RIGHT", 5, 1)
+					</OnLoad>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Size>
+					<AbsDimension x="206" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentBagButton" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="5" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo1" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="8" y="9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo2" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInfo1" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo3" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInfo2" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentInfo4" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentInfo3" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="5" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,this:GetName())
+                this:RegisterForDrag("LeftButton")
+            </OnLoad>
+            <OnDragStart>
+                if not this.handler.db.profile.locked then
+                    this:StartMoving()
+                    this.isMoving = true
+                    
+                    for bag = -1, 10 do
+                        if this.bags[bag] then
+                            for slot = 1, this.bags[bag].size do                        
+                                if this.bags[bag][slot] then
+                                    this.bags[bag][slot]:EnableMouse(false)
+                                end
+                            end
+                        end
+                    end
+                end
+            </OnDragStart>
+            <OnDragStop>
+                this:StopMovingOrSizing()
+                if this.isMoving then
+                    local point = {}
+                    point.top = this:GetTop()
+                    point.left = this:GetLeft()
+                    point.parent = this:GetParent():GetName()
+                    
+                    this.handler.db.profile.point = point
+                    
+                    for bag = -1, 10 do
+                        if this.bags[bag] then
+                            for slot = 1, this.bags[bag].size do                        
+                                if this.bags[bag][slot] then
+                                    this.bags[bag][slot]:EnableMouse(true)
+                                end
+                            end
+                        end
+                    end
+                    
+                end
+                this.isMoving = false
+            </OnDragStop>
+			<OnHide>
+				this.handler:OnHide()		
+			</OnHide>
+			<OnShow>
+                this.handler:OnShow()
+			</OnShow>
+		</Scripts>
+	</Frame>
+ 
+ </Ui>

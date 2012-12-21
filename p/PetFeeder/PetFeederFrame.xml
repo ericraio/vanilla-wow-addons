@@ -1,0 +1,259 @@
+<!--
+path: /PetFeeder/
+filename: PetFeederFrame.xml
+author: 
+created: Sat, 17 Jan 2005 16:09:00 -0800
+updated: Sun, 30 Jan 2005 15:16:00 -0800
+
+-->
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="PetFeederFrame.lua"/>
+	
+	 <GameTooltip name="PetFeederTooltip" inherits="GameTooltipTemplate">
+	   <Scripts>
+		 <Onload>
+		   this:SetOwner(this, "ANCHOR_NONE");
+		 </Onload>
+	   </Scripts>
+	 </GameTooltip>	
+	<GameTooltip name="PetFeederDisplayTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+		
+	<Button name="PetFeederFrameTabButtonTemplate" inherits="CharacterFrameTabButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				this:SetFrameLevel(this:GetFrameLevel() + 4);
+			</OnLoad>
+			<OnClick>
+				PanelTemplates_Tab_OnClick(PetFeederFrame);
+				PetFeederTab_OnClick();
+			</OnClick>
+			<OnShow>
+				PanelTemplates_TabResize(10);
+				getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 30);
+			</OnShow>
+		</Scripts>
+	</Button>
+	
+	<CheckButton name="PetFeeder_Template_CheckBt" enableMouse="true" virtual="true">
+		<Size>
+			<AbsDimension x="24" y="24"/>
+		</Size>
+		<!--
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT"/>
+		</Anchors>
+		-->
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<DisabledTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<NormalText inherits="GameFontNormalSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+		</NormalText>
+		<HighlightText inherits="GameFontHighlightSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+		</HighlightText>
+		<DisabledText inherits="GameFontDisableSmall" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT"/>
+			</Anchors>
+		</DisabledText>
+		<PushedTextOffset>
+			<AbsDimension x="2" y="-2"/>
+		</PushedTextOffset>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		<Scripts>
+			<OnEnter>
+				if ( this.tooltipText ) then
+					GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+					GameTooltip:SetText(this.tooltipText, nil, nil, nil, nil, 1);
+				end
+				if ( this.tooltipRequirement ) then
+					GameTooltip:AddLine(this.tooltipRequirement, "", 1.0, 1.0, 1.0);
+					GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+			<OnClick>
+				getglobal(this:GetName().."_Update")(this:GetChecked());
+			</OnClick>
+		</Scripts>
+	</CheckButton>
+
+	<!-- Frame to handle all core events -->
+	<Frame name="PetFeederLoadingFrame">
+		<Scripts>
+			<OnLoad>
+				PetFeederLoadingFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				PetFeederLoadingFrame_OnEvent(event,arg1,arg2);
+			</OnEvent>
+			<OnUpdate>
+				PetFeederLoadingFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="PetFeederFrame" toplevel="true" movable="true" parent="UIParent" hidden="true">
+		<Size>
+			<AbsDimension x="384" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-104"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="30" top="0" bottom="45"/>
+		</HitRectInsets>	
+		<Layers>		
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\QuestFrame\UI-QuestLog-BookIcon">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="6" y="-4"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>	 
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="2" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="PetFeederTitleText" inherits="GameFontHighlight" text="PETFEEDER_TITLE">
+					<Size>
+					    <AbsDimension x="300" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="PetFeederFrame" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-17"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="PetFeederCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="CENTER" relativeTo="PetFeederFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-44" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						this:SetFrameLevel(this:GetFrameLevel() + 4);
+					</OnLoad>
+				</Scripts>
+			</Button>
+			<Button name="PetFeederFrameTab1" inherits="PetFeederFrameTabButtonTemplate" id="1" text="PETFEEDER_TAB_LIST">
+				<Anchors>
+					<Anchor point="CENTER" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="65" y="61"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="PetFeederFrameTab2" inherits="PetFeederFrameTabButtonTemplate" id="2" text="PETFEEDER_TAB_APPROVED">
+				<Anchors>
+				   <Anchor point="LEFT" relativeTo="PetFeederFrameTab1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="PetFeederFrameTab3" inherits="PetFeederFrameTabButtonTemplate" id="3" text="PETFEEDER_TAB_UNLIKED">
+				<Anchors>
+				   <Anchor point="LEFT" relativeTo="PetFeederFrameTab2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				PFChatParse_OnLoad();
+				PetFeederFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				PFChatParse_OnEvent(event);
+				PetFeederFrame_OnEvent(event,arg1);
+			</OnEvent>
+			<OnShow>
+				PetFeederFrame_OnShow();
+			</OnShow>
+			<OnHide>
+				PetFeederFrame_OnHide();
+			</OnHide>
+		</Scripts>
+	</Frame>
+</Ui>

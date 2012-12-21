@@ -1,0 +1,118 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+  <Script file="FlightMapTimes.lua"/>
+
+  <!-- This frame will only be shown when in flight. -->
+  <StatusBar name="FlightMapTimesFrame" toplevel="true" parent="UIParent"
+             hidden="true" movable="true" enableMouse="true"
+             drawLayer="BORDER">
+    <!-- Standard casting bar size is 195x13 -->
+    <Size>
+      <AbsDimension x="195" y="13"/>
+    </Size>
+
+    <!-- Throw it right into the middle of the screen -->
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+
+    <!-- Build up the layers of the bar -->
+    <Layers>
+      <!-- Alpha mask off the background a bit -->
+      <Layer level="BACKGROUND">
+        <Texture setAllPoints="true">
+          <Color r="0" g="0" b="0" a="0.5"/>
+        </Texture>
+      </Layer>
+
+      <!-- The text and border are just artwork -->
+      <Layer level="ARTWORK">
+        <FontString name="FlightMapTimesText" inherits="GameFontHighlight">
+          <Size>
+            <AbsDimension x="185" y="16"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="5"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <Texture name="FlightMapTimesBorder"
+                 file="Interface\CastingBar\UI-CastingBar-Border">
+          <Size>
+            <AbsDimension x="256" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="28"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+
+      <Layer level="OVERLAY">
+        <!-- Overlay the moving spark to give a bright blended edge rather than
+             a sharp cut between done and not-done -->
+        <Texture name="FlightMapTimesSpark" alphaMode="ADD"
+                 file="Interface\CastingBar\UI-CastingBar-Spark">
+          <Size>
+            <AbsDimension x="32" y="32"/>
+          </Size>
+          <Anchors>
+            <Anchor point="CENTER"/>
+          </Anchors>
+        </Texture>
+        <!-- Overlay a flash to cause the entire status bar to glow briefly as
+             it fades away -->
+        <Texture name="FlightMapTimesFlash" alphaMode="ADD"
+                 file="Interface\CastingBar\UI-CastingBar-Flash">
+          <Size>
+            <AbsDimension x="256" y="64"/>
+          </Size>
+          <Anchors>
+            <Anchor point="TOP">
+              <Offset>
+                <AbsDimension x="0" y="28"/>
+              </Offset>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+
+    <!-- StatusBar specific settings -->
+    <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+    <BarColor r="1.0" g="0.7" b="0.0"/>
+
+    <!-- Make it dance! -->
+    <Scripts>
+      <OnLoad>
+        FlightMapTimes_OnLoad();
+      </OnLoad>
+      <OnUpdate>
+        FlightMapTimes_OnUpdate();
+      </OnUpdate>
+      <OnDragStart>
+        FlightMapTimes_OnDragStart();
+      </OnDragStart>
+      <OnDragStop>
+        FlightMapTimes_OnDragStop();
+      </OnDragStop>
+      <OnMouseUp>
+        FlightMapTimes_OnDragStop();
+      </OnMouseUp>
+      <OnEnter>
+        GameTooltip_AddNewbieTip(FLIGHTMAP_NAME, 1.0, 1.0, 1.0,
+            FLIGHTMAP_TIMER_HELP, 1);
+      </OnEnter>
+      <OnLeave>
+        GameTooltip:Hide();
+      </OnLeave>
+    </Scripts>
+  </StatusBar>
+</Ui>

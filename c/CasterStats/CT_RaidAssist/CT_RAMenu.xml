@@ -1,0 +1,5465 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="CT_RAMenu.lua"/>
+	<Button name="CT_RA_PriorityTemplate" virtual="true" movable="true" hidden="false">
+		<Size>
+			<AbsDimension x="190" y="32"/>
+		</Size>
+		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="ChatFontNormal" text="Player">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnMouseDown>
+				this:StartMoving();
+				CT_RA_PriorityFrame.moving = this;
+			</OnMouseDown>
+			<OnMouseUp>
+				CT_RA_PriorityFrame.moving = nil;
+				this:StopMovingOrSizing();
+				CT_RA_Priority_SetPosition();
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+	<Button name="CT_RA_DebuffSetTemplate" virtual="true" hidden="true">
+		<Size>
+			<AbsDimension x="192" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" justifyH="LEFT" inherits="ChatFontNormal">
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentMO" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+					<Color r="1" g="1" b="1" a="1"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentMoveUp" inherits="UIPanelScrollUpButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="150" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( not CT_RA_PriorityFrame:IsVisible() ) then
+							CT_RAMenuDebuff_MoveSetUp();
+						end
+					</OnClick>
+					<OnEnter>
+						if ( not CT_RA_PriorityFrame:IsVisible() ) then
+							if ( not this:GetParent().isHighlighted ) then
+								getglobal(this:GetParent():GetName() .. "MO"):SetVertexColor(1, 1, 1, 0.1);
+							end
+							getglobal(this:GetParent():GetName() .. "MO"):Show();
+							this:GetParent().isOver = 1;
+						end
+					</OnEnter>
+					<OnLeave>
+						this:GetParent().isOver = nil;
+						if ( not this:GetParent().isHighlighted ) then
+							getglobal(this:GetParent():GetName() .. "MO"):Hide();
+						end
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentMoveDown" inherits="UIPanelScrollDownButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentMoveUp">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if ( not CT_RA_PriorityFrame:IsVisible() ) then
+							CT_RAMenuDebuff_MoveSetDown();
+						end
+					</OnClick>
+					<OnEnter>
+						if ( not CT_RA_PriorityFrame:IsVisible() ) then
+							if ( not this:GetParent().isHighlighted ) then
+								getglobal(this:GetParent():GetName() .. "MO"):SetVertexColor(1, 1, 1, 0.1);
+							end
+							getglobal(this:GetParent():GetName() .. "MO"):Show();
+							this:GetParent().isOver = 1;
+						end
+					</OnEnter>
+					<OnLeave>
+						this:GetParent().isOver = nil;
+						if ( not this:GetParent().isHighlighted ) then
+							getglobal(this:GetParent():GetName() .. "MO"):Hide();
+						end
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnEnter>
+				if ( not CT_RA_PriorityFrame:IsVisible() ) then
+					if ( not this.isHighlighted ) then
+						getglobal(this:GetName() .. "MO"):SetVertexColor(1, 1, 1, 0.1);
+					end
+					getglobal(this:GetName() .. "MO"):Show();
+					this.isOver = 1;
+				end
+			</OnEnter>
+			<OnLeave>
+				this.isOver = nil;
+				if ( not this.isHighlighted ) then
+					getglobal(this:GetName() .. "MO"):Hide();
+				end
+			</OnLeave>
+			<OnClick>
+				if ( not CT_RA_PriorityFrame:IsVisible() ) then
+					CT_RAMenuFrameDebuffSettingsNameEB:ClearFocus();
+					CT_RAMenuFrameDebuffSettingsDebuffTitleEB:ClearFocus();
+					CT_RAMenuFrameDebuffSettingsDebuffTypeEB:ClearFocus();
+					CT_RAMenuFrameDebuffSettingsDebuffDescriptEB:ClearFocus();
+					CT_RAMenuFrameDebuff.selectedIndex = this:GetID()+FauxScrollFrame_GetOffset(CT_RAMenuFrameDebuffUseScrollFrame);
+					CT_RAMenuFrameDebuff_UpdateSet();
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Frame name="CT_RAMenuBossModTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="515" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentShowHide" justifyH="CENTER" justifyV="CENTER" hidden="true" font="Fonts\ARIALN.TTF">
+					<Size>
+						<AbsDimension x="12" y="20"/>
+					</Size>
+					<FontHeight>
+						<AbsValue val="20"/>
+					</FontHeight>
+					<Color r="1.0" g="0.82" b="0"/>
+					<Shadow>
+						<Offset>
+							<AbsDimension x="1" y="-1"/>
+						</Offset>
+						<Color r="0" g="0" b="0"/>
+					</Shadow>
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentName" inherits="ChatFontNormal" hidden="false">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDescript" justifyH="LEFT" inherits="GameFontNormalSmall" hidden="false">
+					<Size>
+						<AbsDimension x="480" y="12"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="45" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentStatus" inherits="ChatFontNormal" hidden="false">
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentLine" file="Interface\Tooltips\UI-Tooltip-Background" hidden="false">
+					<Size>
+						<AbsDimension x="525" y="1"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentMenu" inherits="UIDropDownMenuTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="128" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT">
+						<Offset>
+							<AbsDimension x="-10" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnMouseUp>
+				if ( this.header ) then
+					CT_RAMenuBoss_ToggleHeader(this.headername);
+					CloseMenus();
+				else
+					ToggleDropDownMenu(1, nil, getglobal(this:GetName() .. "Menu"), "cursor");
+				end
+			</OnMouseUp>
+			<OnEnter>
+				this.mouseIsOver = 1;
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				if ( this.header and not this.expanded ) then
+					GameTooltip:SetText("Click to expand");
+				elseif ( this.header ) then
+					GameTooltip:SetText("Click to contract");
+				elseif ( not this.header ) then
+					GameTooltip:SetText("Click to open options");
+				end
+			</OnEnter>
+			<OnLeave>
+				this.mouseIsOver = nil;
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAMenuOptionSetTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="550" y="25"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentName" inherits="ChatFontNormal" hidden="false">
+					<Anchors>
+						<Anchor point="LEFT"/>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentLine" file="Interface\Tooltips\UI-Tooltip-Background" hidden="false">
+					<Size>
+						<AbsDimension x="550" y="1"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentDelete" inherits="GameMenuButtonTemplate" text="Delete" hidden="false">
+				<Size>
+					<AbsDimension x="80" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenu_DeleteSetFrame.name = this:GetParent().setName;
+						ShowUIPanel(CT_RAMenu_DeleteSetFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCopy" inherits="GameMenuButtonTemplate" text="Copy" hidden="false">
+				<Size>
+					<AbsDimension x="80" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentDelete">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenu_NewSetFrame.from = this:GetParent().setName;
+						CT_RAMenu_NewSetFrame.type = "Copy";
+						ShowUIPanel(CT_RAMenu_NewSetFrame);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentLoad" inherits="GameMenuButtonTemplate" text="Load" hidden="false">
+				<Size>
+					<AbsDimension x="80" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentCopy">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenu_CurrSet = this:GetParent().setName;
+						CT_RAMenu_Options["temp"] = CT_RAMenu_CopyTable(CT_RAMenu_Options[CT_RAMenu_CurrSet]);
+						CT_RAMenu_UpdateOptionSets();
+						CT_RA_UpdateRaidGroup();
+						CT_RA_UpdateMTs();
+						CT_RAMenu_UpdateMenu();
+						CT_RAOptions_Update();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	<Button name="CT_RAMenuHelpTemplateSub" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="18" y="16"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-5" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontNormal" justifyH="RIGHT" text="[?]">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 1, 0);
+				CT_RAMenuHelp_SetTooltip()
+				GameTooltip:SetText(this.text, 1, 0.72, 0, nil, 1);
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 0.82, 0);
+				GameTooltip:Hide();						
+			</OnLeave>
+			<OnLoad>
+				this.text = "";
+				CT_RAMenuHelp_LoadText();
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Button name="CT_RAMenuHelpTemplateTitle" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="18" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="RIGHT" text="[?]">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 0.82, 0);
+				CT_RAMenuHelp_SetTooltip()
+				GameTooltip:SetText(this.text, 1, 0.72, 0, nil, 1);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 1, 1);
+				GameTooltip:Hide();						
+			</OnLeave>
+			<OnLoad>
+				this.text = "";
+				CT_RAMenuHelp_LoadText();
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Button name="CT_RAMenuHelpTemplateBuffs" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="18" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="RIGHT" text="[?]">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 1, 1);
+				CT_RAMenuHelp_SetTooltip()
+				GameTooltip:SetText(this.text, 1, 0.72, 0, nil, 1);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 0.82, 0);
+				GameTooltip:Hide();						
+			</OnLeave>
+			<OnLoad>
+				this.text = "";
+				CT_RAMenuHelp_LoadText();
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Button name="CT_RAMenuHelpTemplateFAQ" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="48" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="ChatFontNormal" justifyH="RIGHT" text="[Answer]">
+					<Anchors>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				getglobal(this:GetName() .. "Text"):SetTextColor(0.82, 0.82, 0.82);
+				CT_RAMenuHelp_SetTooltip()
+				GameTooltip:SetText(this.text, 1, 0.72, 0, nil, 1);
+			</OnEnter>
+			<OnLeave>
+				getglobal(this:GetName() .. "Text"):SetTextColor(1, 1, 1);
+				GameTooltip:Hide();						
+			</OnLeave>
+			<OnLoad>
+				this.text = "";
+				CT_RAMenuHelp_LoadText();
+			</OnLoad>
+		</Scripts>
+	</Button>
+	<Frame name="CT_RAMenuFrameBulletPointTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="550" y="12"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\QuestFrame\UI-Quest-BulletPoint">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentText" inherits="GameFontHighlightSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="548" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="17" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Slider name="CT_RAMenuFrameSliderTemplate" virtual="true" inherits="OptionsSliderTemplate">
+		<Size>
+			<AbsDimension x="170" y="17"/>
+		</Size>
+		<Scripts>
+			<OnShow>
+				CT_RAMenuMisc_Slider_OnShow();
+			</OnShow>
+			<OnValueChanged>
+				CT_RAMenuMisc_Slider_OnChange();
+			</OnValueChanged>
+			<OnEvent>
+				CT_RAMenuMisc_Slider_OnEvent();
+			</OnEvent>
+		</Scripts>
+	</Slider>
+	<Button name="CT_RAMenuFrameButtonTemplate" inherits="HelpFrameHomeButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="623" y="37"/>
+		</Size>
+		<Scripts>
+			<OnClick>
+				CT_RAMenuButton_OnClick();
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="CT_RAMenuBuffTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="200" y="16"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentCheckButton" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuBuff_ShowToggle();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+			<Button name="$parentMoveUp" inherits="UIPanelScrollUpButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="165" y="-5"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuBuff_Move(-1);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentMoveDown" inherits="UIPanelScrollDownButtonTemplate" hidden="false">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentMoveUp">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuBuff_Move(1);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" justifyV="top" justifyH="left" inherits="ChatFontNormal" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				if ( this.tooltip ) then
+					CT_RAMenuHelp_SetTooltip();
+					GameTooltip:SetText(this.tooltip);
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAMenuNotifyGroupTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="100" y="16"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentCheckButton" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuNotifyGroup_SetChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" justifyV="top" justifyH="left" inherits="ChatFontNormal" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="CT_RAMenuNotifyClassTemplate" virtual="true" hidden="false">
+		<Size>
+			<AbsDimension x="100" y="16"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentCheckButton" hidden="false" inherits="OptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<HitRectInsets>
+					<AbsInset left="0" right="0" top="0" bottom="0"/>
+				</HitRectInsets>
+				<Size>
+					<AbsDimension x="24" y="24"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuNotifyClass_SetChecked();
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" justifyV="top" justifyH="left" inherits="ChatFontNormal" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="25" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="CT_RAMenuDebuffTemplate" inherits="CT_RAMenuBuffTemplate" virtual="true" hidden="false">
+		<Frames>
+			<Button name="$parentSwatch" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCheckButton">
+						<Offset>
+							<AbsDimension x="120" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBG">
+							<Size>
+								<AbsDimension x="14" y="14"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0"/>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						CT_RAMenuDebuff_OnClick();
+					</OnClick>
+					<OnEnter>
+						getglobal(this:GetName().."BG"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+					</OnEnter>
+					<OnLeave>
+						getglobal(this:GetName().."BG"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+					</OnLeave>
+				</Scripts>
+				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="CT_RAMenuFrame" toplevel="true" parent="UIParent" movable="true" enableMouse="true" hidden="true">
+		<Size>
+			<AbsDimension x="640" y="512"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<HitRectInsets>
+			<AbsInset left="0" right="44" top="0" bottom="13"/>
+		</HitRectInsets>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\HelpFrame\HelpFrame-TopLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-Top">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-TopRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-BotLeft">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-Bottom">
+					<Size>
+						<AbsDimension x="256" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="256" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\HelpFrame\HelpFrame-BotRight">
+					<Size>
+						<AbsDimension x="128" y="256"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="CT_RAMenuFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="336" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="-12" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="CT_RaidAssist">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="CT_RAMenuFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="CT_RAMenuFrameCloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-42" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Frame name="CT_RAMenuFrameDrag">
+				<Size>
+					<AbsDimension x="336" y="64"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-12" y="12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>
+						if ( arg1 == "LeftButton" ) then
+							if ( CT_RAMenu_Locked == 0 ) then
+								this:GetParent():StartMoving();
+							end
+						elseif ( arg1 == "RightButton" ) then
+							this:GetParent():ClearAllPoints();
+							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						this:GetParent():StopMovingOrSizing();
+					</OnMouseUp>
+					<OnEnter>
+						if ( CT_RAMenu_Locked == 0 ) then
+							CT_RAMenuHelp_SetTooltip();
+							GameTooltip:SetText("Left-click to drag\nRight-click to reset");
+						end
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAMenuFrameHome" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString inherits="GameFontHighlightSmall" text="Thank you!">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDescript" inherits="GameFontNormal" text="CT_RAMENU_HOME" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-75"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentButton1" inherits="CT_RAMenuFrameButtonTemplate" id="1"> <!-- General Options -->
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-208"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton2" inherits="CT_RAMenuFrameButtonTemplate" id="2"> <!-- Buff Options -->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton3" inherits="CT_RAMenuFrameButtonTemplate" id="3"> <!--Misc -->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton2" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton4" inherits="CT_RAMenuFrameButtonTemplate" id="4"> <!--Additional Options -->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton5" inherits="CT_RAMenuFrameButtonTemplate" id="5"> <!--Installation -->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton4" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton6" inherits="CT_RAMenuFrameButtonTemplate" id="6"> <!--Boss Mods-->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton7" inherits="CT_RAMenuFrameButtonTemplate" id="7"> <!--Boss Mods-->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton6" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentButton8" inherits="CT_RAMenuFrameButtonTemplate" id="8"> <!--Option Sets-->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentButton7" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentLock" inherits="GameMenuButtonTemplate" text="Unlock" hidden="false">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if ( CT_RAMenu_Locked == 0 ) then
+									CT_RAMenu_Locked = 1;
+									this:SetText("Unlock");
+								else
+									CT_RAMenu_Locked = 0;
+									this:SetText("Lock");
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="CT_RAMenuFrameGeneral" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="General Options">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontNormal" justifyH="LEFT" text="CT_RAMENU_GENERALDESCRIPT">
+							<Size>
+								<AbsDimension x="550" y="100"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Frame name="$parentDisplay">
+						<Size>
+							<AbsDimension x="250" y="170"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="35" y="-165"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontNormal" text="Display">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowGroupsText" inherits="ChatFontNormal" text="Show Group Names">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentLockGroupsText" inherits="ChatFontNormal" text="Lock Group Positions">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-30"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowMPText" inherits="ChatFontNormal" text="Hide Mana Bars">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-50"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowHPText" inherits="ChatFontNormal" text="Hide Health Bars">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-70"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowRPText" inherits="ChatFontNormal" text="Hide Rage/Energy Bars">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-90"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentHealthText" inherits="ChatFontNormal" text="Health:">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="-110"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentWindowColorText" inherits="ChatFontNormal" text="Window BG Color">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-130"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentAlertColorText" inherits="ChatFontNormal" text="Alert Message Color">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-150"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentShowGroupsCB" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-7"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ShowGroupNames();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentLockGroupsCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-27"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_LockGroups();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+
+							<CheckButton name="$parentShowMPCB" checked="false" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-47"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ShowMP();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentShowRPCB" checked="false" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-87"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ShowRP();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<Frame name="$parentHealthDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+								<Size>
+									<AbsDimension x="128" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentHealthText">
+										<Offset>
+											<AbsDimension x="-10" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										CT_RAMenuFrameGeneralDisplayHealthDropDown_OnLoad();
+									</OnLoad>
+									<OnClick>
+										ToggleDropDownMenu(1, nil, this);
+									</OnClick>
+								</Scripts>
+							</Frame>
+							<CheckButton name="$parentShowHealthCB" checked="false" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-67"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ShowHealth();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<Button name="$parentShowHPSwatch" hidden="false">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="-14" y="-110"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentBG">
+											<Size>
+												<AbsDimension x="14" y="14"/>
+											</Size>
+											<Color r="1.0" g="1.0" b="1.0"/>
+											<Anchors>
+												<Anchor point="CENTER"/>
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ChangeTC();
+									</OnClick>
+									<OnEnter>
+										getglobal(this:GetName().."BG"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+									</OnEnter>
+									<OnLeave>
+										getglobal(this:GetName().."BG"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+									</OnLeave>
+								</Scripts>
+								<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+							</Button>
+							<Button name="$parentWindowColorSwatch" hidden="false">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="14" y="-129"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentBG">
+											<Size>
+												<AbsDimension x="14" y="14"/>
+											</Size>
+											<Color r="1.0" g="1.0" b="1.0"/>
+											<Anchors>
+												<Anchor point="CENTER"/>
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ChangeWC();
+									</OnClick>
+									<OnEnter>
+										getglobal(this:GetName().."BG"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+									</OnEnter>
+									<OnLeave>
+										getglobal(this:GetName().."BG"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+									</OnLeave>
+								</Scripts>
+								<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+							</Button>
+							<Button name="$parentAlertColorSwatch" hidden="false">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="14" y="-149"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentBG">
+											<Size>
+												<AbsDimension x="14" y="14"/>
+											</Size>
+											<Color r="1.0" g="1.0" b="1.0"/>
+											<Anchors>
+												<Anchor point="CENTER"/>
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuDisplay_ChangeAC();
+									</OnClick>
+									<OnEnter>
+										getglobal(this:GetName().."BG"):SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
+									</OnEnter>
+									<OnLeave>
+										getglobal(this:GetName().."BG"):SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+									</OnLeave>
+								</Scripts>
+								<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
+							</Button>
+						</Frames>
+					</Frame>
+					<Frame name="$parentMisc">
+						<Size>
+							<AbsDimension x="250" y="180"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-70" y="-160"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontNormal" text="Misc.">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentHidePartyText" inherits="ChatFontNormal" text="Hide party frame">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentHidePartyTextRaid" inherits="ChatFontNormal" text="Hide party frame out of raid">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-30"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentHideOfflineText" inherits="ChatFontNormal" text="Hide offline members">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-50"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentSortAlphaText" inherits="ChatFontNormal" text="Sort players in groups alphabetically">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-70"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentBorderText" inherits="ChatFontNormal" text="Hide border">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-90"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowMTsText" inherits="ChatFontNormal" text="Display Main Tanks">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-110"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowMetersText" inherits="ChatFontNormal" text="Display RaidStatus">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-130"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentSortText" inherits="ChatFontNormal" text="Sort Type:">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="-150"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentHidePartyCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-7"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_HideParty();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentHidePartyRaidCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-27"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_HidePartyOutOfRaid();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentHideOfflineCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-47"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_HideOffline();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentSortAlphaCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-67"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_SortAlpha();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentBorderCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-87"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_HideBorder();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentShowMTsCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-107"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_ShowMTs();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentShowMetersCB" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-127"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuGeneral_ShowMeters();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+								<Size>
+									<AbsDimension x="128" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSortText">
+										<Offset>
+											<AbsDimension x="5" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										CT_RAMenuFrameGeneralMiscDropDown_OnLoad();
+									</OnLoad>
+									<OnClick>
+										ToggleDropDownMenu(1, nil, this);
+									</OnClick>
+								</Scripts>
+							</Frame>
+						</Frames>
+					</Frame>
+					<Frame name="$parentChannel">
+						<Size>
+							<AbsDimension x="250" y="105"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDisplay">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontNormal" text="Channel">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentChannelText" inherits="ChatFontNormal" text="Channel Name:">
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-15"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentChannelNameText" inherits="ChatFontNormal" text="">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentChannelText">
+											<Offset>
+												<AbsDimension x="5" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<EditBox name="$parentChannelEB" hidden="true" historyLines="0" letters="30">
+								<Size>
+									<AbsDimension x="125" y="32"/>
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentChannelText">
+										<Offset>
+											<AbsDimension x="5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="65" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="-10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+											<Size>
+												<AbsDimension x="25" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="RIGHT">
+													<Offset>
+														<AbsDimension x="10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="5" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+									</Layer>
+								</Layers>
+								<FontString inherits="ChatFontNormal"/>
+								<Scripts>
+									<OnEscapePressed>
+										this:GetParent():GetParent():GetParent():Hide();
+									</OnEscapePressed>
+									<OnTextChanged>
+										if ( strsub(this:GetText(), strlen(this:GetText())) == " " ) then
+											this:SetText(strsub(this:GetText(), 1, strlen(this:GetText())-1));
+										end
+									</OnTextChanged>
+								</Scripts>
+							</EditBox>
+							<Button name="$parentEditChannel" inherits="GameMenuButtonTemplate" text="Edit Channel">
+								<Size>
+									<AbsDimension x="160" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-40"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_General_EditChannel();
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentBroadcastChannel" inherits="GameMenuButtonTemplate" text="Broadcast Channel">
+								<Size>
+									<AbsDimension x="160" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="BOTTOM">
+										<Offset>
+											<AbsDimension x="0" y="10"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_General_BroadcastChannel();
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+						<Scripts>
+							<OnShow>
+								CT_RAMenu_General_ChannelOnShow();
+							</OnShow>
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="CT_RAMenuFrameMisc" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="Misc Options">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString inherits="GameFontNormal" justifyH="LEFT" text="CT_RAMENU_MISCDESCRIPT">
+							<Size>
+								<AbsDimension x="550" y="105"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-50"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSendRARS" inherits="ChatFontNormal" text="Send RS messages to RA also">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-295"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentPlayRSSoundText" inherits="ChatFontNormal" text="Play sound on /rs messages">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-320"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentShowTooltipText" inherits="ChatFontNormal" text="Show raid mouseover tooltip">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-345"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentShowAFKText" inherits="ChatFontNormal" text="Show AFK and DND tags">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-370"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentShowResMonitor" inherits="ChatFontNormal" text="Show resurrection monitor">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-395"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentHideButton" inherits="ChatFontNormal" text="Hide minimap button">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-420"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDisableQuery" inherits="ChatFontNormal" text="Disable item/resists query replies">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="80" y="-445"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentNotifyGroupChange" inherits="ChatFontNormal" text="Notify on group changes">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="350" y="-295"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentNotifyGroupChangeSound" inherits="ChatFontNormal" text="Audible notification">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="380" y="-320"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentShowMTTT" inherits="ChatFontNormal" text="Show MT's Target's Target">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="350" y="-345"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentNoColorChange" inherits="ChatFontNormal" text="Hide target change notifier">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="380" y="-370"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAggroNotifier" inherits="ChatFontNormal" text="Notify on aggro gain">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="350" y="-395"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentAggroNotifierSound" inherits="ChatFontNormal" text="Play sound">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="380" y="-420"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Slider name="$parentSetsSlider" inherits="OptionsSliderTemplate">
+						<Size>
+							<AbsDimension x="290" y="17"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="-140"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(this:GetName().."Text"):SetText("Option Sets Button Placement");
+								getglobal(this:GetName().."High"):SetText();
+								getglobal(this:GetName().."Low"):SetText();
+								this:SetMinMaxValues(0, 360);
+								this:SetValueStep(1);
+								this.tooltipText = "Drag the slider to change the position of the Option Sets button";
+							</OnLoad>
+							<OnShow>
+								if (CT_RASets_ButtonPosition) then
+									this:SetValue(CT_RASets_ButtonPosition);
+								end
+							</OnShow>
+							<OnValueChanged>
+								CT_RASets_ButtonPosition = this:GetValue();
+								getglobal(this:GetName().."Text"):SetText("Option Sets Button Placement - "..this:GetValue().."\194\176");
+								CT_RASets_Button:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", 52 - (80 * cos(this:GetValue())), (80 * sin(this:GetValue())) - 52);
+							</OnValueChanged>
+						</Scripts>
+					</Slider>
+					<Frame name="$parentMC">
+						<Size>
+							<AbsDimension x="550" y="105"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-15" y="-185"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontNormal" text="Mana Conserve">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentNoHealer" hidden="true" inherits="GameFontNormal" text="Your class does not have any heals with cast times.">
+									<Anchors>
+										<Anchor point="CENTER"/>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentHealer" hidden="false" inherits="GameFontNormal" text="Setting the value to 0 will disable checking for that spell.">
+									<Color r="1" g="1" b="1"/>
+									<Anchors>
+										<Anchor point="TOP">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Slider name="$parentSlider1" id="1" inherits="CT_RAMenuFrameSliderTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="CENTER">
+										<Offset>
+											<AbsDimension x="-10" y="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Slider>
+							<Slider name="$parentSlider2" id="2" inherits="CT_RAMenuFrameSliderTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="CENTER">
+										<Offset>
+											<AbsDimension x="10" y="8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Slider>
+							<Slider name="$parentSlider3" id="3" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="170" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="CENTER">
+										<Offset>
+											<AbsDimension x="-10" y="-30"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										CT_RAMenuMisc_LagSlider_OnValueChanged();
+									</OnValueChanged>
+								</Scripts>
+							</Slider>
+							<CheckButton name="$parentPercentCheck" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="CENTER">
+										<Offset>
+											<AbsDimension x="15" y="-30"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuMisc_ManaConserve_UsePercent();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+						</Frames>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentPercentCheckText" inherits="ChatFontNormal" text="Use Percent Values">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="CENTER">
+											<Offset>
+												<AbsDimension x="40" y="-30"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnShow>
+								CT_RAMenuMisc_Slider_Update(this:GetName() .. "Slider1");
+								CT_RAMenuMisc_Slider_Update(this:GetName() .. "Slider2");
+								CT_RAMenuMisc_Slider_InitLagSlider(this:GetName() .. "Slider3")
+							</OnShow>
+						</Scripts>
+					</Frame>
+					<CheckButton name="$parentPlayRSSoundCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentPlayRSSoundText">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_PlaySound();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentSendRARSCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentSendRARS">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_SendRARS();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowTooltipCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowTooltipText">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_ShowTooltip();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowAFKCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowAFKText">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_ShowAFK();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentNotifyGroupChangeCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentNotifyGroupChange">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_NotifyGroupChange();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentNotifyGroupChangeCBSound" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentNotifyGroupChangeSound">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_NotifyGroupChangeSound();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowResMonitorCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowResMonitor">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_ShowResMonitor();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentHideButtonCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentHideButton">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_HideButton();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentDisableQueryCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentDisableQuery">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_DisableQuery();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentShowMTTTCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowMTTT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_ShowMTTT();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentNoColorChangeCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentNoColorChange">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_NoColorChange();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentAggroNotifierCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAggroNotifier">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_AggroNotifier();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="$parentAggroNotifierSoundCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentAggroNotifierSound">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="0" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Size>
+							<AbsDimension x="24" y="24"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Misc_AggroNotifierSound();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+				</Frames>
+			</Frame>
+
+			<Frame name="CT_RAMenuFrameSort" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="Installation Guide">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDescript1" inherits="GameFontNormal" text="CT_RAMENU_INSTALLATION" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-75"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDescript2" inherits="GameFontNormal" text="CT_RAMENU_STEP1" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="55"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDescript1" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDescript3" inherits="GameFontNormal" text="CT_RAMENU_STEP2" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDescript2" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDescript4" inherits="GameFontNormal" text="CT_RAMENU_STEP3" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="60"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDescript3" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentInfo" inherits="GameFontNormal" text="CT_RAMENU_VISITSITE" justifyH="CENTER" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="45"/>
+							</Size>
+							<Anchors>
+								<Anchor point="BOTTOM">
+									<Offset>
+										<AbsDimension x="-15" y="40"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="CT_RAMenuFrameBuffs" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" justifyH="CENTER" text="Buff Options">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="-20" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentDebuffsText" inherits="GameFontNormalSmall" text="Debuffs">
+							<Anchors>
+								<Anchor relativePoint="TOPRIGHT" point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-260" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentBuffsText" inherits="GameFontNormalSmall" text="Buffs">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="130" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Frame name="$parentDebuff1" id="1" inherits="CT_RAMenuDebuffTemplate">
+						<Anchors>
+							<Anchor relativePoint="TOPRIGHT" point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-335" y="-75"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentDebuff2" id="2" inherits="CT_RAMenuDebuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuff1">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentDebuff3" id="3" inherits="CT_RAMenuDebuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuff2">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentDebuff4" id="4" inherits="CT_RAMenuDebuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuff3">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentDebuff5" id="5" inherits="CT_RAMenuDebuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuff4">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentDebuff6" id="6" inherits="CT_RAMenuDebuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuff5">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+
+					<Frame name="$parentNotify">
+						<Size>
+							<AbsDimension x="325" y="240"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-65" y="73"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="$parentName" inherits="GameFontNormal" text="Notifications">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString inherits="GameFontNormalSmall" text="Notify me when someone is debuffed with selected">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="36" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString inherits="GameFontNormalSmall" text="Notify when a buff you can cast has faded">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="36" y="-31"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString inherits="GameFontNormalSmall" text="Note that both class and group must fit the requirements">
+									<Color r="1.0" g="1.0" b="1.0"/>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="11" y="-50"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentDebuffs" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-5"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuNotify_SetChecked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentBuffs" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-25"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenuNotify_SetChecked();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+
+							<Frame name="$parentDebuffsGroup1" id="1" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-65"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup2" id="2" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentDebuffsGroup1">
+										<Offset>
+											<AbsDimension x="3" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup3" id="3" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsGroup1">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup4" id="4" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsGroup2">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup5" id="5" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsGroup3">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup6" id="6" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsGroup4">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup7" id="7" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsGroup5">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsGroup8" id="8" inherits="CT_RAMenuNotifyGroupTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsGroup6">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass1" id="1" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-150"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass2" id="2" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentDebuffsClass1">
+										<Offset>
+											<AbsDimension x="3" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass3" id="3" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsClass1">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass4" id="4" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsClass2">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass5" id="5" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsClass3">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass6" id="6" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsClass4">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass7" id="7" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsClass5">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+							<Frame name="$parentDebuffsClass8" id="8" inherits="CT_RAMenuNotifyClassTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDebuffsClass6">
+										<Offset>
+											<AbsDimension x="0" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Frame>
+						</Frames>
+					</Frame>
+
+					<Frame name="$parentBuff1" id="1" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="35" y="-75"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff2" id="2" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff1">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff3" id="3" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff2">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff4" id="4" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff3">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff5" id="5" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff4">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff6" id="6" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff5">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff7" id="7" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff6">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff8" id="8" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff7">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff9" id="9" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff8">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff10" id="10" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff9">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff11" id="11" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff10">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff12" id="12" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff11">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff13" id="13" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff12">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff14" id="14" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff13">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff15" id="15" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff14">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff16" id="16" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff15">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff17" id="17" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff16">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff18" id="18" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff17">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff19" id="19" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff18">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentBuff20" id="20" inherits="CT_RAMenuBuffTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentBuff19">
+								<Offset>
+									<AbsDimension x="0" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+
+					<Frame name="$parentBuffsDropDown" inherits="UIDropDownMenuTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="230" y="40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Size>
+							<AbsDimension x="180" y="16"/>
+						</Size>
+						<Scripts>
+							<OnLoad>
+								CT_RAMenuFrameBuffsBuffsDropDown_OnLoad();
+							</OnLoad>
+							<OnClick>
+								ToggleDropDownMenu(1, nil, this);
+							</OnClick>
+						</Scripts>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						this:RegisterEvent("VARIABLES_LOADED");
+						this:RegisterEvent("RAID_ROSTER_UPDATE");
+						this:RegisterEvent("PARTY_MEMBERS_CHANGED");
+					</OnLoad>
+					<OnEvent>
+						CT_RAMenuBuffs_OnEvent();
+					</OnEvent>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAMenuFrameAdditional" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="Additional Options">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentUpdate" inherits="GameMenuButtonTemplate" text="Update Status">
+						<Size>
+							<AbsDimension x="175" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor relativePoint="TOP" point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-3" y="-425"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SlashCmdList["RAUPDATE"]();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentResetPositions" inherits="GameMenuButtonTemplate" text="Reset CTRaid Positions">
+						<Size>
+							<AbsDimension x="175" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor relativePoint="TOP" point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-425"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_General_ResetWindows();
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Frame name="$parentScaling">
+						<Size>
+							<AbsDimension x="550" y="80"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-15" y="-80"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentName" inherits="GameFontNormal" text="Window Scaling">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentPlayerInfo" hidden="false" inherits="GameFontNormal" text="Sets the scale of raid windows.">
+									<Color r="1" g="1" b="1"/>
+									<Anchors>
+										<Anchor point="TOP">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Slider name="$parentSlider1" id="1" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="230" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="-10" y="-40"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										CT_RAMenuAdditional_Scaling_OnValueChanged();
+									</OnValueChanged>
+									<OnShow>
+										CT_RAMenuAdditional_Scaling_OnShow();
+									</OnShow>
+								</Scripts>
+							</Slider>
+							<Slider name="$parentSlider2" id="2" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="230" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="LEFT" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="10" y="-40"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										CT_RAMenuAdditional_ScalingMT_OnValueChanged();
+									</OnValueChanged>
+									<OnShow>
+										CT_RAMenuAdditional_ScalingMT_OnShow();
+									</OnShow>
+								</Scripts>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentEM">
+						<Size>
+							<AbsDimension x="550" y="145"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-15" y="-175"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentThresholdInfo" hidden="false" inherits="GameFontNormal" text="Displays up to 5 health bars of the party/raid members with the lowest health.">
+									<Color r="1" g="1" b="1"/>
+									<Anchors>
+										<Anchor point="TOP">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentName" inherits="GameFontNormal" text="Emergency Monitor">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentShowText" inherits="ChatFontNormal" text="Show Emergency Monitor">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="55" y="-120"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentPartyText" inherits="ChatFontNormal" text="Show only own party">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="235" y="-120"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentOutsideRaidText" inherits="ChatFontNormal" text="Show outside raid">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="385" y="-120"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentShowCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentShowText">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_Additional_ShowEmergency();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentPartyCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentPartyText">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_Additional_ShowEmergencyParty();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentOutsideRaidCB" hidden="false" id="4" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentOutsideRaidText">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RAMenu_Additional_ShowEmergencyOutsideRaid();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<Slider name="$parentSlider" id="1" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="450" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-30"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										CT_RAMenuAdditional_EM_OnValueChanged();
+									</OnValueChanged>
+									<OnShow>
+										CT_RAMenuAdditional_EM_OnShow();
+									</OnShow>
+								</Scripts>
+							</Slider>
+							<Slider name="$parentSlider2" id="2" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="450" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-80"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										CT_RAMenuAdditional_EM_OnValueChanged();
+									</OnValueChanged>
+									<OnShow>
+										CT_RAMenuAdditional_EM_OnShow();
+									</OnShow>
+								</Scripts>
+							</Slider>
+						</Frames>
+					</Frame>
+					<Frame name="$parentBG">
+						<Size>
+							<AbsDimension x="550" y="80"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP">
+								<Offset>
+									<AbsDimension x="-15" y="-340"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentInfo" hidden="false" inherits="GameFontNormal" text="Changes the health and mana bars' background opacity.">
+									<Color r="1" g="1" b="1"/>
+									<Anchors>
+										<Anchor point="TOP">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentName" inherits="GameFontNormal" text="Health and Mana Bars' Background Opacity">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Slider name="$parentSlider" id="1" inherits="OptionsSliderTemplate">
+								<Size>
+									<AbsDimension x="450" y="17"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativePoint="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-40"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnValueChanged>
+										CT_RAMenuAdditional_BG_OnValueChanged();
+									</OnValueChanged>
+									<OnShow>
+										CT_RAMenuAdditional_BG_OnShow();
+									</OnShow>
+								</Scripts>
+							</Slider>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="CT_RAMenuFrameDebuff" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="Debuff Curing">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentInfo" inherits="GameFontNormal" text="CT_RAMENU_DEBUFFCURING" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-75"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentSettings">
+						<Size>
+							<AbsDimension x="280" y="115"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="290" y="-140"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTitle" inherits="GameFontNormal" text="Set Details">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentName" inherits="ChatFontNormal" justifyH="LEFT" text="Set Name:">
+									<Size>
+										<AbsDimension x="270" y="25"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-8"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentDebuffTitle" inherits="ChatFontNormal" justifyH="LEFT" text="Debuff Title:">
+									<Size>
+										<AbsDimension x="270" y="25"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-33"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentDebuffType" inherits="ChatFontNormal" justifyH="LEFT" text="Debuff Type:">
+									<Size>
+										<AbsDimension x="270" y="25"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-58"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentDebuffDescript" inherits="ChatFontNormal" justifyH="LEFT" text="Debuff Description:">
+									<Size>
+										<AbsDimension x="270" y="25"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="10" y="-83"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<EditBox name="$parentNameEB" autoFocus="false" historyLines="0" letters="30">
+								<Size>
+									<AbsDimension x="125" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="$parentName">
+										<Offset>
+											<AbsDimension x="-15" y="-0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="65" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="-10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+											<Size>
+												<AbsDimension x="25" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="RIGHT">
+													<Offset>
+														<AbsDimension x="10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="5" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+									</Layer>
+								</Layers>
+								<FontString inherits="ChatFontNormal"/>
+								<Scripts>
+									<OnEscapePressed>
+										this:ClearFocus();
+									</OnEscapePressed>
+									<OnTabPressed>
+										if ( IsShiftKeyDown() ) then
+											getglobal(this:GetParent():GetName() .. "DebuffDescriptEB"):SetFocus();
+										else
+											getglobal(this:GetParent():GetName() .. "DebuffTitleEB"):SetFocus();
+										end
+									</OnTabPressed>
+									<OnTextChanged>
+										CT_RADebuff_SaveName();
+									</OnTextChanged>
+								</Scripts>
+							</EditBox>
+							<EditBox name="$parentDebuffTitleEB" autoFocus="false" historyLines="0" letters="30">
+								<Size>
+									<AbsDimension x="125" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="$parentDebuffTitle">
+										<Offset>
+											<AbsDimension x="-15" y="-0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="65" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="-10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+											<Size>
+												<AbsDimension x="25" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="RIGHT">
+													<Offset>
+														<AbsDimension x="10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="5" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+									</Layer>
+								</Layers>
+								<FontString inherits="ChatFontNormal"/>
+								<Scripts>
+									<OnEscapePressed>
+										this:ClearFocus();
+									</OnEscapePressed>
+									<OnTabPressed>
+										if ( IsShiftKeyDown() ) then
+											getglobal(this:GetParent():GetName() .. "NameEB"):SetFocus();
+										else
+											getglobal(this:GetParent():GetName() .. "DebuffTypeEB"):SetFocus();
+										end
+									</OnTabPressed>
+									<OnTextChanged>
+										CT_RADebuff_SaveTitle();
+									</OnTextChanged>
+								</Scripts>
+							</EditBox>
+							<EditBox name="$parentDebuffTypeEB" autoFocus="false" historyLines="0" letters="30">
+								<Size>
+									<AbsDimension x="125" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="$parentDebuffType">
+										<Offset>
+											<AbsDimension x="-15" y="-0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="65" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="-10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+											<Size>
+												<AbsDimension x="25" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="RIGHT">
+													<Offset>
+														<AbsDimension x="10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="5" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+									</Layer>
+								</Layers>
+								<FontString inherits="ChatFontNormal"/>
+								<Scripts>
+									<OnEscapePressed>
+										this:ClearFocus();
+									</OnEscapePressed>
+									<OnTabPressed>
+										if ( IsShiftKeyDown() ) then
+											getglobal(this:GetParent():GetName() .. "DebuffTitleEB"):SetFocus();
+										else
+											getglobal(this:GetParent():GetName() .. "DebuffDescriptEB"):SetFocus();
+										end
+									</OnTabPressed>
+									<OnTextChanged>
+										CT_RADebuff_SaveType();
+									</OnTextChanged>
+								</Scripts>
+							</EditBox>
+							<EditBox name="$parentDebuffDescriptEB" autoFocus="false" historyLines="0" letters="30">
+								<Size>
+									<AbsDimension x="125" y="25"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="$parentDebuffDescript">
+										<Offset>
+											<AbsDimension x="-15" y="-0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="65" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT">
+													<Offset>
+														<AbsDimension x="-10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+											<Size>
+												<AbsDimension x="25" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="RIGHT">
+													<Offset>
+														<AbsDimension x="10" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+										<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+											<Size>
+												<AbsDimension x="5" y="32"/>
+											</Size>
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+												<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+										</Texture>
+									</Layer>
+								</Layers>
+								<FontString inherits="ChatFontNormal"/>
+								<Scripts>
+									<OnEscapePressed>
+										this:ClearFocus();
+									</OnEscapePressed>
+									<OnTabPressed>
+										if ( IsShiftKeyDown() ) then
+											getglobal(this:GetParent():GetName() .. "DebuffTypeEB"):SetFocus();
+										else
+											getglobal(this:GetParent():GetName() .. "NameEB"):SetFocus();
+										end
+									</OnTabPressed>
+									<OnTextChanged>
+										CT_RADebuff_SaveDescript();
+									</OnTextChanged>
+								</Scripts>
+							</EditBox>
+						</Frames>
+					</Frame>
+					<Frame name="$parentClasses">
+						<Size>
+							<AbsDimension x="280" y="138"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="290" y="-270"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentTitle" inherits="GameFontNormal" text="Class Regulations">
+									<Anchors>
+										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="15" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass1" inherits="ChatFontNormal" text="Warrior">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass2" inherits="ChatFontNormal" text="Paladin">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="160" y="-10"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass3" inherits="ChatFontNormal" text="Hunter">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-35"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass4" inherits="ChatFontNormal" text="Rogue">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="160" y="-35"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass5" inherits="ChatFontNormal" text="Mage">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-60"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass6" inherits="ChatFontNormal" text="Warlock">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="160" y="-60"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass7" inherits="ChatFontNormal" text="Priest">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-85"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass8" inherits="ChatFontNormal" text="Druid">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="160" y="-85"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass9" inherits="ChatFontNormal" text="Shaman">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="35" y="-110"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<FontString name="$parentClass10" inherits="ChatFontNormal" text="Pets">
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="160" y="-110"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<CheckButton name="$parentClass1CB" id="1" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-7"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass2CB" id="2" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="135" y="-7"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass3CB" id="3" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-32"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass4CB" id="4" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="135" y="-32"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass5CB" id="5" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-57"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass6CB" id="6" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="135" y="-57"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass7CB" id="7" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-82"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass8CB" id="8" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="135" y="-82"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass9CB" id="9" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="10" y="-107"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+							<CheckButton name="$parentClass10CB" id="10" checked="true" hidden="false" inherits="OptionsCheckButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="135" y="-107"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<HitRectInsets>
+									<AbsInset left="0" right="0" top="0" bottom="0"/>
+								</HitRectInsets>
+								<Size>
+									<AbsDimension x="24" y="24"/>
+								</Size>
+								<Scripts>
+									<OnClick>
+										CT_RADebuff_SaveClass();
+									</OnClick>
+								</Scripts>
+							</CheckButton>
+						</Frames>
+					</Frame>
+					<Frame name="$parentUse">
+						<Size>
+							<AbsDimension x="200" y="325"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="-60" y="-125"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<EdgeSize>
+								<AbsValue val="16"/>
+							</EdgeSize>
+							<TileSize>
+								<AbsValue val="16"/>
+							</TileSize>
+							<BackgroundInsets>
+								<AbsInset left="5" right="5" top="5" bottom="5"/>
+							</BackgroundInsets>
+						</Backdrop>
+						<Frames>
+							<Button name="$parentSet1" id="1" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP">
+										<Offset>
+											<AbsDimension x="0" y="-13"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet2" id="2" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet1" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet3" id="3" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet2" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet4" id="4" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet3" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet5" id="5" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet4" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet6" id="6" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet5" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet7" id="7" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet6" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet8" id="8" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet7" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet9" id="9" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet8" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet10" id="10" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet9" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet11" id="11" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet10" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+							<Button name="$parentSet12" id="12" inherits="CT_RA_DebuffSetTemplate">
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parentSet11" relativePoint="BOTTOM"/>
+								</Anchors>
+							</Button>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								this:SetBackdropColor(0, 0, 0, 0.75);
+							</OnLoad>
+						</Scripts>
+					</Frame>
+					<ScrollFrame name="$parentUseScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="195" y="323"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentUse">
+								<Offset>
+									<AbsDimension x="0" y="-1"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(25, CT_RAMenuFrameDebuff_Update);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+					<Button name="$parentNew" inherits="GameMenuButtonTemplate" text="New Set" hidden="false">
+						<Size>
+							<AbsDimension x="125" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="300" y="-410"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenuDebuff_NewSet();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentDelete" inherits="GameMenuButtonTemplate" text="Delete Set" hidden="false">
+						<Size>
+							<AbsDimension x="125" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentNew">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenuDebuff_DeleteSet();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentEdit" inherits="GameMenuButtonTemplate" text="Edit Priorities" hidden="false">
+						<Size>
+							<AbsDimension x="125" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="430" y="-435"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								ShowUIPanel(CT_RA_PriorityFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						this.selectedIndex = nil;
+						CT_RAMenuFrameDebuff_UpdateSet();
+					</OnShow>
+				</Scripts>
+			</Frame>
+			<Frame name="CT_RAMenuFrameBoss" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="Boss Mods">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentInfo" inherits="GameFontNormal" text="CT_RAMENU_BOSSMODS" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-75"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentMod1" id="1" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="30" y="-131"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod2" id="2" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod1">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod3" id="3" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod2">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod4" id="4" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod3">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod5" id="5" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod4">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod6" id="6" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod5">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod7" id="7" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod6">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod8" id="8" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod7">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod9" id="9" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod8">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentMod10" id="10" inherits="CT_RAMenuBossModTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentMod9">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<ScrollFrame name="$parentScrollFrame" inherits="FauxScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="500" y="330"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="50" y="-130"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(25, CT_RAMenuBoss_Update);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+			<Frame name="CT_RAMenuFrameOptionSets" setAllPoints="true" hidden="true">
+				<Frames>
+					<Frame name="$parentSet1" id="1" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="30" y="-164"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet2" id="2" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet1">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet3" id="3" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet2">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet4" id="4" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet3">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet5" id="5" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet4">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet6" id="6" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet5">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet7" id="7" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet6">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="$parentSet8" id="8" inherits="CT_RAMenuOptionSetTemplate" hidden="false">
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSet7">
+								<Offset>
+									<AbsDimension x="0" y="-8"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Button name="$parentSaveAs" inherits="GameMenuButtonTemplate" text="Save As" hidden="false">
+						<Size>
+							<AbsDimension x="130" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="55"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_NewSetFrame.from = "temp";
+								CT_RAMenu_NewSetFrame.type = "Save";
+								CT_RAMenu_NewSetFrame:Show();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentSave" inherits="GameMenuButtonTemplate" text="Save" hidden="false">
+						<Size>
+							<AbsDimension x="130" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentSaveAs">
+								<Offset>
+									<AbsDimension x="-20" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Options[CT_RAMenu_CurrSet] = CT_RAMenu_CopyTable(CT_RAMenu_Options["temp"]);
+								CT_RAMenu_UpdateOptionSets();
+								CT_RA_UpdateRaidGroup();
+								CT_RA_UpdateMTs();
+								CT_RAMenu_UpdateMenu();
+								CT_RAOptions_Update();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentUndo" inherits="GameMenuButtonTemplate" text="Undo Changes" hidden="false">
+						<Size>
+							<AbsDimension x="130" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSaveAs">
+								<Offset>
+									<AbsDimension x="20" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_Options["temp"] = CT_RAMenu_CopyTable(CT_RAMenu_Options[CT_RAMenu_CurrSet]);
+								CT_RAMenu_UpdateOptionSets();
+								CT_RA_UpdateRaidGroup();
+								CT_RA_UpdateMTs();
+								CT_RAMenu_UpdateMenu();
+								CT_RAOptions_Update();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Close">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-53" y="21"/>
+								</Offset>
+							</Anchor>
+
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								HideUIPanel(CT_RAMenuFrame);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentBack" inherits="GameMenuButtonTemplate" text="Back">
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CT_RAMenu_ShowHome();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontHighlightSmall" text="Option Sets">
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentInfo" inherits="GameFontNormal" text="CT_RAMENU_OPTIONSETS" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="545" y="65"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="25" y="-75"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentCurrentSet" inherits="ChatFontNormal" hidden="false" text="Current Set: None">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="30" y="-140"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentLine" file="Interface\Tooltips\UI-Tooltip-Background" hidden="false">
+							<Size>
+								<AbsDimension x="550" y="1"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="30" y="-160"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture name="$parentLine2" file="Interface\Tooltips\UI-Tooltip-Background" hidden="false">
+							<Size>
+								<AbsDimension x="550" y="1"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="30" y="-424"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						for i = 1, 8, 1 do
+							getglobal(this:GetName() .. "Set" .. i .. "Line"):SetAlpha(0.5);
+						end
+					</OnLoad>
+					<OnShow>
+						CT_RAMenu_UpdateOptionSets();
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				CT_RAMenu_OnShow();
+			</OnShow>
+			<OnLoad>
+				CT_RAMenu_OnLoad();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAMenu_NewSetFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="350" y="135"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="New Set">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEditing" inherits="GameFontNormal" text="Type in the name of the new set:">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentUnavailable" inherits="GameFontNormal" text="This name is already used by another set." hidden="true">
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-75"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentNameEB" historyLines="0" letters="250">
+				<Size>
+					<AbsDimension x="250" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension x="65" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="-10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.2539" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+							<Size>
+								<AbsDimension x="25" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="10" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+						<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+							<Size>
+								<AbsDimension x="5" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.29296875" right="1.0" top="0" bottom="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						this:SetFocus();
+					</OnShow>
+					<OnEnterPressed>
+						if ( not this.cannotCopy ) then
+							CT_RAMenu_CopySet(this:GetParent().from, getglobal(this:GetParent():GetName() .. "NameEB"):GetText());
+							this:SetText("");
+							HideUIPanel(this:GetParent());
+						end
+					</OnEnterPressed>
+					<OnTextChanged>
+						if ( this:GetText() == "" or CT_RAMenu_ExistsSet(this:GetText()) ) then
+							getglobal(this:GetParent():GetName() .. "OkayButton"):Disable();
+							if ( this:GetText() ~= "" ) then
+								getglobal(this:GetParent():GetName() .. "Unavailable"):Show();
+							end
+							this.cannotCopy = 1;
+						else
+							getglobal(this:GetParent():GetName() .. "OkayButton"):Enable();
+							getglobal(this:GetParent():GetName() .. "Unavailable"):Hide();
+							this.cannotCopy = nil;
+						end
+					</OnTextChanged>
+					<OnEscapePressed>
+						HideUIPanel(this:GetParent());
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="$parentOkayButton" hidden="false" inherits="GameMenuButtonTemplate" text="Okay">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenu_CopySet(this:GetParent().from, getglobal(this:GetParent():GetName() .. "NameEB"):GetText());
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelButton" hidden="false" inherits="GameMenuButtonTemplate" text="Cancel">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				getglobal(this:GetName() .. "Title"):SetText(this.type .. " Set");
+				if ( this.type == "Copy" ) then
+					getglobal(this:GetName() .. "NameEB"):SetText(this.from .. " Copy");
+					getglobal(this:GetName() .. "NameEB"):HighlightText();
+					if ( CT_RAMenu_ExistsSet(this.from .. " Copy") ) then
+						getglobal(this:GetName() .. "OkayButton"):Disable();
+						getglobal(this:GetName() .. "Unavailable"):Show();
+						this.cannotCopy = 1;
+					else
+						getglobal(this:GetName() .. "OkayButton"):Enable();
+						getglobal(this:GetName() .. "Unavailable"):Hide();
+						this.cannotCopy = nil;
+					end
+				else
+					getglobal(this:GetName() .. "NameEB"):SetText("");
+				end
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAMenu_DeleteSetFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="350" y="135"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="256" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Delete Set">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDelete" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentDeleteButton" hidden="false" inherits="GameMenuButtonTemplate" text="Delete">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						CT_RAMenu_DeleteSet(this:GetParent().name);
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancelButton" hidden="false" inherits="GameMenuButtonTemplate" text="Cancel">
+				<Size>
+					<AbsDimension x="70" y="21"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="42" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				getglobal(this:GetName() .. "Delete"):SetText("Are you sure you want to delete\n'|c00FFFFFF" .. this.name .. "|r'?");
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RAMenuGlobalFrame" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				this:RegisterEvent("SPELLCAST_START");
+				this:RegisterEvent("SPELLCAST_INTERRUPTED");
+				this:RegisterEvent("SPELLCAST_STOP");
+				this:RegisterEvent("SPELLCAST_FAILED");
+				this:RegisterEvent("PLAYER_REGEN_ENABLED");
+				this:RegisterEvent("PLAYER_REGEN_DISABLED");
+			</OnLoad>
+			<OnEvent>
+				CT_RAMenuMisc_OnEvent(event);
+			</OnEvent>
+			<OnUpdate>
+				CT_RAMenuMisc_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Frame name="CT_RA_PriorityFrame" frameStrata="DIALOG" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="500" y="685"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground">
+					<Size>
+						<AbsDimension x="484" y="669"/>
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentHeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="300" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Edit Priorities">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentHeaderTexture">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSave" inherits="GameFontNormal">
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="-25"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentUse">
+				<Size>
+					<AbsDimension x="200" y="570"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="-20" y="-65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontNormal" text="Used Priorities">
+							<Anchors>
+								<Anchor point="BOTTOM" relativePoint="TOP"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(0, 0, 0, 0.75);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentAvailable">
+				<Size>
+					<AbsDimension x="200" y="570"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="20" y="-65"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+					<EdgeSize>
+						<AbsValue val="16"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val="16"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="5" right="5" top="5" bottom="5"/>
+					</BackgroundInsets>
+				</Backdrop>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentTitle" inherits="GameFontNormal" text="Available Priorities">
+							<Anchors>
+								<Anchor point="BOTTOM" relativePoint="TOP"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetBackdropColor(0, 0, 0, 0.75);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Button name="$parentPriority1" id="1" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority2" id="2" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority3" id="3" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority4" id="4" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority5" id="5" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority6" id="6" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority7" id="7" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority8" id="8" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority9" id="9" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority10" id="10" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority11" id="11" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority12" id="12" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority13" id="13" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority14" id="14" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority15" id="15" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority16" id="16" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentPriority17" id="17" inherits="CT_RA_PriorityTemplate"/>
+			<Button name="$parentSaveButton" inherits="GameMenuButtonTemplate" text="Save Changes" hidden="false">
+				<Size>
+					<AbsDimension x="150" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-10" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+						CT_RA_Priority_SavePriorities();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentCancel" inherits="GameMenuButtonTemplate" text="Cancel" hidden="false">
+				<Size>
+					<AbsDimension x="150" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="10" y="15"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HideUIPanel(this:GetParent());
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				CT_RA_Priority_InitPriorities();
+			</OnShow>
+			<OnUpdate>
+				CT_RA_Priority_OnUpdate()
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+	<Button name="CT_RAMenuGeneralDisplayHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameGeneralDisplay" id="1"/>
+	<Button name="CT_RAMenuGeneralMiscHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameGeneralMisc" id="2"/>
+	<Button name="CT_RAMenuGeneralChannelHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameGeneralChannel" id="3"/>
+	<Button name="CT_RAMenuGeneralTargetsHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameGeneralTargets" id="4"/>
+	<Button name="CT_RAMenuBuffsNotifyHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameBuffsNotify" id="5"/>
+	<Button name="CT_RAMenuMiscMCHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameMiscMC" id="6"/>
+	<Button name="CT_RAMenuAdditionalSCHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameAdditionalSC" id="7"/>
+	<Button name="CT_RAMenuAdditionalScalingHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameAdditionalScaling" id="8"/>
+
+	<Button name="CT_RAMenuBuffsHelp" inherits="CT_RAMenuHelpTemplateTitle" parent="CT_RAMenuFrameBuffs" id="9">
+		<Anchors>
+			<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentTitle">
+				<Offset>
+					<AbsDimension x="3" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+	<Button name="CT_RAMenuBuffsTextHelp" inherits="CT_RAMenuHelpTemplateBuffs" parent="CT_RAMenuFrameBuffs" id="10">
+		<Anchors>
+			<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBuffsText">
+				<Offset>
+					<AbsDimension x="3" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+
+	<Button name="CT_RAMenuDebuffsTextHelp" inherits="CT_RAMenuHelpTemplateBuffs" parent="CT_RAMenuFrameBuffs" id="11">
+		<Anchors>
+			<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentDebuffsText">
+				<Offset>
+					<AbsDimension x="3" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>
+
+	<Button name="CT_RAMenuAdditionalEMHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameAdditionalEM" id="12"/>
+	<Button name="CT_RAMenuDebuffSettingsHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameDebuffSettings" id="13"/>
+	<Button name="CT_RAMenuDebuffClassesHelp" inherits="CT_RAMenuHelpTemplateSub" parent="CT_RAMenuFrameDebuffClasses" id="14"/>
+</Ui>

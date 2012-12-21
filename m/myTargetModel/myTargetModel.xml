@@ -1,0 +1,60 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/"> 
+
+<Button name="myTargetModelFrame" movable="true" parent="UIParent" hidden="false" frameStrata="LOW">
+	<Size>
+		<AbsDimension x="233" y="224"/>
+	</Size>
+	<Anchors>
+		<Anchor point="CENTER"/>
+	</Anchors>
+	<Frames>
+		<PlayerModel name="$parent_TargetModel" hidden="true">
+                <Size>
+                    <AbsDimension x="233" y="224"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="CENTER"/>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+					this:SetUnit("player");
+					this:RegisterEvent("DISPLAY_SIZE_CHANGED");
+					this:RegisterEvent("UNIT_MODEL_CHANGED");
+					this:RegisterEvent("PLAYER_TARGET_CHANGED");
+                    </OnLoad>
+				<OnEvent>
+					if (event == "DISPLAY_SIZE_CHANGED") then
+						this:RefreshUnit();
+					elseif (event == "PLAYER_TARGET_CHANGED") then
+						if (UnitExists("target")) then
+							this:SetUnit("target");
+							this:Show();
+						else
+							this:Hide();
+						end
+					else
+						this:SetUnit("target");
+					end
+				</OnEvent>
+			</Scripts>
+            </PlayerModel>
+	</Frames>
+	<Scripts>
+		<OnLoad>
+			this:RegisterForDrag("LeftButton", "RightButton");
+		</OnLoad>
+		<OnDragStart>
+			if( IsShiftKeyDown() ) then
+				this:StartMoving();
+			end
+		</OnDragStart>
+		<OnDragStop>
+			this:StopMovingOrSizing();
+		</OnDragStop>
+		<OnHide>
+			this:StopMovingOrSizing();
+		</OnHide>
+	</Scripts>
+</Button>
+
+</Ui>
