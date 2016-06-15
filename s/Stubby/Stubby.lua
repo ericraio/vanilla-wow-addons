@@ -173,7 +173,7 @@ local config = {
 	events = {},
 }
 
-StubbyConfig = {}
+local StubbyConfig = {}
 
 
 -- Function prototypes
